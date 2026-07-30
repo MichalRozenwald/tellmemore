@@ -16,13 +16,13 @@
 
 :root{
   /* ---- neutrals (dark surface system) ---- */
-  --bg:            #0D0F12;
-  --surface:       #15181D;
-  --surface-2:     #1B1F26;
-  --line:          #2B303A;
-  --ink:           #EDEFF2;
-  --ink-dim:       #A6ABB4;
-  --ink-faint:     #6E7480;
+  --bg:            #0B1310;
+  --surface:       #111C18;
+  --surface-2:     #16221D;
+  --line:          #24352E;
+  --ink:           #E9EEEA;
+  --ink-dim:       #A9B8B0;
+  --ink-faint:     #6E8079;
 
   /* ---- accessible accent palette (Okabe–Ito) ----
      use these for ANY chart, tag, diagram or comparison
@@ -74,7 +74,7 @@ a{ color:var(--blue); }
 /* ---------- NAV (shared header, reuse on every page) ---------- */
 header.nav{
   position:sticky; top:0; z-index:40;
-  background:rgba(13,15,18,0.86);
+  background:rgba(11,19,16,0.86);
   backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);
 }
@@ -97,13 +97,20 @@ header.nav{
 .nav-links a:hover{ color:var(--blue); }
 @media (max-width:640px){ .nav-links{ display:none; } }
 
-/* ---------- Cross-page banner link (e.g. "see the Day 35 data") ---------- */
+/* ---------- Cross-page banner nav (links to Day 35 / Day 6 / future timepoints) ---------- */
 .top-banner-link{
   position:fixed; top:0; left:0; width:100%; z-index:9999;
+  display:flex;
   background:linear-gradient(90deg, var(--blue-deep), var(--blue));
-  color:#06182A; text-align:center; text-decoration:none;
-  font-weight:700; font-size:16px; padding:14px 12px; box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  box-shadow:0 4px 14px rgba(0,0,0,0.25);
 }
+.top-banner-link a{
+  flex:1; text-align:center; text-decoration:none;
+  color:#06182A; font-weight:700; font-size:15px; padding:14px 12px;
+  transition:background .15s ease;
+}
+.top-banner-link a:not(:last-child){ border-right:1px solid rgba(6,24,42,0.25); }
+.top-banner-link a:hover{ background:rgba(255,255,255,0.12); }
 body.has-top-banner{ padding-top:56px; }
 
 /* ---------- Basic layout building blocks ---------- */
@@ -194,7 +201,7 @@ footer a{ color:var(--ink-dim); }
 .chat-fab:hover{ filter:brightness(1.05); }
 
 .drawer-overlay{
-  position:fixed; inset:0; background:rgba(9,10,12,0.55); z-index:70;
+  position:fixed; inset:0; background:rgba(5,10,8,0.55); z-index:70;
   opacity:0; pointer-events:none; transition:opacity .25s ease;
 }
 .drawer-overlay.open{ opacity:1; pointer-events:auto; }
