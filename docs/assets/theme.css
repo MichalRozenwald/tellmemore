@@ -1,0 +1,276 @@
+/* ============================================================
+   epicme.bio — shared theme
+   ------------------------------------------------------------
+   One file, linked from every page:
+     <link rel="stylesheet" href="assets/theme.css">
+
+   Palette is Okabe–Ito, a colorblind-safe set (safe for
+   protanopia, deuteranopia and tritanopia). Do not add ad-hoc
+   hex colors elsewhere for data/category meaning — reuse these
+   variables, and always pair color with a second cue (label,
+   icon, line style, position) rather than color alone.
+   See: https://jfly.uni-koeln.de/color/
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+:root{
+  /* ---- neutrals (dark surface system) ---- */
+  --bg:            #0D0F12;
+  --surface:       #15181D;
+  --surface-2:     #1B1F26;
+  --line:          #2B303A;
+  --ink:           #EDEFF2;
+  --ink-dim:       #A6ABB4;
+  --ink-faint:     #6E7480;
+
+  /* ---- accessible accent palette (Okabe–Ito) ----
+     use these for ANY chart, tag, diagram or comparison
+     where color needs to carry meaning */
+  --blue:          #56B4E9;   /* primary accent / CTA / "on", "unedited", "safe" state */
+  --blue-deep:     #0072B2;   /* darker companion to --blue, e.g. gradients, hover */
+  --blue-dim:      #56B4E933;
+  --orange:        #E69F00;   /* secondary accent / caution / "off", "CRISPRoff", flagged state */
+  --orange-dim:    #E69F0033;
+  --yellow:        #F0E442;   /* tertiary accent / highlight / strong positive signal */
+  --yellow-dim:    #F0E44233;
+
+  /* ---- legacy aliases (kept so existing markup keeps working) ----
+     teal -> blue, amber -> orange, crimson -> orange as well:
+     we deliberately do not add a 4th ad-hoc hue for "danger" —
+     use --orange plus an icon/label/pattern instead of a new red. */
+  --teal:          var(--blue);
+  --teal-dim:      var(--blue-deep);
+  --amber:         var(--orange);
+  --crimson:       var(--orange);
+
+  --radius: 14px;
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Source Serif 4', Georgia, serif;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3, .display, nav, button, .mono, .label{
+  font-family:'Space Grotesk', sans-serif;
+}
+code, .data, .genotype, .rsid{
+  font-family:'IBM Plex Mono', monospace;
+}
+a{ color:var(--blue); }
+.wrap{ max-width:920px; margin:0 auto; padding:0 24px; }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+}
+:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+
+/* ---------- NAV (shared header, reuse on every page) ---------- */
+header.nav{
+  position:sticky; top:0; z-index:40;
+  background:rgba(13,15,18,0.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{
+  max-width:920px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px;
+}
+.brand{ display:flex; align-items:baseline; gap:10px; }
+.brand-mark{
+  font-weight:700; font-size:15px; letter-spacing:0.02em;
+  color:var(--ink);
+  border:1px solid var(--blue-deep);
+  padding:3px 8px; border-radius:6px;
+  background:linear-gradient(180deg, rgba(86,180,233,0.14), transparent);
+}
+.brand-sub{ font-size:12.5px; color:var(--ink-faint); letter-spacing:0.03em; }
+.nav-links{ display:flex; gap:20px; font-size:13.5px; }
+.nav-links a{ color:var(--ink-dim); text-decoration:none; }
+.nav-links a:hover{ color:var(--blue); }
+@media (max-width:640px){ .nav-links{ display:none; } }
+
+/* ---------- Cross-page banner link (e.g. "see the Day 35 data") ---------- */
+.top-banner-link{
+  position:fixed; top:0; left:0; width:100%; z-index:9999;
+  background:linear-gradient(90deg, var(--blue-deep), var(--blue));
+  color:#06182A; text-align:center; text-decoration:none;
+  font-weight:700; font-size:16px; padding:14px 12px; box-shadow:0 4px 14px rgba(0,0,0,0.25);
+}
+body.has-top-banner{ padding-top:56px; }
+
+/* ---------- Basic layout building blocks ---------- */
+section{ padding:56px 0; border-top:1px solid var(--line); }
+.kicker{
+  font-size:12px; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--ink-faint); font-weight:600; margin-bottom:10px;
+}
+h2{ font-size:clamp(24px,3.4vw,32px); font-weight:600; margin:0 0 18px; letter-spacing:-0.01em; }
+p{ color:var(--ink-dim); margin:0 0 16px; font-size:16.5px; }
+p strong{ color:var(--ink); font-weight:600; }
+.lede{ font-size:18px; color:var(--ink); }
+
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:700px){ .grid2{ grid-template-columns:1fr; } }
+.card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:20px;
+}
+.card h3{ font-size:16px; margin:0 0 8px; }
+.card p{ font-size:14.5px; margin:0; }
+
+/* Tags: only two accent hues (blue / orange) by design — never rely on
+   the color alone, the tag's TEXT always names the category too. */
+.tag{
+  display:inline-block; font-size:11px; letter-spacing:0.05em; text-transform:uppercase;
+  padding:3px 8px; border-radius:5px; margin-bottom:10px; font-weight:600;
+}
+.tag.teal, .tag.blue{ background:var(--blue-dim); color:var(--blue); }
+.tag.amber, .tag.orange{ background:var(--orange-dim); color:var(--orange); }
+.tag.crimson{ background:var(--orange-dim); color:var(--orange); border:1px solid var(--orange); } /* bordered = distinct from plain amber even in grayscale */
+
+.domain-strip{ display:flex; gap:6px; margin:22px 0; flex-wrap:wrap; }
+.domain{
+  flex:1 1 90px; min-width:80px; background:var(--surface-2); border:1px solid var(--line);
+  border-radius:9px; padding:12px 10px; text-align:center;
+}
+.domain .n{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--blue); }
+.domain .t{ font-size:12.5px; color:var(--ink-dim); margin-top:2px; }
+
+.compare{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:8px; }
+@media (max-width:700px){ .compare{ grid-template-columns:1fr; } }
+.compare .card ul{ margin:8px 0 0; padding-left:18px; }
+.compare .card li{ font-size:14px; color:var(--ink-dim); margin-bottom:6px; }
+
+.disclaimer{
+  background:var(--orange-dim); border:1px solid var(--orange);
+  border-radius:10px; padding:14px 16px; font-size:13.5px; color:var(--ink-dim);
+  margin-top:24px;
+}
+.disclaimer strong{ color:var(--orange); }
+
+/* ---------- Buttons ---------- */
+.btn{
+  background:var(--blue); color:#06182A; border:none; border-radius:9px;
+  padding:11px 18px; font-weight:600; font-size:14px; cursor:pointer; font-family:'Space Grotesk',sans-serif;
+}
+.btn:hover{ filter:brightness(1.06); }
+.btn.ghost{ background:transparent; border:1px solid var(--line); color:var(--ink); }
+
+/* ---------- Explorer / form inputs (reusable) ---------- */
+.explorer{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:24px; }
+.explorer-row{ display:flex; gap:10px; flex-wrap:wrap; }
+.explorer input, .explorer textarea{
+  flex:1 1 260px; background:var(--surface-2); border:1px solid var(--line); color:var(--ink);
+  border-radius:9px; padding:11px 13px; font-family:'IBM Plex Mono',monospace; font-size:14px;
+  resize:vertical;
+}
+.explorer input:focus, .explorer textarea:focus{ outline:2px solid var(--blue); outline-offset:1px; }
+.result{ margin-top:18px; }
+.result-empty{ color:var(--ink-faint); font-size:14px; margin-top:14px; }
+.save-row{ display:flex; align-items:center; gap:8px; margin-top:10px; font-size:12.5px; color:var(--ink-faint); }
+
+/* ---------- Footer ---------- */
+footer{ padding:40px 0 80px; }
+footer .wrap{ font-size:13px; color:var(--ink-faint); }
+footer a{ color:var(--ink-dim); }
+
+/* ---------- Chat FAB + drawer (reusable widget) ---------- */
+.chat-fab{
+  position:fixed; right:22px; bottom:22px; z-index:60;
+  background:var(--blue); color:#06182A; border:none; border-radius:999px;
+  padding:14px 20px; font-weight:600; font-size:14px; cursor:pointer;
+  box-shadow:0 8px 24px rgba(86,180,233,0.28);
+  display:flex; align-items:center; gap:8px;
+  font-family:'Space Grotesk',sans-serif;
+}
+.chat-fab:hover{ filter:brightness(1.05); }
+
+.drawer-overlay{
+  position:fixed; inset:0; background:rgba(9,10,12,0.55); z-index:70;
+  opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+.drawer-overlay.open{ opacity:1; pointer-events:auto; }
+
+.drawer{
+  position:fixed; top:0; right:0; height:100%; width:420px; max-width:100vw;
+  background:var(--surface); border-left:1px solid var(--line);
+  z-index:80; display:flex; flex-direction:column;
+  transform:translateX(100%); transition:transform .3s ease;
+}
+.drawer.open{ transform:translateX(0); }
+.drawer-head{
+  padding:16px 18px; border-bottom:1px solid var(--line);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.drawer-head h3{ margin:0; font-size:15px; }
+.drawer-head .sub{ font-size:12px; color:var(--ink-faint); margin-top:2px; }
+.drawer-close{ background:none; border:none; color:var(--ink-dim); font-size:20px; cursor:pointer; line-height:1; }
+.drawer-body{ flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:14px; }
+.msg{ font-size:14.5px; line-height:1.55; }
+.msg.user{ align-self:flex-end; background:var(--blue-deep); color:#EFFAFF; padding:10px 13px; border-radius:12px 12px 2px 12px; max-width:88%; }
+.msg.assistant{ align-self:flex-start; color:var(--ink); padding:2px 0; max-width:100%; }
+.msg.assistant .who{ font-size:11px; color:var(--blue); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:4px; font-family:'Space Grotesk',sans-serif;}
+.msg.assistant p{ color:var(--ink); font-size:14.5px; margin:0 0 10px; }
+.msg.system-note{ align-self:center; font-size:12px; color:var(--ink-faint); font-style:italic; }
+.typing{ display:flex; gap:4px; align-self:flex-start; padding:4px 0; }
+.typing span{ width:6px; height:6px; border-radius:50%; background:var(--ink-faint); animation:blink 1.2s infinite ease-in-out; }
+.typing span:nth-child(2){ animation-delay:.2s; }
+.typing span:nth-child(3){ animation-delay:.4s; }
+@keyframes blink{ 0%,80%,100%{opacity:.25;} 40%{opacity:1;} }
+
+.drawer-suggest{ display:flex; flex-wrap:wrap; gap:6px; padding:0 18px 12px; }
+.chip{
+  font-size:12px; border:1px solid var(--line); color:var(--ink-dim); background:var(--surface-2);
+  padding:6px 10px; border-radius:999px; cursor:pointer;
+}
+.chip:hover{ border-color:var(--blue-deep); color:var(--blue); }
+
+.drawer-input{ border-top:1px solid var(--line); padding:12px 14px; display:flex; gap:8px; }
+.drawer-input textarea{
+  flex:1; resize:none; background:var(--surface-2); border:1px solid var(--line); color:var(--ink);
+  border-radius:9px; padding:10px 12px; font-family:'Source Serif 4',serif; font-size:14px; max-height:100px;
+}
+.drawer-input textarea:focus{ outline:2px solid var(--blue); outline-offset:1px; }
+.send-btn{
+  background:var(--blue); color:#06182A; border:none; border-radius:9px; padding:0 16px;
+  font-weight:600; cursor:pointer; font-family:'Space Grotesk',sans-serif;
+}
+.send-btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+@media (max-width:520px){
+  .drawer{ width:100vw; }
+}
+
+/* ---------- Citations / references (reusable) ---------- */
+.cite{
+  font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--blue);
+  text-decoration:none; padding:0 1px; vertical-align:super; line-height:0;
+}
+.cite:hover{ text-decoration:underline; }
+
+#references{ scroll-margin-top:80px; }
+.ref-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; }
+.ref-item{
+  display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--line);
+  scroll-margin-top:80px;
+}
+.ref-item:target{ background:var(--blue-dim); border-radius:8px; }
+.ref-num{
+  font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--blue-deep);
+  min-width:28px; flex-shrink:0;
+}
+.ref-body h4{ margin:0 0 4px; font-size:14.5px; font-weight:600; color:var(--ink); }
+.ref-body .ref-meta{ font-size:12.5px; color:var(--ink-faint); margin-bottom:6px; }
+.ref-body .ref-meta a{ color:var(--ink-dim); word-break:break-all; }
+.ref-quote{
+  font-size:13px; color:var(--ink-dim); font-style:italic; border-left:2px solid var(--blue-deep);
+  padding-left:10px; margin:6px 0 0;
+}

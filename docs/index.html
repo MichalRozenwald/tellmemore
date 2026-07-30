@@ -4,89 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CD55 / DAF — молекулярный разбор гена</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
 <style>
-  :root{
-    --bg: #0B1310;
-    --surface: #111C18;
-    --surface-2: #16221D;
-    --line: #24352E;
-    --ink: #E9EEEA;
-    --ink-dim: #A9B8B0;
-    --ink-faint: #6E8079;
-    --teal: #46E0B4;
-    --teal-dim: #2A6B57;
-    --amber: #F2A93B;
-    --crimson: #E4574C;
-    --radius: 14px;
-  }
-  *{ box-sizing:border-box; }
-  html{ scroll-behavior:smooth; }
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Source Serif 4', Georgia, serif;
-    line-height:1.65;
-    -webkit-font-smoothing:antialiased;
-  }
-  h1,h2,h3, .display, nav, button, .mono, .label{
-    font-family:'Space Grotesk', sans-serif;
-  }
-  code, .data, .genotype, .rsid{
-    font-family:'IBM Plex Mono', monospace;
-  }
-  a{ color:var(--teal); }
-  .wrap{ max-width:920px; margin:0 auto; padding:0 24px; }
-
-  /* ---------- NAV ---------- */
-  header.nav{
-    position:sticky; top:0; z-index:40;
-    background:rgba(11,19,16,0.86);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);
-  }
-  .nav-inner{
-    max-width:920px; margin:0 auto; padding:14px 24px;
-    display:flex; align-items:center; justify-content:space-between;
-    gap:16px;
-  }
-  .brand{ display:flex; align-items:baseline; gap:10px; }
-  .brand-mark{
-    font-weight:700; font-size:15px; letter-spacing:0.02em;
-    color:var(--ink);
-    border:1px solid var(--teal-dim);
-    padding:3px 8px; border-radius:6px;
-    background:linear-gradient(180deg, rgba(70,224,180,0.10), transparent);
-  }
-  .brand-sub{ font-size:12.5px; color:var(--ink-faint); letter-spacing:0.03em; }
-  .nav-links{ display:flex; gap:20px; font-size:13.5px; }
-  .nav-links a{ color:var(--ink-dim); text-decoration:none; }
-  .nav-links a:hover{ color:var(--teal); }
-  @media (max-width:640px){ .nav-links{ display:none; } }
+  /* Page-specific styles for the CD55 explorer only.
+     Shared palette, typography, nav, footer, cards, tags, chat widget,
+     buttons and references all live in assets/theme.css — reuse those
+     classes on new pages instead of redefining colors here. */
 
   /* ---------- HERO ---------- */
   .hero{ padding:64px 0 40px; }
   .eyebrow{
     font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
-    color:var(--teal); font-weight:600; margin-bottom:16px;
+    color:var(--blue); font-weight:600; margin-bottom:16px;
     display:flex; align-items:center; gap:10px;
   }
   .eyebrow::before{
-    content:''; width:22px; height:1px; background:var(--teal-dim);
+    content:''; width:22px; height:1px; background:var(--blue-deep);
   }
   h1.display{
     font-size:clamp(34px, 6vw, 56px);
     font-weight:600; line-height:1.06; letter-spacing:-0.01em;
     margin:0 0 20px;
   }
-  h1.display em{ font-style:normal; color:var(--teal); }
+  h1.display em{ font-style:normal; color:var(--blue); }
   .hero-sub{
     font-size:18px; color:var(--ink-dim); max-width:640px; margin:0 0 36px;
   }
 
-  /* ---------- CASCADE DIAGRAM (signature element) ---------- */
+  /* ---------- CASCADE DIAGRAM (signature element, this page only) ---------- */
   .cascade-card{
     background:var(--surface);
     border:1px solid var(--line);
@@ -107,196 +52,18 @@
     font-size:13px; padding:7px 14px; border-radius:999px; cursor:pointer;
     font-weight:500; transition:all .2s ease;
   }
-  .toggle button.active{ background:var(--teal); color:#06231A; }
+  .toggle button.active{ background:var(--blue); color:#06182A; }
   .cascade-svg-wrap{ width:100%; overflow:hidden; border-radius:10px; }
   .cascade-caption{
     font-size:14px; color:var(--ink-dim); margin-top:12px; min-height:42px;
   }
   .cascade-caption strong{ color:var(--ink); }
-
-  /* ---------- SECTIONS ---------- */
-  section{ padding:56px 0; border-top:1px solid var(--line); }
-  .kicker{
-    font-size:12px; letter-spacing:0.12em; text-transform:uppercase;
-    color:var(--ink-faint); font-weight:600; margin-bottom:10px;
-  }
-  h2{ font-size:clamp(24px,3.4vw,32px); font-weight:600; margin:0 0 18px; letter-spacing:-0.01em; }
-  p{ color:var(--ink-dim); margin:0 0 16px; font-size:16.5px; }
-  p strong{ color:var(--ink); font-weight:600; }
-  .lede{ font-size:18px; color:var(--ink); }
-
-  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-  @media (max-width:700px){ .grid2{ grid-template-columns:1fr; } }
-  .card{
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-    padding:20px;
-  }
-  .card h3{ font-size:16px; margin:0 0 8px; }
-  .card p{ font-size:14.5px; margin:0; }
-  .tag{
-    display:inline-block; font-size:11px; letter-spacing:0.05em; text-transform:uppercase;
-    padding:3px 8px; border-radius:5px; margin-bottom:10px; font-weight:600;
-  }
-  .tag.teal{ background:rgba(70,224,180,0.12); color:var(--teal); }
-  .tag.amber{ background:rgba(242,169,59,0.14); color:var(--amber); }
-  .tag.crimson{ background:rgba(228,87,76,0.14); color:var(--crimson); }
-
-  .domain-strip{ display:flex; gap:6px; margin:22px 0; flex-wrap:wrap; }
-  .domain{
-    flex:1 1 90px; min-width:80px; background:var(--surface-2); border:1px solid var(--line);
-    border-radius:9px; padding:12px 10px; text-align:center;
-  }
-  .domain .n{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--teal); }
-  .domain .t{ font-size:12.5px; color:var(--ink-dim); margin-top:2px; }
-
-  .compare{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:8px; }
-  @media (max-width:700px){ .compare{ grid-template-columns:1fr; } }
-  .compare .card ul{ margin:8px 0 0; padding-left:18px; }
-  .compare .card li{ font-size:14px; color:var(--ink-dim); margin-bottom:6px; }
-
-  .disclaimer{
-    background:rgba(228,87,76,0.07); border:1px solid rgba(228,87,76,0.35);
-    border-radius:10px; padding:14px 16px; font-size:13.5px; color:var(--ink-dim);
-    margin-top:24px;
-  }
-  .disclaimer strong{ color:var(--crimson); }
-
-  /* ---------- VARIANT EXPLORER ---------- */
-  .explorer{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:24px; }
-  .explorer-row{ display:flex; gap:10px; flex-wrap:wrap; }
-  .explorer input, .explorer textarea{
-    flex:1 1 260px; background:var(--surface-2); border:1px solid var(--line); color:var(--ink);
-    border-radius:9px; padding:11px 13px; font-family:'IBM Plex Mono',monospace; font-size:14px;
-    resize:vertical;
-  }
-  .explorer input:focus, .explorer textarea:focus{ outline:2px solid var(--teal); outline-offset:1px; }
-  .btn{
-    background:var(--teal); color:#06231A; border:none; border-radius:9px;
-    padding:11px 18px; font-weight:600; font-size:14px; cursor:pointer; font-family:'Space Grotesk',sans-serif;
-  }
-  .btn:hover{ filter:brightness(1.06); }
-  .btn.ghost{ background:transparent; border:1px solid var(--line); color:var(--ink); }
-  .result{ margin-top:18px; }
-  .result-empty{ color:var(--ink-faint); font-size:14px; margin-top:14px; }
-  .save-row{ display:flex; align-items:center; gap:8px; margin-top:10px; font-size:12.5px; color:var(--ink-faint); }
-
-  /* ---------- FOOTER ---------- */
-  footer{ padding:40px 0 80px; }
-  footer .wrap{ font-size:13px; color:var(--ink-faint); }
-
-  /* ---------- CHAT FAB + DRAWER ---------- */
-  .chat-fab{
-    position:fixed; right:22px; bottom:22px; z-index:60;
-    background:var(--teal); color:#06231A; border:none; border-radius:999px;
-    padding:14px 20px; font-weight:600; font-size:14px; cursor:pointer;
-    box-shadow:0 8px 24px rgba(70,224,180,0.28);
-    display:flex; align-items:center; gap:8px;
-    font-family:'Space Grotesk',sans-serif;
-  }
-  .chat-fab:hover{ filter:brightness(1.05); }
-
-  .drawer-overlay{
-    position:fixed; inset:0; background:rgba(5,10,8,0.55); z-index:70;
-    opacity:0; pointer-events:none; transition:opacity .25s ease;
-  }
-  .drawer-overlay.open{ opacity:1; pointer-events:auto; }
-
-  .drawer{
-    position:fixed; top:0; right:0; height:100%; width:420px; max-width:100vw;
-    background:var(--surface); border-left:1px solid var(--line);
-    z-index:80; display:flex; flex-direction:column;
-    transform:translateX(100%); transition:transform .3s ease;
-  }
-  .drawer.open{ transform:translateX(0); }
-  .drawer-head{
-    padding:16px 18px; border-bottom:1px solid var(--line);
-    display:flex; align-items:center; justify-content:space-between;
-  }
-  .drawer-head h3{ margin:0; font-size:15px; }
-  .drawer-head .sub{ font-size:12px; color:var(--ink-faint); margin-top:2px; }
-  .drawer-close{ background:none; border:none; color:var(--ink-dim); font-size:20px; cursor:pointer; line-height:1; }
-  .drawer-body{ flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:14px; }
-  .msg{ font-size:14.5px; line-height:1.55; }
-  .msg.user{ align-self:flex-end; background:var(--teal-dim); color:#EFFFFA; padding:10px 13px; border-radius:12px 12px 2px 12px; max-width:88%; }
-  .msg.assistant{ align-self:flex-start; color:var(--ink); padding:2px 0; max-width:100%; }
-  .msg.assistant .who{ font-size:11px; color:var(--teal); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:4px; font-family:'Space Grotesk',sans-serif;}
-  .msg.assistant p{ color:var(--ink); font-size:14.5px; margin:0 0 10px; }
-  .msg.system-note{ align-self:center; font-size:12px; color:var(--ink-faint); font-style:italic; }
-  .typing{ display:flex; gap:4px; align-self:flex-start; padding:4px 0; }
-  .typing span{ width:6px; height:6px; border-radius:50%; background:var(--ink-faint); animation:blink 1.2s infinite ease-in-out; }
-  .typing span:nth-child(2){ animation-delay:.2s; }
-  .typing span:nth-child(3){ animation-delay:.4s; }
-  @keyframes blink{ 0%,80%,100%{opacity:.25;} 40%{opacity:1;} }
-
-  .drawer-suggest{ display:flex; flex-wrap:wrap; gap:6px; padding:0 18px 12px; }
-  .chip{
-    font-size:12px; border:1px solid var(--line); color:var(--ink-dim); background:var(--surface-2);
-    padding:6px 10px; border-radius:999px; cursor:pointer;
-  }
-  .chip:hover{ border-color:var(--teal-dim); color:var(--teal); }
-
-  .drawer-input{ border-top:1px solid var(--line); padding:12px 14px; display:flex; gap:8px; }
-  .drawer-input textarea{
-    flex:1; resize:none; background:var(--surface-2); border:1px solid var(--line); color:var(--ink);
-    border-radius:9px; padding:10px 12px; font-family:'Source Serif 4',serif; font-size:14px; max-height:100px;
-  }
-  .drawer-input textarea:focus{ outline:2px solid var(--teal); outline-offset:1px; }
-  .send-btn{
-    background:var(--teal); color:#06231A; border:none; border-radius:9px; padding:0 16px;
-    font-weight:600; cursor:pointer; font-family:'Space Grotesk',sans-serif;
-  }
-  .send-btn:disabled{ opacity:.5; cursor:not-allowed; }
-
-  @media (max-width:520px){
-    .drawer{ width:100vw; }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
-  }
-
-  :focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
-
-  /* ---------- CITATIONS ---------- */
-  .cite{
-    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--teal);
-    text-decoration:none; padding:0 1px; vertical-align:super; line-height:0;
-  }
-  .cite:hover{ text-decoration:underline; }
-
-  #references{ scroll-margin-top:80px; }
-  .ref-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; }
-  .ref-item{
-    display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--line);
-    scroll-margin-top:80px;
-  }
-  .ref-item:target{ background:rgba(70,224,180,0.06); border-radius:8px; }
-  .ref-num{
-    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--teal-dim);
-    min-width:28px; flex-shrink:0;
-  }
-  .ref-body h4{ margin:0 0 4px; font-size:14.5px; font-weight:600; color:var(--ink); }
-  .ref-body .ref-meta{ font-size:12.5px; color:var(--ink-faint); margin-bottom:6px; }
-  .ref-body .ref-meta a{ color:var(--ink-dim); word-break:break-all; }
-  .ref-quote{
-    font-size:13px; color:var(--ink-dim); font-style:italic; border-left:2px solid var(--teal-dim);
-    padding-left:10px; margin:6px 0 0;
-  }
-    /* Top banner link for Day 35 data & analysis */
-    .top-banner-link{
-      position:fixed; top:0; left:0; width:100%; z-index:9999;
-      background:linear-gradient(90deg, #0d9488, #06b6d4);
-      color:#fff; text-align:center; text-decoration:none;
-      font-weight:700; font-size:20px; padding:16px 12px; box-shadow:0 4px 14px rgba(0,0,0,0.15);
-    }
-    /* push page content below the fixed banner */
-    body{ padding-top:64px; }
 </style>
 </head>
-<body>
+<body class="has-top-banner">
 
   <!-- Adding link to the Day 35 analysis page -->
-  <a href="day35.html">Day 35: Unedited vs CRISPRoff methylation →</a>
+  <a class="top-banner-link" href="day35.html">Day 35: Unedited vs CRISPRoff methylation →</a>
   
 
 <header class="nav">
@@ -352,11 +119,6 @@
     <p style="font-size:14px;">Белок массой около 70 кДа состоит из четырёх повторов CCP (complement control protein, «sushi domains»), богатого серином/треонином стебля и заканчивается не трансмембранным доменом, а GPI-якорем — молекулой, которая встраивает CD55 прямо в липидный слой мембраны. Именно поэтому CD55 (как и CD59) исчезает с поверхности клеток при болезнях, нарушающих синтез GPI-якорей.<a href="#ref-3" class="cite">[3]</a><a href="#ref-4" class="cite">[4]</a></p>
     <p style="font-size:14px;">Помимо блокировки комплемента, CD55 участвует и в регуляции адаптивного иммунитета: в опытах на мышах отсутствие аналога гена (Daf1) заметно усиливало T-клеточный ответ на иммунизацию, что говорит о дополнительной сдерживающей роли CD55 для T-лимфоцитов.<a href="#ref-16" class="cite">[16]</a></p>
   </section>
-
-
-  <!-- Adding link to the Day 35 analysis page -->
-  <a href="day35.html">Day 35: Unedited vs CRISPRoff methylation →</a>
-  
 
   <section id="biology">
     <div class="kicker">Биология</div>
@@ -635,43 +397,43 @@
 /* ---------------- Cascade diagram ---------------- */
 const svgOff = `
 <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="150" width="640" height="14" fill="#1B2A24"/>
-  <rect x="0" y="164" width="640" height="6" fill="#24352E"/>
+  <rect x="0" y="150" width="640" height="14" fill="#1B1F26"/>
+  <rect x="0" y="164" width="640" height="6" fill="#2B303A"/>
   <g id="conv-off">
-    <rect x="260" y="108" width="42" height="42" rx="8" fill="#E4574C" opacity="0.9"/>
-    <rect x="300" y="118" width="30" height="26" rx="6" fill="#F2A93B" opacity="0.9"/>
-    <text x="281" y="133" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#0B1310">C4b2a</text>
+    <rect x="260" y="108" width="42" height="42" rx="8" fill="#E69F00" opacity="0.9"/>
+    <rect x="300" y="118" width="30" height="26" rx="6" fill="#F0E442" opacity="0.9"/>
+    <text x="281" y="133" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#0D0F12">C4b2a</text>
   </g>
   <g id="pulse-off">
-    <circle cx="360" cy="70" r="5" fill="#E4574C"><animate attributeName="cy" values="150;40" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" repeatCount="indefinite"/></circle>
-    <circle cx="380" cy="70" r="5" fill="#E4574C"><animate attributeName="cy" values="150;30" dur="1.6s" begin="0.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" begin="0.4s" repeatCount="indefinite"/></circle>
-    <circle cx="400" cy="70" r="5" fill="#E4574C"><animate attributeName="cy" values="150;50" dur="1.6s" begin="0.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" begin="0.8s" repeatCount="indefinite"/></circle>
+    <circle cx="360" cy="70" r="5" fill="#E69F00"><animate attributeName="cy" values="150;40" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" repeatCount="indefinite"/></circle>
+    <circle cx="380" cy="70" r="5" fill="#E69F00"><animate attributeName="cy" values="150;30" dur="1.6s" begin="0.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" begin="0.4s" repeatCount="indefinite"/></circle>
+    <circle cx="400" cy="70" r="5" fill="#E69F00"><animate attributeName="cy" values="150;50" dur="1.6s" begin="0.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" begin="0.8s" repeatCount="indefinite"/></circle>
   </g>
   <g transform="translate(430,20)">
-    <circle cx="30" cy="30" r="26" fill="none" stroke="#E4574C" stroke-width="3" stroke-dasharray="5 4"/>
-    <text x="30" y="35" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#E4574C" font-weight="600">MAC</text>
+    <circle cx="30" cy="30" r="26" fill="none" stroke="#E69F00" stroke-width="3" stroke-dasharray="5 4"/>
+    <text x="30" y="35" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#E69F00" font-weight="600">MAC</text>
   </g>
-  <text x="20" y="30" font-family="Space Grotesk" font-size="13" fill="#A9B8B0">Мембрана клетки</text>
+  <text x="20" y="30" font-family="Space Grotesk" font-size="13" fill="#A6ABB4">Мембрана клетки</text>
 </svg>`;
 
 const svgOn = `
 <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="150" width="640" height="14" fill="#1B2A24"/>
-  <rect x="0" y="164" width="640" height="6" fill="#24352E"/>
+  <rect x="0" y="150" width="640" height="14" fill="#1B1F26"/>
+  <rect x="0" y="164" width="640" height="6" fill="#2B303A"/>
   <g>
-    <rect x="260" y="122" width="42" height="28" rx="8" fill="#E4574C" opacity="0.35"/>
-    <rect x="300" y="128" width="30" height="18" rx="6" fill="#F2A93B" opacity="0.35"/>
+    <rect x="260" y="122" width="42" height="28" rx="8" fill="#E69F00" opacity="0.35"/>
+    <rect x="300" y="128" width="30" height="18" rx="6" fill="#F0E442" opacity="0.35"/>
   </g>
   <g>
-    <circle cx="330" cy="110" r="20" fill="#0B1310" stroke="#46E0B4" stroke-width="3"/>
-    <text x="330" y="114" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#46E0B4" font-weight="700">DAF</text>
+    <circle cx="330" cy="110" r="20" fill="#0D0F12" stroke="#56B4E9" stroke-width="3"/>
+    <text x="330" y="114" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#56B4E9" font-weight="700">DAF</text>
   </g>
   <g>
-    <line x1="270" y1="130" x2="235" y2="90" stroke="#46E0B4" stroke-width="2" opacity="0.8"><animate attributeName="opacity" values="0;1;0" dur="1.8s" repeatCount="indefinite"/></line>
-    <line x1="300" y1="130" x2="250" y2="60" stroke="#46E0B4" stroke-width="2" opacity="0.6"><animate attributeName="opacity" values="0;1;0" dur="1.8s" begin=".3s" repeatCount="indefinite"/></line>
+    <line x1="270" y1="130" x2="235" y2="90" stroke="#56B4E9" stroke-width="2" opacity="0.8"><animate attributeName="opacity" values="0;1;0" dur="1.8s" repeatCount="indefinite"/></line>
+    <line x1="300" y1="130" x2="250" y2="60" stroke="#56B4E9" stroke-width="2" opacity="0.6"><animate attributeName="opacity" values="0;1;0" dur="1.8s" begin=".3s" repeatCount="indefinite"/></line>
   </g>
-  <text x="380" y="70" font-family="Space Grotesk" font-size="12" fill="#46E0B4">каскад разобран</text>
-  <text x="20" y="30" font-family="Space Grotesk" font-size="13" fill="#A9B8B0">Мембрана клетки</text>
+  <text x="380" y="70" font-family="Space Grotesk" font-size="12" fill="#56B4E9">каскад разобран</text>
+  <text x="20" y="30" font-family="Space Grotesk" font-size="13" fill="#A6ABB4">Мембрана клетки</text>
 </svg>`;
 
 const cascadeEl = document.getElementById('cascade-svg');
