@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 35 vs Day 6 &mdash; CD55 methylation across timepoints | epicme.bio</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Palette pulled from assets/theme.css (--blue/--orange/--yellow/--blue-deep, the
+     Okabe–Ito colorblind-safe set) so this page shares one source of truth for color
+     with day35.html / day6.html / index.html. This page adds one more pair from the
+     same family — vermillion + the existing --blue-deep — used ONLY to encode
+     "which timepoint" (Day 35 vs Day 6), so it's never confused with the
+     Unedited/CRISPRoff (blue/orange) encoding used everywhere else on the site. */
+  :root{
+    --panel:#10151d;
+    --panel2:#141a24;
+    --border:#212a38;
+    --text:#dfe7f3;
+    --muted:#7c869a;
+    --muted2:#4d5666;
+    --unedited:var(--blue);
+    --crispr:var(--orange);
+    --amber:var(--orange);
+    --radius:10px;
+
+    --vermillion: #D55E00;      /* Day 35, this page only */
+    --vermillion-dark: #753300; /* darker shade, for "check overfit" flags */
+    --day6-dark: #003E61;       /* darker shade of --blue-deep, for "check overfit" flags */
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #12203099, transparent),
+      radial-gradient(900px 500px at 100% 0%, #2a132199, transparent),
+      var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--unedited);}
+  .wrap{max-width:1180px;margin:0 auto;padding:56px 24px 100px;}
+  .backlink{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--muted);text-decoration:none;font-size:13px;
+    font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;
+    margin-bottom:28px;
+  }
+  .backlink:hover{color:var(--text);}
+  header h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(30px,4.2vw,48px);
+    line-height:1.1;
+    margin:0 0 14px;
+    letter-spacing:-0.01em;
+  }
+  header h1 em{font-style:italic;font-weight:400;color:var(--muted);}
+  header .lede{
+    color:var(--muted);
+    font-size:16px;
+    max-width:720px;
+    margin:0 0 18px;
+  }
+  .region-chip{
+    display:inline-flex;gap:10px;align-items:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;color:var(--muted);
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:7px 14px;
+    margin-bottom:14px;
+  }
+  .region-chip b{color:var(--text);font-weight:500;}
+
+  .page-links{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+  .page-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-decoration:none;
+    background:var(--panel2);border:1px solid var(--border);border-radius:999px;
+    padding:7px 14px;color:var(--text);
+  }
+  .page-pill:hover{border-color:var(--unedited);}
+
+  .note{
+    margin:36px 0 44px;
+    background:linear-gradient(180deg, #1a140a, var(--panel));
+    border:1px solid #3a2c14;
+    border-left:3px solid var(--amber);
+    border-radius:var(--radius);
+    padding:22px 26px;
+  }
+  .note .note-title{
+    display:flex;align-items:center;gap:9px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--amber);margin-bottom:10px;font-weight:600;
+  }
+  .note p{margin:0 0 12px;color:#c9d2e0;font-size:14.5px;}
+  .note p:last-child{margin-bottom:0;}
+
+  h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:22px;
+    margin:0 0 6px;
+  }
+  h3{font-family:'Fraunces', serif; font-weight:600; font-size:16px; margin:26px 0 8px;}
+  .section-lede{color:var(--muted);font-size:14px;margin:0 0 22px;max-width:680px;}
+  section{margin-bottom:64px;}
+  section p{color:#c9d2e0;font-size:14.5px;max-width:700px;}
+
+  .reveal-section{
+    opacity:0; transform:translateY(18px);
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .reveal-section.is-visible{ opacity:1; transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce){ .reveal-section{ transition:none; } }
+
+  .chart-row{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media(max-width:820px){.chart-row{grid-template-columns:1fr;}}
+  .chart-panel{
+    background:var(--panel);border:1px solid var(--border);
+    border-radius:var(--radius);padding:18px 20px 10px;
+  }
+  .chart-panel .chart-title{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;
+  }
+  .legend{display:flex;gap:16px;margin:10px 0 4px;flex-wrap:wrap;}
+  .legend span{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12.5px;color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .legend .sw{width:14px;height:3px;border-radius:2px;}
+  .legend .sw.dashed{
+    background-image:repeating-linear-gradient(90deg,currentColor,currentColor 3px,transparent 3px,transparent 5px);
+    background-color:transparent !important;
+  }
+  .legend .sq{width:10px;height:10px;border-radius:2px;}
+
+  .caveat{ color:var(--muted); font-size:13.5px; margin-top:14px; max-width:700px; }
+
+  footer{
+    border-top:1px solid var(--border);
+    padding-top:24px;margin-top:20px;
+    color:var(--muted2);font-size:12.5px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  footer a{color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">&larr; back to epicme.bio explorer</a>
+
+  <header>
+    <div class="region-chip">chr1:206,583,354&ndash;206,589,854 &nbsp;&middot;&nbsp; <b>CD55</b> promoter/ROI &nbsp;&middot;&nbsp; 137 CpG sites</div>
+    <h1>Day 35 <em>vs</em> Day 6<br>Two timepoints, two donors, one silencing target</h1>
+    <p class="lede">A side-by-side comparison of every dataset on this site so far: Unedited vs CRISPRoff-silenced
+    T&nbsp;cells, at both confidence thresholds, read out either 6 or 35 days after electroporation. <b>Day 35 and
+    Day 6 are two different donors</b> &mdash; not the same person at two timepoints &mdash; so every difference
+    below could reflect time since editing, donor-to-donor biology, or both at once. That caveat applies to
+    everything on this page and is discussed in full at the bottom.</p>
+    <div class="page-links">
+      <a class="page-pill" href="day35.html">Full Day 35 page &rarr;</a>
+      <a class="page-pill" href="day6.html">Full Day 6 page &rarr;</a>
+    </div>
+  </header>
+
+  <div class="note">
+    <div class="note-title">&#9888; what "Day 35 vs Day 6" can and can&rsquo;t tell you</div>
+    <p>This page puts two independent experiments next to each other. They share a pipeline (same CD55 region,
+    same 137 CpG window, same Nanopore/methylation-calling approach, same CRISPRoff reagent) but <b>not the same
+    donor</b>. Any gap you see between the Day 35 and Day 6 lines/bars below is consistent with several different
+    explanations: silencing changing over time since electroporation, this being a different person's cells, or
+    some mix of both. Nothing here can separate those apart &mdash; that would need the same donor sampled at
+    multiple timepoints, which isn&rsquo;t yet part of this dataset.</p>
+  </div>
+
+  <section id="sizes" class="reveal-section">
+    <h2>How many molecules are we comparing?</h2>
+    <p class="section-lede">Day 6 has substantially more sequenced molecules per group than Day 35 across the
+    board &mdash; several times more at both thresholds. Keep this in mind when comparing precision between the
+    two timepoints: bigger samples generally give steadier estimates.</p>
+    <div class="chart-row">
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.7 &middot; molecules per group</div>
+        <svg id="sizesChart07" viewBox="0 0 560 260" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.995 &middot; molecules per group</div>
+        <svg id="sizesChart0995" viewBox="0 0 560 260" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--vermillion)"></i>Day 35</span>
+      <span><i class="sw" style="background:var(--blue-deep)"></i>Day 6</span>
+    </div>
+  </section>
+
+  <section id="overall" class="reveal-section">
+    <h2>Overall methylation, Day 35 vs Day 6</h2>
+    <p class="section-lede">Percent of all CpG&times;molecule positions called confidently methylated (see each
+    timepoint's own page for why this is a floor estimate, not a precise frequency). Same group, same threshold,
+    different donor and timepoint, side by side.</p>
+    <div class="chart-row">
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.7 &middot; % methylated (floor estimate)</div>
+        <svg id="overallChart07" viewBox="0 0 560 260" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.995 &middot; % methylated (floor estimate)</div>
+        <svg id="overallChart0995" viewBox="0 0 560 260" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--vermillion)"></i>Day 35</span>
+      <span><i class="sw" style="background:var(--blue-deep)"></i>Day 6</span>
+    </div>
+  </section>
+
+  <section id="profile" class="reveal-section">
+    <h2>Methylation across the 137 CpG sites, both timepoints overlaid</h2>
+    <p class="section-lede">Same idea as each timepoint's own per-site chart, but now with all four lines on one
+    plot: colour still marks Unedited vs CRISPRoff, and line style now marks the timepoint (solid = Day 35, dashed
+    = Day 6). Where the CRISPRoff line separates from Unedited &mdash; and whether that gap looks similar in
+    solid and dashed &mdash; is the most direct visual read of how consistent the silencing signature is across
+    donor and timepoint.</p>
+    <div class="chart-row">
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.7</div>
+        <svg id="profileChart07" viewBox="0 0 560 240" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.995</div>
+        <svg id="profileChart0995" viewBox="0 0 560 240" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--unedited)"></i>Unedited &middot; Day 35 (solid)</span>
+      <span><i class="sw dashed" style="color:var(--unedited)"></i>Unedited &middot; Day 6 (dashed)</span>
+      <span><i class="sw" style="background:var(--crispr)"></i>CRISPRoff &middot; Day 35 (solid)</span>
+      <span><i class="sw dashed" style="color:var(--crispr)"></i>CRISPRoff &middot; Day 6 (dashed)</span>
+    </div>
+  </section>
+
+  <section id="delta" class="reveal-section">
+    <h2>The CRISPRoff effect itself, Day 35 vs Day 6</h2>
+    <p class="section-lede">Subtracting Unedited from CRISPRoff at every site isolates the silencing signature from
+    each donor's baseline methylation. If this line has a similar shape at both timepoints, that's evidence the
+    silencing pattern itself (which sites gain methylation, and roughly how much) is reproducible across donor and
+    time &mdash; even if the two donors' raw methylation levels differ.</p>
+    <div class="chart-row">
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.7 &middot; &Delta; = CRISPRoff &minus; Unedited</div>
+        <svg id="deltaChart07" viewBox="0 0 560 240" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.995 &middot; &Delta; = CRISPRoff &minus; Unedited</div>
+        <svg id="deltaChart0995" viewBox="0 0 560 240" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--vermillion)"></i>Day 35</span>
+      <span><i class="sw" style="background:var(--blue-deep)"></i>Day 6</span>
+    </div>
+  </section>
+
+  <section id="correlation" class="reveal-section">
+    <h2>How reproducible is the per-site profile across donor &amp; timepoint?</h2>
+    <p class="section-lede">Each point is one of the 137 CpG sites: x = its methylation fraction at Day 35, y = its
+    methylation fraction at Day 6. Points hugging the dashed diagonal (y&nbsp;=&nbsp;x) mean that site behaves the
+    same way in both datasets. Pearson r is shown per group &mdash; closer to 1 means tighter agreement.</p>
+    <div class="chart-row">
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.7 &middot; Day 35 (x) vs Day 6 (y)</div>
+        <svg id="corrChart07" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.995 &middot; Day 35 (x) vs Day 6 (y)</div>
+        <svg id="corrChart0995" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="sq" style="background:var(--unedited)"></i>Unedited sites</span>
+      <span><i class="sq" style="background:var(--crispr)"></i>CRISPRoff sites</span>
+    </div>
+    <p class="caveat">A quick read on the numbers once they render: Unedited baseline methylation tends to
+    correlate more tightly across donor/timepoint than the CRISPRoff pattern does &mdash; consistent with a stable
+    endogenous methylation landscape at this locus, and a silencing response that varies somewhat more in degree
+    or kinetics from one donor/timepoint to the next.</p>
+  </section>
+
+  <section id="ml-compare" class="reveal-section">
+    <h2>Do the six ML models agree across timepoints?</h2>
+    <p class="section-lede">The same six model types from each timepoint's own page (see those pages for what
+    each one actually does), now plotted side by side. Bars are coloured by timepoint; the dashed 50% line marks
+    chance level for this balanced two-class problem.</p>
+    <div class="chart-row">
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.7 &middot; held-out test accuracy</div>
+        <svg id="mlCompare07" viewBox="0 0 640 320" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title">threshold 0.995 &middot; held-out test accuracy</div>
+        <svg id="mlCompare0995" viewBox="0 0 640 320" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--vermillion)"></i>Day 35 &middot; test set &asymp;84 (0.7) / &asymp;39 (0.995) molecules</span>
+      <span><i class="sw" style="background:var(--blue-deep)"></i>Day 6 &middot; test set &asymp;221 (0.7) / &asymp;270 (0.995) molecules</span>
+    </div>
+    <p class="caveat">Every model clears chance at both timepoints and both thresholds &mdash; CRISPRoff leaves a
+    learnable signature regardless of donor or day. Bars outlined with a dashed border and labelled &ldquo;check
+    overfit&rdquo; hit a perfect 100% on a single train/test split; treat those as optimistic upper bounds rather
+    than proof of a perfectly separable signal, especially where only one model spikes to 100% while the rest
+    cluster lower.</p>
+  </section>
+
+  <section id="caveats">
+    <h2>Reading this comparison honestly</h2>
+    <p><b>Donor and timepoint are confounded.</b> Every difference on this page could be "Day 6 vs Day 35" or
+    "this donor vs that donor" &mdash; there is no way, from this data alone, to attribute a gap to time since
+    electroporation rather than to individual biology. Resolving that would need the same donor's cells sampled
+    at multiple timepoints.</p>
+    <p><b>The unedited baseline is more reproducible than the CRISPRoff response.</b> Per-site correlation between
+    Day 35 and Day 6 is higher for Unedited molecules than for CRISPRoff molecules at both thresholds (see the
+    scatter plots above once rendered). Endogenous methylation at this locus looks fairly stable across donor and
+    time; how strongly CRISPRoff silences it looks more variable.</p>
+    <p><b>Overall CRISPRoff methylation is higher at Day 35 than at Day 6</b> in this data. That's compatible with
+    silencing accumulating further the longer cells are cultured post-electroporation &mdash; but it's equally
+    compatible with this particular Day 35 donor simply silencing more efficiently than this particular Day 6
+    donor. Single-timepoint-per-donor data can't distinguish those.</p>
+    <p><b>The ML classifiers agree more than they disagree.</b> All six models separate Unedited from CRISPRoff
+    well above chance at both timepoints, and the strongest, most consistent performer at both timepoints is the
+    sparse (L1-penalized) logistic regression &mdash; the model built specifically to avoid latching onto noise.
+    That convergence, across two different donors and two different timepoints, is a reasonably strong signal that
+    CRISPRoff leaves a genuine methylation fingerprint at this locus, not an artifact of one dataset.</p>
+  </section>
+
+  <footer>
+    Data: single-molecule Nanopore (R9/minION) CpG calls, T cells &middot; Day 35 and Day 6 are different donors,
+    same CD55 locus/pipeline &middot; see <a href="day35.html">Day 35</a> and <a href="day6.html">Day 6</a> for
+    full per-timepoint detail, including the honest caveats on what NaN calls do and don't mean.
+  </footer>
+
+</div>
+
+<script id="comparison-data" type="application/json">{"groups":{"day35":{"unedited_07":{"naive_per_site":[0.6238,0.8119,0.7871,0.8465,0.8218,0.9059,0.9604,0.896,0.8119,0.9208,0.896,0.8911,0.9406,0.9158,0.8366,0.7772,0.7772,0.8317,0.5297,0.8416,0.3317,0.1931,0.2475,0.0743,0.1386,0.198,0.2475,0.2673,0.2772,0.2327,0.1485,0.0792,0.2277,0.2277,0.0594,0.0644,0.0099,0.0,0.0198,0.0644,0.0396,0.0149,0.0446,0.0495,0.005,0.0347,0.0495,0.0347,0.0099,0.0099,0.0099,0.0,0.0347,0.0297,0.0,0.0198,0.0198,0.0446,0.0248,0.0446,0.0,0.0149,0.0396,0.005,0.0099,0.0297,0.0248,0.0,0.0347,0.0149,0.0347,0.0297,0.0198,0.005,0.0248,0.0149,0.0149,0.0099,0.0099,0.005,0.0396,0.0198,0.0297,0.005,0.0248,0.0149,0.005,0.0149,0.0248,0.0099,0.0149,0.0198,0.0396,0.0495,0.0099,0.0099,0.0198,0.0099,0.0297,0.0198,0.0099,0.0198,0.0248,0.0297,0.0198,0.0198,0.0248,0.0149,0.0149,0.0149,0.0545,0.0248,0.005,0.0594,0.0248,0.0297,0.0347,0.0099,0.0347,0.0198,0.0,0.005,0.0396,0.0198,0.0644,0.0347,0.1188,0.1436,0.0495,0.604,0.4208,0.5198,0.6535,0.6188,0.6139,0.8218,0.7475],"naive_overall":0.1969,"n_rows":202},"unedited_0995":{"naive_per_site":[0.3134,0.6269,0.4279,0.7562,0.3731,0.5522,0.6219,0.6169,0.4328,0.5821,0.7214,0.408,0.7015,0.6617,0.3731,0.7214,0.3731,0.5721,0.3284,0.592,0.1642,0.0846,0.1045,0.0348,0.0547,0.1045,0.1592,0.194,0.1841,0.1393,0.0896,0.0647,0.1642,0.1741,0.0,0.0199,0.0,0.0,0.0,0.0,0.01,0.005,0.005,0.01,0.0,0.005,0.0,0.0,0.0,0.0,0.01,0.0,0.005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.005,0.005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.005,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.005,0.0,0.0,0.0,0.0,0.0,0.005,0.0,0.0,0.0,0.0,0.0,0.005,0.0,0.005,0.0,0.0,0.005,0.0,0.005,0.0299,0.0249,0.0597,0.1045,0.0199,0.3831,0.2736,0.1891,0.4478,0.4179,0.4527,0.7512,0.5721],"naive_overall":0.1191,"n_rows":201},"crisproff_07":{"naive_per_site":[0.6319,0.8497,0.7301,0.7975,0.8497,0.8896,0.9018,0.8773,0.8558,0.862,0.819,0.8834,0.9141,0.8926,0.8374,0.7055,0.6779,0.7485,0.6227,0.8098,0.5706,0.2699,0.6748,0.2546,0.5798,0.5828,0.6748,0.7393,0.7914,0.7546,0.4939,0.3129,0.7669,0.6319,0.2669,0.5706,0.5798,0.1871,0.5276,0.5123,0.6043,0.6472,0.6963,0.4417,0.4417,0.5184,0.4417,0.6656,0.411,0.6656,0.4939,0.5153,0.589,0.6074,0.8129,0.7914,0.4908,0.5061,0.5061,0.5399,0.8067,0.773,0.7331,0.7331,0.7301,0.5368,0.5798,0.7791,0.6871,0.7975,0.7055,0.7975,0.8466,0.2239,0.1779,0.2485,0.2761,0.365,0.5859,0.7025,0.8374,0.8742,0.865,0.681,0.7055,0.7055,0.7546,0.6656,0.7454,0.3712,0.3528,0.4663,0.1687,0.408,0.1687,0.3313,0.3037,0.2393,0.3313,0.5583,0.7178,0.5982,0.6963,0.2975,0.3957,0.4049,0.4571,0.3988,0.5184,0.5982,0.5644,0.3681,0.3067,0.4325,0.6503,0.1871,0.4202,0.4693,0.3804,0.4755,0.3006,0.4663,0.273,0.5859,0.5368,0.7331,0.5061,0.7239,0.3129,0.7791,0.6043,0.6994,0.7423,0.6687,0.7362,0.8067,0.7117],"naive_overall":0.5871,"n_rows":326},"crisproff_0995":{"naive_per_site":[0.3344,0.6933,0.4202,0.6994,0.4356,0.5307,0.6166,0.6748,0.408,0.5061,0.5736,0.4724,0.6074,0.635,0.3589,0.589,0.3098,0.5031,0.3405,0.5368,0.2607,0.1135,0.2515,0.1319,0.3436,0.3466,0.4233,0.5276,0.6135,0.5368,0.3466,0.2393,0.5798,0.5,0.0613,0.2178,0.4018,0.1227,0.3221,0.3129,0.3282,0.3681,0.3988,0.1534,0.2423,0.2822,0.2147,0.2485,0.2699,0.3773,0.2975,0.3006,0.1871,0.2178,0.6564,0.5429,0.3006,0.2883,0.1595,0.1442,0.5675,0.5031,0.411,0.4479,0.1779,0.3129,0.3344,0.4233,0.3957,0.546,0.227,0.4325,0.7055,0.1166,0.0583,0.0951,0.0521,0.1503,0.3098,0.3742,0.5245,0.7577,0.6963,0.2761,0.3773,0.4049,0.4755,0.4018,0.411,0.1595,0.1779,0.1933,0.0583,0.135,0.0337,0.138,0.0583,0.1166,0.1074,0.2791,0.5,0.3067,0.4755,0.1012,0.184,0.2393,0.1718,0.1718,0.2914,0.4018,0.2822,0.184,0.1656,0.1564,0.2975,0.0675,0.2454,0.1963,0.1902,0.2607,0.2025,0.2607,0.0706,0.4141,0.3282,0.5123,0.1994,0.4939,0.2147,0.4202,0.3436,0.181,0.5092,0.411,0.5368,0.7086,0.5184],"naive_overall":0.3395,"n_rows":326}},"day6":{"unedited_07":{"naive_per_site":[0.5,0.7363,0.6296,0.6852,0.7954,0.806,0.8598,0.8272,0.7875,0.8183,0.821,0.8554,0.8704,0.8792,0.7945,0.642,0.5838,0.6296,0.4145,0.754,0.321,0.1473,0.2257,0.1323,0.1384,0.1323,0.1737,0.2143,0.246,0.246,0.1993,0.1755,0.1675,0.0996,0.0494,0.0467,0.0176,0.0256,0.0238,0.0573,0.0379,0.0212,0.0485,0.0503,0.0229,0.0432,0.0432,0.0432,0.0062,0.0635,0.0168,0.0353,0.0564,0.0273,0.0115,0.0291,0.0176,0.0379,0.0485,0.0467,0.0194,0.0388,0.0538,0.0097,0.0379,0.0344,0.0362,0.0194,0.0661,0.0097,0.0432,0.0414,0.022,0.0132,0.0247,0.0265,0.0485,0.0317,0.015,0.0132,0.0317,0.0247,0.0212,0.0194,0.0176,0.03,0.0185,0.0176,0.0476,0.022,0.0212,0.0229,0.0353,0.0485,0.022,0.0326,0.045,0.015,0.0344,0.0212,0.022,0.0212,0.0106,0.0317,0.0238,0.0467,0.0476,0.0212,0.0159,0.0176,0.0714,0.0344,0.0203,0.0326,0.0362,0.0265,0.037,0.03,0.0265,0.0406,0.0317,0.0829,0.0732,0.1261,0.1799,0.2451,0.2787,0.3148,0.1764,0.5203,0.4718,0.5185,0.5467,0.5035,0.6058,0.657,0.5053],"naive_overall":0.1886,"n_rows":1134},"unedited_0995":{"naive_per_site":[0.2209,0.5421,0.2644,0.5776,0.3177,0.4055,0.4871,0.5475,0.3957,0.4774,0.535,0.4153,0.5377,0.6353,0.3239,0.5226,0.2742,0.3984,0.1854,0.4969,0.1402,0.0532,0.0728,0.0293,0.0594,0.0665,0.0861,0.1074,0.1189,0.1083,0.0896,0.0728,0.1136,0.0612,0.0053,0.008,0.0044,0.0009,0.0035,0.0009,0.0018,0.0,0.0018,0.0009,0.0009,0.0027,0.0027,0.0018,0.0,0.0,0.0,0.0,0.0,0.0,0.0018,0.0018,0.0009,0.0018,0.0,0.0,0.0009,0.0,0.0,0.0,0.0018,0.0,0.0,0.0,0.0009,0.0,0.0009,0.0,0.0027,0.0018,0.0,0.0009,0.0009,0.0009,0.0009,0.0,0.0,0.0,0.0009,0.0,0.0,0.0,0.0018,0.0009,0.0,0.0,0.0,0.0009,0.0,0.0,0.0009,0.0,0.0009,0.0009,0.0,0.0009,0.0009,0.0,0.0,0.0,0.0009,0.0044,0.0009,0.0,0.0,0.0,0.0018,0.0009,0.0,0.0,0.0009,0.0009,0.0062,0.0027,0.0027,0.0053,0.0053,0.047,0.016,0.0896,0.1056,0.1544,0.1287,0.189,0.1056,0.3221,0.2733,0.213,0.3434,0.2777,0.449,0.5555,0.3398],"naive_overall":0.0981,"n_rows":1127},"crisproff_07":{"naive_per_site":[0.44,0.6174,0.4974,0.5517,0.7734,0.7274,0.8129,0.784,0.7713,0.7734,0.7875,0.8181,0.8317,0.8348,0.7686,0.5026,0.4733,0.507,0.3944,0.7068,0.3751,0.2152,0.4097,0.2634,0.3103,0.3295,0.4062,0.475,0.5127,0.4759,0.4176,0.3699,0.4728,0.3348,0.1468,0.3418,0.358,0.1179,0.3352,0.3357,0.4378,0.4869,0.493,0.2791,0.2835,0.3357,0.2379,0.3826,0.1525,0.4167,0.2572,0.3462,0.5399,0.4579,0.6148,0.5535,0.3098,0.2682,0.3532,0.3449,0.6266,0.6358,0.5666,0.5798,0.5259,0.3247,0.3181,0.4961,0.4904,0.6056,0.5789,0.6529,0.6437,0.1236,0.1052,0.1415,0.1477,0.1766,0.369,0.5508,0.6192,0.6709,0.6937,0.5368,0.489,0.511,0.5592,0.5026,0.6065,0.2651,0.266,0.3252,0.0977,0.1727,0.1196,0.1968,0.2007,0.2112,0.2713,0.3729,0.5478,0.4001,0.4781,0.1543,0.2095,0.2134,0.2515,0.2051,0.2954,0.3685,0.4067,0.2542,0.4899,0.2958,0.4194,0.0995,0.2366,0.3098,0.2568,0.3633,0.2533,0.3295,0.1779,0.3593,0.3585,0.4255,0.3523,0.4619,0.2051,0.5088,0.4207,0.4251,0.468,0.4316,0.5048,0.5333,0.3843],"naive_overall":0.417,"n_rows":2282},"crisproff_0995":{"naive_per_site":[0.186,0.434,0.2043,0.4572,0.2832,0.3283,0.3849,0.4603,0.3171,0.397,0.4594,0.3434,0.4924,0.5268,0.2975,0.3872,0.2016,0.3122,0.1704,0.4211,0.1476,0.0723,0.1512,0.0879,0.1369,0.1418,0.1896,0.2444,0.2636,0.2279,0.1936,0.1753,0.2926,0.2435,0.033,0.153,0.2235,0.0562,0.182,0.1552,0.2132,0.256,0.2707,0.1151,0.1392,0.1378,0.0901,0.1334,0.0749,0.1722,0.1044,0.1766,0.1824,0.1762,0.4701,0.3394,0.1789,0.1347,0.1178,0.1164,0.3653,0.3764,0.2859,0.3211,0.1659,0.1539,0.1494,0.2333,0.2542,0.3907,0.1989,0.3158,0.4514,0.0317,0.0169,0.025,0.0161,0.0428,0.1454,0.2337,0.3546,0.4808,0.4804,0.1958,0.2574,0.2257,0.281,0.2649,0.2832,0.0932,0.1066,0.1195,0.0219,0.0326,0.0196,0.0504,0.0397,0.0736,0.0736,0.1405,0.3644,0.1704,0.2404,0.0415,0.0624,0.0937,0.0705,0.0562,0.1351,0.1989,0.1601,0.1106,0.2194,0.0972,0.1601,0.0236,0.1044,0.1062,0.1106,0.1802,0.1401,0.186,0.0491,0.2284,0.2141,0.264,0.1476,0.2676,0.1048,0.2707,0.2279,0.165,0.2913,0.2248,0.3622,0.4318,0.2672],"naive_overall":0.207,"n_rows":2242}}},"delta":{"day35":{"07":[0.0081,0.0378,-0.057,-0.049,0.0279,-0.0163,-0.0586,-0.0187,0.0439,-0.0588,-0.077,-0.0077,-0.0265,-0.0232,0.0008,-0.0717,-0.0993,-0.0832,0.093,-0.0318,0.2389,0.0768,0.4273,0.1803,0.4412,0.3848,0.4273,0.472,0.5142,0.5219,0.3454,0.2337,0.5392,0.4042,0.2075,0.5062,0.5699,0.1871,0.5078,0.4479,0.5647,0.6323,0.6517,0.3922,0.4367,0.4837,0.3922,0.6309,0.4011,0.6557,0.484,0.5153,0.5543,0.5777,0.8129,0.7716,0.471,0.4615,0.4813,0.4953,0.8067,0.7581,0.6935,0.7281,0.7202,0.5071,0.555,0.7791,0.6524,0.7826,0.6708,0.7678,0.8268,0.2189,0.1531,0.2336,0.2612,0.3551,0.576,0.6975,0.7978,0.8544,0.8353,0.676,0.6807,0.6906,0.7496,0.6507,0.7206,0.3613,0.3379,0.4465,0.1291,0.3585,0.1588,0.3214,0.2839,0.2294,0.3016,0.5385,0.7079,0.5784,0.6715,0.2678,0.3759,0.3851,0.4323,0.3839,0.5035,0.5833,0.5099,0.3433,0.3017,0.3731,0.6255,0.1574,0.3855,0.4594,0.3457,0.4557,0.3006,0.4613,0.2334,0.5661,0.4724,0.6984,0.3873,0.5803,0.2634,0.1751,0.1835,0.1796,0.0888,0.0499,0.1223,-0.0151,-0.0358],"0995":[0.021,0.0664,-0.0077,-0.0568,0.0625,-0.0215,-0.0053,0.0579,-0.0248,-0.076,-0.1478,0.0644,-0.0941,-0.0267,-0.0142,-0.1324,-0.0633,-0.069,0.0121,-0.0552,0.0965,0.0289,0.147,0.0971,0.2889,0.2421,0.2641,0.3336,0.4294,0.3975,0.257,0.1746,0.4156,0.3259,0.0613,0.1979,0.4018,0.1227,0.3221,0.3129,0.3182,0.3631,0.3938,0.1434,0.2423,0.2772,0.2147,0.2485,0.2699,0.3773,0.2875,0.3006,0.1821,0.2178,0.6564,0.5429,0.3006,0.2883,0.1595,0.1442,0.5675,0.4981,0.406,0.4479,0.1779,0.3129,0.3344,0.4233,0.3957,0.546,0.227,0.4325,0.7055,0.1166,0.0583,0.0951,0.0521,0.1503,0.3098,0.3742,0.5245,0.7577,0.6963,0.2761,0.3773,0.4049,0.4755,0.4018,0.411,0.1595,0.1779,0.1933,0.0583,0.135,0.0337,0.138,0.0533,0.1166,0.1074,0.2791,0.5,0.3067,0.4755,0.1012,0.179,0.2393,0.1718,0.1718,0.2914,0.4018,0.2772,0.184,0.1656,0.1564,0.2975,0.0675,0.2404,0.1963,0.1852,0.2607,0.2025,0.2557,0.0706,0.4091,0.2983,0.4874,0.1397,0.3894,0.1948,0.0371,0.07,-0.0081,0.0614,-0.0069,0.0841,-0.0426,-0.0537]},"day6":{"07":[-0.06,-0.1189,-0.1322,-0.1335,-0.022,-0.0786,-0.0469,-0.0432,-0.0162,-0.0449,-0.0335,-0.0373,-0.0387,-0.0444,-0.0259,-0.1394,-0.1105,-0.1226,-0.0201,-0.0472,0.0541,0.0679,0.184,0.1311,0.1719,0.1972,0.2325,0.2607,0.2667,0.2299,0.2183,0.1944,0.3053,0.2352,0.0974,0.2951,0.3404,0.0923,0.3114,0.2784,0.3999,0.4657,0.4445,0.2288,0.2606,0.2925,0.1947,0.3394,0.1463,0.3532,0.2404,0.3109,0.4835,0.4306,0.6033,0.5244,0.2922,0.2303,0.3047,0.2982,0.6072,0.597,0.5128,0.5701,0.488,0.2903,0.2819,0.4767,0.4243,0.5959,0.5357,0.6115,0.6217,0.1104,0.0805,0.115,0.0992,0.1449,0.354,0.5376,0.5875,0.6462,0.6725,0.5174,0.4714,0.481,0.5407,0.485,0.5589,0.2431,0.2448,0.3023,0.0624,0.1242,0.0976,0.1642,0.1557,0.1962,0.2369,0.3517,0.5258,0.3789,0.4675,0.1226,0.1857,0.1667,0.2039,0.1839,0.2795,0.3509,0.3353,0.2198,0.4696,0.2632,0.3832,0.073,0.1996,0.2798,0.2303,0.3227,0.2216,0.2466,0.1047,0.2332,0.1786,0.1804,0.0736,0.1471,0.0287,-0.0115,-0.0511,-0.0934,-0.0787,-0.0719,-0.101,-0.1237,-0.121],"0995":[-0.0349,-0.1081,-0.0601,-0.1204,-0.0345,-0.0772,-0.1022,-0.0872,-0.0786,-0.0804,-0.0756,-0.0719,-0.0453,-0.1085,-0.0264,-0.1354,-0.0726,-0.0862,-0.015,-0.0758,0.0074,0.0191,0.0784,0.0586,0.0775,0.0753,0.1035,0.137,0.1447,0.1196,0.104,0.1025,0.179,0.1823,0.0277,0.145,0.2191,0.0553,0.1785,0.1543,0.2114,0.256,0.2689,0.1142,0.1383,0.1351,0.0874,0.1316,0.0749,0.1722,0.1044,0.1766,0.1824,0.1762,0.4683,0.3376,0.178,0.1329,0.1178,0.1164,0.3644,0.3764,0.2859,0.3211,0.1641,0.1539,0.1494,0.2333,0.2533,0.3907,0.198,0.3158,0.4487,0.0299,0.0169,0.0241,0.0152,0.0419,0.1445,0.2337,0.3546,0.4808,0.4795,0.1958,0.2574,0.2257,0.2792,0.264,0.2832,0.0932,0.1066,0.1186,0.0219,0.0326,0.0187,0.0504,0.0388,0.0727,0.0736,0.1396,0.3635,0.1704,0.2404,0.0415,0.0615,0.0893,0.0696,0.0562,0.1351,0.1989,0.1583,0.1097,0.2194,0.0972,0.1592,0.0227,0.0982,0.1035,0.1079,0.1749,0.1348,0.139,0.0331,0.1388,0.1085,0.1096,0.0189,0.0786,-0.0008,-0.0514,-0.0454,-0.048,-0.0521,-0.0529,-0.0868,-0.1237,-0.0726]}},"correlations":{"unedited":{"07":0.9843,"0995":0.98},"crisproff":{"07":0.9176,"0995":0.9341}},"counts":{"unedited_07":{"day35":202,"day6":1134},"unedited_0995":{"day35":201,"day6":1127},"crisproff_07":{"day35":326,"day6":2282},"crisproff_0995":{"day35":326,"day6":2242}},"overall":{"unedited_07":{"day35":19.69,"day6":18.86},"unedited_0995":{"day35":11.91,"day6":9.81},"crisproff_07":{"day35":58.71,"day6":41.7},"crisproff_0995":{"day35":33.95,"day6":20.7}},"ml":{"day35":{"07":{"GLM":97.62,"Tree":96.43,"RF":100.0,"GBM":96.43,"NN":96.43,"Sparse GLM":98.81},"0995":{"GLM":89.74,"Tree":89.74,"RF":87.18,"GBM":89.74,"NN":87.18,"Sparse GLM":94.87}},"day6":{"07":{"GLM":99.55,"Tree":97.29,"RF":99.55,"GBM":99.55,"NN":98.19,"Sparse GLM":99.1},"0995":{"GLM":98.89,"Tree":99.63,"RF":100.0,"GBM":100.0,"NN":96.67,"Sparse GLM":100.0}},"test_n":{"day35":{"07":84,"0995":39},"day6":{"07":221,"0995":270}}}}</script>
+<script>
+const DATA = JSON.parse(document.getElementById('comparison-data').textContent);
+
+function cssVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+const COLORS = {
+  unedited:      cssVar('--unedited'),
+  crispr:        cssVar('--crispr'),
+  day35:         cssVar('--vermillion'),
+  day35dark:     cssVar('--vermillion-dark'),
+  day6:          cssVar('--blue-deep'),
+  day6dark:      cssVar('--day6-dark'),
+};
+
+/* ---------- generic grouped bar chart: N categories on x, one bar per series ---------- */
+function drawGroupedBar(svgId, categories, seriesList, opts){
+  opts = opts || {};
+  const svg = document.getElementById(svgId);
+  if(!svg || svg.dataset.built) return;
+  svg.dataset.built = '1';
+
+  const W = opts.width || 640, H = opts.height || 300;
+  const padL = 48, padR = 16, padT = 20, padB = 44;
+  const n = categories.length;
+  const nSeries = seriesList.length;
+  const bandW = (W - padL - padR) / n;
+  const groupPad = bandW * 0.14;
+  const usableW = bandW - groupPad * 2;
+  const barW = usableW / nSeries;
+  const maxVal = opts.maxVal || 100;
+  const decimals = opts.decimals != null ? opts.decimals : 1;
+  const suffix = opts.suffix || '';
+  const y = v => padT + (1 - v / maxVal) * (H - padT - padB);
+
+  let html = '';
+  const gridVals = opts.gridVals || [0, maxVal*0.25, maxVal*0.5, maxVal*0.75, maxVal];
+  gridVals.forEach(v => {
+    const gy = y(v);
+    html += `<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${W-padR}" y2="${gy.toFixed(1)}" stroke="#242830" stroke-width="1"/>`;
+    html += `<text x="${padL-8}" y="${(gy+3).toFixed(1)}" text-anchor="end" font-size="9" fill="#7a808c" font-family="IBM Plex Mono, monospace">${opts.gridLabel ? opts.gridLabel(v) : Math.round(v)+suffix}</text>`;
+  });
+
+  categories.forEach((cat, ci) => {
+    const groupX0 = padL + bandW * ci + groupPad;
+    seriesList.forEach((s, si) => {
+      const val = s.values[ci];
+      const isSuspect = !!(opts.flag100 && val >= 100);
+      const barX = groupX0 + si * barW;
+      const barY = y(Math.min(val, maxVal));
+      const barH = (H - padB) - barY;
+      const fill = isSuspect ? s.darkColor : s.color;
+      const w = barW * 0.82;
+      html += `<rect x="${barX.toFixed(1)}" y="${barY.toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(0,barH).toFixed(1)}" rx="3" fill="${fill}" fill-opacity="0.82" ${isSuspect ? 'stroke="#7a808c" stroke-dasharray="3,2"' : ''}/>`;
+      const labelX = barX + w/2;
+      html += `<text x="${labelX.toFixed(1)}" y="${(barY-6).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="600" fill="${fill}" font-family="IBM Plex Mono, monospace">${val.toFixed(decimals)}${suffix}</text>`;
+      if(isSuspect){
+        html += `<text x="${labelX.toFixed(1)}" y="${(barY-19).toFixed(1)}" text-anchor="middle" font-size="8" font-weight="600" fill="#7a808c" font-family="IBM Plex Mono, monospace">check overfit</text>`;
+      }
+    });
+    const catCx = groupX0 + usableW/2;
+    html += `<text x="${catCx.toFixed(1)}" y="${H-padB+18}" text-anchor="middle" font-size="11" fill="#dfe7f3" font-family="IBM Plex Sans, sans-serif">${cat}</text>`;
+  });
+
+  if(opts.chanceLine != null){
+    const cy = y(opts.chanceLine);
+    html += `<line x1="${padL}" y1="${cy.toFixed(1)}" x2="${W-padR}" y2="${cy.toFixed(1)}" stroke="#F0E442" stroke-width="1.5" stroke-dasharray="5,4"/>`;
+    html += `<text x="${W-padR}" y="${(cy-6).toFixed(1)}" text-anchor="end" font-size="10" fill="#F0E442" font-family="IBM Plex Mono, monospace">chance level (${opts.chanceLine}%)</text>`;
+  }
+
+  svg.innerHTML = html;
+}
+
+/* ---------- generic multi-line overlay chart (137-point series, or any fixed-length series) ---------- */
+function drawLineOverlay(svgId, seriesList, opts){
+  opts = opts || {};
+  const svg = document.getElementById(svgId);
+  if(!svg || svg.dataset.built) return;
+  svg.dataset.built = '1';
+
+  const W = opts.width || 560, H = opts.height || 220;
+  const padL = 40, padR = 14, padT = 14, padB = 26;
+  const n = seriesList[0].values.length;
+  const minV = opts.min != null ? opts.min : 0;
+  const maxV = opts.max != null ? opts.max : 1;
+  const x = i => padL + (n > 1 ? i/(n-1) : 0) * (W - padL - padR);
+  const y = v => padT + (1 - (v - minV)/(maxV - minV)) * (H - padT - padB);
+
+  let html = '';
+  const steps = opts.gridSteps || [0, 0.25, 0.5, 0.75, 1];
+  steps.forEach(t => {
+    const v = minV + t * (maxV - minV);
+    const gy = y(v);
+    html += `<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${W-padR}" y2="${gy.toFixed(1)}" stroke="#242830" stroke-width="1"/>`;
+    html += `<text x="${padL-6}" y="${(gy+3).toFixed(1)}" text-anchor="end" font-size="8" fill="#7a808c" font-family="IBM Plex Mono, monospace">${opts.gridLabel ? opts.gridLabel(v) : Math.round(v*100)+'%'}</text>`;
+  });
+
+  if(opts.zeroLine && minV < 0 && maxV > 0){
+    const zy = y(0);
+    html += `<line x1="${padL}" y1="${zy.toFixed(1)}" x2="${W-padR}" y2="${zy.toFixed(1)}" stroke="#8a92a0" stroke-width="1" stroke-dasharray="3,3"/>`;
+  }
+
+  html += `<text x="${padL}" y="${H-6}" font-size="8" fill="#5c6577" font-family="IBM Plex Mono, monospace">CpG 1</text>`;
+  html += `<text x="${W-padR}" y="${H-6}" text-anchor="end" font-size="8" fill="#5c6577" font-family="IBM Plex Mono, monospace">CpG ${n}</text>`;
+
+  seriesList.forEach(s => {
+    let d = '';
+    for(let i=0;i<n;i++){
+      const px = x(i).toFixed(1), py = y(s.values[i]).toFixed(1);
+      d += (i===0 ? 'M':'L') + px + ',' + py + ' ';
+    }
+    html += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="1.8" ${s.dashed ? 'stroke-dasharray="6,4"' : ''} stroke-opacity="0.95"/>`;
+  });
+
+  svg.innerHTML = html;
+}
+
+/* ---------- generic scatter chart with a y=x reference line ---------- */
+function drawScatter(svgId, pointSets, opts){
+  opts = opts || {};
+  const svg = document.getElementById(svgId);
+  if(!svg || svg.dataset.built) return;
+  svg.dataset.built = '1';
+
+  const W = opts.width || 400, H = opts.height || 400;
+  const pad = 42;
+  const minV = opts.min != null ? opts.min : 0;
+  const maxV = opts.max != null ? opts.max : 1;
+  const sx = v => pad + (v - minV)/(maxV - minV) * (W - 2*pad);
+  const sy = v => (H - pad) - (v - minV)/(maxV - minV) * (H - 2*pad);
+
+  let html = '';
+  [0, 0.25, 0.5, 0.75, 1].forEach(t => {
+    const v = minV + t * (maxV - minV);
+    const gx = sx(v), gy = sy(v);
+    html += `<line x1="${gx.toFixed(1)}" y1="${pad}" x2="${gx.toFixed(1)}" y2="${H-pad}" stroke="#242830" stroke-width="1"/>`;
+    html += `<line x1="${pad}" y1="${gy.toFixed(1)}" x2="${W-pad}" y2="${gy.toFixed(1)}" stroke="#242830" stroke-width="1"/>`;
+    html += `<text x="${gx.toFixed(1)}" y="${H-pad+16}" text-anchor="middle" font-size="8" fill="#7a808c" font-family="IBM Plex Mono, monospace">${Math.round(v*100)}%</text>`;
+    html += `<text x="${pad-6}" y="${(gy+3).toFixed(1)}" text-anchor="end" font-size="8" fill="#7a808c" font-family="IBM Plex Mono, monospace">${Math.round(v*100)}%</text>`;
+  });
+
+  html += `<line x1="${sx(minV).toFixed(1)}" y1="${sy(minV).toFixed(1)}" x2="${sx(maxV).toFixed(1)}" y2="${sy(maxV).toFixed(1)}" stroke="#8a92a0" stroke-width="1.2" stroke-dasharray="4,3"/>`;
+
+  pointSets.forEach(ps => {
+    for(let i=0;i<ps.x.length;i++){
+      html += `<circle cx="${sx(ps.x[i]).toFixed(1)}" cy="${sy(ps.y[i]).toFixed(1)}" r="2.6" fill="${ps.color}" fill-opacity="0.6"/>`;
+    }
+  });
+
+  html += `<text x="${(W/2).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="10" fill="#7a808c" font-family="IBM Plex Sans, sans-serif">${opts.xLabel || 'Day 35'}</text>`;
+  html += `<text x="12" y="${(H/2).toFixed(1)}" text-anchor="middle" font-size="10" fill="#7a808c" font-family="IBM Plex Sans, sans-serif" transform="rotate(-90 12 ${(H/2).toFixed(1)})">${opts.yLabel || 'Day 6'}</text>`;
+
+  let ry = pad + 14;
+  pointSets.forEach(ps => {
+    html += `<text x="${W-pad}" y="${ry}" text-anchor="end" font-size="11" font-weight="600" fill="${ps.color}" font-family="IBM Plex Mono, monospace">${ps.label}: r=${ps.r.toFixed(3)}</text>`;
+    ry += 16;
+  });
+
+  svg.innerHTML = html;
+}
+
+/* ---------- lazy-render-on-scroll, same pattern as day35.html / day6.html ---------- */
+function lazyReveal(sectionId, renderFn){
+  const el = document.getElementById(sectionId);
+  if(!el) return;
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        el.classList.add('is-visible');
+        if(renderFn) renderFn();
+        obs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.1 });
+  obs.observe(el);
+}
+
+/* ================= section renderers ================= */
+
+function renderSizes(){
+  ['07','0995'].forEach(thr => {
+    const u35 = DATA.counts['unedited_'+thr].day35, u6 = DATA.counts['unedited_'+thr].day6;
+    const c35 = DATA.counts['crisproff_'+thr].day35, c6 = DATA.counts['crisproff_'+thr].day6;
+    const maxVal = Math.ceil(Math.max(u35,u6,c35,c6) / 500) * 500;
+    drawGroupedBar('sizesChart'+thr, ['Unedited','CRISPRoff'], [
+      { name:'Day 35', color:COLORS.day35, darkColor:COLORS.day35dark, values:[u35, c35] },
+      { name:'Day 6',  color:COLORS.day6,  darkColor:COLORS.day6dark,  values:[u6, c6] },
+    ], { maxVal: maxVal, decimals:0, suffix:'', gridVals:[0, maxVal*0.25, maxVal*0.5, maxVal*0.75, maxVal] });
+  });
+}
+
+function renderOverall(){
+  ['07','0995'].forEach(thr => {
+    const u35 = DATA.overall['unedited_'+thr].day35, u6 = DATA.overall['unedited_'+thr].day6;
+    const c35 = DATA.overall['crisproff_'+thr].day35, c6 = DATA.overall['crisproff_'+thr].day6;
+    drawGroupedBar('overallChart'+thr, ['Unedited','CRISPRoff'], [
+      { name:'Day 35', color:COLORS.day35, darkColor:COLORS.day35dark, values:[u35, c35] },
+      { name:'Day 6',  color:COLORS.day6,  darkColor:COLORS.day6dark,  values:[u6, c6] },
+    ], { maxVal:100, decimals:1, suffix:'%' });
+  });
+}
+
+function renderProfile(){
+  ['07','0995'].forEach(thr => {
+    const u35 = DATA.groups.day35['unedited_'+thr].naive_per_site;
+    const c35 = DATA.groups.day35['crisproff_'+thr].naive_per_site;
+    const u6  = DATA.groups.day6['unedited_'+thr].naive_per_site;
+    const c6  = DATA.groups.day6['crisproff_'+thr].naive_per_site;
+    drawLineOverlay('profileChart'+thr, [
+      { values:u35, color:COLORS.unedited, dashed:false },
+      { values:u6,  color:COLORS.unedited, dashed:true  },
+      { values:c35, color:COLORS.crispr,   dashed:false },
+      { values:c6,  color:COLORS.crispr,   dashed:true  },
+    ], { min:0, max:1 });
+  });
+}
+
+function renderDelta(){
+  ['07','0995'].forEach(thr => {
+    const d35 = DATA.delta.day35[thr];
+    const d6  = DATA.delta.day6[thr];
+    drawLineOverlay('deltaChart'+thr, [
+      { values:d35, color:COLORS.day35, dashed:false },
+      { values:d6,  color:COLORS.day6,  dashed:false },
+    ], { min:-0.2, max:0.9, zeroLine:true, gridSteps:[0,0.2,0.4,0.6,0.8,1.0].map(t=>t) , gridLabel:(v)=> Math.round(v*100)+'%' });
+  });
+}
+
+function renderCorrelation(){
+  ['07','0995'].forEach(thr => {
+    const u35 = DATA.groups.day35['unedited_'+thr].naive_per_site;
+    const u6  = DATA.groups.day6['unedited_'+thr].naive_per_site;
+    const c35 = DATA.groups.day35['crisproff_'+thr].naive_per_site;
+    const c6  = DATA.groups.day6['crisproff_'+thr].naive_per_site;
+    drawScatter('corrChart'+thr, [
+      { x:u35, y:u6, color:COLORS.unedited, label:'Unedited', r:DATA.correlations.unedited[thr] },
+      { x:c35, y:c6, color:COLORS.crispr,   label:'CRISPRoff', r:DATA.correlations.crisproff[thr] },
+    ], { min:0, max:1, xLabel:'Day 35', yLabel:'Day 6' });
+  });
+}
+
+function renderMlCompare(){
+  const models = ['GLM','Tree','RF','GBM','NN','Sparse GLM'];
+  ['07','0995'].forEach(thr => {
+    const m35 = DATA.ml.day35[thr];
+    const m6  = DATA.ml.day6[thr];
+    drawGroupedBar('mlCompare'+thr, models, [
+      { name:'Day 35', color:COLORS.day35, darkColor:COLORS.day35dark, values: models.map(m => m35[m]) },
+      { name:'Day 6',  color:COLORS.day6,  darkColor:COLORS.day6dark,  values: models.map(m => m6[m]) },
+    ], { maxVal:100, decimals:2, suffix:'%', chanceLine:50, flag100:true });
+  });
+}
+
+lazyReveal('sizes', renderSizes);
+lazyReveal('overall', renderOverall);
+lazyReveal('profile', renderProfile);
+lazyReveal('delta', renderDelta);
+lazyReveal('correlation', renderCorrelation);
+lazyReveal('ml-compare', renderMlCompare);
+</script>
+</body>
+</html>
