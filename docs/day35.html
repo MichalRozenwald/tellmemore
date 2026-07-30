@@ -543,7 +543,7 @@ const tooltip = document.getElementById('tooltip');
 function drawHeatmap(canvasId, key){
   const d = DATA[key];
   const canvas = document.getElementById(canvasId);
-  const cols = d.n_cols, rows = d.n_rows;
+  const cols = d.n_cols, rows = d.matrix.length; // use actual sampled row count, not the pre-sampling total
   const cellW = 4, cellH = Math.max(2, Math.min(4, Math.floor(360/rows)));
   const dpr = window.devicePixelRatio || 1;
   const cw = cols*cellW, ch = rows*cellH;
