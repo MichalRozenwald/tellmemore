@@ -16,11 +16,11 @@
     --text:#dfe7f3;
     --muted:#7c869a;
     --muted2:#4d5666;
-    --unedited:#56B4E9;
-    --unedited-dim:#56B4E933;
-    --crispr:#E69F00;
-    --crispr-dim:#E69F0033;
-    --meth:#F0E442;
+    --unedited:#4fb3ff;
+    --unedited-dim:#4fb3ff33;
+    --crispr:#ff6f9c;
+    --crispr-dim:#ff6f9c33;
+    --meth:#31d6ab;
     --miss:#1b222c;
     --amber:#f0a83c;
     --radius:10px;
@@ -253,8 +253,8 @@
       </div>
     </div>
     <div class="legend">
-      <span><i class="sw" style="background:var(--unedited)"></i>Unedited — solid line</span>
-      <span><i class="sw" style="background:var(--crispr);background-image:repeating-linear-gradient(90deg,transparent,transparent 3px,var(--panel) 3px,var(--panel) 5px)"></i>CRISPRoff — dashed line</span>
+      <span><i class="sw" style="background:var(--unedited)"></i>Unedited</span>
+      <span><i class="sw" style="background:var(--crispr)"></i>CRISPRoff</span>
     </div>
   </section>
 
@@ -287,9 +287,7 @@
     Data: single-molecule Nanopore (R9/minION) CpG calls, T cells, donor + timepoint as noted &middot;
     processed with dimelo v2, filterMode10, NoFullyUnmeth, overlap&ge;0.9, mismatch&le;0.7, mapQ&ge;60 &middot;
     both DNA strands realigned to one reference-forward coordinate frame.
-    Part of <a href="index.html">epicme.bio</a>, an open-science PhD capstone on epigenome editing &amp; methylation.<br>
-    Built to be colorblind-friendly: every series uses an Okabe&ndash;Ito colorblind-safe palette and is also
-    distinguished by line style, labels, or brightness contrast &mdash; never color alone.
+    Part of <a href="index.html">epicme.bio</a>, an open-science PhD capstone on epigenome editing &amp; methylation.
   </footer>
 
 </div>
@@ -350,11 +348,8 @@ function drawLineChart(svgId, keyUnedited, keyCrispr){
   function pathFor(arr){
     return arr.map((v,i)=> (i===0?'M':'L') + x(i).toFixed(1) + ',' + y(v).toFixed(1)).join(' ');
   }
-  svgHTML += `<path d="${pathFor(dU)}" fill="none" stroke="${COLORS.Unedited}" stroke-width="2" opacity="0.95"/>`;
-  svgHTML += `<path d="${pathFor(dC)}" fill="none" stroke="${COLORS.CRISPRoff}" stroke-width="2" stroke-dasharray="6,4" opacity="0.95"/>`;
-  // end-of-line labels: a third, color-independent cue
-  svgHTML += `<text x="${x(n-1)-4}" y="${y(dU[n-1])-6}" text-anchor="end" font-size="9" font-weight="600" fill="${COLORS.Unedited}" font-family="IBM Plex Mono, monospace">Unedited</text>`;
-  svgHTML += `<text x="${x(n-1)-4}" y="${y(dC[n-1])+13}" text-anchor="end" font-size="9" font-weight="600" fill="${COLORS.CRISPRoff}" font-family="IBM Plex Mono, monospace">CRISPRoff</text>`;
+  svgHTML += `<path d="${pathFor(dU)}" fill="none" stroke="${COLORS.Unedited}" stroke-width="1.6" opacity="0.95"/>`;
+  svgHTML += `<path d="${pathFor(dC)}" fill="none" stroke="${COLORS.CRISPRoff}" stroke-width="1.6" opacity="0.95"/>`;
   svg.innerHTML = svgHTML;
 }
 drawLineChart('lineChart07','unedited_07','crisproff_07');
