@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>О проекте — epicme.bio</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific styles for the About / background page only.
+     Shared palette, typography, nav, footer, cards, tags, buttons and
+     references live in assets/theme.css — reuse those classes instead
+     of redefining colors here. */
+
+  .hero{ padding:64px 0 40px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--blue); font-weight:600; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--blue-deep); }
+  h1.display{
+    font-size:clamp(32px, 5.4vw, 50px);
+    font-weight:600; line-height:1.1; letter-spacing:-0.01em;
+    margin:0 0 20px;
+  }
+  h1.display em{ font-style:normal; color:var(--blue); }
+  .hero-sub{ font-size:18px; color:var(--ink-dim); max-width:660px; margin:0 0 36px; }
+
+  /* ---------- Write/Read/Learn loop (signature element) ---------- */
+  .loop-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:24px 22px 20px;
+  }
+  .loop-head{ font-size:13px; color:var(--ink-faint); letter-spacing:0.04em; margin-bottom:14px; }
+  .loop-svg-wrap{ width:100%; overflow:hidden; border-radius:10px; }
+  .loop-steps{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:18px; }
+  @media (max-width:700px){ .loop-steps{ grid-template-columns:1fr; } }
+  .loop-step{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:14px 15px;
+  }
+  .loop-step .mk{
+    display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:600;
+    letter-spacing:0.05em; text-transform:uppercase; margin-bottom:8px;
+  }
+  .loop-step .mk .shape{ width:11px; height:11px; flex-shrink:0; }
+  .loop-step.write .mk{ color:var(--orange); }
+  .loop-step.write .shape{ background:var(--orange); border-radius:3px; }
+  .loop-step.read .mk{ color:var(--blue); }
+  .loop-step.read .shape{ background:var(--blue); border-radius:50%; }
+  .loop-step.learn .mk{ color:var(--yellow); }
+  .loop-step.learn .shape{ background:var(--yellow); clip-path:polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+  .loop-step p{ font-size:13.5px; margin:0; color:var(--ink-dim); }
+
+  /* ---------- Scale strip (genome -> epigenome -> diversity) ---------- */
+  .scale-strip{
+    display:flex; align-items:stretch; gap:0; margin:24px 0 6px;
+    border:1px solid var(--line); border-radius:12px; overflow:hidden;
+  }
+  .scale-node{
+    flex:1; padding:16px 14px; text-align:center; border-right:1px solid var(--line);
+    background:var(--surface);
+  }
+  .scale-node:last-child{ border-right:none; }
+  .scale-node .num{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--blue); margin-bottom:4px; }
+  .scale-node .lbl{ font-size:13px; color:var(--ink-dim); }
+  .scale-arrow{
+    display:flex; align-items:center; justify-content:center; width:26px; color:var(--ink-faint);
+    background:var(--surface-2); flex-shrink:0;
+  }
+  @media (max-width:640px){ .scale-strip{ flex-direction:column; } .scale-node{ border-right:none; border-bottom:1px solid var(--line); } .scale-arrow{ width:100%; height:20px; } }
+
+  .link-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+
+  /* ---------- Lab photo ---------- */
+  .lab-photo{ margin:0; }
+  .lab-photo img{
+    width:100%; display:block; border-radius:var(--radius);
+    border:1px solid var(--line);
+  }
+  .lab-photo figcaption{
+    margin-top:12px; font-size:13.5px; color:var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub">эпигеном · цитозин · метилирование</span>
+    </div>
+    <nav class="nav-links">
+      <a href="about.html">О проекте</a>
+      <a href="index.html">CD55 explorer</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day6.html">Day 6</a>
+      <a href="#team">Команда</a>
+      <a href="#references">Источники</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow">UC Berkeley · Streets &amp; Urnov labs · PhD capstone</div>
+    <h1 class="display">Как метилирование ДНК<br>управляет работой гена?</h1>
+    <p class="hero-sub">Это мой PhD-проект и одновременно основа epicme.bio — открытой научной страницы, где я собираю данные, методы и находки в одном месте. Здесь — введение и контекст: что я изучаю, зачем, и как устроен мой экспериментальный подход.</p>
+
+    <div class="loop-card">
+      <div class="loop-head">ПОДХОД: WRITE → READ → LEARN</div>
+      <div class="loop-svg-wrap">
+        <img src="media/write-read-learn-loop.gif" alt="Анимированная схема: Write (ZFPoff) → Read (Nanopore) → Learn (ML models), с зацикленной стрелкой возврата" style="width:100%; display:block;">
+      </div>
+      <div class="loop-steps">
+        <div class="loop-step write">
+          <div class="mk"><span class="shape"></span>Write</div>
+          <p>ZFPoff — эпигенетическое «выключение» гена: цинковый палец (ZFP) нацеливает KRAB и DNMT на нужный локус, вызывая CpG-метилирование и молчание гена — без изменения самой последовательности ДНК.</p>
+        </div>
+        <div class="loop-step read">
+          <div class="mk"><span class="shape"></span>Read</div>
+          <p>Nanopore-секвенирование (в т.ч. DiMeLo-seq) читает и метилирование, и последовательность ДНК в одной молекуле — на уровне одной цепи, без усреднения по популяции клеток.</p>
+        </div>
+        <div class="loop-step learn">
+          <div class="mk"><span class="shape"></span>Learn</div>
+          <p>Модели машинного обучения ищут связь между профилем CpG-метилирования одной молекулы и состоянием гена — активен он или замолчал.</p>
+        </div>
+      </div>
+    </div>
+
+    <figure class="lab-photo" style="margin-top:22px;">
+      <img src="media/write-read-learn.jpeg" alt="Более детальная иллюстрация схемы Write → Read → Learn со слайда презентации: ZFPoff эпигенетическое молчание, Nanopore/DiMeLo-seq секвенирование, ML модели предсказывают состояние гена">
+      <figcaption>Та же схема — более развёрнуто, со слайда презентации: молекулярные детали ZFPoff, Nanopore/DiMeLo-seq и входа/выхода ML-модели.</figcaption>
+    </figure>
+  </section>
+
+  <section id="big-picture">
+    <div class="kicker">Контекст</div>
+    <h2>Зачем вообще изучать эпигеном</h2>
+    <p class="lede">Геном человека — это около 3.3 миллиардов пар оснований, и лишь малая его часть — примерно 3 миллиона регуляторных элементов — определяет, когда, где и насколько сильно работает каждый ген.</p>
+    <p>Эпигеном — это слой химических «пометок» поверх ДНК (например, метилирование цитозинов в CpG-динуклеотидах), который переводит одну и ту же последовательность генома в разные клеточные состояния. Именно эпигенетические пометки во многом объясняют, почему нейрон и T-лимфоцит содержат одну и ту же ДНК, но работают совершенно по-разному. Принципы, по которым эпигенетическая информация управляет экспрессией генов, до сих пор изучены не полностью — это и есть центральный вопрос моей диссертации.</p>
+
+    <div class="scale-strip">
+      <div class="scale-node"><div class="num">3.3 млрд п.о.</div><div class="lbl">геном человека</div></div>
+      <div class="scale-arrow">→</div>
+      <div class="scale-node"><div class="num">~3 млн</div><div class="lbl">регуляторных элементов</div></div>
+      <div class="scale-arrow">→</div>
+      <div class="scale-node"><div class="num">метки → состояния</div><div class="lbl">эпигеном</div></div>
+      <div class="scale-arrow">→</div>
+      <div class="scale-node"><div class="num">200+ типов</div><div class="lbl">клеточное разнообразие</div></div>
+    </div>
+  </section>
+
+  <section id="framework">
+    <div class="kicker">Экспериментальный подход</div>
+    <h2>Write, Read, Learn — три инструмента одной задачи</h2>
+
+    <div class="grid2">
+      <div class="card">
+        <span class="tag amber">Write</span>
+        <h3>ZFPoff: программируемое молчание гена</h3>
+        <p>ZFP-белок находит нужный участок ДНК; связанные с ним домены KRAB и DNMT запускают эпигенетическое молчание — ген «выключается» через метилирование, а не через разрезание ДНК, как в классическом CRISPR-нокауте. Это позволяет обратимо и точечно гасить экспрессию конкретного гена в живых клетках.<a href="#ref-1" class="cite">[1]</a></p>
+      </div>
+      <div class="card">
+        <span class="tag blue">Read</span>
+        <h3>Nanopore и DiMeLo-seq: чтение на уровне одной молекулы</h3>
+        <p>Технология Oxford Nanopore определяет последовательность ДНК напрямую по изменению электрического сигнала при прохождении молекулы через нанопору — и попутно «видит» метилированные цитозины без бисульфитной конверсии. DiMeLo-seq расширяет это до картирования белок-ДНК взаимодействий на длинных прочтениях.<a href="#ref-2" class="cite">[2]</a><a href="#ref-3" class="cite">[3]</a></p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <span class="tag" style="background:var(--yellow-dim); color:var(--yellow);">Learn</span>
+      <h3>ML-модели: от профиля метилирования к состоянию гена</h3>
+      <p>Каждая просеквенированная молекула даёт бинарный вектор — метилирован ли CpG в конкретной позиции. Собрав такие вектора по многим одиночным молекулам одного и того же локуса, можно обучить модель, которая по CpG-профилю предсказывает, «включён» ген или «выключен» — и находить закономерности, которые не видны при усреднении по популяции клеток.<a href="#ref-4" class="cite">[4]</a></p>
+    </div>
+  </section>
+
+  <section id="application">
+    <div class="kicker">Приложение метода</div>
+    <h2>Модельная система: CD55 в донорских T-клетках</h2>
+    <p class="lede">Весь этот подход я применяю к конкретному гену — <strong>CD55</strong> (DAF) — и конкретному типу клеток — первичным донорским T-лимфоцитам человека.</p>
+    <p>Я использую CRISPRoff/ZFPoff для эпигенетического «выключения» CD55 в T-клетках доноров, а затем секвенирую локус CD55 методом Nanopore с прицельным (targeted) захватом — это даёт метилирование и последовательность ДНК с разрешением до одной молекулы, по множеству временных точек после редактирования (например, Day 6, Day 35). Сравнение метилирования между отредактированными (CRISPRoff) и неотредактированными (unedited) клетками одного донора в одной и той же временной точке — основа для понимания того, как закрепляется и поддерживается эпигенетическое молчание гена во времени.</p>
+    <div class="link-row">
+      <a class="btn ghost" href="index.html">Разобрать биологию CD55 →</a>
+      <a class="btn ghost" href="day35.html">Данные: Day 35 →</a>
+      <a class="btn ghost" href="day6.html">Данные: Day 6 →</a>
+    </div>
+  </section>
+
+  <section id="why-open">
+    <div class="kicker">Почему открыто</div>
+    <h2>epicme.bio как часть диссертации</h2>
+    <p>epicme.bio — это не просто визуализация данных, а сама PhD-работа, собранная в открытом, интерактивном виде: та же логика Write → Read → Learn, но доступная для изучения любому человеку — от студента до другого исследователя эпигенетики. Название отражает суть темы: <strong>epi</strong> (редактирование эпигенома) + <strong>C</strong> (цитозин) + <strong>me</strong> (метилирование).</p>
+    <p>Публикация сырых и промежуточных данных, кода обработки и рассуждений в процессе — часть принципа открытой науки, который лежит в основе этого проекта.</p>
+  </section>
+
+  <section id="team">
+    <div class="kicker">Команда</div>
+    <h2>Streets &amp; Urnov labs</h2>
+    <figure class="lab-photo">
+      <img src="media/streets-urnov-lab-mates.png" alt="Группа лабораторий Aaron Streets и Fyodor Urnov на территории UC Berkeley">
+      <figcaption>Лаборатории Aaron Streets и Fyodor Urnov, UC Berkeley — часть команды, в которой проходит эта работа.</figcaption>
+    </figure>
+  </section>
+
+  <section id="references">
+    <div class="kicker">Библиография</div>
+    <h2>Источники</h2>
+    <ul class="ref-list">
+      <li class="ref-item" id="ref-1">
+        <span class="ref-num">[1]</span>
+        <div class="ref-body">
+          <h4>Nuñez et al., «Genome-wide programmable transcriptional memory by CRISPR-based epigenome editing» — Cell, 2021</h4>
+          <div class="ref-meta">Обоснование ZFPoff-подхода к эпигенетическому молчанию генов · <a href="https://doi.org/10.1016/j.cell.2021.03.025" target="_blank" rel="noopener">doi.org/10.1016/j.cell.2021.03.025</a></div>
+        </div>
+      </li>
+      <li class="ref-item" id="ref-2">
+        <span class="ref-num">[2]</span>
+        <div class="ref-body">
+          <h4>Wang et al., «Nanopore sequencing technology, bioinformatics and applications» — Nature Biotechnology, 2021</h4>
+          <div class="ref-meta">Принцип Nanopore-секвенирования и детекции метилирования · <a href="https://doi.org/10.1038/s41587-021-01108-x" target="_blank" rel="noopener">doi.org/10.1038/s41587-021-01108-x</a></div>
+        </div>
+      </li>
+      <li class="ref-item" id="ref-3">
+        <span class="ref-num">[3]</span>
+        <div class="ref-body">
+          <h4>Altemose et al., «DiMeLo-seq: a long-read, single-molecule method for mapping protein–DNA interactions genome wide» — Nature Methods, 2022</h4>
+          <div class="ref-meta">Метод картирования белок-ДНК взаимодействий на длинных прочтениях · <a href="https://doi.org/10.1038/s41592-022-01475-6" target="_blank" rel="noopener">doi.org/10.1038/s41592-022-01475-6</a></div>
+        </div>
+      </li>
+      <li class="ref-item" id="ref-4">
+        <span class="ref-num">[4]</span>
+        <div class="ref-body">
+          <h4>Yourgenome.org — «What is Oxford Nanopore Technology (ONT) sequencing?»</h4>
+          <div class="ref-meta">Общее объяснение технологии ONT для неспециалистов · <a href="https://www.yourgenome.org/facts/what-is-oxford-nanopore-technology-ont-sequencing/" target="_blank" rel="noopener">yourgenome.org</a></div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley.
+  </div>
+</footer>
+
+</body>
+</html>
