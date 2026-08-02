@@ -111,12 +111,12 @@
     <div class="loop-card">
       <div class="loop-head">ПОДХОД: WRITE → READ → LEARN</div>
       <div class="loop-svg-wrap">
-        <img src="media/write-read-learn-loop.gif" alt="Анимированная схема: Write (ZFPoff) → Read (Nanopore) → Learn (ML models), с зацикленной стрелкой возврата" style="width:100%; display:block;">
+        <img src="media/write-read-learn-loop.gif" alt="Анимированная схема: Write (ZFPoff / CRISPRoff) → Read (Nanopore) → Learn (ML models), с зацикленной стрелкой возврата" style="width:100%; display:block;">
       </div>
       <div class="loop-steps">
         <div class="loop-step write">
           <div class="mk"><span class="shape"></span>Write</div>
-          <p>ZFPoff — эпигенетическое «выключение» гена: цинковый палец (ZFP) нацеливает KRAB и DNMT на нужный локус, вызывая CpG-метилирование и молчание гена — без изменения самой последовательности ДНК.</p>
+          <p>ZFPoff и CRISPRoff — два альтернативных инструмента эпигенетического «выключения» гена: цинковый палец (ZFP) или dCas9 нацеливает KRAB и DNMT на нужный локус, вызывая CpG-метилирование и молчание гена — без изменения самой последовательности ДНК.</p>
         </div>
         <div class="loop-step read">
           <div class="mk"><span class="shape"></span>Read</div>
@@ -130,8 +130,8 @@
     </div>
 
     <figure class="lab-photo" style="margin-top:22px;">
-      <img src="media/write-read-learn.jpeg" alt="Более детальная иллюстрация схемы Write → Read → Learn со слайда презентации: ZFPoff эпигенетическое молчание, Nanopore/DiMeLo-seq секвенирование, ML модели предсказывают состояние гена">
-      <figcaption>Та же схема — более развёрнуто, со слайда презентации: молекулярные детали ZFPoff, Nanopore/DiMeLo-seq и входа/выхода ML-модели.</figcaption>
+      <img src="media/write-read-learn.jpeg" alt="Более детальная иллюстрация схемы Write → Read → Learn со слайда презентации: ZFPoff/CRISPRoff эпигенетическое молчание, Nanopore/DiMeLo-seq секвенирование, ML модели предсказывают состояние гена">
+      <figcaption>Та же схема — более развёрнуто, со слайда презентации: молекулярные детали ZFPoff (на слайде показан именно этот вариант; в работе также используется альтернативный инструмент CRISPRoff), Nanopore/DiMeLo-seq и входа/выхода ML-модели.</figcaption>
     </figure>
   </section>
 
@@ -159,8 +159,13 @@
     <div class="grid2">
       <div class="card">
         <span class="tag amber">Write</span>
-        <h3>ZFPoff: программируемое молчание гена</h3>
-        <p>ZFP-белок находит нужный участок ДНК; связанные с ним домены KRAB и DNMT запускают эпигенетическое молчание — ген «выключается» через метилирование, а не через разрезание ДНК, как в классическом CRISPR-нокауте. Это позволяет обратимо и точечно гасить экспрессию конкретного гена в живых клетках.<a href="#ref-1" class="cite">[1]</a></p>
+        <h3>ZFPoff и CRISPRoff: два способа «выключить» ген</h3>
+        <p>В работе я использую два альтернативных инструмента для программируемого эпигенетического молчания CD55 — оба запускают CpG-метилирование локуса и «выключают» ген без разрезания ДНК, в отличие от классического CRISPR-нокаута:</p>
+        <ul style="margin:0 0 12px; padding-left:18px; font-size:14.5px; color:var(--ink-dim);">
+          <li style="margin-bottom:6px;"><strong style="color:var(--ink);">CRISPRoff</strong> — dCas9 под управлением направляющей РНК (sgRNA) доставляет домены KRAB и DNMT3A/3L к нужному локусу.<a href="#ref-1" class="cite">[1]</a></li>
+          <li><strong style="color:var(--ink);">ZFPoff</strong> — те же домены KRAB и DNMT доставляются белком с цинковыми пальцами (ZFP), нацеленным на локус напрямую, без направляющей РНК.</li>
+        </ul>
+        <p style="font-size:13px; color:var(--ink-faint); margin:0;">Оба подхода обратимы и точечны — это позволяет сравнивать, насколько по-разному закрепляется и поддерживается молчание гена в зависимости от способа его «записи».</p>
       </div>
       <div class="card">
         <span class="tag blue">Read</span>
@@ -212,7 +217,7 @@
         <span class="ref-num">[1]</span>
         <div class="ref-body">
           <h4>Nuñez et al., «Genome-wide programmable transcriptional memory by CRISPR-based epigenome editing» — Cell, 2021</h4>
-          <div class="ref-meta">Обоснование ZFPoff-подхода к эпигенетическому молчанию генов · <a href="https://doi.org/10.1016/j.cell.2021.03.025" target="_blank" rel="noopener">doi.org/10.1016/j.cell.2021.03.025</a></div>
+          <div class="ref-meta">Обоснование платформы CRISPRoff для эпигенетического молчания генов · <a href="https://doi.org/10.1016/j.cell.2021.03.025" target="_blank" rel="noopener">doi.org/10.1016/j.cell.2021.03.025</a></div>
         </div>
       </li>
       <li class="ref-item" id="ref-2">
