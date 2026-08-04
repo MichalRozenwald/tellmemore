@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CD55 / DAF — молекулярный разбор гена</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific styles for the CD55 explorer only.
+     Shared palette, typography, nav, footer, cards, tags, chat widget,
+     buttons and references all live in assets/theme.css — reuse those
+     classes on new pages instead of redefining colors here. */
+
+  /* ---------- HERO ---------- */
+  .hero{ padding:64px 0 40px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--blue); font-weight:600; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{
+    content:''; width:22px; height:1px; background:var(--blue-deep);
+  }
+  h1.display{
+    font-size:clamp(34px, 6vw, 56px);
+    font-weight:600; line-height:1.06; letter-spacing:-0.01em;
+    margin:0 0 20px;
+  }
+  h1.display em{ font-style:normal; color:var(--blue); }
+  .hero-sub{
+    font-size:18px; color:var(--ink-dim); max-width:640px; margin:0 0 36px;
+  }
+
+  /* ---------- CASCADE DIAGRAM (signature element, this page only) ---------- */
+  .cascade-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 22px 18px;
+  }
+  .cascade-head{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:12px; margin-bottom:6px;
+  }
+  .cascade-title{ font-size:13px; color:var(--ink-faint); letter-spacing:0.04em; }
+  .toggle{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:3px; gap:2px;
+  }
+  .toggle button{
+    border:none; background:transparent; color:var(--ink-dim);
+    font-size:13px; padding:7px 14px; border-radius:999px; cursor:pointer;
+    font-weight:500; transition:all .2s ease;
+  }
+  .toggle button.active{ background:var(--blue); color:#06182A; }
+  .cascade-svg-wrap{ width:100%; overflow:hidden; border-radius:10px; }
+  .cascade-caption{
+    font-size:14px; color:var(--ink-dim); margin-top:12px; min-height:42px;
+  }
+  .cascade-caption strong{ color:var(--ink); }
+</style>
+</head>
+<body class="has-top-banner">
+
+  <!-- Cross-page data banner: links to each timepoint's analysis page -->
+  <div class="top-banner-link">
+    <a href="day35.html">Day 35: Unedited vs CRISPRoff &rarr;</a>
+    <a href="day6.html">Day 6: Unedited vs CRISPRoff &rarr;</a>
+    <a href="day6VSday35.html">Day 35 vs Day 6: compared &rarr;</a>
+  </div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <span class="brand-mark">CD55</span>
+      <span class="brand-sub">DAF · ген комплемента</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#mechanism">Механизм</a>
+      <a href="#biology">Биология</a>
+      <a href="#clinical">Клиника</a>
+      <a href="#variant">Мой вариант</a>
+      <a href="#references">Источники</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow">Chromosome 1q32 · Complement Control Protein family</div>
+    <h1 class="display">Белок, который каждую секунду говорит<br><em>«это свой».</em></h1>
+    <p class="hero-sub">CD55 (он же DAF — decay-accelerating factor) сидит на поверхности почти всех ваших клеток и в реальном времени останавливает систему комплемента, не давая ей атаковать собственные ткани. Разберём, как именно, где это важно и что известно о вариантах гена.</p>
+
+    <div class="cascade-card">
+      <div class="cascade-head">
+        <div class="cascade-title">СХЕМА: C3-КОНВЕРТАЗА НА ПОВЕРХНОСТИ КЛЕТКИ</div>
+        <div class="toggle">
+          <button id="btn-off" class="active">Без CD55</button>
+          <button id="btn-on">С CD55</button>
+        </div>
+      </div>
+      <div class="cascade-svg-wrap" id="cascade-svg"></div>
+      <div class="cascade-caption" id="cascade-caption"></div>
+    </div>
+  </section>
+
+  <section id="mechanism">
+    <div class="kicker">Механизм</div>
+    <h2>Как DAF разбирает конвертазу</h2>
+    <p class="lede">Система комплемента — это каскад белков крови, которые метят и разрушают чужеродные клетки. Проблема в том, что каскад склонен к самоусилению: если его не тормозить, он начнёт повреждать и здоровые клетки.</p>
+    <p>Когда фрагменты C3b или C4b оседают на поверхности клетки, они собираются в фермент — C3-конвертазу (C4b2a по классическому/лектиновому пути или C3bBb по альтернативному). Этот фермент лавинообразно расщепляет всё новые молекулы C3, что в итоге приводит к сборке мембраноатакующего комплекса и лизису клетки. CD55 физически связывается с C3b и C4b и ускоряет распад этих конвертаз — отсюда и название decay-accelerating factor. Он не разрушает уже сформированный мембраноатакующий комплекс, а не даёт ему вообще собраться, обрывая каскад на раннем этапе.<a href="#ref-1" class="cite">[1]</a><a href="#ref-2" class="cite">[2]</a></p>
+
+    <div class="domain-strip">
+      <div class="domain"><div class="n">CCP1</div><div class="t">сушi-домен</div></div>
+      <div class="domain"><div class="n">CCP2</div><div class="t">связывание C3b/C4b</div></div>
+      <div class="domain"><div class="n">CCP3</div><div class="t">ключевой для активности</div></div>
+      <div class="domain"><div class="n">CCP4</div><div class="t">стабилизация</div></div>
+      <div class="domain"><div class="n">Ser/Thr stalk</div><div class="t">гибкий линкер</div></div>
+      <div class="domain"><div class="n">GPI-anchor</div><div class="t">крепление к мембране</div></div>
+    </div>
+    <p style="font-size:14px;">Белок массой около 70 кДа состоит из четырёх повторов CCP (complement control protein, «sushi domains»), богатого серином/треонином стебля и заканчивается не трансмембранным доменом, а GPI-якорем — молекулой, которая встраивает CD55 прямо в липидный слой мембраны. Именно поэтому CD55 (как и CD59) исчезает с поверхности клеток при болезнях, нарушающих синтез GPI-якорей.<a href="#ref-3" class="cite">[3]</a><a href="#ref-4" class="cite">[4]</a></p>
+    <p style="font-size:14px;">Помимо блокировки комплемента, CD55 участвует и в регуляции адаптивного иммунитета: в опытах на мышах отсутствие аналога гена (Daf1) заметно усиливало T-клеточный ответ на иммунизацию, что говорит о дополнительной сдерживающей роли CD55 для T-лимфоцитов.<a href="#ref-16" class="cite">[16]</a></p>
+  </section>
+
+  <section id="biology">
+    <div class="kicker">Биология</div>
+    <h2>Где ещё «работает» этот ген</h2>
+    <div class="grid2">
+      <div class="card">
+        <span class="tag teal">Экспрессия</span>
+        <h3>Почти повсеместный, но неравномерный</h3>
+        <p>CD55 присутствует на большинстве типов клеток, но особенно высок в дыхательных путях, репродуктивных тканях, эндотелии сосудов и на клетках крови — там, где контакт с системой комплемента наиболее вероятен.<a href="#ref-2" class="cite">[2]</a></p>
+      </div>
+      <div class="card">
+        <span class="tag teal">Группа крови</span>
+        <h3>Антиген системы Cromer</h3>
+        <p>CD55 — это ещё и несущий белок для антигенов группы крови Cromer. Редкие варианты гена меняют профиль этих антигенов, что имеет значение при переливании крови.<a href="#ref-9" class="cite">[9]</a></p>
+      </div>
+      <div class="card">
+        <span class="tag amber">Обратная сторона</span>
+        <h3>«Дверь», которой пользуются вирусы</h3>
+        <p>Некоторые энтеровирусы (например, отдельные эховирусы и коксаки-вирусы) используют CD55 как рецептор для проникновения в клетку — обилие белка на поверхности клетки, которое защищает от комплемента, одновременно делает его удобной мишенью для патогенов.<a href="#ref-9" class="cite">[9]</a><a href="#ref-10" class="cite">[10]</a></p>
+      </div>
+      <div class="card">
+        <span class="tag amber">Онкология</span>
+        <h3>Щит для опухолевых клеток</h3>
+        <p>Многие опухоли гиперэкспрессируют CD55, что снижает эффективность комплемент-зависимого уничтожения раковых клеток иммунной системой — это одна из причин, по которой CD55 изучают как мишень для терапии.<a href="#ref-8" class="cite">[8]</a><a href="#ref-11" class="cite">[11]</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="clinical">
+    <div class="kicker">Клиническое значение</div>
+    <h2>Когда регуляция ломается</h2>
+    <p class="lede">Важно не путать два состояния, которые часто упоминают рядом с CD55 — они возникают по совершенно разным причинам.</p>
+
+    <div class="compare">
+      <div class="card">
+        <span class="tag crimson">Герминативная мутация CD55</span>
+        <h3>CHAPLE-синдром</h3>
+        <p>Редкое аутосомно-рецессивное заболевание: обе копии гена CD55 несут инактивирующие мутации. Название — аббревиатура от Complement Hyperactivation, Angiopathic thrombosis, Protein-Losing Enteropathy. Проявляется с детства отёками, потерей белка через кишечник и повышенной свёртываемостью.<a href="#ref-5" class="cite">[5]</a><a href="#ref-6" class="cite">[6]</a><a href="#ref-7" class="cite">[7]</a></p>
+        <ul>
+          <li>Причина: наследуемые мутации именно в CD55</li>
+          <li>Наследование: аутосомно-рецессивное</li>
+          <li>Встречаемость: очень редкое</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag crimson">Приобретённый дефицит GPI-якоря</span>
+        <h3>Пароксизмальная ночная гемоглобинурия (PNH)</h3>
+        <p>Возникает не из-за мутации в CD55, а из-за соматической мутации гена PIGA в стволовых клетках крови, которая нарушает синтез GPI-якорей вообще. В результате с поверхности эритроцитов пропадают сразу и CD55, и CD59 — отсюда гемолиз.<a href="#ref-1" class="cite">[1]</a><a href="#ref-8" class="cite">[8]</a></p>
+        <ul>
+          <li>Причина: соматическая мутация PIGA, не CD55</li>
+          <li>Наследование: приобретённое, не передаётся детям</li>
+          <li>CD55 страдает вторично, вместе с другими GPI-белками</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:16px;">
+      <div class="card">
+        <span class="tag amber">Регуляторный SNP</span>
+        <h3><span class="rsid">rs2564978</span> в промоторе</h3>
+        <p>Один из наиболее изученных вариантов CD55: находится в промоторной области и нарушает сайт связывания транскрипционного фактора PU.1, снижая активность промотора. В популяционных исследованиях его связывали с риском немелкоклеточного рака лёгкого, тяжёлым течением гриппа A и восприимчивостью к малярии — но во всех случаях речь идёт об умеренных статистических ассоциациях, а не о детерминирующем эффекте.<a href="#ref-12" class="cite">[12]</a><a href="#ref-13" class="cite">[13]</a><a href="#ref-14" class="cite">[14]</a></p>
+      </div>
+      <div class="card">
+        <span class="tag amber">Аутоиммунные состояния</span>
+        <h3>Сниженная экспрессия на клетках крови</h3>
+        <p>При аутоиммунной гемолитической анемии, части случаев аутоиммунной тромбоцитопении и цитопений на фоне волчанки описано снижение CD55 (и CD59) на поражённых клетках. Это, как правило, приобретённое и многофакторное явление, а не результат конкретного варианта гена.<a href="#ref-15" class="cite">[15]</a></p>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Это не медицинский инструмент.</strong> Материалы на странице и ответы ИИ-чата носят образовательный характер, основаны на открытых научных публикациях и не заменяют консультацию врача или генетического консультанта. Ассоциации «вариант — риск», упомянутые выше, в подавляющем большинстве статистические и популяционные: они не говорят о том, что произойдёт с конкретным человеком. Любые решения о здоровье принимайте вместе со специалистом.
+    </div>
+  </section>
+
+  <section id="variant">
+    <div class="kicker">Разберите свой вариант</div>
+    <h2>Введите rsID, генотип или строку из вашего файла</h2>
+    <p>Можно вставить, например, <span class="rsid">rs2564978</span>, генотип вроде <span class="genotype">CC</span>, или строку в формате 23andMe (<code>rsid&nbsp;&nbsp;chromosome&nbsp;&nbsp;position&nbsp;&nbsp;genotype</code>). Данные обрабатываются прямо в браузере; в чат с ИИ они уходят только если вы сами об этом попросите.</p>
+
+    <div class="explorer">
+      <div class="explorer-row">
+        <input id="variant-input" type="text" placeholder="например: rs2564978 CT" autocomplete="off">
+        <button class="btn" id="variant-lookup">Разобрать</button>
+      </div>
+      <div class="save-row">
+        <label><input type="checkbox" id="variant-save"> запомнить это на этом устройстве</label>
+      </div>
+      <div id="variant-result"></div>
+    </div>
+  </section>
+
+  <section id="references">
+    <div class="kicker">Библиография</div>
+    <h2>Источники</h2>
+    <p>Каждая цифра в тексте выше — ссылка на источник ниже. Где уместно, приведена короткая дословная цитата (в кавычках) — для остального содержания источника используйте ссылку.</p>
+    <ul class="ref-list">
+
+      <li class="ref-item" id="ref-1">
+        <span class="ref-num">[1]</span>
+        <div class="ref-body">
+          <h4>Decay-accelerating factor — Wikipedia</h4>
+          <div class="ref-meta">Механизм действия DAF, связь с PNH · <a href="https://en.wikipedia.org/wiki/Decay-accelerating_factor" target="_blank" rel="noopener">en.wikipedia.org/wiki/Decay-accelerating_factor</a></div>
+          <p class="ref-quote">«its expression is reduced in persons with mutations that reduce GPI levels»</p>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-2">
+        <span class="ref-num">[2]</span>
+        <div class="ref-body">
+          <h4>CD55 Gene — GeneCards</h4>
+          <div class="ref-meta">Функция, домены, экспрессия в тканях · <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=CD55" target="_blank" rel="noopener">genecards.org/cgi-bin/carddisp.pl?gene=CD55</a></div>
+          <p class="ref-quote">«preventing downstream membrane attack complex formation»</p>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-3">
+        <span class="ref-num">[3]</span>
+        <div class="ref-body">
+          <h4>Complement Regulator DAF/CD55 — Creative Biolabs</h4>
+          <div class="ref-meta">Хромосомная локализация, структура CCP-доменов · <a href="https://www.creative-biolabs.com/complement-therapeutics/complement-regulator-of-complement-system-decay-accelerating-factor-daf-cd55.htm" target="_blank" rel="noopener">creative-biolabs.com</a></div>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-4">
+        <span class="ref-num">[4]</span>
+        <div class="ref-body">
+          <h4>CD55: A Key Regulator of the Complement System — Mapmygenome</h4>
+          <div class="ref-meta">Молекулярная масса, GPI-якорь, CCP-повторы · <a href="https://learn.mapmygenome.in/CD55" target="_blank" rel="noopener">learn.mapmygenome.in/CD55</a></div>
+          <p class="ref-quote">«CD55 is a 70 kDa membrane protein attached to the cell membrane via a GPI anchor»</p>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-5">
+        <span class="ref-num">[5]</span>
+        <div class="ref-body">
+          <h4>Ozen et al., «CD55 Deficiency, Early-Onset Protein-Losing Enteropathy, and Thrombosis» — NEJM, 2017</h4>
+          <div class="ref-meta">Первое описание CHAPLE-синдрома · <a href="https://www.nejm.org/doi/full/10.1056/NEJMoa1615887" target="_blank" rel="noopener">nejm.org/doi/full/10.1056/NEJMoa1615887</a></div>
+          <p class="ref-quote">«abnormal complement activation due to biallelic loss-of-function mutations in CD55»</p>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-6">
+        <span class="ref-num">[6]</span>
+        <div class="ref-body">
+          <h4>OMIM #226300 — CHAPLE</h4>
+          <div class="ref-meta">Каталог менделевских болезней человека, запись о CD55 и CHAPLE · <a href="https://omim.org/entry/226300" target="_blank" rel="noopener">omim.org/entry/226300</a></div>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-7">
+        <span class="ref-num">[7]</span>
+        <div class="ref-body">
+          <h4>CD55 deficiency — Wikipedia</h4>
+          <div class="ref-meta">Обзор клинической картины CHAPLE-синдрома · <a href="https://en.wikipedia.org/wiki/CD55_deficiency" target="_blank" rel="noopener">en.wikipedia.org/wiki/CD55_deficiency</a></div>
+          <p class="ref-quote">«usually manifests in childhood and can be life-threatening»</p>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-8">
+        <span class="ref-num">[8]</span>
+        <div class="ref-body">
+          <h4>Decay-Accelerating Factor — ScienceDirect Topics</h4>
+          <div class="ref-meta">Роль DAF в PNH и на опухолевых клетках · <a href="https://www.sciencedirect.com/topics/biochemistry-genetics-and-molecular-biology/decay-accelerating-factor" target="_blank" rel="noopener">sciencedirect.com/topics/.../decay-accelerating-factor</a></div>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-9">
+        <span class="ref-num">[9]</span>
+        <div class="ref-body">
+          <h4>CD55 Gene (Cromer Blood Group) — GeneCards</h4>
+          <div class="ref-meta">Список вирусов-рецепторов, антигены Cromer · <a href="https://www.genecards.org/card/CD55" target="_blank" rel="noopener">genecards.org/card/CD55</a></div>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-10">
+        <span class="ref-num">[10]</span>
+        <div class="ref-body">
+          <h4>Bergelson et al., 1994, цит. по «Cromer System» — SpringerLink</h4>
+          <div class="ref-meta">Открытие CD55 как рецептора для эховирусов · <a href="https://link.springer.com/chapter/10.1007/978-3-7091-6294-1_21" target="_blank" rel="noopener">link.springer.com/chapter/10.1007/978-3-7091-6294-1_21</a></div>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-11">
+        <span class="ref-num">[11]</span>
+        <div class="ref-body">
+          <h4>CD55 molecule — Creative Biogene</h4>
+          <div class="ref-meta">CD55, CD97 и роль в миграции опухолевых клеток · <a href="https://www.creative-biogene.com/genesearch/CD55.html" target="_blank" rel="noopener">creative-biogene.com/genesearch/CD55.html</a></div>
+          <p class="ref-quote">«CD55 has been found to help tumor cell migration and metastases»</p>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-12">
+        <span class="ref-num">[12]</span>
+        <div class="ref-body">
+          <h4>Xu et al., «Association Between CD55 Polymorphisms and Susceptibility to... Malaria» — Vector-Borne and Zoonotic Diseases, 2025</h4>
+          <div class="ref-meta">rs2564978 и восприимчивость к малярии · <a href="https://journals.sagepub.com/doi/full/10.1089/vbz.2024.0132" target="_blank" rel="noopener">journals.sagepub.com/doi/full/10.1089/vbz.2024.0132</a></div>
+          <p class="ref-quote">«heterozygous CT genotype was associated with an increased risk of uncomplicated malaria»</p>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-13">
+        <span class="ref-num">[13]</span>
+        <div class="ref-body">
+          <h4>«A common CD55 rs2564978 variant is associated with... NSCLC» — PMC, 2017</h4>
+          <div class="ref-meta">rs2564978 и риск немелкоклеточного рака лёгкого · <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5351625/" target="_blank" rel="noopener">ncbi.nlm.nih.gov/pmc/articles/PMC5351625</a></div>
+          <p class="ref-quote">«significantly higher lung cancer risk was linked with CD55 rs2564978 CC genotype»</p>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-14">
+        <span class="ref-num">[14]</span>
+        <div class="ref-body">
+          <h4>«The rs2564978(T) Allele Associated with Severe Influenza A Disrupts... PU.1» — Molecular Biology, 2024</h4>
+          <div class="ref-meta">Механизм нарушения сайта связывания PU.1 · <a href="https://link.springer.com/article/10.1134/S002689332402016X" target="_blank" rel="noopener">link.springer.com/article/10.1134/S002689332402016X</a></div>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-15">
+        <span class="ref-num">[15]</span>
+        <div class="ref-body">
+          <h4>«The role of complement regulatory proteins (CD55 and CD59) in autoimmune hemocytopenias» — ScienceDirect</h4>
+          <div class="ref-meta">Снижение CD55/CD59 при аутоиммунных цитопениях · <a href="https://www.sciencedirect.com/science/article/abs/pii/S1568997206001637" target="_blank" rel="noopener">sciencedirect.com/science/article/abs/pii/S1568997206001637</a></div>
+          <p class="ref-quote">«cytopenias are associated to deficient expression of CD55 and CD59»</p>
+        </div>
+      </li>
+
+      <li class="ref-item" id="ref-16">
+        <span class="ref-num">[16]</span>
+        <div class="ref-body">
+          <h4>«The complement inhibitory protein DAF (CD55) suppresses T cell immunity in vivo» — J. Experimental Medicine, 2005</h4>
+          <div class="ref-meta">Роль DAF/Daf1 в сдерживании T-клеточного ответа · <a href="https://rupress.org/jem/article/201/4/567/52879/" target="_blank" rel="noopener">rupress.org/jem/article/201/4/567/52879</a></div>
+          <p class="ref-quote">«significantly enhanced T cell responses to active immunization»</p>
+        </div>
+      </li>
+
+    </ul>
+    <p style="font-size:12.5px; color:var(--ink-faint); margin-top:18px;">Это не исчерпывающий обзор литературы по CD55 — подборка отражает факты, упомянутые на этой странице. Спросите ИИ-чат, если нужны дополнительные источники по конкретному вопросу: он умеет искать в интернете и обычно указывает, что и где нашёл.</p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    Источники перечислены в разделе «Библиография» выше. Страница создана как образовательный ресурс и не хранит вашу генетическую информацию на сервере.
+  </div>
+</footer>
+
+<button class="chat-fab" id="chat-open" aria-haspopup="dialog">
+  <span>💬</span> Спросить ИИ про CD55
+</button>
+
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-label="Чат про ген CD55">
+  <div class="drawer-head">
+    <div>
+      <h3>Разговор о CD55</h3>
+      <div class="sub">Может искать в интернете свежие данные</div>
+    </div>
+    <button class="drawer-close" id="drawer-close" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body">
+    <div class="msg system-note">Спросите про механизм, конкретный вариант, связь с болезнью — или про то, что вы ввели в разделе «Мой вариант».</div>
+  </div>
+  <div class="drawer-suggest" id="drawer-suggest">
+    <span class="chip" data-q="Объясни, что значит CT-генотип по rs2564978">rs2564978: что значит CT?</span>
+    <span class="chip" data-q="В чём разница между CHAPLE и PNH простыми словами?">CHAPLE vs PNH</span>
+    <span class="chip" data-q="Насколько серьёзны исследования CD55 и рака лёгкого?">Надёжность связи с раком лёгкого</span>
+  </div>
+  <div class="drawer-input">
+    <textarea id="chat-text" rows="1" placeholder="Спросите что-нибудь про CD55…"></textarea>
+    <button class="send-btn" id="chat-send">→</button>
+  </div>
+</aside>
+
+<script>
+/* ---------------- Cascade diagram ---------------- */
+const svgOff = `
+<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="150" width="640" height="14" fill="#1B1F26"/>
+  <rect x="0" y="164" width="640" height="6" fill="#2B303A"/>
+  <g id="conv-off">
+    <rect x="260" y="108" width="42" height="42" rx="8" fill="#E69F00" opacity="0.9"/>
+    <rect x="300" y="118" width="30" height="26" rx="6" fill="#F0E442" opacity="0.9"/>
+    <text x="281" y="133" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#0D0F12">C4b2a</text>
+  </g>
+  <g id="pulse-off">
+    <circle cx="360" cy="70" r="5" fill="#E69F00"><animate attributeName="cy" values="150;40" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" repeatCount="indefinite"/></circle>
+    <circle cx="380" cy="70" r="5" fill="#E69F00"><animate attributeName="cy" values="150;30" dur="1.6s" begin="0.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" begin="0.4s" repeatCount="indefinite"/></circle>
+    <circle cx="400" cy="70" r="5" fill="#E69F00"><animate attributeName="cy" values="150;50" dur="1.6s" begin="0.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" begin="0.8s" repeatCount="indefinite"/></circle>
+  </g>
+  <g transform="translate(430,20)">
+    <circle cx="30" cy="30" r="26" fill="none" stroke="#E69F00" stroke-width="3" stroke-dasharray="5 4"/>
+    <text x="30" y="35" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#E69F00" font-weight="600">MAC</text>
+  </g>
+  <text x="20" y="30" font-family="Space Grotesk" font-size="13" fill="#A6ABB4">Мембрана клетки</text>
+</svg>`;
+
+const svgOn = `
+<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="150" width="640" height="14" fill="#1B1F26"/>
+  <rect x="0" y="164" width="640" height="6" fill="#2B303A"/>
+  <g>
+    <rect x="260" y="122" width="42" height="28" rx="8" fill="#E69F00" opacity="0.35"/>
+    <rect x="300" y="128" width="30" height="18" rx="6" fill="#F0E442" opacity="0.35"/>
+  </g>
+  <g>
+    <circle cx="330" cy="110" r="20" fill="#0D0F12" stroke="#56B4E9" stroke-width="3"/>
+    <text x="330" y="114" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#56B4E9" font-weight="700">DAF</text>
+  </g>
+  <g>
+    <line x1="270" y1="130" x2="235" y2="90" stroke="#56B4E9" stroke-width="2" opacity="0.8"><animate attributeName="opacity" values="0;1;0" dur="1.8s" repeatCount="indefinite"/></line>
+    <line x1="300" y1="130" x2="250" y2="60" stroke="#56B4E9" stroke-width="2" opacity="0.6"><animate attributeName="opacity" values="0;1;0" dur="1.8s" begin=".3s" repeatCount="indefinite"/></line>
+  </g>
+  <text x="380" y="70" font-family="Space Grotesk" font-size="12" fill="#56B4E9">каскад разобран</text>
+  <text x="20" y="30" font-family="Space Grotesk" font-size="13" fill="#A6ABB4">Мембрана клетки</text>
+</svg>`;
+
+const cascadeEl = document.getElementById('cascade-svg');
+const captionEl = document.getElementById('cascade-caption');
+const btnOff = document.getElementById('btn-off');
+const btnOn = document.getElementById('btn-on');
+
+function setCascade(on){
+  cascadeEl.innerHTML = on ? svgOn : svgOff;
+  btnOn.classList.toggle('active', on);
+  btnOff.classList.toggle('active', !on);
+  captionEl.innerHTML = on
+    ? '<strong>С CD55:</strong> DAF связывается с C4b/C3b в составе конвертазы и ускоряет её распад раньше, чем каскад успеет усилиться — мембраноатакующий комплекс не собирается.'
+    : '<strong>Без CD55:</strong> конвертаза (C4b2a или C3bBb) остаётся стабильной, каскад лавинообразно расщепляет C3, и в итоге собирается мембраноатакующий комплекс (MAC), который лизирует клетку.';
+}
+btnOff.addEventListener('click', () => setCascade(false));
+btnOn.addEventListener('click', () => setCascade(true));
+setCascade(false);
+
+/* ---------------- Variant explorer ---------------- */
+const KNOWN_VARIANTS = {
+  'rs2564978': {
+    location: 'промотор CD55',
+    summary: 'Нарушает сайт связывания транскрипционного фактора PU.1, снижая активность промотора и, соответственно, уровень белка CD55 на поверхности клеток (особенно заметно на моноцитах). <a href="#ref-14" class="cite">[14]</a>',
+    genotypes: {
+      'TT': 'Обычно рассматривается как референсный/более распространённый вариант в изученных когортах — в упомянутых исследованиях выступал как группа сравнения с более низким риском.',
+      'CT': 'Гетерозиготный вариант; в отдельных исследованиях ассоциировался с умеренно повышенным риском некоторых инфекций и лёгочных опухолей — эффект небольшой и статистический.',
+      'CC': 'Гомозиготный по минорному аллелю; в ряде исследований показывал наиболее выраженную (но всё ещё умеренную) ассоциацию со сниженной активностью промотора и повышенным относительным риском в отдельных когортах.'
+    },
+    caveat: 'Все ассоциации получены в популяционных исследованиях "случай-контроль", часто в конкретных этнических группах (например, китайская Хань) — они не переносятся автоматически на любого человека и не являются диагнозом.'
+  }
+};
+
+function renderVariantResult(raw){
+  const resultEl = document.getElementById('variant-result');
+  const cleaned = raw.trim();
+  if(!cleaned){
+    resultEl.innerHTML = '<div class="result-empty">Введите rsID (например, rs2564978) с генотипом или без.</div>';
+    return;
+  }
+  // try to parse "rsid genotype" or 23andMe-style tab line
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  let rsid = null, genotype = null;
+  for(const p of parts){
+    if(/^rs\d+$/i.test(p)) rsid = p.toLowerCase();
+    else if(/^[ACGT]{1,2}$/i.test(p)) genotype = p.toUpperCase();
+  }
+  if(!rsid){
+    resultEl.innerHTML = `<div class="result-empty">Не нашёл rsID в этой строке. Попробуйте формат вроде <span class="rsid">rs2564978 CT</span>, или спросите об этом ИИ-чат.</div>`;
+    return;
+  }
+  const data = KNOWN_VARIANTS[rsid];
+  if(!data){
+    resultEl.innerHTML = `
+      <div class="card" style="margin-top:14px;">
+        <span class="tag amber">${rsid}</span>
+        <h3>Этого варианта нет в нашей курируемой подборке</h3>
+        <p>Мы храним локально данные лишь по нескольким наиболее изученным вариантам CD55. Нажмите «Спросить ИИ» — чат может поискать актуальные публикации именно по <span class="rsid">${rsid}</span>${genotype ? ' и генотипу ' + genotype : ''}.</p>
+        <button class="btn ghost" onclick="askAboutVariant('${rsid}','${genotype||''}')">Спросить ИИ про ${rsid}</button>
+      </div>`;
+    return;
+  }
+  const genotypeText = genotype && data.genotypes[genotype]
+    ? `<p><strong>Генотип ${genotype}:</strong> ${data.genotypes[genotype]}</p>`
+    : (genotype ? `<p style="color:var(--ink-faint);font-size:13.5px;">Генотип «${genotype}» не распознан в нашей подборке (ожидались TT / CT / CC).</p>` : '');
+  resultEl.innerHTML = `
+    <div class="card" style="margin-top:14px;">
+      <span class="tag teal">${rsid}</span>
+      <h3>${data.location}</h3>
+      <p>${data.summary}</p>
+      ${genotypeText}
+      <p style="font-size:12.5px; color:var(--ink-faint);">${data.caveat}</p>
+      <button class="btn ghost" onclick="askAboutVariant('${rsid}','${genotype||''}')">Обсудить это с ИИ</button>
+    </div>`;
+}
+
+document.getElementById('variant-lookup').addEventListener('click', async () => {
+  const val = document.getElementById('variant-input').value;
+  renderVariantResult(val);
+  const save = document.getElementById('variant-save').checked;
+  if(save && val.trim()){
+    try{ await window.storage.set('cd55-variant', val.trim(), false); }catch(e){ console.warn('storage save failed', e); }
+  }
+});
+document.getElementById('variant-input').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') document.getElementById('variant-lookup').click();
+});
+
+// restore saved variant on load
+(async () => {
+  try{
+    const saved = await window.storage.get('cd55-variant', false);
+    if(saved && saved.value){
+      document.getElementById('variant-input').value = saved.value;
+      document.getElementById('variant-save').checked = true;
+    }
+  }catch(e){ /* no saved value yet, ignore */ }
+})();
+
+/* ---------------- Chat ---------------- */
+const drawer = document.getElementById('drawer');
+const overlay = document.getElementById('drawer-overlay');
+const body = document.getElementById('drawer-body');
+const textEl = document.getElementById('chat-text');
+const sendBtn = document.getElementById('chat-send');
+let chatHistory = []; // {role, content}
+let currentVariantContext = '';
+
+function openDrawer(){
+  drawer.classList.add('open');
+  overlay.classList.add('open');
+  textEl.focus();
+}
+function closeDrawer(){
+  drawer.classList.remove('open');
+  overlay.classList.remove('open');
+}
+document.getElementById('chat-open').addEventListener('click', openDrawer);
+document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+overlay.addEventListener('click', closeDrawer);
+
+window.askAboutVariant = function(rsid, genotype){
+  currentVariantContext = `Пользователь интересуется вариантом ${rsid}${genotype ? ' с генотипом ' + genotype : ''}.`;
+  openDrawer();
+  textEl.value = `Расскажи подробнее про ${rsid}${genotype ? ' (генотип ' + genotype + ')' : ''}: что о нём известно, насколько надёжны данные?`;
+  textEl.focus();
+};
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    textEl.value = chip.dataset.q;
+    sendMessage();
+  });
+});
+
+function addMessage(role, text){
+  const div = document.createElement('div');
+  if(role === 'user'){
+    div.className = 'msg user';
+    div.textContent = text;
+  } else {
+    div.className = 'msg assistant';
+    div.innerHTML = `<div class="who">CD55 assistant</div><div class="content"></div>`;
+    div.querySelector('.content').innerHTML = formatAssistantText(text);
+  }
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+  return div;
+}
+
+function formatAssistantText(text){
+  // minimal markdown-ish formatting: paragraphs + bold
+  return text
+    .split(/\n{2,}/)
+    .map(p => `<p>${escapeHtml(p).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</p>`)
+    .join('');
+}
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function addTyping(){
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+function removeTyping(){
+  const el = document.getElementById('typing-indicator');
+  if(el) el.remove();
+}
+
+const SYSTEM_PROMPT = `Ты — образовательный ассистент, специализирующийся на гене CD55 (DAF, decay-accelerating factor) и системе комплемента. Отвечай точно, ссылаясь на механизмы и известные исследования. Используй веб-поиск, если нужно найти конкретную научную публикацию, свежие данные о варианте (rsID) или актуальную статистику.
+
+Правила:
+- Ты НЕ ставишь диагнозы и не даёшь персональных медицинских рекомендаций. Если пользователь спрашивает про личное здоровье или решения о лечении — дай образовательный контекст и порекомендуй обратиться к врачу или генетическому консультанту.
+- Чётко разделяй установленные факты, статистические ассоциации из исследований и предположения.
+- Если пользователь указывает свой генотип/вариант, объясняй, что это значит на уровне механизма и популяционных данных, но не делай выводов о его личном риске как факта.
+- Отвечай на языке пользователя (обычно русский), понятно, но с точной терминологией. Используй короткие абзацы.
+- Когда приводишь конкретный факт, исследование или статистику — указывай источник (название публикации/базы данных и, если нашёл через поиск, ссылку). Если не уверен в источнике — так и скажи, не выдумывай ссылку.
+${currentVariantContext ? '\nКонтекст: ' + currentVariantContext : ''}`;
+
+async function callClaude(messages){
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT,
+      messages: messages,
+      tools: [{ type: "web_search_20250305", name: "web_search" }]
+    })
+  });
+  if(!response.ok){
+    throw new Error('API error: ' + response.status);
+  }
+  const data = await response.json();
+  const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
+  return textBlocks.join('\n\n') || 'Не удалось получить ответ. Попробуйте переформулировать вопрос.';
+}
+
+async function sendMessage(){
+  const text = textEl.value.trim();
+  if(!text) return;
+  textEl.value = '';
+  sendBtn.disabled = true;
+  addMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  addTyping();
+  try{
+    const reply = await callClaude(chatHistory);
+    removeTyping();
+    addMessage('assistant', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  }catch(e){
+    removeTyping();
+    addMessage('assistant', 'Произошла ошибка при обращении к ИИ. Попробуйте ещё раз через пару секунд.');
+    console.error(e);
+  }finally{
+    sendBtn.disabled = false;
+    textEl.focus();
+  }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+textEl.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+textEl.addEventListener('input', () => {
+  textEl.style.height = 'auto';
+  textEl.style.height = Math.min(textEl.scrollHeight, 100) + 'px';
+});
+</script>
+</body>
+</html>
