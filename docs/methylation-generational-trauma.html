@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inherited Marks — DNA Methylation &amp; Generational Trauma — epicme.bio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b1210;
+    --bg-panel: #101a17;
+    --bg-panel-2: #0e1a1c;
+    --line: #23332f;
+    --ink: #e9efe9;
+    --ink-dim: #a9bab3;
+    --ink-faint: #6f8179;
+    --amber: #e0a458;
+    --cyan: #4fb3bf;
+    --rose: #c97b84;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--amber); color:#0b1210; }
+  a{ color:var(--cyan); }
+  .wrap{ max-width:780px; margin:0 auto; padding:0 24px; }
+
+  .mk{ display:inline-block; width:0.62em; height:0.62em; border-radius:50%;
+       margin-right:0.5em; vertical-align:middle; flex-shrink:0; border:1.6px solid currentColor; }
+  .mk.filled{ background:currentColor; }
+  .mk.open{ background:transparent; }
+
+  header.hero{ padding:80px 0 48px; border-bottom:1px solid var(--line); }
+  .eyebrow{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:0.14em;
+            text-transform:uppercase; color:var(--ink-faint); display:flex; align-items:center; gap:10px; margin-bottom:22px; }
+  .eyebrow .mk{ color:var(--amber); }
+  h1{ font-family:'Fraunces', serif; font-weight:500; font-size:clamp(32px,5.6vw,50px);
+      line-height:1.1; letter-spacing:-0.01em; margin:0 0 20px; }
+  h1 em{ font-style:italic; color:var(--amber); }
+  .hero p.lede{ font-size:17.5px; color:var(--ink-dim); max-width:58ch; margin:0 0 8px; }
+
+  section{ padding:52px 0; border-bottom:1px solid var(--line); }
+  section:last-of-type{ border-bottom:none; }
+  .kicker{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.1em;
+           text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px; }
+  h2{ font-family:'Fraunces', serif; font-weight:500; font-size:clamp(23px,3.8vw,29px); margin:0 0 16px; letter-spacing:-0.01em; }
+  h3{ font-family:'IBM Plex Sans', sans-serif; font-weight:600; font-size:17px; margin:6px 0 4px; color:var(--ink); }
+  .meta{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-faint); margin-bottom:14px; }
+  p{ color:var(--ink-dim); margin:0 0 14px; font-size:15.5px; }
+  p strong{ color:var(--ink); font-weight:600; }
+  .gene{ font-family:'IBM Plex Mono', monospace; color:var(--amber); font-size:0.92em; }
+  blockquote{
+    margin:16px 0; padding:14px 18px;
+    border-left:3px solid var(--amber);
+    background:var(--bg-panel);
+    font-family:'Fraunces', serif; font-style:italic; font-size:16.5px;
+    color:var(--ink);
+  }
+  blockquote cite{ display:block; margin-top:8px; font-family:'IBM Plex Mono', monospace;
+    font-style:normal; font-size:12px; color:var(--ink-faint); }
+
+  .paper{ background:var(--bg-panel); border:1px solid var(--line); border-radius:8px; padding:22px 24px; margin:22px 0; }
+  .paper .tag{ display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:11px;
+    text-transform:uppercase; letter-spacing:0.08em; color:var(--cyan); border:1px solid var(--line);
+    border-radius:20px; padding:3px 10px; margin-bottom:10px; }
+
+  .callout{ background:var(--bg-panel); border:1px solid var(--line); border-left:3px solid var(--cyan);
+    border-radius:6px; padding:16px 18px; margin:20px 0; font-size:14.5px; color:var(--ink-dim); }
+  .callout .mk{ color:var(--cyan); }
+  .caution{ background:var(--bg-panel-2); border:1px solid var(--line); border-left:3px solid var(--rose);
+    border-radius:6px; padding:16px 18px; margin:20px 0; font-size:14.5px; color:var(--ink-dim); }
+  .caution .kicker{ color:var(--rose); }
+
+  /* ---- generational diagram ---- */
+  .gen-diagram{ margin:26px 0; overflow-x:auto; }
+  .gen-diagram svg{ display:block; min-width:640px; width:100%; height:auto; }
+  .gen-caption{ font-size:13px; color:var(--ink-faint); margin-top:10px; }
+
+  /* ---- sample size bars ---- */
+  .bars{ margin:22px 0; }
+  .bar-row{ display:flex; align-items:center; gap:12px; margin-bottom:10px; font-size:13px; }
+  .bar-label{ width:230px; flex-shrink:0; color:var(--ink-dim); font-family:'IBM Plex Mono', monospace; font-size:12px; }
+  .bar-track{ flex:1; background:var(--bg-panel-2); border:1px solid var(--line); border-radius:4px; height:16px; position:relative; }
+  .bar-fill{ height:100%; border-radius:3px 0 0 3px; }
+  .bar-n{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-faint); width:70px; text-align:right; }
+
+  /* ---- table ---- */
+  .tbl{ width:100%; border-collapse:collapse; margin:20px 0; font-size:13.5px; }
+  .tbl th{ text-align:left; font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase;
+    letter-spacing:0.06em; color:var(--ink-faint); padding:8px 10px; border-bottom:1px solid var(--line); }
+  .tbl td{ padding:10px 10px; border-bottom:1px solid var(--line); color:var(--ink-dim); vertical-align:top; }
+  .tbl td.gene{ white-space:nowrap; }
+  .tbl tr:last-child td{ border-bottom:none; }
+
+  ul.refs{ list-style:none; margin:0; padding:0; font-size:13.5px; color:var(--ink-faint); }
+  ul.refs li{ padding:10px 0; border-top:1px solid var(--line); display:flex; gap:10px; }
+  ul.refs li:first-child{ border-top:none; }
+  ul.refs .mk{ margin-top:4px; }
+
+  footer{ padding:40px 0 80px; font-size:13px; color:var(--ink-faint); }
+  footer a{ color:var(--ink-dim); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="mk open"></span> epicme.bio — field notes</div>
+    <h1>Does trauma leave<br><em>a mark on the next generation?</em></h1>
+    <p class="lede">A survey of what's actually been measured — not what headlines claim. Human cohort studies, mouse mechanistic work, and the germline-biology critique that most popular coverage skips entirely.</p>
+  </div>
+</header>
+
+<section id="framing">
+  <div class="wrap">
+    <div class="kicker">before the papers — one definition that matters</div>
+    <h2>Intergenerational vs. transgenerational</h2>
+    <p>These words get used interchangeably in the press, but in this field they mean different things, and the difference determines what a study can actually prove.</p>
+
+    <div class="gen-diagram">
+      <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of F0 through F3 generations showing which are directly exposed versus germline-exposed versus truly transgenerational">
+        <!-- generation lane lines -->
+        <line x1="40" y1="40" x2="640" y2="40" stroke="#23332f" stroke-width="1"/>
+        <line x1="40" y1="95" x2="640" y2="95" stroke="#23332f" stroke-width="1"/>
+        <line x1="40" y1="150" x2="640" y2="150" stroke="#23332f" stroke-width="1"/>
+
+        <!-- F0 -->
+        <circle cx="90" cy="40" r="16" fill="#e0a458"/>
+        <text x="90" y="45" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#0b1210">F0</text>
+        <text x="90" y="70" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="#a9bab3">directly exposed</text>
+
+        <!-- F1 -->
+        <circle cx="270" cy="95" r="16" fill="#e0a458" fill-opacity="0.55" stroke="#e0a458" stroke-width="1.5"/>
+        <text x="270" y="100" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#0b1210">F1</text>
+        <text x="270" y="122" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="#a9bab3">germline-exposed in utero</text>
+        <text x="270" y="137" text-anchor="middle" font-family="IBM Plex Mono" font-size="10.5" fill="#6f8179">= intergenerational</text>
+
+        <!-- F2 -->
+        <circle cx="450" cy="150" r="16" fill="none" stroke="#4fb3bf" stroke-width="2"/>
+        <text x="450" y="155" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#4fb3bf">F2</text>
+        <text x="450" y="177" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="#a9bab3">first unexposed generation</text>
+        <text x="450" y="192" text-anchor="middle" font-family="IBM Plex Mono" font-size="10.5" fill="#4fb3bf">= true transgenerational test (maternal line)</text>
+
+        <!-- F3 for paternal -->
+        <circle cx="600" cy="150" r="16" fill="none" stroke="#4fb3bf" stroke-width="2" stroke-dasharray="3 3"/>
+        <text x="600" y="155" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#4fb3bf">F3</text>
+        <text x="600" y="177" text-anchor="middle" font-family="IBM Plex Sans" font-size="10.5" fill="#a9bab3">paternal-line equivalent</text>
+
+        <!-- connecting arrows -->
+        <path d="M106,42 C180,42 210,90 254,93" stroke="#6f8179" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+        <path d="M286,97 C360,97 400,145 434,148" stroke="#6f8179" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#6f8179"/>
+          </marker>
+        </defs>
+      </svg>
+      <p class="gen-caption"><span class="mk filled" style="color:var(--amber)"></span> filled = directly or germline-exposed &nbsp;·&nbsp; <span class="mk open" style="color:var(--cyan)"></span> open = never exposed, mark still present = the actual transgenerational claim</p>
+    </div>
+
+    <p>If a pregnant female (<strong>F0</strong>) is exposed to trauma, her fetus (<strong>F1</strong>) was already alive — and so were that fetus's own developing germ cells, meaning the future <strong>F2</strong> generation's DNA was physically present, in utero, during the exposure. That's <strong>intergenerational</strong> transmission: direct exposure, just at an early developmental stage. The real test of transgenerational inheritance is whether the effect still shows up in a generation that was never physically present for the event at all — F2 through the maternal line, F3 through the paternal line. Most human trauma studies, including the ones below, are intergenerational (F0→F1). Very few get to a genuine F2/F3 test.</p>
+  </div>
+</section>
+
+<section id="human">
+  <div class="wrap">
+    <div class="kicker">01 — human cohort studies</div>
+    <h2>What's been measured in people</h2>
+
+    <div class="paper">
+      <span class="tag">Biological Psychiatry, 2016</span>
+      <h3>Yehuda et al. — Holocaust Exposure Induced Intergenerational Effects on <span class="gene">FKBP5</span> Methylation</h3>
+      <div class="meta">32 Holocaust survivors · 22 adult offspring · matched controls · blood-derived DNA</div>
+      <p>The first study to directly test, in humans, whether a parent's methylation response to trauma shows up in their adult children at the same genomic site. The team measured methylation at <span class="gene">FKBP5</span> intron 7 — the same glucocorticoid-response region implicated in PTSD risk generally — in survivors and their offspring.</p>
+      <p>The result was directionally striking rather than simply "more methylation everywhere": survivors themselves showed <em>higher</em> methylation than controls at one specific CpG site, while their offspring showed <em>lower</em> methylation than controls at that same site. The offspring effect held up even after controlling for the offspring's own FKBP5 genotype and their own trauma exposure — meaning it wasn't just inherited DNA sequence or the offspring's own hard life doing the work.</p>
+      <blockquote>"Holocaust exposure had an effect on FKBP5 methylation that was observed in exposed parents as well in their offspring."<cite>— Yehuda et al., Biological Psychiatry, 2016</cite></blockquote>
+      <p>Caveat the authors themselves flagged: sample sizes this small (n=22 offspring) can't distinguish gamete-mediated transmission from in-utero effects, and can't rule out that offspring methylation partly reflects growing up with a parent who had PTSD, not a molecular inheritance at all.</p>
+    </div>
+
+    <div class="paper">
+      <span class="tag">World J. Biological Psychiatry, 2014</span>
+      <h3>Perroud et al. — The Tutsi Genocide and Transgenerational Transmission of Maternal Stress</h3>
+      <div class="meta">25 women pregnant during the 1994 Rwandan genocide · their children · 25 non-exposed matched pairs</div>
+      <p>Women who were pregnant during the genocide — and were therefore carrying what would become the F1 generation, with F2 germ cells already forming — were compared with non-exposed Rwandan mothers of the same era. Both PTSD symptom severity and methylation of the glucocorticoid receptor gene <span class="gene">NR3C1</span> (exon 1F promoter) were measured in mothers and, years later, in their children.</p>
+      <p>Exposed mothers and their children both showed elevated <span class="gene">NR3C1</span> methylation, lower cortisol and glucocorticoid receptor levels, and higher mineralocorticoid receptor levels than the control pairs — the same HPA-axis signature appearing in both generations.</p>
+      <blockquote>"PTSD was associated with NR3C1 epigenetic modifications."<cite>— Perroud et al., World Journal of Biological Psychiatry, 2014</cite></blockquote>
+      <p>This is intergenerational by the definition above — the "offspring" generation was in utero during the genocide, not conceived afterward — so it can't distinguish a methylation mark transmitted through the germline from a methylation mark induced by the direct physiological stress of maternal cortisol crossing the placenta during pregnancy.</p>
+    </div>
+
+    <div class="paper">
+      <span class="tag">World Psychiatry, 2018 — review</span>
+      <h3>Yehuda &amp; Lehrner — Intergenerational Transmission of Trauma Effects: Putative Role of Epigenetic Mechanisms</h3>
+      <div class="meta">narrative review, human + animal literature</div>
+      <p>Yehuda's own review of the field is notably more hedged than the primary papers that made her name in this area. It walks through candidate windows for transmission — preconception effects on oocytes (which sit in a de-methylated, vulnerable state from birth until puberty), sperm epigenetic marks, and in-utero programming via maternal cortisol — and is explicit that current human data can support any of these routes without being able to cleanly separate them.</p>
+      <p>The review is also where the field's central limitation gets stated plainly: parental gender, PTSD status, and offspring developmental timing all shift the direction and magnitude of methylation differences across studies, in ways that don't yet resolve into one consistent mechanistic story.</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="animal">
+  <div class="wrap">
+    <div class="kicker">02 — mouse mechanistic work</div>
+    <h2>Where the germline evidence actually gets tested</h2>
+    <p>Human studies can show correlation across two generations; they can't touch the germline directly, breed multiple generations on command, or fully rule out confounds. Mouse work can — and it's where the "F2/F3, never exposed" bar from the diagram above actually gets cleared.</p>
+
+    <div class="paper">
+      <span class="tag">Nature Neuroscience, 2013</span>
+      <h3>Dias &amp; Ressler — Parental Olfactory Experience Influences Behavior and Neural Structure in Subsequent Generations</h3>
+      <div class="meta">mice · odor-shock fear conditioning to acetophenone · F1 and F2 tested</div>
+      <p>Male mice were conditioned to fear a specific odor (acetophenone, similar to cherry blossom) by pairing it with a mild shock, then bred — via natural mating <em>and</em>, separately, via in vitro fertilization, to rule out learned behavior or in-utero maternal exposure as the explanation. Their pups, who had never smelled the odor or been shocked, still startled more to that specific odor and not to others — and so did the following generation of grandpups.</p>
+      <p>The mechanistic piece: the odorant receptor gene for that specific smell was hypomethylated in the sperm of conditioned fathers, and both offspring and grandoffspring had measurably more neurons and a larger brain structure dedicated to processing that exact odor.</p>
+      <blockquote>"A parent's anxiety could influence later generations through epigenetic modifications."<cite>— Kerry Ressler, quoted in Nature News, 2013</cite></blockquote>
+      <p>This is the cleanest published evidence that a learned, fear-specific association can leave a locus-specific methylation signature in sperm and produce a matching phenotype two generations later without any physical or social exposure — in mice. It has not been, and likely cannot ethically be, replicated this cleanly in humans.</p>
+    </div>
+
+    <div class="paper">
+      <span class="tag">Nature Neuroscience, 2014</span>
+      <h3>Gapp et al. — Implication of Sperm RNAs in Transgenerational Inheritance of the Effects of Early Trauma in Mice</h3>
+      <div class="meta">mice · early-life maternal separation + unpredictable stress</div>
+      <p>A companion mechanistic thread to the methylation story: this group traced altered metabolic and behavioral phenotypes in the offspring of stressed fathers not to sperm DNA methylation directly, but to small RNAs carried in sperm. Injecting those sperm RNAs alone into normal fertilized eggs was sufficient to reproduce some of the offspring phenotypes — evidence that methylation is one carrier among several, and possibly not even the dominant one in every trauma-transmission pathway.</p>
+    </div>
+  </div>
+</section>
+
+<section id="critique">
+  <div class="wrap">
+    <div class="kicker">03 — the skeptic's case</div>
+    <h2>Why this remains genuinely contested</h2>
+    <p>The most-cited pushback in this literature isn't a failed replication — it's a mechanistic objection about mammalian germline biology itself, and it's worth taking seriously before building anything on top of this field.</p>
+
+    <div class="paper">
+      <span class="tag">Nature Communications, 2018</span>
+      <h3>Horsthemke — A Critical View on Transgenerational Epigenetic Inheritance in Humans</h3>
+      <p>The core argument: mammalian germ cells are separated from somatic cells by the <strong>Weismann barrier</strong>, and on top of that, the genome undergoes two rounds of near-total epigenetic erasure and reprogramming — once in primordial germ cells, once again just after fertilization. For an acquired methylation mark to survive intergenerational transmission at all, it has to escape both erasure events, which very few loci are known to do. Horsthemke argues that most human "transgenerational" findings are confounded by ordinary genetic inheritance, shared environment, and cultural transmission of parenting style — and are almost never actually transgenerational by the F2/F3 standard.</p>
+      <blockquote>"Lamarck has never been dead and every so often raises his head."<cite>— Bernhard Horsthemke, Nature Communications, 2018</cite></blockquote>
+    </div>
+
+    <div class="caution">
+      <div class="kicker">reading the human studies honestly</div>
+      Every human paper above is intergenerational (F0→F1), not transgenerational (F2/F3) — none of them clear the bar the diagram sets. Sample sizes are small (n≈20–30 per group), effect sizes at individual CpGs are modest, and blood methylation is a proxy for — not a measurement of — what's happening in brain or germ tissue. None of this means the effects are fake. It means "genocide survivors' grandchildren inherited trauma through their genes," the version that circulates in the press, overstates what any single study has actually shown.
+    </div>
+  </div>
+</section>
+
+<section id="compare">
+  <div class="wrap">
+    <div class="kicker">at a glance</div>
+    <h2>Study sizes, side by side</h2>
+    <div class="bars">
+      <div class="bar-row">
+        <div class="bar-label">Yehuda 2016 (offspring, n)</div>
+        <div class="bar-track"><div class="bar-fill" style="width:15%; background:var(--amber);"></div></div>
+        <div class="bar-n">22</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Perroud 2014 (per group, n)</div>
+        <div class="bar-track"><div class="bar-fill" style="width:17%; background:var(--amber);"></div></div>
+        <div class="bar-n">25</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Dias &amp; Ressler 2013 (mice, per cohort, n)</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--cyan);"></div></div>
+        <div class="bar-n">~150</div>
+      </div>
+    </div>
+    <p class="gen-caption" style="margin-top:-6px;">Mouse studies can run far larger, tightly controlled cohorts across bred generations. Human trauma cohorts are inherently limited by how many people lived through a specific historical exposure and were later reachable for a blood draw — which is a real ceiling on statistical power, not a design flaw.</p>
+
+    <table class="tbl">
+      <tr><th>Study</th><th>Species</th><th>Gene</th><th>Generation tested</th><th>Type</th></tr>
+      <tr><td>Yehuda et al. 2016</td><td>human</td><td class="gene">FKBP5</td><td>F0 → F1</td><td>intergenerational</td></tr>
+      <tr><td>Perroud et al. 2014</td><td>human</td><td class="gene">NR3C1</td><td>F0 → F1</td><td>intergenerational</td></tr>
+      <tr><td>Dias &amp; Ressler 2013</td><td>mouse</td><td>odorant receptor (<span class="gene">Olfr151</span>)</td><td>F0 → F1 → F2</td><td>transgenerational</td></tr>
+      <tr><td>Gapp et al. 2014</td><td>mouse</td><td>sperm small RNAs (not DNAm)</td><td>F0 → F1 → F2</td><td>transgenerational</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="threads">
+  <div class="wrap">
+    <div class="kicker">connecting thread</div>
+    <h2>What would actually settle this</h2>
+    <p>The field doesn't need another intergenerational human cohort finding a p-value at one CpG site — it has several of those now, pointing in genuinely interesting but mechanistically ambiguous directions. What's missing is human data at the F2 standard (grandchildren of directly exposed grandparents, never themselves exposed), paired with a plausible germline carrier mechanism that survives both rounds of epigenetic reprogramming — which right now looks more like sperm small RNAs than DNA methylation itself, at least in the mouse model that's actually been able to test it properly.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <ul class="refs">
+      <li><span class="mk filled"></span>Yehuda R, Daskalakis NP, Bierer LM, et al. Holocaust Exposure Induced Intergenerational Effects on FKBP5 Methylation. <em>Biol Psychiatry</em>. 2016;80(5):372–380.</li>
+      <li><span class="mk filled"></span>Perroud N, Rutembesa E, Paoloni-Giacobino A, et al. The Tutsi Genocide and Transgenerational Transmission of Maternal Stress. <em>World J Biol Psychiatry</em>. 2014;15(4):334–345.</li>
+      <li><span class="mk filled"></span>Yehuda R, Lehrner A. Intergenerational Transmission of Trauma Effects: Putative Role of Epigenetic Mechanisms. <em>World Psychiatry</em>. 2018;17(3):243–257.</li>
+      <li><span class="mk filled"></span>Dias BG, Ressler KJ. Parental Olfactory Experience Influences Behavior and Neural Structure in Subsequent Generations. <em>Nat Neurosci</em>. 2014;17(1):89–96.</li>
+      <li><span class="mk filled"></span>Gapp K, Jawaid A, Sarkies P, et al. Implication of Sperm RNAs in Transgenerational Inheritance of the Effects of Early Trauma in Mice. <em>Nat Neurosci</em>. 2014;17(5):667–669.</li>
+      <li><span class="mk filled"></span>Horsthemke B. A Critical View on Transgenerational Epigenetic Inheritance in Humans. <em>Nat Commun</em>. 2018;9:2973.</li>
+    </ul>
+    <p style="margin-top:24px;">epicme.bio — draft page, pending integration · quotes above are single short excerpts (&lt;15 words) per source, for attribution — read the papers linked in the references for the full argument.</p>
+  </div>
+</footer>
+
+</body>
+</html>
