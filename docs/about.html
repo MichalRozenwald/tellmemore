@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>О проекте — epicme.bio</title>
+<title data-i18n="title">О проекте — epicme.bio</title>
 <link rel="stylesheet" href="assets/theme.css">
 <style>
   /* Page-specific styles for the About / background page only.
@@ -25,6 +25,21 @@
   }
   h1.display em{ font-style:normal; color:var(--blue); }
   .hero-sub{ font-size:18px; color:var(--ink-dim); max-width:660px; margin:0 0 36px; }
+
+  /* ---------- language switch, top-left of nav — deliberately large:
+     this is the one control on the page that changes everything else,
+     so it earns more visual weight than a normal nav link. ---------- */
+  .lang-switch{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+  }
+  .lang-switch button{
+    border:none; background:transparent; color:var(--ink-dim);
+    font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+  }
+  .lang-switch button.active{ background:var(--blue); color:#06182A; }
+  .nav-inner{ flex-wrap:wrap; row-gap:10px; }
 
   /* ---------- Write/Read/Learn loop (signature element) ---------- */
   .loop-card{
@@ -86,18 +101,22 @@
 
 <header class="nav">
   <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
     <a href="index.html" class="brand" style="text-decoration:none;">
       <span class="brand-mark">epicme</span>
-      <span class="brand-sub">эпигеном · цитозин · метилирование</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
     </a>
     <nav class="nav-links">
-      <a href="index.html">Главная</a>
-      <a href="about.html">О проекте</a>
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
       <a href="about-cd55.html">CD55 explorer</a>
       <a href="day35.html">Day 35</a>
       <a href="day6.html">Day 6</a>
-      <a href="#team">Команда</a>
-      <a href="#references">Источники</a>
+      <a href="#team" data-i18n="nav-team">Команда</a>
+      <a href="#references" data-i18n="nav-refs">Источники</a>
     </nav>
   </div>
 </header>
@@ -106,140 +125,140 @@
 
   <section class="hero">
     <div class="eyebrow">UC Berkeley · Streets &amp; Urnov labs · PhD capstone</div>
-    <h1 class="display">Как метилирование ДНК<br>управляет работой гена?</h1>
-    <p class="hero-sub">Это мой PhD-проект и одновременно основа epicme.bio — открытой научной страницы, где я собираю данные, методы и находки в одном месте. Здесь — введение и контекст: что я изучаю, зачем, и как устроен мой экспериментальный подход.</p>
+    <h1 class="display" data-i18n="h1">Как метилирование ДНК<br>управляет работой гена?</h1>
+    <p class="hero-sub" data-i18n="hero-sub">Это мой PhD-проект и одновременно основа epicme.bio — открытой научной страницы, где я собираю данные, методы и находки в одном месте. Здесь — введение и контекст: что я изучаю, зачем, и как устроен мой экспериментальный подход.</p>
 
     <div class="loop-card">
       <div class="loop-head">ПОДХОД: WRITE → READ → LEARN</div>
       <div class="loop-svg-wrap">
-        <img src="media/write-read-learn-loop.gif" alt="Анимированная схема: Write (ZFPoff / CRISPRoff) → Read (Nanopore) → Learn (ML models), с зацикленной стрелкой возврата" style="width:100%; display:block;">
+        <img src="media/write-read-learn-loop.gif" data-i18n-alt="loop-gif-alt" alt="Анимированная схема: Write (ZFPoff / CRISPRoff) → Read (Nanopore) → Learn (ML models), с зацикленной стрелкой возврата" style="width:100%; display:block;">
       </div>
       <div class="loop-steps">
         <div class="loop-step write">
           <div class="mk"><span class="shape"></span>Write</div>
-          <p>ZFPoff и CRISPRoff — два альтернативных инструмента эпигенетического «выключения» гена: цинковый палец (ZFP) или dCas9 нацеливает KRAB и DNMT на нужный локус, вызывая CpG-метилирование и молчание гена — без изменения самой последовательности ДНК.</p>
+          <p data-i18n="loop-write-p">ZFPoff и CRISPRoff — два альтернативных инструмента эпигенетического «выключения» гена: цинковый палец (ZFP) или dCas9 нацеливает KRAB и DNMT на нужный локус, вызывая CpG-метилирование и молчание гена — без изменения самой последовательности ДНК.</p>
         </div>
         <div class="loop-step read">
           <div class="mk"><span class="shape"></span>Read</div>
-          <p>Nanopore-секвенирование (в т.ч. DiMeLo-seq) читает и метилирование, и последовательность ДНК в одной молекуле — на уровне одной цепи, без усреднения по популяции клеток.</p>
+          <p data-i18n="loop-read-p">Nanopore-секвенирование (в т.ч. DiMeLo-seq) читает и метилирование, и последовательность ДНК в одной молекуле — на уровне одной цепи, без усреднения по популяции клеток.</p>
         </div>
         <div class="loop-step learn">
           <div class="mk"><span class="shape"></span>Learn</div>
-          <p>Модели машинного обучения ищут связь между профилем CpG-метилирования одной молекулы и состоянием гена — активен он или замолчал.</p>
+          <p data-i18n="loop-learn-p">Модели машинного обучения ищут связь между профилем CpG-метилирования одной молекулы и состоянием гена — активен он или замолчал.</p>
         </div>
       </div>
     </div>
 
     <figure class="lab-photo" style="margin-top:22px;">
-      <img src="media/write-read-learn.jpeg" alt="Более детальная иллюстрация схемы Write → Read → Learn со слайда презентации: ZFPoff/CRISPRoff эпигенетическое молчание, Nanopore/DiMeLo-seq секвенирование, ML модели предсказывают состояние гена">
-      <figcaption>Та же схема — более развёрнуто, со слайда презентации: молекулярные детали ZFPoff (на слайде показан именно этот вариант; в работе также используется альтернативный инструмент CRISPRoff), Nanopore/DiMeLo-seq и входа/выхода ML-модели.</figcaption>
+      <img src="media/write-read-learn.jpeg" data-i18n-alt="slide-img-alt" alt="Более детальная иллюстрация схемы Write → Read → Learn со слайда презентации: ZFPoff/CRISPRoff эпигенетическое молчание, Nanopore/DiMeLo-seq секвенирование, ML модели предсказывают состояние гена">
+      <figcaption data-i18n="slide-caption">Та же схема — более развёрнуто, со слайда презентации: молекулярные детали ZFPoff (на слайде показан именно этот вариант; в работе также используется альтернативный инструмент CRISPRoff), Nanopore/DiMeLo-seq и входа/выхода ML-модели.</figcaption>
     </figure>
   </section>
 
   <section id="big-picture">
-    <div class="kicker">Контекст</div>
-    <h2>Зачем вообще изучать эпигеном</h2>
-    <p class="lede">Геном человека — это около 3.3 миллиардов пар оснований, и лишь малая его часть — примерно 3 миллиона регуляторных элементов — определяет, когда, где и насколько сильно работает каждый ген.</p>
-    <p>Эпигеном — это слой химических «пометок» поверх ДНК (например, метилирование цитозинов в CpG-динуклеотидах), который переводит одну и ту же последовательность генома в разные клеточные состояния. Именно эпигенетические пометки во многом объясняют, почему нейрон и T-лимфоцит содержат одну и ту же ДНК, но работают совершенно по-разному. Принципы, по которым эпигенетическая информация управляет экспрессией генов, до сих пор изучены не полностью — это и есть центральный вопрос моей диссертации.</p>
+    <div class="kicker" data-i18n="bp-kicker">Контекст</div>
+    <h2 data-i18n="bp-h2">Зачем вообще изучать эпигеном</h2>
+    <p class="lede" data-i18n="bp-lede">Геном человека — это около 3.3 миллиардов пар оснований, и лишь малая его часть — примерно 3 миллиона регуляторных элементов — определяет, когда, где и насколько сильно работает каждый ген.</p>
+    <p data-i18n="bp-p">Эпигеном — это слой химических «пометок» поверх ДНК (например, метилирование цитозинов в CpG-динуклеотидах), который переводит одну и ту же последовательность генома в разные клеточные состояния. Именно эпигенетические пометки во многом объясняют, почему нейрон и T-лимфоцит содержат одну и ту же ДНК, но работают совершенно по-разному. Принципы, по которым эпигенетическая информация управляет экспрессией генов, до сих пор изучены не полностью — это и есть центральный вопрос моей диссертации.</p>
 
     <div class="scale-strip">
-      <div class="scale-node"><div class="num">3.3 млрд п.о.</div><div class="lbl">геном человека</div></div>
+      <div class="scale-node"><div class="num" data-i18n="scale-1-num">3.3 млрд п.о.</div><div class="lbl" data-i18n="scale-1-lbl">геном человека</div></div>
       <div class="scale-arrow">→</div>
-      <div class="scale-node"><div class="num">~3 млн</div><div class="lbl">регуляторных элементов</div></div>
+      <div class="scale-node"><div class="num" data-i18n="scale-2-num">~3 млн</div><div class="lbl" data-i18n="scale-2-lbl">регуляторных элементов</div></div>
       <div class="scale-arrow">→</div>
-      <div class="scale-node"><div class="num">метки → состояния</div><div class="lbl">эпигеном</div></div>
+      <div class="scale-node"><div class="num" data-i18n="scale-3-num">метки → состояния</div><div class="lbl" data-i18n="scale-3-lbl">эпигеном</div></div>
       <div class="scale-arrow">→</div>
-      <div class="scale-node"><div class="num">200+ типов</div><div class="lbl">клеточное разнообразие</div></div>
+      <div class="scale-node"><div class="num" data-i18n="scale-4-num">200+ типов</div><div class="lbl" data-i18n="scale-4-lbl">клеточное разнообразие</div></div>
     </div>
   </section>
 
   <section id="framework">
-    <div class="kicker">Экспериментальный подход</div>
-    <h2>Write, Read, Learn — три инструмента одной задачи</h2>
+    <div class="kicker" data-i18n="fw-kicker">Экспериментальный подход</div>
+    <h2 data-i18n="fw-h2">Write, Read, Learn — три инструмента одной задачи</h2>
 
     <div class="grid2">
       <div class="card">
         <span class="tag amber">Write</span>
-        <h3>ZFPoff и CRISPRoff: два способа «выключить» ген</h3>
-        <p>В работе я использую два альтернативных инструмента для программируемого эпигенетического молчания CD55 — оба запускают CpG-метилирование локуса и «выключают» ген без разрезания ДНК, в отличие от классического CRISPR-нокаута:</p>
+        <h3 data-i18n="fw-write-h3">ZFPoff и CRISPRoff: два способа «выключить» ген</h3>
+        <p data-i18n="fw-write-p">В работе я использую два альтернативных инструмента для программируемого эпигенетического молчания CD55 — оба запускают CpG-метилирование локуса и «выключают» ген без разрезания ДНК, в отличие от классического CRISPR-нокаута:</p>
         <ul style="margin:0 0 12px; padding-left:18px; font-size:14.5px; color:var(--ink-dim);">
-          <li style="margin-bottom:6px;"><strong style="color:var(--ink);">CRISPRoff</strong> — dCas9 под управлением направляющей РНК (sgRNA) доставляет домены KRAB и DNMT3A/3L к нужному локусу.<a href="#ref-1" class="cite">[1]</a></li>
-          <li><strong style="color:var(--ink);">ZFPoff</strong> — те же домены KRAB и DNMT доставляются белком с цинковыми пальцами (ZFP), нацеленным на локус напрямую, без направляющей РНК.</li>
+          <li style="margin-bottom:6px;" data-i18n="fw-write-li1"><strong style="color:var(--ink);">CRISPRoff</strong> — dCas9 под управлением направляющей РНК (sgRNA) доставляет домены KRAB и DNMT3A/3L к нужному локусу.<a href="#ref-1" class="cite">[1]</a></li>
+          <li data-i18n="fw-write-li2"><strong style="color:var(--ink);">ZFPoff</strong> — те же домены KRAB и DNMT доставляются белком с цинковыми пальцами (ZFP), нацеленным на локус напрямую, без направляющей РНК.</li>
         </ul>
-        <p style="font-size:13px; color:var(--ink-faint); margin:0;">Оба подхода обратимы и точечны — это позволяет сравнивать, насколько по-разному закрепляется и поддерживается молчание гена в зависимости от способа его «записи».</p>
+        <p style="font-size:13px; color:var(--ink-faint); margin:0;" data-i18n="fw-write-note">Оба подхода обратимы и точечны — это позволяет сравнивать, насколько по-разному закрепляется и поддерживается молчание гена в зависимости от способа его «записи».</p>
       </div>
       <div class="card">
         <span class="tag blue">Read</span>
-        <h3>Nanopore и DiMeLo-seq: чтение на уровне одной молекулы</h3>
-        <p>Технология Oxford Nanopore определяет последовательность ДНК напрямую по изменению электрического сигнала при прохождении молекулы через нанопору — и попутно «видит» метилированные цитозины без бисульфитной конверсии. DiMeLo-seq расширяет это до картирования белок-ДНК взаимодействий на длинных прочтениях.<a href="#ref-2" class="cite">[2]</a><a href="#ref-3" class="cite">[3]</a></p>
+        <h3 data-i18n="fw-read-h3">Nanopore и DiMeLo-seq: чтение на уровне одной молекулы</h3>
+        <p data-i18n="fw-read-p">Технология Oxford Nanopore определяет последовательность ДНК напрямую по изменению электрического сигнала при прохождении молекулы через нанопору — и попутно «видит» метилированные цитозины без бисульфитной конверсии. DiMeLo-seq расширяет это до картирования белок-ДНК взаимодействий на длинных прочтениях.<a href="#ref-2" class="cite">[2]</a><a href="#ref-3" class="cite">[3]</a></p>
       </div>
     </div>
 
     <div class="card" style="margin-top:16px;">
       <span class="tag" style="background:var(--yellow-dim); color:var(--yellow);">Learn</span>
-      <h3>ML-модели: от профиля метилирования к состоянию гена</h3>
-      <p>Каждая просеквенированная молекула даёт бинарный вектор — метилирован ли CpG в конкретной позиции. Собрав такие вектора по многим одиночным молекулам одного и того же локуса, можно обучить модель, которая по CpG-профилю предсказывает, «включён» ген или «выключен» — и находить закономерности, которые не видны при усреднении по популяции клеток.<a href="#ref-4" class="cite">[4]</a></p>
+      <h3 data-i18n="fw-learn-h3">ML-модели: от профиля метилирования к состоянию гена</h3>
+      <p data-i18n="fw-learn-p">Каждая просеквенированная молекула даёт бинарный вектор — метилирован ли CpG в конкретной позиции. Собрав такие вектора по многим одиночным молекулам одного и того же локуса, можно обучить модель, которая по CpG-профилю предсказывает, «включён» ген или «выключен» — и находить закономерности, которые не видны при усреднении по популяции клеток.<a href="#ref-4" class="cite">[4]</a></p>
     </div>
   </section>
 
   <section id="application">
-    <div class="kicker">Приложение метода</div>
-    <h2>Модельная система: CD55 в донорских T-клетках</h2>
-    <p class="lede">Весь этот подход я применяю к конкретному гену — <strong>CD55</strong> (DAF) — и конкретному типу клеток — первичным донорским T-лимфоцитам человека.</p>
-    <p>Я использую CRISPRoff/ZFPoff для эпигенетического «выключения» CD55 в T-клетках доноров, а затем секвенирую локус CD55 методом Nanopore с прицельным (targeted) захватом — это даёт метилирование и последовательность ДНК с разрешением до одной молекулы, по множеству временных точек после редактирования (например, Day 6, Day 35). Сравнение метилирования между отредактированными (CRISPRoff) и неотредактированными (unedited) клетками одного донора в одной и той же временной точке — основа для понимания того, как закрепляется и поддерживается эпигенетическое молчание гена во времени.</p>
+    <div class="kicker" data-i18n="app-kicker">Приложение метода</div>
+    <h2 data-i18n="app-h2">Модельная система: CD55 в донорских T-клетках</h2>
+    <p class="lede" data-i18n="app-lede">Весь этот подход я применяю к конкретному гену — <strong>CD55</strong> (DAF) — и конкретному типу клеток — первичным донорским T-лимфоцитам человека.</p>
+    <p data-i18n="app-p">Я использую CRISPRoff/ZFPoff для эпигенетического «выключения» CD55 в T-клетках доноров, а затем секвенирую локус CD55 методом Nanopore с прицельным (targeted) захватом — это даёт метилирование и последовательность ДНК с разрешением до одной молекулы, по множеству временных точек после редактирования (например, Day 6, Day 35). Сравнение метилирования между отредактированными (CRISPRoff) и неотредактированными (unedited) клетками одного донора в одной и той же временной точке — основа для понимания того, как закрепляется и поддерживается эпигенетическое молчание гена во времени.</p>
     <div class="link-row">
-      <a class="btn ghost" href="about-cd55.html">Разобрать биологию CD55 →</a>
-      <a class="btn ghost" href="day35.html">Данные: Day 35 →</a>
-      <a class="btn ghost" href="day6.html">Данные: Day 6 →</a>
+      <a class="btn ghost" href="about-cd55.html" data-i18n="app-link-cd55">Разобрать биологию CD55 →</a>
+      <a class="btn ghost" href="day35.html" data-i18n="app-link-day35">Данные: Day 35 →</a>
+      <a class="btn ghost" href="day6.html" data-i18n="app-link-day6">Данные: Day 6 →</a>
     </div>
   </section>
 
   <section id="why-open">
-    <div class="kicker">Почему открыто</div>
-    <h2>epicme.bio как часть диссертации</h2>
-    <p>epicme.bio — это не просто визуализация данных, а сама PhD-работа, собранная в открытом, интерактивном виде: та же логика Write → Read → Learn, но доступная для изучения любому человеку — от студента до другого исследователя эпигенетики. Название отражает суть темы: <strong>epi</strong> (редактирование эпигенома) + <strong>C</strong> (цитозин) + <strong>me</strong> (метилирование).</p>
-    <p>Публикация сырых и промежуточных данных, кода обработки и рассуждений в процессе — часть принципа открытой науки, который лежит в основе этого проекта.</p>
+    <div class="kicker" data-i18n="wo-kicker">Почему открыто</div>
+    <h2 data-i18n="wo-h2">epicme.bio как часть диссертации</h2>
+    <p data-i18n="wo-p1">epicme.bio — это не просто визуализация данных, а сама PhD-работа, собранная в открытом, интерактивном виде: та же логика Write → Read → Learn, но доступная для изучения любому человеку — от студента до другого исследователя эпигенетики. Название отражает суть темы: <strong>epi</strong> (редактирование эпигенома) + <strong>C</strong> (цитозин) + <strong>me</strong> (метилирование).</p>
+    <p data-i18n="wo-p2">Публикация сырых и промежуточных данных, кода обработки и рассуждений в процессе — часть принципа открытой науки, который лежит в основе этого проекта.</p>
   </section>
 
   <section id="team">
-    <div class="kicker">Команда</div>
+    <div class="kicker" data-i18n="team-kicker">Команда</div>
     <h2>Streets &amp; Urnov labs</h2>
     <figure class="lab-photo">
-      <img src="media/streets-urnov-lab-mates.png" alt="Группа лабораторий Aaron Streets и Fyodor Urnov на территории UC Berkeley">
-      <figcaption>Лаборатории Aaron Streets и Fyodor Urnov, UC Berkeley — часть команды, в которой проходит эта работа.</figcaption>
+      <img src="media/streets-urnov-lab-mates.png" data-i18n-alt="team-img-alt" alt="Группа лабораторий Aaron Streets и Fyodor Urnov на территории UC Berkeley">
+      <figcaption data-i18n="team-caption">Лаборатории Aaron Streets и Fyodor Urnov, UC Berkeley — часть команды, в которой проходит эта работа.</figcaption>
     </figure>
   </section>
 
   <section id="references">
-    <div class="kicker">Библиография</div>
-    <h2>Источники</h2>
+    <div class="kicker" data-i18n="refs-kicker">Библиография</div>
+    <h2 data-i18n="refs-h2">Источники</h2>
     <ul class="ref-list">
       <li class="ref-item" id="ref-1">
         <span class="ref-num">[1]</span>
         <div class="ref-body">
           <h4>Nuñez et al., «Genome-wide programmable transcriptional memory by CRISPR-based epigenome editing» — Cell, 2021</h4>
-          <div class="ref-meta">Обоснование платформы CRISPRoff для эпигенетического молчания генов · <a href="https://doi.org/10.1016/j.cell.2021.03.025" target="_blank" rel="noopener">doi.org/10.1016/j.cell.2021.03.025</a></div>
+          <div class="ref-meta" data-i18n="ref-1-meta">Обоснование платформы CRISPRoff для эпигенетического молчания генов · <a href="https://doi.org/10.1016/j.cell.2021.03.025" target="_blank" rel="noopener">doi.org/10.1016/j.cell.2021.03.025</a></div>
         </div>
       </li>
       <li class="ref-item" id="ref-2">
         <span class="ref-num">[2]</span>
         <div class="ref-body">
           <h4>Wang et al., «Nanopore sequencing technology, bioinformatics and applications» — Nature Biotechnology, 2021</h4>
-          <div class="ref-meta">Принцип Nanopore-секвенирования и детекции метилирования · <a href="https://doi.org/10.1038/s41587-021-01108-x" target="_blank" rel="noopener">doi.org/10.1038/s41587-021-01108-x</a></div>
+          <div class="ref-meta" data-i18n="ref-2-meta">Принцип Nanopore-секвенирования и детекции метилирования · <a href="https://doi.org/10.1038/s41587-021-01108-x" target="_blank" rel="noopener">doi.org/10.1038/s41587-021-01108-x</a></div>
         </div>
       </li>
       <li class="ref-item" id="ref-3">
         <span class="ref-num">[3]</span>
         <div class="ref-body">
           <h4>Altemose et al., «DiMeLo-seq: a long-read, single-molecule method for mapping protein–DNA interactions genome wide» — Nature Methods, 2022</h4>
-          <div class="ref-meta">Метод картирования белок-ДНК взаимодействий на длинных прочтениях · <a href="https://doi.org/10.1038/s41592-022-01475-6" target="_blank" rel="noopener">doi.org/10.1038/s41592-022-01475-6</a></div>
+          <div class="ref-meta" data-i18n="ref-3-meta">Метод картирования белок-ДНК взаимодействий на длинных прочтениях · <a href="https://doi.org/10.1038/s41592-022-01475-6" target="_blank" rel="noopener">doi.org/10.1038/s41592-022-01475-6</a></div>
         </div>
       </li>
       <li class="ref-item" id="ref-4">
         <span class="ref-num">[4]</span>
         <div class="ref-body">
           <h4>Yourgenome.org — «What is Oxford Nanopore Technology (ONT) sequencing?»</h4>
-          <div class="ref-meta">Общее объяснение технологии ONT для неспециалистов · <a href="https://www.yourgenome.org/facts/what-is-oxford-nanopore-technology-ont-sequencing/" target="_blank" rel="noopener">yourgenome.org</a></div>
+          <div class="ref-meta" data-i18n="ref-4-meta">Общее объяснение технологии ONT для неспециалистов · <a href="https://www.yourgenome.org/facts/what-is-oxford-nanopore-technology-ont-sequencing/" target="_blank" rel="noopener">yourgenome.org</a></div>
         </div>
       </li>
     </ul>
@@ -248,10 +267,165 @@
 </main>
 
 <footer>
-  <div class="wrap">
+  <div class="wrap" data-i18n="footer">
     epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley.
   </div>
 </footer>
+
+<script>
+/* ============================================================
+   Bilingual RU/EN toggle — same pattern as index.html.
+   Every translatable element carries data-i18n="key" (text) or
+   data-i18n-alt="key" (image alt text). Both languages are
+   stored here in full so switching never derives one from the
+   other. Choice persists in localStorage and is shared with
+   index.html (same key), so the language carries across pages.
+   ============================================================ */
+const I18N = {
+  ru: {
+    'title': 'О проекте — epicme.bio',
+    'brand-sub': 'эпигеном · цитозин · метилирование',
+    'nav-home': 'Главная',
+    'nav-about': 'О проекте',
+    'nav-team': 'Команда',
+    'nav-refs': 'Источники',
+    'h1': 'Как метилирование ДНК<br>управляет работой гена?',
+    'hero-sub': 'Это мой PhD-проект и одновременно основа epicme.bio — открытой научной страницы, где я собираю данные, методы и находки в одном месте. Здесь — введение и контекст: что я изучаю, зачем, и как устроен мой экспериментальный подход.',
+    'loop-gif-alt': 'Анимированная схема: Write (ZFPoff / CRISPRoff) → Read (Nanopore) → Learn (ML models), с зацикленной стрелкой возврата',
+    'loop-write-p': 'ZFPoff и CRISPRoff — два альтернативных инструмента эпигенетического «выключения» гена: цинковый палец (ZFP) или dCas9 нацеливает KRAB и DNMT на нужный локус, вызывая CpG-метилирование и молчание гена — без изменения самой последовательности ДНК.',
+    'loop-read-p': 'Nanopore-секвенирование (в т.ч. DiMeLo-seq) читает и метилирование, и последовательность ДНК в одной молекуле — на уровне одной цепи, без усреднения по популяции клеток.',
+    'loop-learn-p': 'Модели машинного обучения ищут связь между профилем CpG-метилирования одной молекулы и состоянием гена — активен он или замолчал.',
+    'slide-img-alt': 'Более детальная иллюстрация схемы Write → Read → Learn со слайда презентации: ZFPoff/CRISPRoff эпигенетическое молчание, Nanopore/DiMeLo-seq секвенирование, ML модели предсказывают состояние гена',
+    'slide-caption': 'Та же схема — более развёрнуто, со слайда презентации: молекулярные детали ZFPoff (на слайде показан именно этот вариант; в работе также используется альтернативный инструмент CRISPRoff), Nanopore/DiMeLo-seq и входа/выхода ML-модели.',
+    'bp-kicker': 'Контекст',
+    'bp-h2': 'Зачем вообще изучать эпигеном',
+    'bp-lede': 'Геном человека — это около 3.3 миллиардов пар оснований, и лишь малая его часть — примерно 3 миллиона регуляторных элементов — определяет, когда, где и насколько сильно работает каждый ген.',
+    'bp-p': 'Эпигеном — это слой химических «пометок» поверх ДНК (например, метилирование цитозинов в CpG-динуклеотидах), который переводит одну и ту же последовательность генома в разные клеточные состояния. Именно эпигенетические пометки во многом объясняют, почему нейрон и T-лимфоцит содержат одну и ту же ДНК, но работают совершенно по-разному. Принципы, по которым эпигенетическая информация управляет экспрессией генов, до сих пор изучены не полностью — это и есть центральный вопрос моей диссертации.',
+    'scale-1-num': '3.3 млрд п.о.', 'scale-1-lbl': 'геном человека',
+    'scale-2-num': '~3 млн', 'scale-2-lbl': 'регуляторных элементов',
+    'scale-3-num': 'метки → состояния', 'scale-3-lbl': 'эпигеном',
+    'scale-4-num': '200+ типов', 'scale-4-lbl': 'клеточное разнообразие',
+    'fw-kicker': 'Экспериментальный подход',
+    'fw-h2': 'Write, Read, Learn — три инструмента одной задачи',
+    'fw-write-h3': 'ZFPoff и CRISPRoff: два способа «выключить» ген',
+    'fw-write-p': 'В работе я использую два альтернативных инструмента для программируемого эпигенетического молчания CD55 — оба запускают CpG-метилирование локуса и «выключают» ген без разрезания ДНК, в отличие от классического CRISPR-нокаута:',
+    'fw-write-li1': '<strong style="color:var(--ink);">CRISPRoff</strong> — dCas9 под управлением направляющей РНК (sgRNA) доставляет домены KRAB и DNMT3A/3L к нужному локусу.<a href="#ref-1" class="cite">[1]</a>',
+    'fw-write-li2': '<strong style="color:var(--ink);">ZFPoff</strong> — те же домены KRAB и DNMT доставляются белком с цинковыми пальцами (ZFP), нацеленным на локус напрямую, без направляющей РНК.',
+    'fw-write-note': 'Оба подхода обратимы и точечны — это позволяет сравнивать, насколько по-разному закрепляется и поддерживается молчание гена в зависимости от способа его «записи».',
+    'fw-read-h3': 'Nanopore и DiMeLo-seq: чтение на уровне одной молекулы',
+    'fw-read-p': 'Технология Oxford Nanopore определяет последовательность ДНК напрямую по изменению электрического сигнала при прохождении молекулы через нанопору — и попутно «видит» метилированные цитозины без бисульфитной конверсии. DiMeLo-seq расширяет это до картирования белок-ДНК взаимодействий на длинных прочтениях.<a href="#ref-2" class="cite">[2]</a><a href="#ref-3" class="cite">[3]</a>',
+    'fw-learn-h3': 'ML-модели: от профиля метилирования к состоянию гена',
+    'fw-learn-p': 'Каждая просеквенированная молекула даёт бинарный вектор — метилирован ли CpG в конкретной позиции. Собрав такие вектора по многим одиночным молекулам одного и того же локуса, можно обучить модель, которая по CpG-профилю предсказывает, «включён» ген или «выключен» — и находить закономерности, которые не видны при усреднении по популяции клеток.<a href="#ref-4" class="cite">[4]</a>',
+    'app-kicker': 'Приложение метода',
+    'app-h2': 'Модельная система: CD55 в донорских T-клетках',
+    'app-lede': 'Весь этот подход я применяю к конкретному гену — <strong>CD55</strong> (DAF) — и конкретному типу клеток — первичным донорским T-лимфоцитам человека.',
+    'app-p': 'Я использую CRISPRoff/ZFPoff для эпигенетического «выключения» CD55 в T-клетках доноров, а затем секвенирую локус CD55 методом Nanopore с прицельным (targeted) захватом — это даёт метилирование и последовательность ДНК с разрешением до одной молекулы, по множеству временных точек после редактирования (например, Day 6, Day 35). Сравнение метилирования между отредактированными (CRISPRoff) и неотредактированными (unedited) клетками одного донора в одной и той же временной точке — основа для понимания того, как закрепляется и поддерживается эпигенетическое молчание гена во времени.',
+    'app-link-cd55': 'Разобрать биологию CD55 →',
+    'app-link-day35': 'Данные: Day 35 →',
+    'app-link-day6': 'Данные: Day 6 →',
+    'wo-kicker': 'Почему открыто',
+    'wo-h2': 'epicme.bio как часть диссертации',
+    'wo-p1': 'epicme.bio — это не просто визуализация данных, а сама PhD-работа, собранная в открытом, интерактивном виде: та же логика Write → Read → Learn, но доступная для изучения любому человеку — от студента до другого исследователя эпигенетики. Название отражает суть темы: <strong>epi</strong> (редактирование эпигенома) + <strong>C</strong> (цитозин) + <strong>me</strong> (метилирование).',
+    'wo-p2': 'Публикация сырых и промежуточных данных, кода обработки и рассуждений в процессе — часть принципа открытой науки, который лежит в основе этого проекта.',
+    'team-kicker': 'Команда',
+    'team-img-alt': 'Группа лабораторий Aaron Streets и Fyodor Urnov на территории UC Berkeley',
+    'team-caption': 'Лаборатории Aaron Streets и Fyodor Urnov, UC Berkeley — часть команды, в которой проходит эта работа.',
+    'refs-kicker': 'Библиография',
+    'refs-h2': 'Источники',
+    'ref-1-meta': 'Обоснование платформы CRISPRoff для эпигенетического молчания генов · <a href="https://doi.org/10.1016/j.cell.2021.03.025" target="_blank" rel="noopener">doi.org/10.1016/j.cell.2021.03.025</a>',
+    'ref-2-meta': 'Принцип Nanopore-секвенирования и детекции метилирования · <a href="https://doi.org/10.1038/s41587-021-01108-x" target="_blank" rel="noopener">doi.org/10.1038/s41587-021-01108-x</a>',
+    'ref-3-meta': 'Метод картирования белок-ДНК взаимодействий на длинных прочтениях · <a href="https://doi.org/10.1038/s41592-022-01475-6" target="_blank" rel="noopener">doi.org/10.1038/s41592-022-01475-6</a>',
+    'ref-4-meta': 'Общее объяснение технологии ONT для неспециалистов · <a href="https://www.yourgenome.org/facts/what-is-oxford-nanopore-technology-ont-sequencing/" target="_blank" rel="noopener">yourgenome.org</a>',
+    'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley.'
+  },
+  en: {
+    'title': 'About — epicme.bio',
+    'brand-sub': 'epigenome · cytosine · methylation',
+    'nav-home': 'Home',
+    'nav-about': 'About',
+    'nav-team': 'Team',
+    'nav-refs': 'References',
+    'h1': 'How does DNA methylation<br>control the way a gene works?',
+    'hero-sub': 'This is my PhD project and, at the same time, the foundation of epicme.bio — an open science page where I bring together data, methods, and findings in one place. This page is the introduction and context: what I study, why, and how my experimental approach is built.',
+    'loop-gif-alt': 'Animated diagram: Write (ZFPoff / CRISPRoff) → Read (Nanopore) → Learn (ML models), with a looping return arrow',
+    'loop-write-p': 'ZFPoff and CRISPRoff are two alternative tools for epigenetically "switching off" a gene: a zinc finger protein (ZFP) or dCas9 targets KRAB and DNMT to the locus, triggering CpG methylation and gene silencing — without changing the DNA sequence itself.',
+    'loop-read-p': 'Nanopore sequencing (including DiMeLo-seq) reads both methylation and DNA sequence on the same molecule — at the single-strand level, with no averaging across a population of cells.',
+    'loop-learn-p': 'Machine learning models look for the relationship between a single molecule\u2019s CpG methylation profile and the gene\u2019s state — active or silenced.',
+    'slide-img-alt': 'A more detailed illustration of the Write → Read → Learn diagram from a presentation slide: ZFPoff/CRISPRoff epigenetic silencing, Nanopore/DiMeLo-seq sequencing, ML model inputs and outputs predicting gene state',
+    'slide-caption': 'The same diagram, in more detail, from a presentation slide: the molecular specifics of ZFPoff (shown here; the work also uses the alternative CRISPRoff tool), Nanopore/DiMeLo-seq, and the ML model\u2019s inputs and outputs.',
+    'bp-kicker': 'Context',
+    'bp-h2': 'Why study the epigenome at all',
+    'bp-lede': 'The human genome is about 3.3 billion base pairs, and only a small fraction of it — roughly 3 million regulatory elements — determines when, where, and how strongly each gene is expressed.',
+    'bp-p': 'The epigenome is a layer of chemical "marks" on top of DNA (for example, methylation of cytosines in CpG dinucleotides) that translates one and the same genome sequence into different cell states. Epigenetic marks are a big part of why a neuron and a T lymphocyte contain the same DNA yet behave completely differently. The principles by which epigenetic information controls gene expression are still not fully understood — that\u2019s the central question of my dissertation.',
+    'scale-1-num': '3.3 billion bp', 'scale-1-lbl': 'human genome',
+    'scale-2-num': '~3 million', 'scale-2-lbl': 'regulatory elements',
+    'scale-3-num': 'marks → states', 'scale-3-lbl': 'epigenome',
+    'scale-4-num': '200+ types', 'scale-4-lbl': 'cell diversity',
+    'fw-kicker': 'Experimental approach',
+    'fw-h2': 'Write, Read, Learn — three tools, one task',
+    'fw-write-h3': 'ZFPoff and CRISPRoff: two ways to switch off a gene',
+    'fw-write-p': 'In this work I use two alternative tools for programmable epigenetic silencing of CD55 — both trigger CpG methylation of the locus and switch off the gene without cutting DNA, unlike a classic CRISPR knockout:',
+    'fw-write-li1': '<strong style="color:var(--ink);">CRISPRoff</strong> — dCas9, guided by an sgRNA, delivers KRAB and DNMT3A/3L domains to the target locus.<a href="#ref-1" class="cite">[1]</a>',
+    'fw-write-li2': '<strong style="color:var(--ink);">ZFPoff</strong> — the same KRAB and DNMT domains are delivered by a zinc finger protein (ZFP) that targets the locus directly, without a guide RNA.',
+    'fw-write-note': 'Both approaches are reversible and precise — which makes it possible to compare how differently gene silencing gets established and maintained depending on how it was "written."',
+    'fw-read-h3': 'Nanopore and DiMeLo-seq: reading at single-molecule resolution',
+    'fw-read-p': 'Oxford Nanopore technology reads the DNA sequence directly from the change in electrical signal as a molecule passes through a nanopore — and along the way "sees" methylated cytosines without bisulfite conversion. DiMeLo-seq extends this to mapping protein–DNA interactions on long reads.<a href="#ref-2" class="cite">[2]</a><a href="#ref-3" class="cite">[3]</a>',
+    'fw-learn-h3': 'ML models: from a methylation profile to gene state',
+    'fw-learn-p': 'Every sequenced molecule yields a binary vector — is the CpG at a given position methylated or not. Collecting such vectors across many single molecules of the same locus makes it possible to train a model that predicts, from a CpG profile, whether the gene is "on" or "off" — and to find patterns that are invisible when averaging across a cell population.<a href="#ref-4" class="cite">[4]</a>',
+    'app-kicker': 'Applying the method',
+    'app-h2': 'Model system: CD55 in donor T cells',
+    'app-lede': 'I apply this whole approach to one specific gene — <strong>CD55</strong> (DAF) — and one specific cell type: primary donor human T lymphocytes.',
+    'app-p': 'I use CRISPRoff/ZFPoff to epigenetically "switch off" CD55 in donor T cells, then sequence the CD55 locus with targeted Nanopore sequencing — which gives methylation and DNA sequence at single-molecule resolution, across multiple timepoints after editing (for example, Day 6, Day 35). Comparing methylation between edited (CRISPRoff) and unedited cells from the same donor at the same timepoint is the basis for understanding how epigenetic gene silencing gets established and maintained over time.',
+    'app-link-cd55': 'Explore CD55 biology →',
+    'app-link-day35': 'Data: Day 35 →',
+    'app-link-day6': 'Data: Day 6 →',
+    'wo-kicker': 'Why open',
+    'wo-h2': 'epicme.bio as part of the dissertation',
+    'wo-p1': 'epicme.bio isn\u2019t just a data visualization — it\u2019s the PhD work itself, assembled in an open, interactive form: the same Write → Read → Learn logic, but accessible to anyone, from a student to another epigenetics researcher. The name reflects the subject: <strong>epi</strong> (epigenome editing) + <strong>C</strong> (cytosine) + <strong>me</strong> (methylation).',
+    'wo-p2': 'Publishing raw and intermediate data, processing code, and reasoning-in-progress is part of the open science principle this project is built on.',
+    'team-kicker': 'Team',
+    'team-img-alt': 'The Aaron Streets and Fyodor Urnov labs, UC Berkeley',
+    'team-caption': 'The Aaron Streets and Fyodor Urnov labs, UC Berkeley — part of the team behind this work.',
+    'refs-kicker': 'Bibliography',
+    'refs-h2': 'References',
+    'ref-1-meta': 'Basis for the CRISPRoff platform for epigenetic gene silencing · <a href="https://doi.org/10.1016/j.cell.2021.03.025" target="_blank" rel="noopener">doi.org/10.1016/j.cell.2021.03.025</a>',
+    'ref-2-meta': 'Principle of Nanopore sequencing and methylation detection · <a href="https://doi.org/10.1038/s41587-021-01108-x" target="_blank" rel="noopener">doi.org/10.1038/s41587-021-01108-x</a>',
+    'ref-3-meta': 'Method for mapping protein–DNA interactions on long reads · <a href="https://doi.org/10.1038/s41592-022-01475-6" target="_blank" rel="noopener">doi.org/10.1038/s41592-022-01475-6</a>',
+    'ref-4-meta': 'General, non-specialist explanation of ONT sequencing technology · <a href="https://www.yourgenome.org/facts/what-is-oxford-nanopore-technology-ont-sequencing/" target="_blank" rel="noopener">yourgenome.org</a>',
+    'footer': 'epicme.bio — an open science project and PhD work by Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley.'
+  }
+};
+
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  const dict = I18N[lang];
+  if(!dict) return;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if(!(key in dict)) return;
+    if(el.tagName === 'TITLE'){ document.title = dict[key]; }
+    else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('[data-i18n-alt]').forEach(el => {
+    const key = el.getAttribute('data-i18n-alt');
+    if(key in dict) el.setAttribute('alt', dict[key]);
+  });
+  document.querySelectorAll('#lang-switch button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){ /* ignore */ }
+}
+
+document.querySelectorAll('#lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+
+(function(){
+  let saved = 'ru';
+  try{ saved = localStorage.getItem('epicme_lang') || 'ru'; }catch(e){ /* ignore */ }
+  if(saved === 'en') applyLang('en');
+})();
+</script>
 
 </body>
 </html>

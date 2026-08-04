@@ -27,14 +27,16 @@
   .hero-sub{ font-size:18px; color:var(--ink-dim); max-width:640px; margin:0 0 28px; }
   .hero-cta{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
 
-  /* ---------- language switch, top-left of nav ---------- */
+  /* ---------- language switch, top-left of nav — deliberately large:
+     this is the one control on the page that changes everything else,
+     so it earns more visual weight than a normal nav link. ---------- */
   .lang-switch{
     display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
-    border-radius:999px; padding:3px; gap:2px; flex-shrink:0;
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
   }
   .lang-switch button{
     border:none; background:transparent; color:var(--ink-dim);
-    font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:999px; cursor:pointer;
+    font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
     font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
   }
   .lang-switch button.active{ background:var(--blue); color:#06182A; }
