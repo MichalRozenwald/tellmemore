@@ -106,12 +106,14 @@
   <section class="page-hero">
     <div class="kicker-shaped read"><span class="shape"></span><span class="lbl" data-i18n="kicker">Read — что видит секвенатор</span></div>
     <h1 data-i18n="h1">K562: сортировка по экспрессии CD55 — полный разбор</h1>
-    <p class="lede" data-i18n="lede">Другая клеточная линия, другой способ разделения: вместо донорских T-клеток — K562, и вместо просто «отредактировано / не отредактировано» — сортировка по уровню самого белка CD55 на поверхности клетки (проточная цитометрия), Day 6 после ZFPoff. То же самое считывание — метилирование по 137 CpG-сайтам на одной молекуле ДНК. Эта страница — полная версия анализа: профиль по каждому CpG, одномолекульные паттерны, ML-классификаторы, статистика по каждой позиции, геномные координаты и проверка на независимых данных T-клеток.</p>
+    <p class="lede" data-i18n="lede">Другая клеточная линия, другой способ разделения: вместо донорских T-клеток — K562, и вместо просто «отредактировано / не отредактировано» — сортировка по уровню самого белка CD55 на поверхности клетки (проточная цитометрия), Day 16 после ZFPoff. То же самое считывание — метилирование по 137 CpG-сайтам на одной молекуле ДНК. Эта страница — полная версия анализа: профиль по каждому CpG, одномолекульные паттерны, ML-классификаторы, статистика по каждой позиции, геномные координаты и проверка на независимых данных T-клеток.</p>
   </section>
 
   <section id="overview" style="padding-top:0;">
     <div class="domain-strip wide" id="domainStrip"></div>
-    <p class="kv-note" style="margin-top:12px;" data-i18n="baseline-inline-note">Учтите: для baseline загружены две версии одной и той же матрицы 206×137 с разным числом меток метилирования (14,8% и 7,4%) — подробности в разделе «Открытые вопросы» ниже.</p>
+    <div class="disclaimer" style="margin-top:16px;" data-i18n="timing-note">
+      <strong>Группы получены не в одной и той же временной точке.</strong> CD55-LOW и CD55-HIGH — Day 16 после настоящего ZFPoff-редактирования, отсортированы по экспрессии CD55. Baseline — K562 на Day 2 пассирования после «фейкового» (контрольного, мок-) редактирования, не после настоящего ZFPoff и не в тот же день. Значит, сравнения LOW-vs-baseline и HIGH-vs-baseline смешивают «отредактировано/нет» с разницей во времени и пассировании. Сравнение <strong>LOW vs HIGH</strong> — единственное, где оба образца взяты в один день (Day 16) после одной и той же процедуры и отличаются только воротами сортировки; на него стоит полагаться в первую очередь.
+    </div>
   </section>
 
   <section id="profile">
@@ -127,7 +129,7 @@
       <button class="toggle-btn" id="toggleProfileTable" data-i18n="show-table">Показать таблицей</button>
       <div id="profileTableWrap" style="display:none; max-height:320px; overflow:auto;"></div>
     </div>
-    <p class="kv-note" data-i18n="profile-note"><strong>Неожиданное направление:</strong> клетки с ВЫСОКОЙ поверхностной экспрессией CD55 оказались более метилированы (39,9%), чем клетки с НИЗКОЙ экспрессией (12,9%) — почти на уровне необработанного контроля (14,8%). Это противоположно классической модели «метилирование промотора → выключение гена».</p>
+    <p class="kv-note" data-i18n="profile-note"><strong>Неожиданное направление:</strong> клетки с ВЫСОКОЙ поверхностной экспрессией CD55 оказались более метилированы (39,9%), чем клетки с НИЗКОЙ экспрессией (12,9%) — которая, в свою очередь, близка к уровню мок-контроля Day 2 (14,8%; см. оговорку про разные временные точки выше). Решающее сравнение здесь — LOW vs HIGH, оба Day 16: направление эффекта противоположно классической модели «метилирование промотора → выключение гена».</p>
   </section>
 
   <section id="singlemolecule">
@@ -221,11 +223,14 @@
   <section id="caveats">
     <div class="kicker" data-i18n="caveat-kicker">Открытые вопросы</div>
     <h2 data-i18n="caveat-h2">Что ещё предстоит проверить</h2>
-    <div class="disclaimer" data-i18n="caveat">
-      <strong>Открытый вопрос по данным:</strong> для необработанного контроля (baseline, K562) загружено две версии одной и той же матрицы 206×137 с разным числом метилированных вызовов — 14,8% и 7,4% в среднем. На этой странице используется версия 14,8% (совпала с тремя из четырёх загрузок); какая версия верна — предстоит подтвердить.
+    <div class="disclaimer" data-i18n="caveat-timing2">
+      <strong>Baseline ≠ Day 16, unedited.</strong> Baseline — это K562 на Day 2 пассирования после мок- («фейкового») редактирования, а не необработанные клетки того же дня, что LOW/HIGH. Любое сравнение с участием baseline (HIGH-vs-baseline, LOW-vs-baseline) может отражать не только эффект ZFPoff, но и разницу во времени/пассировании/самой процедуры мок-редактирования. Сравнение LOW vs HIGH этой проблемы не имеет.
+    </div>
+    <div class="disclaimer" style="margin-top:12px;" data-i18n="caveat">
+      <strong>Открытый вопрос по данным:</strong> для baseline (K562, Day 2, мок) загружено две версии одной и той же матрицы 206×137 с разным числом метилированных вызовов — 14,8% и 7,4% в среднем. На этой странице используется версия 14,8% (совпала с тремя из четырёх загрузок); какая версия верна — предстоит подтвердить.
     </div>
     <div class="disclaimer" style="margin-top:12px;" data-i18n="caveat2">
-      <strong>Почему именно HIGH гиперметилирован, а не LOW, всё ещё открытый вопрос.</strong> Возможные объяснения: (1) значимый кластер CpG может лежать не в самом репрессивном элементе, а в теле гена/области ниже TSS, где метилирование не напрямую отражает выключение; (2) на Day 6 метилирование могло ещё не полностью «докатиться» до подавления экспрессии, либо идёт временная/компенсаторная волна метилирования; (3) сортировка по поверхностному белку могла захватить существующую гетерогенность клеток, не связанную напрямую с работой ZFPoff именно в этом локусе.
+      <strong>Почему именно HIGH гиперметилирован, а не LOW, всё ещё открытый вопрос.</strong> Возможные объяснения: (1) значимый кластер CpG может лежать не в самом репрессивном элементе, а в теле гена/области ниже TSS, где метилирование не напрямую отражает выключение; (2) на Day 16 метилирование могло ещё не полностью «докатиться» до подавления экспрессии, либо идёт временная/компенсаторная волна метилирования; (3) сортировка по поверхностному белку могла захватить существующую гетерогенность клеток, не связанную напрямую с работой ZFPoff именно в этом локусе. Эти вопросы касаются сравнений с baseline; ключевой результат LOW vs HIGH (см. выше) от датировки baseline не зависит.
     </div>
   </section>
 
@@ -282,12 +287,12 @@ const I18N = {
     'nav-home': 'Главная', 'nav-about': 'О проекте',
     'kicker': 'Read — что видит секвенатор',
     'h1': 'K562: сортировка по экспрессии CD55 — полный разбор',
-    'lede': 'Другая клеточная линия, другой способ разделения: вместо донорских T-клеток — K562, и вместо просто «отредактировано / не отредактировано» — сортировка по уровню самого белка CD55 на поверхности клетки (проточная цитометрия), Day 6 после ZFPoff. То же самое считывание — метилирование по 137 CpG-сайтам на одной молекуле ДНК. Эта страница — полная версия анализа: профиль по каждому CpG, одномолекульные паттерны, ML-классификаторы, статистика по каждой позиции, геномные координаты и проверка на независимых данных T-клеток.',
-    'baseline-inline-note': 'Учтите: для baseline загружены две версии одной и той же матрицы 206×137 с разным числом меток метилирования (14,8% и 7,4%) — подробности в разделе «Открытые вопросы» ниже.',
+    'lede': 'Другая клеточная линия, другой способ разделения: вместо донорских T-клеток — K562, и вместо просто «отредактировано / не отредактировано» — сортировка по уровню самого белка CD55 на поверхности клетки (проточная цитометрия), Day 16 после ZFPoff. То же самое считывание — метилирование по 137 CpG-сайтам на одной молекуле ДНК. Эта страница — полная версия анализа: профиль по каждому CpG, одномолекульные паттерны, ML-классификаторы, статистика по каждой позиции, геномные координаты и проверка на независимых данных T-клеток.',
+    'timing-note': '<strong>Группы получены не в одной и той же временной точке.</strong> CD55-LOW и CD55-HIGH — Day 16 после настоящего ZFPoff-редактирования, отсортированы по экспрессии CD55. Baseline — K562 на Day 2 пассирования после «фейкового» (контрольного, мок-) редактирования, не после настоящего ZFPoff и не в тот же день. Значит, сравнения LOW-vs-baseline и HIGH-vs-baseline смешивают «отредактировано/нет» с разницей во времени и пассировании. Сравнение <strong>LOW vs HIGH</strong> — единственное, где оба образца взяты в один день (Day 16) после одной и той же процедуры и отличаются только воротами сортировки; на него стоит полагаться в первую очередь.',
     'profile-kicker': 'Профиль метилирования',
     'profile-h2': '137 CpG-сайтов, три группы',
     'profile-p': 'Доля молекул, помеченных как метилированные, в каждой из 137 позиций. LOW и HIGH объединяют по два повтора сортировки.',
-    'profile-note': '<strong>Неожиданное направление:</strong> клетки с ВЫСОКОЙ поверхностной экспрессией CD55 оказались более метилированы (39,9%), чем клетки с НИЗКОЙ экспрессией (12,9%) — почти на уровне необработанного контроля (14,8%). Это противоположно классической модели «метилирование промотора → выключение гена».',
+    'profile-note': '<strong>Неожиданное направление:</strong> клетки с ВЫСОКОЙ поверхностной экспрессией CD55 оказались более метилированы (39,9%), чем клетки с НИЗКОЙ экспрессией (12,9%) — которая, в свою очередь, близка к уровню мок-контроля Day 2 (14,8%; см. оговорку про разные временные точки выше). Решающее сравнение здесь — LOW vs HIGH, оба Day 16: направление эффекта противоположно классической модели «метилирование промотора → выключение гена».',
     'show-table': 'Показать таблицей',
     'sm-kicker': 'Одна молекула за раз',
     'sm-h2': 'Паттерны метилирования по отдельным молекулам',
@@ -308,7 +313,7 @@ const I18N = {
     'conc-kicker': 'Воспроизводимость',
     'conc-h2': 'Согласованность повторов',
     'conc-p': 'Корреляция Пирсона профиля метилирования по 137 CpG между двумя повторами сортировки внутри каждой группы.',
-    'conc-note': 'Для baseline (unedited K562) загружен только один повтор, поэтому согласованность не считается — см. «Открытые вопросы» ниже.',
+    'conc-note': 'Для baseline (Day 2, мок-редактирование) загружен только один повтор, поэтому согласованность не считается — см. «Открытые вопросы» ниже.',
     'tss-kicker': 'Геномные координаты',
     'tss-h2': 'Ампликон охватывает точку старта транскрипции CD55',
     'tss-p': 'Координаты (GRCh38, chr1:207 318 092–207 324 450) показывают, что старт транскрипции CD55 (chr1:207 321 678) лежит внутри самого ампликона, между CpG #69 и #70. Три известных сайта связывания KLF4 — главного активатора CD55 — почти точно совпадают с реальными CpG в этих данных.',
@@ -322,8 +327,9 @@ const I18N = {
     'val-note': 'Это независимое подтверждение: направление эффекта (больше метилирования при более сильном сигнале CRISPRoff/CD55) воспроизводится в другой клеточной линии и другом способе сравнения групп — значит, дело не в артефакте сортировки K562.',
     'caveat-kicker': 'Открытые вопросы',
     'caveat-h2': 'Что ещё предстоит проверить',
-    'caveat': '<strong>Открытый вопрос по данным:</strong> для необработанного контроля (baseline, K562) загружено две версии одной и той же матрицы 206×137 с разным числом метилированных вызовов — 14,8% и 7,4% в среднем. На этой странице используется версия 14,8% (совпала с тремя из четырёх загрузок); какая версия верна — предстоит подтвердить.',
-    'caveat2': '<strong>Почему именно HIGH гиперметилирован, а не LOW, всё ещё открытый вопрос.</strong> Возможные объяснения: (1) значимый кластер CpG может лежать не в самом репрессивном элементе, а в теле гена/области ниже TSS, где метилирование не напрямую отражает выключение; (2) на Day 6 метилирование могло ещё не полностью «докатиться» до подавления экспрессии, либо идёт временная/компенсаторная волна метилирования; (3) сортировка по поверхностному белку могла захватить существующую гетерогенность клеток, не связанную напрямую с работой ZFPoff именно в этом локусе.',
+    'caveat-timing2': '<strong>Baseline ≠ Day 16, unedited.</strong> Baseline — это K562 на Day 2 пассирования после мок- («фейкового») редактирования, а не необработанные клетки того же дня, что LOW/HIGH. Любое сравнение с участием baseline (HIGH-vs-baseline, LOW-vs-baseline) может отражать не только эффект ZFPoff, но и разницу во времени/пассировании/самой процедуры мок-редактирования. Сравнение LOW vs HIGH этой проблемы не имеет.',
+    'caveat': '<strong>Открытый вопрос по данным:</strong> для baseline (K562, Day 2, мок) загружено две версии одной и той же матрицы 206×137 с разным числом метилированных вызовов — 14,8% и 7,4% в среднем. На этой странице используется версия 14,8% (совпала с тремя из четырёх загрузок); какая версия верна — предстоит подтвердить.',
+    'caveat2': '<strong>Почему именно HIGH гиперметилирован, а не LOW, всё ещё открытый вопрос.</strong> Возможные объяснения: (1) значимый кластер CpG может лежать не в самом репрессивном элементе, а в теле гена/области ниже TSS, где метилирование не напрямую отражает выключение; (2) на Day 16 метилирование могло ещё не полностью «докатиться» до подавления экспрессии, либо идёт временная/компенсаторная волна метилирования; (3) сортировка по поверхностному белку могла захватить существующую гетерогенность клеток, не связанную напрямую с работой ZFPoff именно в этом локусе. Эти вопросы касаются сравнений с baseline; ключевой результат LOW vs HIGH (см. выше) от датировки baseline не зависит.',
     'ref-kicker': 'Источники', 'ref-h2': 'Ссылки',
     'ref1-h': 'KLF4 — основной активатор CD55, три сайта CACCC + CRE',
     'ref2-h': 'Генетическая и эпигенетическая регуляция CD55 при колоректальном раке (TFCP2, NF-κB, miR-27a-3p)',
@@ -331,7 +337,7 @@ const I18N = {
     'ref4-h': 'NCBI Gene — CD55, координаты GRCh38',
     'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. Полная библиография — на страницах <a href="about.html">о проекте</a> и <a href="about-cd55.html">CD55 explorer</a>.',
     'stat-molecules': 'молекул', 'stat-methyl': 'метилирования', 'stat-auc': 'AUC (LOW vs HIGH)', 'stat-sig': 'значимых CpG из 137',
-    'grp-base': 'Baseline (unedited)', 'grp-low': 'CD55-LOW (сорт.)', 'grp-high': 'CD55-HIGH (сорт.)',
+    'grp-base': 'Baseline (Day 2, мок)', 'grp-low': 'CD55-LOW (сорт.)', 'grp-high': 'CD55-HIGH (сорт.)',
     'ml-logreg-auc': 'LogReg AUC', 'ml-logreg-acc': 'LogReg accuracy', 'ml-rf-auc': 'RF AUC', 'ml-rf-acc': 'RF accuracy',
     'ml-sig-line': 'значимых CpG из 137 (q<0.05)',
     'th-rank': '#', 'th-cpg': 'CpG', 'th-coord': 'chr1', 'th-tss': 'от TSS', 'th-low': 'LOW %', 'th-high': 'HIGH %', 'th-delta': 'Δ', 'th-q': 'q-value', 'th-lr': 'LR coef.', 'th-rf': 'RF importance',
@@ -343,12 +349,12 @@ const I18N = {
     'nav-home': 'Home', 'nav-about': 'About',
     'kicker': 'Read — what the sequencer sees',
     'h1': 'K562: sorted by CD55 surface expression — full analysis',
-    'lede': 'A different cell line, a different way of splitting groups: K562 instead of donor T cells, and sorting directly on CD55 surface protein (flow cytometry) instead of just “edited / unedited,” Day 6 after ZFPoff. Same readout — single-molecule methylation across 137 CpG sites. This page is the full-depth version: the per-CpG profile, single-molecule patterns, ML classifiers, per-position statistics, genomic coordinates, and a check against independent T-cell data.',
-    'baseline-inline-note': 'Note: two versions of the baseline (206×137 matrix) were uploaded with different methylation-call counts (14.8% and 7.4%) — details in "Open questions" below.',
+    'lede': 'A different cell line, a different way of splitting groups: K562 instead of donor T cells, and sorting directly on CD55 surface protein (flow cytometry) instead of just “edited / unedited,” Day 16 after ZFPoff. Same readout — single-molecule methylation across 137 CpG sites. This page is the full-depth version: the per-CpG profile, single-molecule patterns, ML classifiers, per-position statistics, genomic coordinates, and a check against independent T-cell data.',
+    'timing-note': '<strong>These groups aren’t from the same timepoint.</strong> CD55-LOW and CD55-HIGH are Day 16 after real ZFPoff editing, sorted by CD55 expression. Baseline is K562 at Day 2 of passaging after a “fake” (mock/control) editing procedure — not real ZFPoff, and not the same day. So the LOW-vs-baseline and HIGH-vs-baseline comparisons conflate edited/unedited with a time-and-passaging difference. <strong>LOW vs HIGH</strong> is the one comparison where both samples are same-day (Day 16), same procedure, differing only by sort gate — lean on that one first.',
     'profile-kicker': 'Methylation profile',
     'profile-h2': '137 CpG sites, three groups',
     'profile-p': 'Fraction of molecules called methylated at each of the 137 positions. LOW and HIGH pool two sort replicates each.',
-    'profile-note': '<strong>Unexpected direction:</strong> cells with HIGH surface CD55 turned out more methylated (39.9%) than cells with LOW CD55 (12.9%) — close to the unedited control (14.8%). That’s the opposite of the classic “promoter methylation silences the gene” model.',
+    'profile-note': '<strong>Unexpected direction:</strong> cells with HIGH surface CD55 turned out more methylated (39.9%) than cells with LOW CD55 (12.9%) — which in turn is close to the Day 2 mock-control level (14.8%; see the timepoint caveat above). The load-bearing comparison here is LOW vs HIGH, both Day 16: the direction is the opposite of the classic “promoter methylation silences the gene” model.',
     'show-table': 'Show as table',
     'sm-kicker': 'One molecule at a time',
     'sm-h2': 'Single-molecule methylation patterns',
@@ -369,7 +375,7 @@ const I18N = {
     'conc-kicker': 'Reproducibility',
     'conc-h2': 'Replicate concordance',
     'conc-p': 'Pearson correlation of the 137-CpG methylation profile between the two sort replicates within each group.',
-    'conc-note': 'Baseline (unedited K562) has only one uploaded replicate, so concordance isn’t computed for it — see "Open questions" below.',
+    'conc-note': 'Baseline (Day 2, mock-edited) has only one uploaded replicate, so concordance isn’t computed for it — see "Open questions" below.',
     'tss-kicker': 'Genomic coordinates',
     'tss-h2': 'The amplicon spans the CD55 transcription start site',
     'tss-p': 'Coordinates (GRCh38, chr1:207,318,092–207,324,450) show the CD55 TSS (chr1:207,321,678) sits inside the amplicon itself, between CpG #69 and #70. The three known KLF4 binding sites — CD55’s main activator — line up almost exactly onto real CpGs in this data.',
@@ -383,8 +389,9 @@ const I18N = {
     'val-note': 'This is independent confirmation: the direction of the effect (more methylation with a stronger CRISPRoff/CD55 signal) replicates in a different cell line and a different way of splitting groups — so it isn’t a K562-sorting artifact.',
     'caveat-kicker': 'Open questions',
     'caveat-h2': 'What still needs checking',
-    'caveat': '<strong>Open data question:</strong> two versions of the unedited K562 baseline were uploaded — an identical 206×137 matrix with different methylated-call counts, averaging 14.8% and 7.4%. This page uses the 14.8% version (it matched three of four uploads); which is correct still needs confirming.',
-    'caveat2': '<strong>Why HIGH — not LOW — is hypermethylated is still an open question.</strong> Possible explanations: (1) the significant CpG cluster may sit outside the actual repressive element — e.g. in the gene body / downstream of the TSS, where methylation doesn’t directly track silencing; (2) at Day 6, methylation may not have fully propagated to suppress expression yet, or there’s a transient/compensatory methylation wave; (3) sorting on surface protein may have captured pre-existing cell heterogeneity unrelated to ZFPoff activity at this specific locus.',
+    'caveat-timing2': '<strong>Baseline ≠ Day 16, unedited.</strong> Baseline is K562 at Day 2 of passaging after a mock (“fake”) editing procedure, not untreated cells from the same day as LOW/HIGH. Any comparison involving baseline (HIGH-vs-baseline, LOW-vs-baseline) may reflect not just the ZFPoff effect but also the time/passaging/mock-procedure difference. The LOW vs HIGH comparison doesn’t have this problem.',
+    'caveat': '<strong>Open data question:</strong> two versions of the baseline (K562, Day 2, mock) were uploaded — an identical 206×137 matrix with different methylated-call counts, averaging 14.8% and 7.4%. This page uses the 14.8% version (it matched three of four uploads); which is correct still needs confirming.',
+    'caveat2': '<strong>Why HIGH — not LOW — is hypermethylated is still an open question.</strong> Possible explanations: (1) the significant CpG cluster may sit outside the actual repressive element — e.g. in the gene body / downstream of the TSS, where methylation doesn’t directly track silencing; (2) at Day 16, methylation may not have fully propagated to suppress expression yet, or there’s a transient/compensatory methylation wave; (3) sorting on surface protein may have captured pre-existing cell heterogeneity unrelated to ZFPoff activity at this specific locus. These questions concern comparisons against baseline; the key LOW vs HIGH result (see above) doesn’t depend on baseline dating.',
     'ref-kicker': 'Sources', 'ref-h2': 'References',
     'ref1-h': 'KLF4 — CD55’s dominant activator, three CACCC + CRE sites',
     'ref2-h': 'Genetic and epigenetic regulation of CD55 in colorectal cancer (TFCP2, NF-κB, miR-27a-3p)',
@@ -392,7 +399,7 @@ const I18N = {
     'ref4-h': 'NCBI Gene — CD55, GRCh38 coordinates',
     'footer': 'epicme.bio — an open science project and PhD work by Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. The full bibliography lives on the <a href="about.html">about</a> and <a href="about-cd55.html">CD55 explorer</a> pages.',
     'stat-molecules': 'molecules', 'stat-methyl': 'methylation', 'stat-auc': 'AUC (LOW vs HIGH)', 'stat-sig': 'significant CpGs of 137',
-    'grp-base': 'Baseline (unedited)', 'grp-low': 'CD55-LOW (sorted)', 'grp-high': 'CD55-HIGH (sorted)',
+    'grp-base': 'Baseline (Day 2, mock)', 'grp-low': 'CD55-LOW (sorted)', 'grp-high': 'CD55-HIGH (sorted)',
     'ml-logreg-auc': 'LogReg AUC', 'ml-logreg-acc': 'LogReg accuracy', 'ml-rf-auc': 'RF AUC', 'ml-rf-acc': 'RF accuracy',
     'ml-sig-line': 'significant CpGs of 137 (q<0.05)',
     'th-rank': '#', 'th-cpg': 'CpG', 'th-coord': 'chr1', 'th-tss': 'vs TSS', 'th-low': 'LOW %', 'th-high': 'HIGH %', 'th-delta': 'Δ', 'th-q': 'q-value', 'th-lr': 'LR coef.', 'th-rf': 'RF importance',
