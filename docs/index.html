@@ -68,6 +68,33 @@
     border-color:var(--blue);
     color:#06182A;
   }
+  /* the upload link is an action, not just a destination — it earns a
+     standing accent border instead of waiting for hover like its siblings */
+  .nav-links a.upload-nav-link{
+    border-color:var(--orange); color:var(--orange);
+  }
+  .nav-links a.upload-nav-link:hover, .nav-links a.upload-nav-link:focus-visible{
+    background:var(--orange); border-color:var(--orange); color:#2B1900;
+  }
+
+  /* ---------- Upload section — deliberately set apart from the rest of
+     the page: a bordered, tinted panel rather than a plain section, so
+     it reads as "do something" next to everything above that reads
+     "learn something". Uses only the existing blue/orange hues. ---------- */
+  #upload{ border-top:2px solid var(--orange); }
+  .upload-panel{
+    background:linear-gradient(160deg, rgba(230,159,0,0.10), rgba(86,180,233,0.06) 65%);
+    border:2px solid var(--orange);
+    border-radius:var(--radius);
+    padding:30px 28px 28px;
+  }
+  .upload-panel .kicker-shaped .shape{ background:var(--orange); border-radius:3px; transform:rotate(45deg); }
+  .upload-panel .kicker-shaped span.lbl{ color:var(--orange); }
+  .upload-panel .card{ background:var(--surface); }
+  .upload-cta{
+    border:2px solid var(--blue-deep) !important;
+    background:linear-gradient(135deg, rgba(86,180,233,0.14), var(--surface-2) 60%) !important;
+  }
 
   /* ---------- shape vocabulary, shared meaning across the whole site:
      square/orange = Write, circle/blue = Read, hexagon/yellow = Learn.
@@ -222,6 +249,7 @@
       <a href="cd55-tf-tcells.html" data-i18n="nav-tf">Механизмы</a>
       <a href="methylation-and-memory.html" data-i18n="nav-memory">Метилирование и память</a>
       <a href="methylation-generational-trauma.html" data-i18n="nav-trauma">Метилирование и травма</a>
+      <a href="upload-user-input.html" data-i18n="nav-upload" class="upload-nav-link">Загрузка данных</a>
     </nav>
   </div>
 </header>
@@ -437,6 +465,42 @@
     <div class="disclaimer" data-i18n="beyond-overlap"><strong>Где они пересекаются:</strong> FKBP5 и NR3C1 встречаются на обеих страницах, но отвечают на разные вопросы. На странице про память — осталась ли метка у самого человека, пережившего стресс. На странице про травму — появилась ли она у его ребёнка. Это единственное место, где темы соприкасаются, и оно помечено на обеих страницах перекрёстными ссылками.</div>
   </section>
 
+  <section id="upload">
+    <div class="upload-panel">
+      <div class="kicker-shaped upload"><span class="shape"></span><span class="lbl" data-i18n="upload-kicker">Contribute — пришлите нам свои данные</span></div>
+      <h2 data-i18n="upload-h2">Загрузите свои данные для обработки и структурированного глубокого анализа epiCme</h2>
+      <p class="lede" data-i18n="upload-lede">Кроме наборов, уже разобранных на этом сайте, мы принимаем данные метилирования CD55 от других лабораторий, доноров и клеточных линий — чтобы прогнать их через тот же пайплайн epiCme и сопоставить с уже накопленной картой промотора, факторами и профилями on/off.</p>
+
+      <div class="grid3">
+        <div class="card">
+          <span class="tag blue" data-i18n="upload-nano-tag">Сырые данные · Nanopore</span>
+          <h3 data-i18n="upload-nano-h">Сырые прогоны Oxford Nanopore</h3>
+          <p data-i18n="upload-nano-p">POD5 / FAST5 / FASTQ — мы выполним базовое вызывание и вызов CpG-метилирования на выбранном пороге достоверности через наш пайплайн epiCme, тот же, что использован для всех данных на этом сайте.</p>
+        </div>
+        <div class="card">
+          <span class="tag amber" data-i18n="upload-proc-tag">Обработанные данные</span>
+          <h3 data-i18n="upload-proc-h">Уже обработанные профили метилирования</h3>
+          <p data-i18n="upload-proc-p">Готовые per-CpG таблицы (CSV/TSV, bedMethyl) — для прямого сравнения on/off клеток (отредактированные vs контроль) на тех же координатах, что и наши наборы K562 и T-клеток.</p>
+        </div>
+        <div class="card">
+          <span class="tag blue" data-i18n="upload-cross-tag">Сопоставление</span>
+          <h3 data-i18n="upload-cross-h">Сверка с уже накопленным анализом</h3>
+          <p data-i18n="upload-cross-p">Ваши профили можно наложить на карту транскрипционных факторов, ChIP-seq треки и семь механизмов неровного метилирования, разобранные на страницах K562 и «Механизмы».</p>
+        </div>
+      </div>
+
+      <a class="start-card upload-cta" href="upload-user-input.html" style="text-decoration:none; margin-top:20px;">
+        <div class="txt">
+          <h3 data-i18n="upload-cta-h3">Открыть форму загрузки данных</h3>
+          <p data-i18n="upload-cta-p">Демо-интерфейс формы: собирает метаданные образца по обоим типам данных и объясняет, как передать сами файлы — большие Nanopore-раны через браузер надёжно не передать.</p>
+        </div>
+        <span class="btn" data-i18n="upload-cta-go">Перейти к загрузке →</span>
+      </a>
+
+      <div class="disclaimer" data-i18n="upload-note"><strong>Статус:</strong> форма загрузки — черновик интерфейса. Реальный приём файлов ещё не подключён; после отправки формы вы увидите демонстрационный ID заявки и описание того, как это будет работать в финальной версии (Globus / SFTP / защищённая ссылка для больших файлов).</div>
+    </div>
+  </section>
+
 </main>
 
 <footer>
@@ -558,6 +622,23 @@ const I18N = {
     'tf-mech-h3': 'Семь механизмов неровного профиля',
     'tf-mech': '<li><strong>След самого редактора</strong> dCas9 закрывает собой 20–30 п.н.; под ним метилирования почти нет, пики сидят сбоку от PAM.</li><li><strong>Предпочтения DNMT3A по фланкам</strong> Соседние ±2 п.н. меняют скорость до 100 раз: TACGYC хорошо, CGG плохо.</li><li><strong>Нуклеосомы и период 10 п.н.</strong> Фермент работает по линкерной ДНК; длина линкера и поворот спирали решают, какие CpG смотрят наружу.</li><li><strong>Занятые сайты факторов</strong> KLF4, CREB, SP1 и NF-κB физически загораживают свои CpG от метилтрансферазы.</li><li><strong>Исходный хроматин</strong> H3K4me3 отталкивает ADD-домен DNMT3A, H3K36me2 притягивает PWWP: активный промотор — враждебная территория.</li><li><strong>Деметилирование и сбои поддержания</strong> TET выедает метку, DNMT1 не всегда успевает при делении. «Не записалось» ≠ «записалось и стёрлось».</li><li><strong>Гетерогенность между молекулами</strong> Средние 40% — это «40% на каждой» или «100% на 40% молекул»? Нанопор видит это напрямую.</li>',
     'tf-note': '<strong>Важно:</strong> вся механистика по KLF4, CREB и CBP получена на эндотелиальных клетках и репортёрных конструкциях, а не на первичных человеческих T-клетках. Перенос на нашу систему — допущение, пока T-клеточный ChIP не скажет обратного. На странице механизмов это помечено отдельно, и ни одно число там не измерено заново — это гипотезы с прописанными способами проверки.',
+    'nav-upload': 'Загрузка данных',
+    'upload-kicker': 'Contribute — пришлите нам свои данные',
+    'upload-h2': 'Загрузите свои данные для обработки и структурированного глубокого анализа epiCme',
+    'upload-lede': 'Кроме наборов, уже разобранных на этом сайте, мы принимаем данные метилирования CD55 от других лабораторий, доноров и клеточных линий — чтобы прогнать их через тот же пайплайн epiCme и сопоставить с уже накопленной картой промотора, факторами и профилями on/off.',
+    'upload-nano-tag': 'Сырые данные · Nanopore',
+    'upload-nano-h': 'Сырые прогоны Oxford Nanopore',
+    'upload-nano-p': 'POD5 / FAST5 / FASTQ — мы выполним базовое вызывание и вызов CpG-метилирования на выбранном пороге достоверности через наш пайплайн epiCme, тот же, что использован для всех данных на этом сайте.',
+    'upload-proc-tag': 'Обработанные данные',
+    'upload-proc-h': 'Уже обработанные профили метилирования',
+    'upload-proc-p': 'Готовые per-CpG таблицы (CSV/TSV, bedMethyl) — для прямого сравнения on/off клеток (отредактированные vs контроль) на тех же координатах, что и наши наборы K562 и T-клеток.',
+    'upload-cross-tag': 'Сопоставление',
+    'upload-cross-h': 'Сверка с уже накопленным анализом',
+    'upload-cross-p': 'Ваши профили можно наложить на карту транскрипционных факторов, ChIP-seq треки и семь механизмов неровного метилирования, разобранные на страницах K562 и «Механизмы».',
+    'upload-cta-h3': 'Открыть форму загрузки данных',
+    'upload-cta-p': 'Демо-интерфейс формы: собирает метаданные образца по обоим типам данных и объясняет, как передать сами файлы — большие Nanopore-раны через браузер надёжно не передать.',
+    'upload-cta-go': 'Перейти к загрузке →',
+    'upload-note': '<strong>Статус:</strong> форма загрузки — черновик интерфейса. Реальный приём файлов ещё не подключён; после отправки формы вы увидите демонстрационный ID заявки и описание того, как это будет работать в финальной версии (Globus / SFTP / защищённая ссылка для больших файлов).',
     'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. Эта страница — точка входа: полная библиография — на страницах <a href="about.html">о проекте</a> и <a href="about-cd55.html">CD55 explorer</a>.'
   },
   en: {
@@ -662,6 +743,23 @@ const I18N = {
     'tf-mech-h3': 'Seven mechanisms for a bumpy profile',
     'tf-mech': '<li><strong>Footprint of the editor itself</strong> dCas9 covers 20–30 bp; almost no methylation underneath it, with the maxima sitting off to the side of the PAM.</li><li><strong>DNMT3A flanking preferences</strong> The neighbouring ±2 bp swing the rate up to 100-fold: TACGYC good, CGG poor.</li><li><strong>Nucleosomes and the 10 bp repeat</strong> The enzyme works on linker DNA; linker length and helical twist decide which CpGs face outward.</li><li><strong>Occupied factor sites</strong> KLF4, CREB, SP1 and NF-κB physically shield their own CpGs from the methyltransferase.</li><li><strong>Pre-existing chromatin</strong> H3K4me3 repels the DNMT3A ADD domain, H3K36me2 attracts the PWWP: an active promoter is hostile territory.</li><li><strong>Erasure and maintenance failure</strong> TET eats the mark away and DNMT1 does not always keep up through division. Never written is not the same as written then erased.</li><li><strong>Molecule-to-molecule heterogeneity</strong> Does an average of 40% mean 40% on every molecule, or 100% on 40% of them? Nanopore sees this directly.</li>',
     'tf-note': '<strong>Important:</strong> all the mechanistic work on KLF4, CREB and CBP was done in endothelial cells and reporter constructs, not in primary human T cells. Carrying it over to our system is an assumption until a T-cell ChIP says otherwise. The mechanisms page flags this explicitly, and no number on it has been measured afresh — these are hypotheses with their tests written out.',
+    'nav-upload': 'Upload data',
+    'upload-kicker': 'Contribute — send us your data',
+    'upload-h2': 'Upload your data for processing and epiCme structured deep analysis',
+    'upload-lede': 'Beyond the datasets already worked through on this site, we accept CD55 methylation data from other labs, donors and cell lines — to run it through the same epiCme pipeline and cross-reference it against the promoter map, factors, and on/off profiles already built up here.',
+    'upload-nano-tag': 'Raw data · Nanopore',
+    'upload-nano-h': 'Raw Oxford Nanopore runs',
+    'upload-nano-p': 'POD5 / FAST5 / FASTQ — we run basecalling and CpG methylation calling at your chosen confidence threshold through our epiCme pipeline, the same one used for every dataset on this site.',
+    'upload-proc-tag': 'Processed data',
+    'upload-proc-h': 'Already-processed methylation profiles',
+    'upload-proc-p': 'Ready per-CpG tables (CSV/TSV, bedMethyl) — for direct on/off cell comparison (edited vs control) on the same coordinates as our K562 and T-cell datasets.',
+    'upload-cross-tag': 'Cross-referencing',
+    'upload-cross-h': 'Checked against our existing analysis',
+    'upload-cross-p': 'Your profiles can be laid over the transcription-factor map, ChIP-seq tracks, and the seven mechanisms behind uneven methylation worked out on the K562 and Mechanisms pages.',
+    'upload-cta-h3': 'Open the data submission form',
+    'upload-cta-p': 'A demo interface: it collects sample metadata for both data types and explains how to transfer the files themselves — large Nanopore runs can’t be sent reliably through a browser.',
+    'upload-cta-go': 'Go to upload →',
+    'upload-note': '<strong>Status:</strong> the upload form is an interface draft. Real file intake isn’t wired up yet — after submitting, you’ll see a demo submission ID and a description of how this will work in the final version (Globus / SFTP / a protected link for large files).',
     'footer': 'epicme.bio — an open science project and PhD work by Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. This page is the entry point: the full bibliography lives on the <a href="about.html">about</a> and <a href="about-cd55.html">CD55 explorer</a> pages.'
   }
 };

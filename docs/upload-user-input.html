@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">epicme.bio — загрузка данных</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific styles for the upload / data-intake page.
+     Shared palette, typography, nav, footer, cards, tags and buttons
+     live in assets/theme.css — this reuses those tokens throughout. */
+
+  .hero{ padding:56px 0 28px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--orange); font-weight:600; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--orange); }
+  h1.display{
+    font-size:clamp(30px, 5vw, 44px);
+    font-weight:600; line-height:1.12; letter-spacing:-0.01em;
+    margin:0 0 18px;
+  }
+  h1.display em{ font-style:normal; color:var(--orange); }
+  .hero-sub{ font-size:17px; color:var(--ink-dim); max-width:660px; margin:0 0 20px; }
+
+  .lang-switch{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+  }
+  .lang-switch button{
+    border:none; background:transparent; color:var(--ink-dim);
+    font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+  }
+  .lang-switch button.active{ background:var(--blue); color:#06182A; }
+  .nav-inner{ flex-wrap:wrap; row-gap:10px; }
+  .nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+  .nav-links a{
+    display:inline-flex; align-items:center; padding:10px 18px; border-radius:999px;
+    border:1.5px solid var(--line); background:var(--surface-2); color:var(--ink-dim);
+    font-size:14.5px; font-weight:600; text-decoration:none;
+    transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{
+    border-color:var(--blue); color:var(--ink); background:var(--surface); transform:translateY(-1px);
+  }
+  .nav-links a.active{ background:var(--orange); border-color:var(--orange); color:#2B1900; }
+
+  .demo-banner{
+    display:flex; gap:12px; align-items:flex-start;
+    background:var(--orange-dim); border:1px solid var(--orange);
+    border-radius:var(--radius); padding:14px 18px; font-size:13.8px; color:var(--ink-dim);
+    margin-bottom:8px;
+  }
+  .demo-banner svg{ flex:0 0 auto; margin-top:2px; }
+  .demo-banner strong{ color:var(--orange); }
+
+  /* ---------- data-type picker ---------- */
+  .type-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:10px 0 4px; }
+  @media (max-width:700px){ .type-grid{ grid-template-columns:1fr; } }
+  .type-card{
+    position:relative; text-align:left; cursor:pointer;
+    background:var(--surface-2); border:2px solid var(--line); border-radius:var(--radius);
+    padding:20px 20px 18px; transition:border-color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .type-card:hover{ border-color:var(--blue); transform:translateY(-2px); }
+  .type-card.selected{ border-color:var(--blue); background:var(--surface); box-shadow:0 10px 28px rgba(86,180,233,0.14); }
+  .type-card .radio-dot{
+    position:absolute; top:18px; right:18px; width:16px; height:16px; border-radius:50%; border:2px solid var(--line);
+  }
+  .type-card.selected .radio-dot{
+    border-color:var(--blue);
+    background:radial-gradient(circle at center, var(--blue) 0 5px, transparent 6px);
+  }
+  .type-card h3{ font-size:16.5px; margin:0 0 8px; color:var(--ink); }
+  .type-card p{ font-size:14px; margin:0; color:var(--ink-dim); }
+  .type-card .tag-row{ margin-top:14px; display:flex; gap:6px; flex-wrap:wrap; }
+  .type-card .tag{ margin-bottom:0; }
+
+  /* ---------- form ---------- */
+  .form-panel{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px 26px 24px; margin-top:22px;
+  }
+  .form-panel h3{ margin:0 0 4px; font-size:16.5px; color:var(--ink); }
+  .form-panel .panel-sub{ font-size:14px; color:var(--ink-dim); margin:0 0 20px; }
+
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block; font-family:'Space Grotesk',sans-serif; font-size:12.5px; font-weight:600;
+    color:var(--ink-dim); margin-bottom:7px; letter-spacing:0.02em;
+  }
+  .field .req{ color:var(--orange); }
+  .field .hint{ font-size:11.5px; color:var(--ink-faint); margin-top:6px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:640px){ .grid2{ grid-template-columns:1fr; } }
+
+  select, input[type=text], input[type=email], input[type=number], textarea{
+    width:100%; background:var(--surface-2); border:1px solid var(--line); color:var(--ink);
+    padding:11px 13px; border-radius:9px; font-family:'IBM Plex Mono',monospace; font-size:13.5px;
+  }
+  textarea{ font-family:'Source Serif 4', Georgia, serif; resize:vertical; }
+  select:focus, input:focus, textarea:focus{ outline:2px solid var(--blue); outline-offset:1px; }
+  input::placeholder, textarea::placeholder{ color:var(--ink-faint); }
+
+  fieldset{ border:1px solid var(--line); border-radius:9px; padding:14px 16px; margin:0 0 16px; }
+  fieldset legend{ font-family:'Space Grotesk',sans-serif; font-size:12.5px; font-weight:600; color:var(--ink-dim); padding:0 6px; }
+  .pill-options{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pill-options label{
+    display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink);
+    border:1px solid var(--line); padding:7px 12px; border-radius:999px; cursor:pointer; margin:0;
+    background:var(--surface-2);
+  }
+  .pill-options input{ accent-color:var(--blue); }
+
+  .dropzone{
+    border:2px dashed var(--line); border-radius:var(--radius); padding:30px 16px; text-align:center;
+    color:var(--ink-dim); font-size:13.5px; cursor:pointer; margin-bottom:8px;
+    transition:border-color .15s ease, background .15s ease; background:var(--surface-2);
+  }
+  .dropzone.drag{ border-color:var(--blue); background:var(--blue-dim); }
+  .dropzone strong{ color:var(--ink); }
+  .dropzone input{ display:none; }
+  .file-list{ margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+  .file-chip{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:8px 12px; font-size:12.8px;
+  }
+  .file-chip .fname{ font-family:'IBM Plex Mono',monospace; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .file-chip .fsize{ color:var(--ink-faint); flex:0 0 auto; }
+  .file-chip .remove{ cursor:pointer; color:var(--orange); flex:0 0 auto; font-family:'IBM Plex Mono',monospace; }
+
+  .large-file-note{
+    display:flex; gap:10px; align-items:flex-start; background:var(--yellow-dim);
+    border:1px solid var(--yellow); border-radius:9px; padding:12px 14px; font-size:13px; color:var(--ink-dim); margin:16px 0 4px;
+  }
+  .large-file-note strong{ color:#cbbf3e; }
+
+  .submit-row{ display:flex; align-items:center; gap:16px; margin-top:20px; flex-wrap:wrap; }
+  .submit-note{ font-size:12px; color:var(--ink-faint); }
+
+  .success-panel{
+    display:none; margin-top:22px; border:1px solid var(--blue-deep);
+    background:var(--blue-dim); border-radius:var(--radius); padding:20px 22px;
+  }
+  .success-panel.show{ display:block; }
+  .success-panel h4{ margin:0 0 10px; color:var(--blue); font-size:15.5px; display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; }
+  .success-panel p{ margin:0 0 8px; font-size:13.8px; color:var(--ink-dim); }
+  .success-panel code{
+    background:var(--surface); border:1px solid var(--line); padding:2px 8px; border-radius:5px;
+    font-family:'IBM Plex Mono',monospace; color:var(--blue); font-size:13px;
+  }
+  .success-panel ol{ margin:10px 0 0; padding-left:20px; font-size:13.3px; color:var(--ink-dim); }
+  .success-panel li{ margin-bottom:6px; }
+
+  .back-link{ display:inline-block; margin-top:6px; font-size:13.5px; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="upload-user-input.html" data-i18n="nav-upload" class="active">Загрузка данных</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow" data-i18n="eyebrow">Contribute · epicme.bio</div>
+    <h1 class="display" data-i18n="h1">Загрузите свои данные для обработки и<br><em>структурированного глубокого анализа epiCme</em></h1>
+    <p class="hero-sub" data-i18n="hero-sub">Пришлите сырые прогоны Oxford Nanopore или уже обработанные профили метилирования CD55 — мы прогоним их через наш пайплайн epiCme и сопоставим с картой промотора, транскрипционными факторами и профилями on/off, уже собранными на этом сайте.</p>
+
+    <div class="demo-banner">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" style="margin-top:1px;"><path d="M8 1L15 14H1L8 1Z" stroke="#E69F00" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 6V9" stroke="#E69F00" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="11.3" r="0.9" fill="#E69F00"/></svg>
+      <span data-i18n="demo-banner"><strong>Демо-версия интерфейса.</strong> Реальная загрузка файлов пока не подключена — сырые Nanopore-раны обычно весят десятки–сотни ГБ, что не передать надёжно через браузер. После заполнения формы вы получите демонстрационный ID заявки и инструкции по безопасной передаче файлов (Globus / SFTP / защищённая ссылка).</span>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <h2 data-i18n="step1-h2">1. Выберите тип данных</h2>
+    <p class="lede" data-i18n="step1-sub" style="font-size:14.5px;">Форма ниже подстроится под выбранный тип.</p>
+
+    <div class="type-grid">
+      <div class="type-card selected" data-type="nanopore">
+        <div class="radio-dot"></div>
+        <span class="tag blue" data-i18n="card-nano-tag">Сырые данные</span>
+        <h3 data-i18n="card-nano-h">Сырые данные Oxford Nanopore</h3>
+        <p data-i18n="card-nano-p">POD5 / FAST5 / FASTQ (+ опционально BAM). Мы прогоним их через пайплайн epiCme — базовое вызывание и вызов CpG-метилирования на выбранном пороге достоверности.</p>
+        <div class="tag-row">
+          <span class="tag blue">.pod5</span><span class="tag blue">.fast5</span><span class="tag blue">.fastq.gz</span><span class="tag blue">.bam</span>
+        </div>
+      </div>
+
+      <div class="type-card" data-type="processed">
+        <div class="radio-dot"></div>
+        <span class="tag amber" data-i18n="card-proc-tag">Обработанные данные</span>
+        <h3 data-i18n="card-proc-h">Уже обработанные данные метилирования</h3>
+        <p data-i18n="card-proc-p">Готовые per-CpG таблицы метилирования (CSV/TSV, bedMethyl) — для прямого сравнения on/off клеток (отредактированные vs контроль) на общих координатах.</p>
+        <div class="tag-row">
+          <span class="tag amber">.csv</span><span class="tag amber">.tsv</span><span class="tag amber">bedMethyl</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <h2 data-i18n="step2-h2">2. Заполните информацию о выборке</h2>
+    <p class="lede" data-i18n="step2-sub" style="font-size:14.5px;">Поля отмеченные <span class="req">*</span> обязательны.</p>
+
+    <form id="submit-form">
+      <div class="form-panel" id="panel-nanopore">
+        <h3 data-i18n="panel-nano-h3">Сырые данные Nanopore → epiCme</h3>
+        <p class="panel-sub" data-i18n="panel-nano-sub">Прогоним через базовое вызывание и CpG-метилирование на выбранном пороге.</p>
+
+        <div class="grid2">
+          <div class="field">
+            <label data-i18n="f-sampleId">ID образца / группы <span class="req">*</span></label>
+            <input type="text" placeholder="e.g. CD55-HIGH_D16_rep1" required>
+          </div>
+          <div class="field">
+            <label data-i18n="f-cellLine">Клеточная линия <span class="req">*</span></label>
+            <input type="text" placeholder="e.g. K562, primary T-cells" required>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label data-i18n="f-editSystem">Система редактирования</label>
+            <select>
+              <option data-i18n="opt-crisproff">CRISPR-off</option>
+              <option data-i18n="opt-zfpoff">ZFP-off</option>
+              <option data-i18n="opt-mock">Mock (контроль)</option>
+              <option data-i18n="opt-unedited">Нередактированные</option>
+              <option data-i18n="opt-other">Другое</option>
+            </select>
+          </div>
+          <div class="field">
+            <label data-i18n="f-status">Статус (on/off) <span class="req">*</span></label>
+            <select required>
+              <option data-i18n="opt-on">CD55 ON (экспрессия сохранена)</option>
+              <option data-i18n="opt-off">CD55 OFF (замолчан)</option>
+              <option data-i18n="opt-mixed">Смешанная / несортированная популяция</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label data-i18n="f-timepoint">День / временная точка</label>
+            <input type="text" placeholder="e.g. Day 16 post-editing">
+          </div>
+          <div class="field">
+            <label data-i18n="f-sortMethod">Метод сортировки</label>
+            <input type="text" placeholder="e.g. FACS on CD55 surface expression">
+          </div>
+        </div>
+
+        <fieldset>
+          <legend data-i18n="f-platform">Платформа секвенирования</legend>
+          <div class="pill-options">
+            <label><input type="radio" name="flowcell" checked> MinION</label>
+            <label><input type="radio" name="flowcell"> GridION</label>
+            <label><input type="radio" name="flowcell"> PromethION</label>
+            <label><input type="radio" name="flowcell"> <span data-i18n="opt-other2">Другое</span></label>
+          </div>
+        </fieldset>
+
+        <div class="grid2">
+          <div class="field">
+            <label data-i18n="f-genome">Геном / сборка</label>
+            <input type="text" value="GRCh38">
+          </div>
+          <div class="field">
+            <label data-i18n="f-region">Регион / локус (если таргетный)</label>
+            <input type="text" placeholder="chr1:207,318,092-207,324,450 (CD55)">
+          </div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="f-upload">Файлы (демо — реальная загрузка не выполняется)</label>
+          <div class="dropzone" data-drop="nanopore">
+            <div data-i18n="dz-main"><strong>Перетащите файлы сюда</strong> или нажмите, чтобы выбрать</div>
+            <div class="hint" data-i18n="dz-hint">POD5, FAST5, FASTQ.GZ, BAM — любой размер (это демо, реальная передача не выполняется)</div>
+            <input type="file" multiple data-input="nanopore">
+          </div>
+          <div class="file-list" data-list="nanopore"></div>
+        </div>
+
+        <div class="large-file-note">
+          <span>⚠</span>
+          <span data-i18n="large-note">Файлы больше ~2 ГБ не передавайте через эту форму. После отправки заявки вы получите ID и адрес для передачи через Globus / SFTP / защищённую ссылку на файлообменник лаборатории.</span>
+        </div>
+      </div>
+
+      <div class="form-panel" id="panel-processed" style="display:none;">
+        <h3 data-i18n="panel-proc-h3">Обработанные данные метилирования</h3>
+        <p class="panel-sub" data-i18n="panel-proc-sub">Для сравнения on/off клеток на общих координатах CpG.</p>
+
+        <div class="grid2">
+          <div class="field">
+            <label data-i18n="f-sampleId2">ID образца / группы <span class="req">*</span></label>
+            <input type="text" placeholder="e.g. CD55-LOW_D16">
+          </div>
+          <div class="field">
+            <label data-i18n="f-cellLine2">Клеточная линия <span class="req">*</span></label>
+            <input type="text" placeholder="e.g. K562">
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label data-i18n="f-caller">Метод / порог вызова метилирования</label>
+            <select>
+              <option>≥0.995 (strict)</option>
+              <option>≥0.7 (permissive)</option>
+              <option data-i18n="opt-other3">Другой / нестандартный</option>
+            </select>
+          </div>
+          <div class="field">
+            <label data-i18n="f-comparison">Сравнение on/off</label>
+            <select>
+              <option data-i18n="opt-pairedOnOff">Парное: on-клетки vs off-клетки</option>
+              <option data-i18n="opt-vsBaseline">vs baseline / mock control</option>
+              <option data-i18n="opt-standalone">Отдельный набор без пары</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label data-i18n="f-nmol">Число молекул / прочтений (N)</label>
+            <input type="number" placeholder="e.g. 1433">
+          </div>
+          <div class="field">
+            <label data-i18n="f-genome2">Геном / сборка</label>
+            <input type="text" value="GRCh38">
+          </div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="f-upload2">Файлы (демо — реальная загрузка не выполняется)</label>
+          <div class="dropzone" data-drop="processed">
+            <div data-i18n="dz-main2"><strong>Перетащите файлы сюда</strong> или нажмите, чтобы выбрать</div>
+            <div class="hint" data-i18n="dz-hint2">CSV, TSV, bedMethyl — таблицы per-CpG метилирования</div>
+            <input type="file" multiple data-input="processed">
+          </div>
+          <div class="file-list" data-list="processed"></div>
+        </div>
+      </div>
+
+      <div class="form-panel">
+        <h3 data-i18n="contact-title">Контактная информация</h3>
+        <div class="grid2">
+          <div class="field">
+            <label data-i18n="f-name">Имя <span class="req">*</span></label>
+            <input type="text" required>
+          </div>
+          <div class="field">
+            <label data-i18n="f-email">Email <span class="req">*</span></label>
+            <input type="email" required>
+          </div>
+        </div>
+        <div class="field">
+          <label data-i18n="f-notes">Комментарии для лаборатории</label>
+          <textarea rows="3"></textarea>
+        </div>
+
+        <div class="submit-row">
+          <button type="submit" class="btn" data-i18n="submit-btn">Отправить заявку</button>
+          <span class="submit-note" data-i18n="submit-note">Демо: файлы никуда не передаются, только собираются метаданные заявки.</span>
+        </div>
+
+        <div class="success-panel" id="success-panel">
+          <h4><span>✓</span> <span data-i18n="success-title">Заявка принята (демо)</span></h4>
+          <p data-i18n="success-p1">Ваш демонстрационный ID заявки: <code id="submission-id">CD55-000000</code></p>
+          <p data-i18n="success-p2">В реальной версии сайта дальше произойдёт следующее:</p>
+          <ol>
+            <li data-i18n="success-li1">Вы получите письмо со ссылкой для безопасной передачи файлов (Globus / SFTP).</li>
+            <li data-i18n="success-li2">Сырые Nanopore-данные будут прогнаны через пайплайн epiCme (базовое вызывание + CpG-метилирование).</li>
+            <li data-i18n="success-li3">Обработанные данные будут сопоставлены с существующими профилями on/off и ChIP-seq треками по локусу CD55.</li>
+            <li data-i18n="success-li4">Мы свяжемся с вами по указанному email с результатами анализа.</li>
+          </ol>
+          <a class="back-link" href="index.html" data-i18n="back-home">← Вернуться на главную</a>
+        </div>
+      </div>
+    </form>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap" data-i18n="footer">epicme.bio — портал приёма данных для CD55 multi-omics анализа. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="index.html">← Назад на главную</a></div>
+</footer>
+
+<script>
+const I18N = {
+  ru: {
+    'title':'epicme.bio — загрузка данных',
+    'brand-sub':'эпигеном · цитозин · метилирование',
+    'nav-home':'Главная','nav-about':'О проекте','nav-k562':'K562','nav-chipseq':'ChIP-seq','nav-upload':'Загрузка данных',
+    'eyebrow':'Contribute · epicme.bio',
+    'h1':'Загрузите свои данные для обработки и<br><em>структурированного глубокого анализа epiCme</em>',
+    'hero-sub':'Пришлите сырые прогоны Oxford Nanopore или уже обработанные профили метилирования CD55 — мы прогоним их через наш пайплайн epiCme и сопоставим с картой промотора, транскрипционными факторами и профилями on/off, уже собранными на этом сайте.',
+    'demo-banner':'<strong>Демо-версия интерфейса.</strong> Реальная загрузка файлов пока не подключена — сырые Nanopore-раны обычно весят десятки–сотни ГБ, что не передать надёжно через браузер. После заполнения формы вы получите демонстрационный ID заявки и инструкции по безопасной передаче файлов (Globus / SFTP / защищённая ссылка).',
+    'step1-h2':'1. Выберите тип данных','step1-sub':'Форма ниже подстроится под выбранный тип.',
+    'card-nano-tag':'Сырые данные','card-nano-h':'Сырые данные Oxford Nanopore',
+    'card-nano-p':'POD5 / FAST5 / FASTQ (+ опционально BAM). Мы прогоним их через пайплайн epiCme — базовое вызывание и вызов CpG-метилирования на выбранном пороге достоверности.',
+    'card-proc-tag':'Обработанные данные','card-proc-h':'Уже обработанные данные метилирования',
+    'card-proc-p':'Готовые per-CpG таблицы метилирования (CSV/TSV, bedMethyl) — для прямого сравнения on/off клеток (отредактированные vs контроль) на общих координатах.',
+    'step2-h2':'2. Заполните информацию о выборке','step2-sub':'Поля отмеченные * обязательны.',
+    'panel-nano-h3':'Сырые данные Nanopore → epiCme','panel-nano-sub':'Прогоним через базовое вызывание и CpG-метилирование на выбранном пороге.',
+    'f-sampleId':'ID образца / группы *','f-cellLine':'Клеточная линия *',
+    'f-editSystem':'Система редактирования','f-status':'Статус (on/off) *',
+    'opt-crisproff':'CRISPR-off','opt-zfpoff':'ZFP-off','opt-mock':'Mock (контроль)','opt-unedited':'Нередактированные','opt-other':'Другое',
+    'opt-on':'CD55 ON (экспрессия сохранена)','opt-off':'CD55 OFF (замолчан)','opt-mixed':'Смешанная / несортированная популяция',
+    'f-timepoint':'День / временная точка','f-sortMethod':'Метод сортировки',
+    'f-platform':'Платформа секвенирования','opt-other2':'Другое',
+    'f-genome':'Геном / сборка','f-region':'Регион / локус (если таргетный)',
+    'f-upload':'Файлы (демо — реальная загрузка не выполняется)',
+    'dz-main':'<strong>Перетащите файлы сюда</strong> или нажмите, чтобы выбрать',
+    'dz-hint':'POD5, FAST5, FASTQ.GZ, BAM — любой размер (это демо, реальная передача не выполняется)',
+    'large-note':'Файлы больше ~2 ГБ не передавайте через эту форму. После отправки заявки вы получите ID и адрес для передачи через Globus / SFTP / защищённую ссылку на файлообменник лаборатории.',
+    'panel-proc-h3':'Обработанные данные метилирования','panel-proc-sub':'Для сравнения on/off клеток на общих координатах CpG.',
+    'f-sampleId2':'ID образца / группы *','f-cellLine2':'Клеточная линия *',
+    'f-caller':'Метод / порог вызова метилирования','opt-other3':'Другой / нестандартный',
+    'f-comparison':'Сравнение on/off','opt-pairedOnOff':'Парное: on-клетки vs off-клетки',
+    'opt-vsBaseline':'vs baseline / mock control','opt-standalone':'Отдельный набор без пары',
+    'f-nmol':'Число молекул / прочтений (N)','f-genome2':'Геном / сборка',
+    'f-upload2':'Файлы (демо — реальная загрузка не выполняется)',
+    'dz-main2':'<strong>Перетащите файлы сюда</strong> или нажмите, чтобы выбрать',
+    'dz-hint2':'CSV, TSV, bedMethyl — таблицы per-CpG метилирования',
+    'contact-title':'Контактная информация',
+    'f-name':'Имя *','f-email':'Email *','f-notes':'Комментарии для лаборатории',
+    'submit-btn':'Отправить заявку','submit-note':'Демо: файлы никуда не передаются, только собираются метаданные заявки.',
+    'success-title':'Заявка принята (демо)','success-p1':'Ваш демонстрационный ID заявки: ',
+    'success-p2':'В реальной версии сайта дальше произойдёт следующее:',
+    'success-li1':'Вы получите письмо со ссылкой для безопасной передачи файлов (Globus / SFTP).',
+    'success-li2':'Сырые Nanopore-данные будут прогнаны через пайплайн epiCme (базовое вызывание + CpG-метилирование).',
+    'success-li3':'Обработанные данные будут сопоставлены с существующими профилями on/off и ChIP-seq треками по локусу CD55.',
+    'success-li4':'Мы свяжемся с вами по указанному email с результатами анализа.',
+    'back-home':'← Вернуться на главную',
+    'footer':'epicme.bio — портал приёма данных для CD55 multi-omics анализа. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="index.html">← Назад на главную</a>'
+  },
+  en: {
+    'title':'epicme.bio — data upload',
+    'brand-sub':'epigenome · cytosine · methylation',
+    'nav-home':'Home','nav-about':'About','nav-k562':'K562','nav-chipseq':'ChIP-seq','nav-upload':'Upload data',
+    'eyebrow':'Contribute · epicme.bio',
+    'h1':'Upload your data for processing and<br><em>epiCme structured deep analysis</em>',
+    'hero-sub':'Send us raw Oxford Nanopore runs or already-processed CD55 methylation profiles — we run them through our epiCme pipeline and cross-reference them against the promoter map, transcription factors, and on/off profiles already built up on this site.',
+    'demo-banner':'<strong>Interface demo.</strong> Real file upload isn’t wired up yet — raw Nanopore runs are typically tens to hundreds of GB, too large to reliably send through a browser. After submitting the form you’ll get a demo submission ID and instructions for secure transfer (Globus / SFTP / a protected link).',
+    'step1-h2':'1. Choose a data type','step1-sub':'The form below adapts to the type you pick.',
+    'card-nano-tag':'Raw data','card-nano-h':'Raw Oxford Nanopore data',
+    'card-nano-p':'POD5 / FAST5 / FASTQ (+ optional BAM). We run it through the epiCme pipeline — basecalling plus CpG methylation calling at your chosen confidence threshold.',
+    'card-proc-tag':'Processed data','card-proc-h':'Already-processed methylation data',
+    'card-proc-p':'Ready per-CpG methylation tables (CSV/TSV, bedMethyl) — for direct on/off cell comparison (edited vs control) on shared coordinates.',
+    'step2-h2':'2. Fill in sample information','step2-sub':'Fields marked * are required.',
+    'panel-nano-h3':'Raw Nanopore data → epiCme','panel-nano-sub':'We’ll run basecalling and CpG methylation calling at your chosen threshold.',
+    'f-sampleId':'Sample / group ID *','f-cellLine':'Cell line *',
+    'f-editSystem':'Editing system','f-status':'Status (on/off) *',
+    'opt-crisproff':'CRISPR-off','opt-zfpoff':'ZFP-off','opt-mock':'Mock (control)','opt-unedited':'Unedited','opt-other':'Other',
+    'opt-on':'CD55 ON (expression retained)','opt-off':'CD55 OFF (silenced)','opt-mixed':'Mixed / unsorted population',
+    'f-timepoint':'Day / timepoint','f-sortMethod':'Sorting method',
+    'f-platform':'Sequencing platform','opt-other2':'Other',
+    'f-genome':'Genome build','f-region':'Region / locus (if targeted)',
+    'f-upload':'Files (demo — no real upload happens)',
+    'dz-main':'<strong>Drag files here</strong> or click to browse',
+    'dz-hint':'POD5, FAST5, FASTQ.GZ, BAM — any size (this is a demo, no real transfer happens)',
+    'large-note':'Don’t send files larger than ~2 GB through this form. After you submit, you’ll get an ID and address for transfer via Globus / SFTP / a protected lab file-share link.',
+    'panel-proc-h3':'Processed methylation data','panel-proc-sub':'For on/off cell comparison on shared CpG coordinates.',
+    'f-sampleId2':'Sample / group ID *','f-cellLine2':'Cell line *',
+    'f-caller':'Methylation calling method / threshold','opt-other3':'Other / custom',
+    'f-comparison':'On/off comparison','opt-pairedOnOff':'Paired: on-cells vs off-cells',
+    'opt-vsBaseline':'vs baseline / mock control','opt-standalone':'Standalone, no pair',
+    'f-nmol':'Number of molecules / reads (N)','f-genome2':'Genome build',
+    'f-upload2':'Files (demo — no real upload happens)',
+    'dz-main2':'<strong>Drag files here</strong> or click to browse',
+    'dz-hint2':'CSV, TSV, bedMethyl — per-CpG methylation tables',
+    'contact-title':'Contact information',
+    'f-name':'Name *','f-email':'Email *','f-notes':'Notes for the lab',
+    'submit-btn':'Submit request','submit-note':'Demo: no files are actually transferred, only submission metadata is collected.',
+    'success-title':'Request received (demo)','success-p1':'Your demo submission ID: ',
+    'success-p2':'In the real version of the site, here’s what happens next:',
+    'success-li1':'You’ll get an email with a link for secure file transfer (Globus / SFTP).',
+    'success-li2':'Raw Nanopore data runs through the epiCme pipeline (basecalling + CpG methylation calling).',
+    'success-li3':'Processed data gets cross-referenced against existing on/off profiles and ChIP-seq tracks at the CD55 locus.',
+    'success-li4':'We’ll follow up at the email you provided with the analysis results.',
+    'back-home':'← Back to home',
+    'footer':'epicme.bio — the data-intake portal for CD55 multi-omics analysis. Part of the PhD project of Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. <a href="index.html">← Back to home</a>'
+  }
+};
+
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const dict = I18N[lang];
+    if(!dict || !(key in dict)) return;
+    if(el.tagName === 'TITLE'){ document.title = dict[key]; }
+    else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('#lang-switch button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){}
+}
+document.querySelectorAll('#lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+(function(){
+  let saved = 'ru';
+  try{ saved = localStorage.getItem('epicme_lang') || 'ru'; }catch(e){}
+  if(saved === 'en') applyLang('en');
+})();
+
+/* ---------- data-type toggle ---------- */
+(function(){
+  const cards = document.querySelectorAll('.type-card');
+  const panelNano = document.getElementById('panel-nanopore');
+  const panelProc = document.getElementById('panel-processed');
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      cards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      const type = card.getAttribute('data-type');
+      panelNano.style.display = type === 'nanopore' ? 'block' : 'none';
+      panelProc.style.display = type === 'processed' ? 'block' : 'none';
+    });
+  });
+})();
+
+/* ---------- dropzones (demo only — files are listed, never uploaded) ---------- */
+document.querySelectorAll('.dropzone').forEach(zone => {
+  const key = zone.getAttribute('data-drop');
+  const input = zone.querySelector('input[type=file]');
+  const list = document.querySelector('.file-list[data-list="'+key+'"]');
+  zone.addEventListener('click', () => input.click());
+  ['dragenter','dragover'].forEach(evt => zone.addEventListener(evt, e => { e.preventDefault(); zone.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(evt => zone.addEventListener(evt, e => { e.preventDefault(); zone.classList.remove('drag'); }));
+  zone.addEventListener('drop', e => renderFiles(e.dataTransfer.files));
+  input.addEventListener('change', () => renderFiles(input.files));
+  function renderFiles(files){
+    Array.from(files).forEach(f => {
+      const chip = document.createElement('div');
+      chip.className = 'file-chip';
+      chip.innerHTML = '<span class="fname">'+f.name+'</span><span class="fsize">'+formatSize(f.size)+'</span><span class="remove">✕</span>';
+      chip.querySelector('.remove').addEventListener('click', () => chip.remove());
+      list.appendChild(chip);
+    });
+  }
+  function formatSize(bytes){
+    if(bytes < 1024) return bytes+' B';
+    if(bytes < 1024*1024) return (bytes/1024).toFixed(1)+' KB';
+    if(bytes < 1024*1024*1024) return (bytes/1024/1024).toFixed(1)+' MB';
+    return (bytes/1024/1024/1024).toFixed(2)+' GB';
+  }
+});
+
+/* ---------- fake submit ---------- */
+document.getElementById('submit-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const id = 'CD55-' + Math.floor(100000 + Math.random()*900000);
+  document.getElementById('submission-id').textContent = id;
+  const panel = document.getElementById('success-panel');
+  panel.classList.add('show');
+  panel.scrollIntoView({behavior:'smooth', block:'center'});
+});
+</script>
+
+</body>
+</html>
