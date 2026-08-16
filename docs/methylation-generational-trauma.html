@@ -1,307 +1,989 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inherited Marks — DNA Methylation &amp; Generational Trauma — epicme.bio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inherited Marks — DNA methylation &amp; generational trauma — epicme.bio</title>
+<meta name="description" content="What the human and animal literature actually shows about DNA methylation and the inheritance of trauma — papers, short quotes, and the caveats that matter.">
+<link rel="stylesheet" href="assets/theme.css">
 <style>
-  :root{
-    --bg: #0b1210;
-    --bg-panel: #101a17;
-    --bg-panel-2: #0e1a1c;
-    --line: #23332f;
-    --ink: #e9efe9;
-    --ink-dim: #a9bab3;
-    --ink-faint: #6f8179;
-    --amber: #e0a458;
-    --cyan: #4fb3bf;
-    --rose: #c97b84;
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:'IBM Plex Sans', sans-serif; line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
-  ::selection{ background:var(--amber); color:#0b1210; }
-  a{ color:var(--cyan); }
-  .wrap{ max-width:780px; margin:0 auto; padding:0 24px; }
+/* ============================================================
+   Page-local styles — only what theme.css does not already provide.
+   Every color below is a theme variable. Category meaning is always
+   carried by a text label or symbol as well as by hue.
+   ============================================================ */
 
-  .mk{ display:inline-block; width:0.62em; height:0.62em; border-radius:50%;
-       margin-right:0.5em; vertical-align:middle; flex-shrink:0; border:1.6px solid currentColor; }
-  .mk.filled{ background:currentColor; }
-  .mk.open{ background:transparent; }
+/* ---------- language switch + pill nav: copied verbatim from index.html
+   so the header is identical across the site ---------- */
+.lang-switch{
+  display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+  border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+}
+.lang-switch button{
+  border:none; background:transparent; color:var(--ink-dim);
+  font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+  font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+}
+.lang-switch button.active{ background:var(--blue); color:#06182A; }
+.nav-inner{ flex-wrap:wrap; row-gap:10px; }
 
-  header.hero{ padding:80px 0 48px; border-bottom:1px solid var(--line); }
-  .eyebrow{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:0.14em;
-            text-transform:uppercase; color:var(--ink-faint); display:flex; align-items:center; gap:10px; margin-bottom:22px; }
-  .eyebrow .mk{ color:var(--amber); }
-  h1{ font-family:'Fraunces', serif; font-weight:500; font-size:clamp(32px,5.6vw,50px);
-      line-height:1.1; letter-spacing:-0.01em; margin:0 0 20px; }
-  h1 em{ font-style:italic; color:var(--amber); }
-  .hero p.lede{ font-size:17.5px; color:var(--ink-dim); max-width:58ch; margin:0 0 8px; }
+.nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+.nav-links a{
+  display:inline-flex; align-items:center;
+  padding:10px 18px;
+  border-radius:999px;
+  border:1.5px solid var(--line);
+  background:var(--surface-2);
+  color:var(--ink-dim);
+  font-size:14.5px; font-weight:600;
+  text-decoration:none;
+  transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+}
+.nav-links a:hover, .nav-links a:focus-visible{
+  border-color:var(--blue);
+  color:var(--ink);
+  background:var(--surface);
+  transform:translateY(-1px);
+}
+.nav-links a.active{
+  background:var(--blue);
+  border-color:var(--blue);
+  color:#06182A;
+}
 
-  section{ padding:52px 0; border-bottom:1px solid var(--line); }
-  section:last-of-type{ border-bottom:none; }
-  .kicker{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.1em;
-           text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px; }
-  h2{ font-family:'Fraunces', serif; font-weight:500; font-size:clamp(23px,3.8vw,29px); margin:0 0 16px; letter-spacing:-0.01em; }
-  h3{ font-family:'IBM Plex Sans', sans-serif; font-weight:600; font-size:17px; margin:6px 0 4px; color:var(--ink); }
-  .meta{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-faint); margin-bottom:14px; }
-  p{ color:var(--ink-dim); margin:0 0 14px; font-size:15.5px; }
-  p strong{ color:var(--ink); font-weight:600; }
-  .gene{ font-family:'IBM Plex Mono', monospace; color:var(--amber); font-size:0.92em; }
-  blockquote{
-    margin:16px 0; padding:14px 18px;
-    border-left:3px solid var(--amber);
-    background:var(--bg-panel);
-    font-family:'Fraunces', serif; font-style:italic; font-size:16.5px;
-    color:var(--ink);
-  }
-  blockquote cite{ display:block; margin-top:8px; font-family:'IBM Plex Mono', monospace;
-    font-style:normal; font-size:12px; color:var(--ink-faint); }
+/* hero */
+.hero{ border-top:none; padding-top:34px; }
+.hero h1{
+  font-size:clamp(30px,5.4vw,50px); line-height:1.05; margin:0 0 20px;
+  letter-spacing:-0.025em; max-width:19ch; font-weight:700;
+}
+.hero h1 em{ font-style:normal; color:var(--blue); }
 
-  .paper{ background:var(--bg-panel); border:1px solid var(--line); border-radius:8px; padding:22px 24px; margin:22px 0; }
-  .paper .tag{ display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:11px;
-    text-transform:uppercase; letter-spacing:0.08em; color:var(--cyan); border:1px solid var(--line);
-    border-radius:20px; padding:3px 10px; margin-bottom:10px; }
+/* the generation ledger (signature element) */
+.ledger{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:22px 20px; }
+.ledger svg{ width:100%; height:auto; display:block; max-width:820px; margin:4px auto 0; }
+.ledger-legend{
+  display:flex; flex-wrap:wrap; gap:12px 22px; margin-top:18px; padding-top:16px;
+  border-top:1px dashed var(--line); font-size:12.5px; color:var(--ink-faint);
+  font-family:'Space Grotesk',sans-serif;
+}
+.ledger-legend span{ display:flex; align-items:center; gap:8px; }
+.ledger-legend i{ width:18px; height:12px; border-radius:3px; flex:0 0 auto; }
 
-  .callout{ background:var(--bg-panel); border:1px solid var(--line); border-left:3px solid var(--cyan);
-    border-radius:6px; padding:16px 18px; margin:20px 0; font-size:14.5px; color:var(--ink-dim); }
-  .callout .mk{ color:var(--cyan); }
-  .caution{ background:var(--bg-panel-2); border:1px solid var(--line); border-left:3px solid var(--rose);
-    border-radius:6px; padding:16px 18px; margin:20px 0; font-size:14.5px; color:var(--ink-dim); }
-  .caution .kicker{ color:var(--rose); }
+/* study cards — built on .card, with a left rule naming the evidence type */
+.studies{ display:flex; flex-direction:column; gap:16px; }
+.study{ border-left:4px solid var(--line); }
+.study[data-kind="human"]{ border-left-color:var(--blue); }
+.study[data-kind="animal"]{ border-left-color:var(--orange); }
+.study[data-kind="review"]{ border-left-color:var(--yellow); }
+.study .tagrow{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.study .tagrow .tag{ margin-bottom:0; }
+.tag.review{ background:var(--yellow-dim); color:var(--yellow); }
+.study h3{ font-size:16.5px; line-height:1.35; margin:0 0 8px; }
+.study .study-meta{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint);
+  line-height:1.55; margin:0 0 14px;
+}
+.study .ref-quote{ margin:0 0 14px; }
+.study .ref-quote cite{
+  display:block; margin-top:6px; font-style:normal;
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-faint);
+}
+.row{ display:flex; gap:12px; margin:0 0 10px; }
+.row .lbl{
+  font-family:'Space Grotesk',sans-serif; font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+  font-weight:600; color:var(--ink-faint); flex:0 0 76px; padding-top:3px;
+}
+.row.caveat .lbl{ color:var(--orange); }
+.row .txt{ font-size:14.5px; color:var(--ink-dim); line-height:1.6; }
+.study .paper-link{
+  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:12px;
+  color:var(--blue); text-decoration:none; border-bottom:1px solid var(--blue-dim); word-break:break-word;
+}
+.study .paper-link:hover{ border-bottom-color:var(--blue); }
+@media (max-width:520px){ .row{ flex-direction:column; gap:2px; } .row .lbl{ flex-basis:auto; } }
 
-  /* ---- generational diagram ---- */
-  .gen-diagram{ margin:26px 0; overflow-x:auto; }
-  .gen-diagram svg{ display:block; min-width:640px; width:100%; height:auto; }
-  .gen-caption{ font-size:13px; color:var(--ink-faint); margin-top:10px; }
+/* three routes */
+.grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+@media (max-width:760px){ .grid3{ grid-template-columns:1fr; } }
+.route .num{
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-faint);
+  display:block; margin-bottom:8px; letter-spacing:0.05em;
+}
 
-  /* ---- sample size bars ---- */
-  .bars{ margin:22px 0; }
-  .bar-row{ display:flex; align-items:center; gap:12px; margin-bottom:10px; font-size:13px; }
-  .bar-label{ width:230px; flex-shrink:0; color:var(--ink-dim); font-family:'IBM Plex Mono', monospace; font-size:12px; }
-  .bar-track{ flex:1; background:var(--bg-panel-2); border:1px solid var(--line); border-radius:4px; height:16px; position:relative; }
-  .bar-fill{ height:100%; border-radius:3px 0 0 3px; }
-  .bar-n{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-faint); width:70px; text-align:right; }
+/* criteria checklist */
+.checklist{ list-style:none; padding:0; margin:20px 0 0; display:flex; flex-direction:column; gap:10px; }
+.checklist li{
+  display:flex; gap:12px; align-items:flex-start; font-size:14.5px; color:var(--ink-dim); line-height:1.6;
+  background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:13px 15px;
+}
+.checklist li::before{
+  content:"☐"; font-family:'IBM Plex Mono',monospace; color:var(--yellow); flex:0 0 auto; font-size:15px;
+}
 
-  /* ---- table ---- */
-  .tbl{ width:100%; border-collapse:collapse; margin:20px 0; font-size:13.5px; }
-  .tbl th{ text-align:left; font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase;
-    letter-spacing:0.06em; color:var(--ink-faint); padding:8px 10px; border-bottom:1px solid var(--line); }
-  .tbl td{ padding:10px 10px; border-bottom:1px solid var(--line); color:var(--ink-dim); vertical-align:top; }
-  .tbl td.gene{ white-space:nowrap; }
-  .tbl tr:last-child td{ border-bottom:none; }
+/* claim table */
+.table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); }
+table{ border-collapse:collapse; width:100%; min-width:560px; }
+th,td{ padding:12px 15px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; font-size:14px; }
+thead th{
+  font-family:'Space Grotesk',sans-serif; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--ink-faint); background:var(--surface-2); font-weight:600;
+}
+tbody td{ color:var(--ink-dim); }
+tbody td:first-child{ color:var(--ink); font-weight:600; }
+tbody tr:last-child td{ border-bottom:none; }
 
-  ul.refs{ list-style:none; margin:0; padding:0; font-size:13.5px; color:var(--ink-faint); }
-  ul.refs li{ padding:10px 0; border-top:1px solid var(--line); display:flex; gap:10px; }
-  ul.refs li:first-child{ border-top:none; }
-  ul.refs .mk{ margin-top:4px; }
+/* cohort-size bars */
+.bars{ margin:22px 0 8px; }
+.bar-row{ display:flex; align-items:center; gap:12px; margin-bottom:9px; }
+.bar-label{
+  width:250px; flex-shrink:0; color:var(--ink-dim);
+  font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.4;
+}
+.bar-track{ flex:1; min-width:80px; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; height:16px; }
+.bar-fill{ height:100%; background:var(--blue); border-radius:3px 0 0 3px; }
+.bar-n{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint); width:44px; text-align:right; flex-shrink:0; }
+@media (max-width:600px){
+  .bar-row{ flex-wrap:wrap; }
+  .bar-label{ width:100%; }
+}
 
-  footer{ padding:40px 0 80px; font-size:13px; color:var(--ink-faint); }
-  footer a{ color:var(--ink-dim); }
+/* small print */
+.quotenote{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint);
+  border-top:1px dashed var(--line); border-bottom:1px dashed var(--line);
+  padding:9px 0; margin:0 0 20px;
+}
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <div class="wrap">
-    <div class="eyebrow"><span class="mk open"></span> epicme.bio — field notes</div>
-    <h1>Does trauma leave<br><em>a mark on the next generation?</em></h1>
-    <p class="lede">A survey of what's actually been measured — not what headlines claim. Human cohort studies, mouse mechanistic work, and the germline-biology critique that most popular coverage skips entirely.</p>
+<!-- ===== NAV — identical structure and links to index.html ===== -->
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru">RU</button>
+      <button type="button" data-lang="en" class="active">EN</button>
+    </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="day6.html">Day 6</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day6VSday35.html">Day 35 vs Day 6</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="cd55-tf-tcells.html" data-i18n="nav-tf">Механизмы</a>
+      <a href="methylation-and-memory.html" data-i18n="nav-memory">Метилирование и память</a>
+      <a href="methylation-generational-trauma.html" data-i18n="nav-trauma" class="active" aria-current="page">Метилирование и травма</a>
+    </nav>
   </div>
 </header>
 
-<section id="framing">
-  <div class="wrap">
-    <div class="kicker">before the papers — one definition that matters</div>
-    <h2>Intergenerational vs. transgenerational</h2>
-    <p>These words get used interchangeably in the press, but in this field they mean different things, and the difference determines what a study can actually prove.</p>
+<main>
 
-    <div class="gen-diagram">
-      <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of F0 through F3 generations showing which are directly exposed versus germline-exposed versus truly transgenerational">
-        <!-- generation lane lines -->
-        <line x1="40" y1="40" x2="640" y2="40" stroke="#23332f" stroke-width="1"/>
-        <line x1="40" y1="95" x2="640" y2="95" stroke="#23332f" stroke-width="1"/>
-        <line x1="40" y1="150" x2="640" y2="150" stroke="#23332f" stroke-width="1"/>
-
-        <!-- F0 -->
-        <circle cx="90" cy="40" r="16" fill="#e0a458"/>
-        <text x="90" y="45" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#0b1210">F0</text>
-        <text x="90" y="70" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="#a9bab3">directly exposed</text>
-
-        <!-- F1 -->
-        <circle cx="270" cy="95" r="16" fill="#e0a458" fill-opacity="0.55" stroke="#e0a458" stroke-width="1.5"/>
-        <text x="270" y="100" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#0b1210">F1</text>
-        <text x="270" y="122" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="#a9bab3">germline-exposed in utero</text>
-        <text x="270" y="137" text-anchor="middle" font-family="IBM Plex Mono" font-size="10.5" fill="#6f8179">= intergenerational</text>
-
-        <!-- F2 -->
-        <circle cx="450" cy="150" r="16" fill="none" stroke="#4fb3bf" stroke-width="2"/>
-        <text x="450" y="155" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#4fb3bf">F2</text>
-        <text x="450" y="177" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="#a9bab3">first unexposed generation</text>
-        <text x="450" y="192" text-anchor="middle" font-family="IBM Plex Mono" font-size="10.5" fill="#4fb3bf">= true transgenerational test (maternal line)</text>
-
-        <!-- F3 for paternal -->
-        <circle cx="600" cy="150" r="16" fill="none" stroke="#4fb3bf" stroke-width="2" stroke-dasharray="3 3"/>
-        <text x="600" y="155" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#4fb3bf">F3</text>
-        <text x="600" y="177" text-anchor="middle" font-family="IBM Plex Sans" font-size="10.5" fill="#a9bab3">paternal-line equivalent</text>
-
-        <!-- connecting arrows -->
-        <path d="M106,42 C180,42 210,90 254,93" stroke="#6f8179" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
-        <path d="M286,97 C360,97 400,145 434,148" stroke="#6f8179" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
-        <defs>
-          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L6,3 L0,6 Z" fill="#6f8179"/>
-          </marker>
-        </defs>
-      </svg>
-      <p class="gen-caption"><span class="mk filled" style="color:var(--amber)"></span> filled = directly or germline-exposed &nbsp;·&nbsp; <span class="mk open" style="color:var(--cyan)"></span> open = never exposed, mark still present = the actual transgenerational claim</p>
-    </div>
-
-    <p>If a pregnant female (<strong>F0</strong>) is exposed to trauma, her fetus (<strong>F1</strong>) was already alive — and so were that fetus's own developing germ cells, meaning the future <strong>F2</strong> generation's DNA was physically present, in utero, during the exposure. That's <strong>intergenerational</strong> transmission: direct exposure, just at an early developmental stage. The real test of transgenerational inheritance is whether the effect still shows up in a generation that was never physically present for the event at all — F2 through the maternal line, F3 through the paternal line. Most human trauma studies, including the ones below, are intergenerational (F0→F1). Very few get to a genuine F2/F3 test.</p>
-  </div>
-</section>
-
-<section id="human">
-  <div class="wrap">
-    <div class="kicker">01 — human cohort studies</div>
-    <h2>What's been measured in people</h2>
-
-    <div class="paper">
-      <span class="tag">Biological Psychiatry, 2016</span>
-      <h3>Yehuda et al. — Holocaust Exposure Induced Intergenerational Effects on <span class="gene">FKBP5</span> Methylation</h3>
-      <div class="meta">32 Holocaust survivors · 22 adult offspring · matched controls · blood-derived DNA</div>
-      <p>The first study to directly test, in humans, whether a parent's methylation response to trauma shows up in their adult children at the same genomic site. The team measured methylation at <span class="gene">FKBP5</span> intron 7 — the same glucocorticoid-response region implicated in PTSD risk generally — in survivors and their offspring.</p>
-      <p>The result was directionally striking rather than simply "more methylation everywhere": survivors themselves showed <em>higher</em> methylation than controls at one specific CpG site, while their offspring showed <em>lower</em> methylation than controls at that same site. The offspring effect held up even after controlling for the offspring's own FKBP5 genotype and their own trauma exposure — meaning it wasn't just inherited DNA sequence or the offspring's own hard life doing the work.</p>
-      <blockquote>"Holocaust exposure had an effect on FKBP5 methylation that was observed in exposed parents as well in their offspring."<cite>— Yehuda et al., Biological Psychiatry, 2016</cite></blockquote>
-      <p>Caveat the authors themselves flagged: sample sizes this small (n=22 offspring) can't distinguish gamete-mediated transmission from in-utero effects, and can't rule out that offspring methylation partly reflects growing up with a parent who had PTSD, not a molecular inheritance at all.</p>
-    </div>
-
-    <div class="paper">
-      <span class="tag">World J. Biological Psychiatry, 2014</span>
-      <h3>Perroud et al. — The Tutsi Genocide and Transgenerational Transmission of Maternal Stress</h3>
-      <div class="meta">25 women pregnant during the 1994 Rwandan genocide · their children · 25 non-exposed matched pairs</div>
-      <p>Women who were pregnant during the genocide — and were therefore carrying what would become the F1 generation, with F2 germ cells already forming — were compared with non-exposed Rwandan mothers of the same era. Both PTSD symptom severity and methylation of the glucocorticoid receptor gene <span class="gene">NR3C1</span> (exon 1F promoter) were measured in mothers and, years later, in their children.</p>
-      <p>Exposed mothers and their children both showed elevated <span class="gene">NR3C1</span> methylation, lower cortisol and glucocorticoid receptor levels, and higher mineralocorticoid receptor levels than the control pairs — the same HPA-axis signature appearing in both generations.</p>
-      <blockquote>"PTSD was associated with NR3C1 epigenetic modifications."<cite>— Perroud et al., World Journal of Biological Psychiatry, 2014</cite></blockquote>
-      <p>This is intergenerational by the definition above — the "offspring" generation was in utero during the genocide, not conceived afterward — so it can't distinguish a methylation mark transmitted through the germline from a methylation mark induced by the direct physiological stress of maternal cortisol crossing the placenta during pregnancy.</p>
-    </div>
-
-    <div class="paper">
-      <span class="tag">World Psychiatry, 2018 — review</span>
-      <h3>Yehuda &amp; Lehrner — Intergenerational Transmission of Trauma Effects: Putative Role of Epigenetic Mechanisms</h3>
-      <div class="meta">narrative review, human + animal literature</div>
-      <p>Yehuda's own review of the field is notably more hedged than the primary papers that made her name in this area. It walks through candidate windows for transmission — preconception effects on oocytes (which sit in a de-methylated, vulnerable state from birth until puberty), sperm epigenetic marks, and in-utero programming via maternal cortisol — and is explicit that current human data can support any of these routes without being able to cleanly separate them.</p>
-      <p>The review is also where the field's central limitation gets stated plainly: parental gender, PTSD status, and offspring developmental timing all shift the direction and magnitude of methylation differences across studies, in ways that don't yet resolve into one consistent mechanistic story.</p>
-    </div>
-
-  </div>
-</section>
-
-<section id="animal">
-  <div class="wrap">
-    <div class="kicker">02 — mouse mechanistic work</div>
-    <h2>Where the germline evidence actually gets tested</h2>
-    <p>Human studies can show correlation across two generations; they can't touch the germline directly, breed multiple generations on command, or fully rule out confounds. Mouse work can — and it's where the "F2/F3, never exposed" bar from the diagram above actually gets cleared.</p>
-
-    <div class="paper">
-      <span class="tag">Nature Neuroscience, 2013</span>
-      <h3>Dias &amp; Ressler — Parental Olfactory Experience Influences Behavior and Neural Structure in Subsequent Generations</h3>
-      <div class="meta">mice · odor-shock fear conditioning to acetophenone · F1 and F2 tested</div>
-      <p>Male mice were conditioned to fear a specific odor (acetophenone, similar to cherry blossom) by pairing it with a mild shock, then bred — via natural mating <em>and</em>, separately, via in vitro fertilization, to rule out learned behavior or in-utero maternal exposure as the explanation. Their pups, who had never smelled the odor or been shocked, still startled more to that specific odor and not to others — and so did the following generation of grandpups.</p>
-      <p>The mechanistic piece: the odorant receptor gene for that specific smell was hypomethylated in the sperm of conditioned fathers, and both offspring and grandoffspring had measurably more neurons and a larger brain structure dedicated to processing that exact odor.</p>
-      <blockquote>"A parent's anxiety could influence later generations through epigenetic modifications."<cite>— Kerry Ressler, quoted in Nature News, 2013</cite></blockquote>
-      <p>This is the cleanest published evidence that a learned, fear-specific association can leave a locus-specific methylation signature in sperm and produce a matching phenotype two generations later without any physical or social exposure — in mice. It has not been, and likely cannot ethically be, replicated this cleanly in humans.</p>
-    </div>
-
-    <div class="paper">
-      <span class="tag">Nature Neuroscience, 2014</span>
-      <h3>Gapp et al. — Implication of Sperm RNAs in Transgenerational Inheritance of the Effects of Early Trauma in Mice</h3>
-      <div class="meta">mice · early-life maternal separation + unpredictable stress</div>
-      <p>A companion mechanistic thread to the methylation story: this group traced altered metabolic and behavioral phenotypes in the offspring of stressed fathers not to sperm DNA methylation directly, but to small RNAs carried in sperm. Injecting those sperm RNAs alone into normal fertilized eggs was sufficient to reproduce some of the offspring phenotypes — evidence that methylation is one carrier among several, and possibly not even the dominant one in every trauma-transmission pathway.</p>
-    </div>
-  </div>
-</section>
-
-<section id="critique">
-  <div class="wrap">
-    <div class="kicker">03 — the skeptic's case</div>
-    <h2>Why this remains genuinely contested</h2>
-    <p>The most-cited pushback in this literature isn't a failed replication — it's a mechanistic objection about mammalian germline biology itself, and it's worth taking seriously before building anything on top of this field.</p>
-
-    <div class="paper">
-      <span class="tag">Nature Communications, 2018</span>
-      <h3>Horsthemke — A Critical View on Transgenerational Epigenetic Inheritance in Humans</h3>
-      <p>The core argument: mammalian germ cells are separated from somatic cells by the <strong>Weismann barrier</strong>, and on top of that, the genome undergoes two rounds of near-total epigenetic erasure and reprogramming — once in primordial germ cells, once again just after fertilization. For an acquired methylation mark to survive intergenerational transmission at all, it has to escape both erasure events, which very few loci are known to do. Horsthemke argues that most human "transgenerational" findings are confounded by ordinary genetic inheritance, shared environment, and cultural transmission of parenting style — and are almost never actually transgenerational by the F2/F3 standard.</p>
-      <blockquote>"Lamarck has never been dead and every so often raises his head."<cite>— Bernhard Horsthemke, Nature Communications, 2018</cite></blockquote>
-    </div>
-
-    <div class="caution">
-      <div class="kicker">reading the human studies honestly</div>
-      Every human paper above is intergenerational (F0→F1), not transgenerational (F2/F3) — none of them clear the bar the diagram sets. Sample sizes are small (n≈20–30 per group), effect sizes at individual CpGs are modest, and blood methylation is a proxy for — not a measurement of — what's happening in brain or germ tissue. None of this means the effects are fake. It means "genocide survivors' grandchildren inherited trauma through their genes," the version that circulates in the press, overstates what any single study has actually shown.
-    </div>
-  </div>
-</section>
-
-<section id="compare">
-  <div class="wrap">
-    <div class="kicker">at a glance</div>
-    <h2>Study sizes, side by side</h2>
-    <div class="bars">
-      <div class="bar-row">
-        <div class="bar-label">Yehuda 2016 (offspring, n)</div>
-        <div class="bar-track"><div class="bar-fill" style="width:15%; background:var(--amber);"></div></div>
-        <div class="bar-n">22</div>
-      </div>
-      <div class="bar-row">
-        <div class="bar-label">Perroud 2014 (per group, n)</div>
-        <div class="bar-track"><div class="bar-fill" style="width:17%; background:var(--amber);"></div></div>
-        <div class="bar-n">25</div>
-      </div>
-      <div class="bar-row">
-        <div class="bar-label">Dias &amp; Ressler 2013 (mice, per cohort, n)</div>
-        <div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--cyan);"></div></div>
-        <div class="bar-n">~150</div>
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="kicker" data-i18n="hero_eyebrow">Literature review · methylation series</div>
+      <h1><span data-i18n="hero_title_a">Can a methyl group</span> <em data-i18n="hero_title_b">carry a memory</em> <span data-i18n="hero_title_c">across generations?</span></h1>
+      <p class="lede" data-i18n="hero_lead">A guided tour of what the human and animal literature actually reports about DNA methylation and inherited trauma — with the original papers, short quotes, and the caveat that belongs next to each one.</p>
+      <div class="disclaimer">
+        <strong data-i18n="hero_note_lbl">The honest version:</strong>
+        <span data-i18n="hero_note">the animal work is strong and controlled; the human work is suggestive, small, and hard to disentangle from everything else parents pass to children. This page keeps those two apart on purpose.</span>
       </div>
     </div>
-    <p class="gen-caption" style="margin-top:-6px;">Mouse studies can run far larger, tightly controlled cohorts across bred generations. Human trauma cohorts are inherently limited by how many people lived through a specific historical exposure and were later reachable for a blood draw — which is a real ceiling on statistical power, not a design flaw.</p>
+  </section>
 
-    <table class="tbl">
-      <tr><th>Study</th><th>Species</th><th>Gene</th><th>Generation tested</th><th>Type</th></tr>
-      <tr><td>Yehuda et al. 2016</td><td>human</td><td class="gene">FKBP5</td><td>F0 → F1</td><td>intergenerational</td></tr>
-      <tr><td>Perroud et al. 2014</td><td>human</td><td class="gene">NR3C1</td><td>F0 → F1</td><td>intergenerational</td></tr>
-      <tr><td>Dias &amp; Ressler 2013</td><td>mouse</td><td>odorant receptor (<span class="gene">Olfr151</span>)</td><td>F0 → F1 → F2</td><td>transgenerational</td></tr>
-      <tr><td>Gapp et al. 2014</td><td>mouse</td><td>sperm small RNAs (not DNAm)</td><td>F0 → F1 → F2</td><td>transgenerational</td></tr>
-    </table>
-  </div>
-</section>
+  <!-- ===== 01 · THE DISTINCTION ===== -->
+  <section id="distinction">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s1_eyebrow">01 · The distinction everything hinges on</div>
+      <h2 data-i18n="s1_title">Intergenerational is not transgenerational</h2>
+      <p class="lede" data-i18n="s1_lead">Almost every argument in this field is really an argument about which generation you are looking at. If a generation was physically present during the exposure — as a fetus, or as a germ cell inside that fetus — then finding a mark in it is not evidence of inheritance. It is evidence of exposure.</p>
 
-<section id="threads">
-  <div class="wrap">
-    <div class="kicker">connecting thread</div>
-    <h2>What would actually settle this</h2>
-    <p>The field doesn't need another intergenerational human cohort finding a p-value at one CpG site — it has several of those now, pointing in genuinely interesting but mechanistically ambiguous directions. What's missing is human data at the F2 standard (grandchildren of directly exposed grandparents, never themselves exposed), paired with a plausible germline carrier mechanism that survives both rounds of epigenetic reprogramming — which right now looks more like sperm small RNAs than DNA methylation itself, at least in the mouse model that's actually been able to test it properly.</p>
-  </div>
-</section>
+      <div class="grid2">
+        <div class="card">
+          <span class="tag blue">F1 / F2 · <span data-i18n="def_inter_t">Intergenerational</span></span>
+          <p data-i18n="def_inter_d">The exposed individual and any generation that was directly present during the exposure. Real, measurable, biologically important — but it does not require anything to be transmitted through the germline.</p>
+        </div>
+        <div class="card">
+          <span class="tag review">F2 / F3 · <span data-i18n="def_trans_t">Transgenerational</span></span>
+          <p data-i18n="def_trans_d">The first generation with no direct exposure at any point, including as a germ cell. This is the only generation that can demonstrate inheritance through the germline — and it is the generation most human studies never reach.</p>
+        </div>
+      </div>
+
+      <p style="margin-top:18px" data-i18n="s1_p2">The arithmetic is concrete. If a pregnant woman (F0) lives through a famine or a genocide, her fetus (F1) is already alive — and so are that fetus's own developing germ cells, which will become F2. Three generations are physically present for one event. Only F3 is conceived from material that was never there. On the paternal side the chain is shorter: a man's sperm is exposed, so his child F1 is exposed, and F2 is the first clean generation.</p>
+    </div>
+  </section>
+
+  <!-- ===== 02 · THE LEDGER ===== -->
+  <section id="ledger">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s2_eyebrow">02 · Counting the generations</div>
+      <h2 data-i18n="s2_title">Which generation is the first clean one?</h2>
+      <p class="lede" data-i18n="s2_lead">The answer differs depending on which parent was exposed, because germ cells are already present in a fetus. Pregnant exposure reaches three generations at once. Paternal preconception exposure reaches two.</p>
+
+      <div class="ledger">
+        <svg viewBox="0 0 820 320" role="img" aria-labelledby="ledger-title ledger-desc">
+          <title id="ledger-title">Generation ledger for maternal and paternal exposure</title>
+          <desc id="ledger-desc">Under maternal gestational exposure, F0, F1 and F2 are all directly exposed, so F3 is the first unexposed generation. Under paternal preconception exposure, F0 and F1 are directly exposed, so F2 is the first unexposed generation.</desc>
+
+          <defs>
+            <pattern id="gtHatch" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+              <rect width="8" height="8" fill="#16221D"/>
+              <line x1="0" y1="0" x2="0" y2="8" stroke="#E69F00" stroke-width="3"/>
+            </pattern>
+            <marker id="gtArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#6E8079"/>
+            </marker>
+          </defs>
+
+          <!-- maternal row -->
+          <text x="0" y="20" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="12" letter-spacing="1.4">MATERNAL · EXPOSED WHILE PREGNANT</text>
+          <line x1="150" y1="68" x2="188" y2="68" stroke="#6E8079" stroke-width="2" marker-end="url(#gtArrow)"/>
+          <line x1="340" y1="68" x2="378" y2="68" stroke="#6E8079" stroke-width="2" marker-end="url(#gtArrow)"/>
+          <line x1="530" y1="68" x2="568" y2="68" stroke="#6E8079" stroke-width="2" marker-end="url(#gtArrow)"/>
+
+          <rect x="0" y="40" width="150" height="56" rx="9" fill="url(#gtHatch)" stroke="#E69F00" stroke-width="1.5"/>
+          <text x="12" y="62" fill="#E9EEEA" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700">F0</text>
+          <text x="12" y="82" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="11">mother · exposed</text>
+
+          <rect x="190" y="40" width="150" height="56" rx="9" fill="url(#gtHatch)" stroke="#E69F00" stroke-width="1.5"/>
+          <text x="202" y="62" fill="#E9EEEA" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700">F1</text>
+          <text x="202" y="82" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="11">fetus · exposed</text>
+
+          <rect x="380" y="40" width="150" height="56" rx="9" fill="url(#gtHatch)" stroke="#E69F00" stroke-width="1.5"/>
+          <text x="392" y="62" fill="#E9EEEA" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700">F2</text>
+          <text x="392" y="82" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="11">germ cell · exposed</text>
+
+          <rect x="570" y="40" width="150" height="56" rx="9" fill="#0072B2" fill-opacity="0.28" stroke="#56B4E9" stroke-width="2.5"/>
+          <text x="582" y="62" fill="#E9EEEA" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700">F3 ✓</text>
+          <text x="582" y="82" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="11">first clean test</text>
+
+          <line x1="0" y1="128" x2="820" y2="128" stroke="#24352E" stroke-width="1" stroke-dasharray="4 5"/>
+
+          <!-- paternal row -->
+          <text x="0" y="172" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="12" letter-spacing="1.4">PATERNAL · EXPOSED BEFORE CONCEPTION</text>
+          <line x1="150" y1="220" x2="188" y2="220" stroke="#6E8079" stroke-width="2" marker-end="url(#gtArrow)"/>
+          <line x1="340" y1="220" x2="378" y2="220" stroke="#6E8079" stroke-width="2" marker-end="url(#gtArrow)"/>
+
+          <rect x="0" y="192" width="150" height="56" rx="9" fill="url(#gtHatch)" stroke="#E69F00" stroke-width="1.5"/>
+          <text x="12" y="214" fill="#E9EEEA" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700">F0</text>
+          <text x="12" y="234" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="11">father · exposed</text>
+
+          <rect x="190" y="192" width="150" height="56" rx="9" fill="url(#gtHatch)" stroke="#E69F00" stroke-width="1.5"/>
+          <text x="202" y="214" fill="#E9EEEA" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700">F1</text>
+          <text x="202" y="234" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="11">sperm · exposed</text>
+
+          <rect x="380" y="192" width="150" height="56" rx="9" fill="#0072B2" fill-opacity="0.28" stroke="#56B4E9" stroke-width="2.5"/>
+          <text x="392" y="214" fill="#E9EEEA" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700">F2 ✓</text>
+          <text x="392" y="234" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="11">first clean test</text>
+
+          <rect x="570" y="192" width="150" height="56" rx="9" fill="none" stroke="#24352E" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="582" y="224" fill="#6E8079" font-family="IBM Plex Mono, monospace" font-size="11">F3 · confirms F2</text>
+
+          <text x="0" y="292" fill="#6E8079" font-family="IBM Plex Mono, monospace" font-size="11">Hatched + orange = directly exposed. Blue + ✓ = first generation that can test germline inheritance.</text>
+        </svg>
+
+        <div class="ledger-legend">
+          <span><i style="background:repeating-linear-gradient(45deg,#16221D 0 4px,#E69F00 4px 7px);border:1px solid #E69F00"></i><span data-i18n="legend_exposed">Hatched — directly exposed</span></span>
+          <span><i style="background:rgba(0,114,178,.28);border:2px solid #56B4E9"></i><span data-i18n="legend_clean">Solid + ✓ — first unexposed generation</span></span>
+          <span><i style="border:1.5px dashed #24352E"></i><span data-i18n="legend_conf">Dashed — confirmatory, not required</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 03 · HUMAN ===== -->
+  <section id="human">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s3_eyebrow">03 · Human cohorts</div>
+      <h2 data-i18n="s3_title">What has been measured in people</h2>
+      <p class="lede" data-i18n="s3_lead">Human studies are observational, the cohorts are small, and the tissue is almost always blood rather than the tissue anyone cares about. They are still the reason the field exists — read each finding with its caveat attached.</p>
+      <p class="quotenote" data-i18n="quotenote">Quotes are short excerpts in the original English, linked to the source. Everything else is a paraphrase.</p>
+
+      <div class="studies">
+
+        <article class="card study" data-kind="human">
+          <div class="tagrow">
+            <span class="tag blue">◆ Human</span>
+            <span class="tag blue">F1 · in utero</span>
+            <span class="tag blue">IGF2 DMR</span>
+          </div>
+          <h3>Persistent epigenetic differences associated with prenatal exposure to famine in humans</h3>
+          <p class="study-meta">Heijmans, Tobi, Stein, Putter, Blauw, Susser, Slagboom &amp; Lumey · PNAS 2008 · Dutch Hunger Winter · 60 sibships</p>
+          <p class="ref-quote">“less DNA methylation of the imprinted IGF2 gene”<cite>— Heijmans et al., PNAS 2008</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_heij">People conceived during the 1944–45 Dutch famine still differed in IGF2 methylation from their own unexposed same-sex siblings six decades later. The effect showed up only for periconceptional exposure, not for exposure late in gestation.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_heij">This is a mark in the directly exposed generation. It shows an environmental exposure can leave a durable methylation difference in a human — it says nothing about that difference being inherited by anyone.</span></div>
+          <a class="paper-link" href="https://www.pnas.org/doi/10.1073/pnas.0806560105" target="_blank" rel="noopener">pnas.org · 10.1073/pnas.0806560105 ↗</a>
+        </article>
+
+        <article class="card study" data-kind="human">
+          <div class="tagrow">
+            <span class="tag blue">◆ Human</span>
+            <span class="tag blue">F1 · adult offspring</span>
+            <span class="tag blue">FKBP5 intron 7</span>
+          </div>
+          <h3>Holocaust exposure induced intergenerational effects on FKBP5 methylation</h3>
+          <p class="study-meta">Yehuda, Daskalakis, Bierer, Bader, Klengel, Holsboer &amp; Binder · Biological Psychiatry 2016 · 32 survivors, 22 offspring, 8 + 9 controls</p>
+          <p class="ref-quote">“Holocaust exposure had an effect on FKBP5 methylation”<cite>— Yehuda et al., Biol Psychiatry 2016</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_yeh16">The first study to test directly in humans whether a parent's methylation response to trauma reappears in their adult children at the same genomic site. At one CpG in FKBP5 intron 7 — the glucocorticoid-response region already tied to PTSD risk — survivors were more methylated than controls while their adult children were less methylated than control offspring. The offspring effect survived controlling for the children's own FKBP5 genotype and their own trauma history, so it is not simply inherited sequence or a hard life of their own.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_yeh16">The authors flag it themselves: at n = 22 offspring you cannot separate a mark carried in the gametes from an in utero effect, or from simply growing up with a parent who had PTSD. One CpG site, in blood. The opposite-direction result has no agreed mechanism. A hypothesis generator, not a demonstration.</span></div>
+          <a class="paper-link" href="https://www.sciencedirect.com/science/article/abs/pii/S0006322315006526" target="_blank" rel="noopener">sciencedirect · 10.1016/j.biopsych.2015.08.005 ↗</a>
+        </article>
+
+        <article class="card study" data-kind="human">
+          <div class="tagrow">
+            <span class="tag blue">◆ Human</span>
+            <span class="tag blue">F1 · adult offspring</span>
+            <span class="tag blue">NR3C1 exon 1F</span>
+          </div>
+          <h3>Influences of maternal and paternal PTSD on epigenetic regulation of the glucocorticoid receptor gene in Holocaust survivor offspring</h3>
+          <p class="study-meta">Yehuda, Daskalakis, Lehrner, Desarnaud, Bader, Makotkine, Flory, Bierer &amp; Meaney · American Journal of Psychiatry 2014 · 80 Holocaust offspring vs 15 comparison subjects</p>
+          <p class="ref-quote">“offspring with paternal PTSD showed higher GR-1F promoter methylation”<cite>— Yehuda et al., Am J Psychiatry 2014</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_yeh14">Which parent had PTSD changed the direction of the effect. With paternal PTSD alone, offspring had higher methylation at the NR3C1 exon 1F promoter; when both parents had PTSD, methylation was lower. Lower methylation went with stronger cortisol suppression after dexamethasone.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_yeh14">Parental PTSD also changes how a child is raised. No observational design can separate a germline mark from a childhood spent with a traumatised parent.</span></div>
+          <a class="paper-link" href="https://psychiatryonline.org/doi/10.1176/appi.ajp.2014.13121571" target="_blank" rel="noopener">psychiatryonline · 10.1176/appi.ajp.2014.13121571 ↗</a>
+        </article>
+
+        <article class="card study" data-kind="human">
+          <div class="tagrow">
+            <span class="tag blue">◆ Human</span>
+            <span class="tag blue">F1 · in utero</span>
+            <span class="tag blue">NR3C1 exon 1F</span>
+          </div>
+          <h3>The Tutsi genocide and transgenerational transmission of maternal stress: epigenetics and biology of the HPA axis</h3>
+          <p class="study-meta">Perroud, Rutembesa, Paoloni-Giacobino, Mutabaruka, Mutesa, Stenz, Malafosse &amp; Karege · World J Biol Psychiatry 2014 · 25 exposed mothers + children vs 25 unexposed pairs</p>
+          <p class="ref-quote">“higher methylation of the NR3C1 exon 1F than non-exposed groups”<cite>— Perroud et al., World J Biol Psychiatry 2014</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_perroud">Women pregnant during the 1994 genocide were compared with Rwandan women of the same ethnicity pregnant in the same period but not exposed. Exposed mothers and their children both showed higher PTSD and depression scores, lower cortisol and glucocorticoid receptor levels, higher mineralocorticoid receptor levels, and higher NR3C1 exon 1F methylation — the same HPA-axis signature appearing in both generations.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_perroud">The children were in utero during the genocide, so this is F1 programming, not inheritance — it cannot separate a mark transmitted through the germline from one induced directly by maternal cortisol crossing the placenta. n = 25 per group, cross-sectional, and the exposed families also lived through very different postnatal conditions.</span></div>
+          <a class="paper-link" href="https://www.tandfonline.com/doi/full/10.3109/15622975.2013.866693" target="_blank" rel="noopener">tandfonline · 10.3109/15622975.2013.866693 ↗</a>
+        </article>
+
+        <article class="card study" data-kind="review">
+          <div class="tagrow">
+            <span class="tag review">▲ Review</span>
+            <span class="tag review">Open access</span>
+          </div>
+          <h3>Intergenerational transmission of trauma effects: putative role of epigenetic mechanisms</h3>
+          <p class="study-meta">Yehuda &amp; Lehrner · World Psychiatry 2018 · 17(3):243–257</p>
+          <p class="ref-quote">“The most compelling work to date has been done in animal models”<cite>— Yehuda &amp; Lehrner, World Psychiatry 2018</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_yl18">Notably more hedged than the primary papers that made this author's name in the area. The review separates two mechanisms that popular coverage conflates — developmental programming through maternal care and the in utero environment, versus preconception changes in the parental germline — and walks through the candidate windows: oocytes, which sit in a demethylated and vulnerable state from birth until puberty; sperm marks; and in utero programming via maternal cortisol.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_yl18">It is also where the field's central limitation gets said plainly: parental sex, PTSD status and the offspring's developmental timing all shift the direction and size of the methylation difference between studies, in ways that do not yet resolve into one mechanistic story. A position paper as well as a survey — and still the best single entry point.</span></div>
+          <a class="paper-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6127768/" target="_blank" rel="noopener">PMC6127768 · full text ↗</a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 04 · ANIMAL ===== -->
+  <section id="animal">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s4_eyebrow">04 · Animal models</div>
+      <h2 data-i18n="s4_title">What has been measured in mice and rats</h2>
+      <p class="lede" data-i18n="s4_lead">Here you can control the genome, the environment, and who raises whom — and you can go one step further and move the candidate molecule into a fresh embryo. This is where the mechanistic claims actually come from.</p>
+
+      <div class="studies">
+
+        <article class="card study" data-kind="animal">
+          <div class="tagrow">
+            <span class="tag orange">● Rat</span>
+            <span class="tag orange">Developmental, not germline</span>
+            <span class="tag orange">GR exon 17 promoter</span>
+          </div>
+          <h3>Epigenetic programming by maternal behavior</h3>
+          <p class="study-meta">Weaver, Cervoni, Champagne, D'Alessio, Sharma, Seckl, Dymov, Szyf &amp; Meaney · Nature Neuroscience 2004</p>
+          <p class="ref-quote">“differences emerged over the first week of life, were reversed with cross-fostering”<cite>— Weaver et al., Nat Neurosci 2004</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_weaver">Pups of high-licking, high-grooming mothers ended up with a demethylated CpG in the NGFI-A binding site of the hippocampal glucocorticoid receptor promoter, more GR expression, and a calmer stress axis in adulthood. Infusing an HDAC inhibitor erased the group difference — methylation, transcription factor binding, GR levels and stress response all moved together.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_weaver">Cross-fostering reversed it, which is the point: this is behaviour writing methylation in the pup's own brain each generation, not a mark travelling through sperm or egg. It is the cleanest evidence that experience becomes methylation — and the clearest example of transmission without inheritance.</span></div>
+          <a class="paper-link" href="https://www.nature.com/articles/nn1276" target="_blank" rel="noopener">nature.com · 10.1038/nn1276 ↗</a>
+        </article>
+
+        <article class="card study" data-kind="animal">
+          <div class="tagrow">
+            <span class="tag orange">● Mouse</span>
+            <span class="tag orange">F1 sperm → F2 brain</span>
+            <span class="tag orange">MeCP2 · CB1 · CRFR2</span>
+          </div>
+          <h3>Epigenetic transmission of the impact of early stress across generations</h3>
+          <p class="study-meta">Franklin, Russig, Weiss, Gräff, Linder, Michalon, Vizi &amp; Mansuy · Biological Psychiatry 2010 · unpredictable maternal separation (MSUS), P1–P14</p>
+          <p class="ref-quote">“DNA methylation is altered in both directions and in a gene-specific manner”<cite>— Franklin et al., Biol Psychiatry 2010</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_franklin">Early separation stress produced depressive-like behaviour that persisted into the next generations. In F1 sperm, methylation went up at MeCP2 and CB1 and down at CRFR2 — and the MeCP2 and CRFR2 changes reappeared in the brains of F2 females, alongside reduced expression of those genes.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_franklin">A matching mark in sperm and in the next brain is a correlation across tissues, not proof the sperm mark caused the brain phenotype. Group sizes are small (often n = 3–6 for methylation), and the effects were largely female-specific in F2.</span></div>
+          <a class="paper-link" href="https://www.sciencedirect.com/science/article/abs/pii/S0006322310005767" target="_blank" rel="noopener">sciencedirect · 10.1016/j.biopsych.2010.05.036 ↗</a>
+        </article>
+
+        <article class="card study" data-kind="animal">
+          <div class="tagrow">
+            <span class="tag orange">● Mouse</span>
+            <span class="tag orange">Causal test</span>
+            <span class="tag orange">Sperm sncRNA</span>
+          </div>
+          <h3>Implication of sperm RNAs in transgenerational inheritance of the effects of early trauma in mice</h3>
+          <p class="study-meta">Gapp, Jawaid, Sarkies, Bohacek, Pelczar, Prados, Farinelli, Miska &amp; Mansuy · Nature Neuroscience 2014</p>
+          <p class="ref-quote">“Injection of sperm RNAs from traumatized males into fertilized wild-type oocytes”<cite>— Gapp et al., Nat Neurosci 2014</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_gapp">Same MSUS trauma paradigm, but this time the candidate carrier was purified and moved: RNA from the sperm of stressed males, injected into normal fertilised oocytes, reproduced the behavioural and metabolic phenotype in animals with no stressed ancestor at all.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_gapp">This is the strongest causal design in the whole field — and the carrier it identifies is small non-coding RNA, not DNA methylation. Worth sitting with: the best-evidenced germline vehicle for inherited stress effects so far is not a methyl mark.</span></div>
+          <a class="paper-link" href="https://www.nature.com/articles/nn.3695" target="_blank" rel="noopener">nature.com · 10.1038/nn.3695 ↗</a>
+        </article>
+
+        <article class="card study" data-kind="animal">
+          <div class="tagrow">
+            <span class="tag orange">● Mouse</span>
+            <span class="tag orange">F1 + F2</span>
+            <span class="tag orange">Olfr151 · IVF control</span>
+          </div>
+          <h3>Parental olfactory experience influences behavior and neural structure in subsequent generations</h3>
+          <p class="study-meta">Dias &amp; Ressler · Nature Neuroscience 2014 · odour fear conditioning before conception</p>
+          <p class="ref-quote">“increased behavioral sensitivity to the F0-conditioned odor, but not to other odors”<cite>— Dias &amp; Ressler, Nat Neurosci 2014</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_dias">Males were shock-conditioned to acetophenone — a cherry-and-almond-like smell that activates one identified receptor, Olfr151 — then bred, both by natural mating and separately by IVF, to rule out learned behaviour and the in utero environment. Pups that had never met the odour startled more to it and not to others, and so did the grand-pups. Both generations had more neurons detecting that odour and an enlarged brain structure devoted to it, and the Olfr151 region was hypomethylated in the fathers' sperm.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_dias">The single most striking result here, and the most contested: independent replication has been patchy, the proposed route from a fear memory to a specific sperm locus has no accepted mechanism, and the reported methylation differences are small. Ressler himself, speaking to the press at the time, put the human extension only as speculation — that a parent's anxiety might reach later generations through marks on stress-hormone receptor genes. Cite it as an open question, not a settled fact.</span></div>
+          <a class="paper-link" href="https://www.nature.com/articles/nn.3594" target="_blank" rel="noopener">nature.com · 10.1038/nn.3594 ↗</a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 05 · ROUTES ===== -->
+  <section id="routes">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s5_eyebrow">05 · Three routes, often confused</div>
+      <h2 data-i18n="s5_title">How an experience can reach a grandchild</h2>
+      <p class="lede" data-i18n="s5_lead">Popular coverage collapses these into one story. Only the third one requires anything to survive in the germline, and it is the only one that would count as epigenetic inheritance.</p>
+
+      <div class="grid3">
+        <div class="card route">
+          <span class="num">ROUTE 1 · <span data-i18n="route1_k">social</span></span>
+          <h3 data-i18n="route1_t">Care and environment</h3>
+          <p data-i18n="route1_d">A traumatised parent parents differently. The child's own methylation changes in response to their own childhood. Weaver 2004 is the mechanistic version of this — and cross-fostering switches it off.</p>
+        </div>
+        <div class="card route">
+          <span class="num">ROUTE 2 · <span data-i18n="route2_k">in utero</span></span>
+          <h3 data-i18n="route2_t">Fetal programming</h3>
+          <p data-i18n="route2_d">Maternal stress hormones, nutrition and placental signalling act on a developing fetus during the window when methylation patterns are being set. Heijmans 2008 and Perroud 2014 sit here.</p>
+        </div>
+        <div class="card route">
+          <span class="num">ROUTE 3 · <span data-i18n="route3_k">germline</span></span>
+          <h3 data-i18n="route3_t">Through sperm or egg</h3>
+          <p data-i18n="route3_d">A mark survives in the gamete and shapes the next embryo. The obstacle is that mammalian germlines erase and rewrite most methylation twice — after fertilisation and again during germ cell development. Small RNA has cleared this bar experimentally; methylation has not, convincingly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 06 · THE BAR ===== -->
+  <section id="criteria">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s6_eyebrow">06 · The bar</div>
+      <h2 data-i18n="s6_title">What a convincing result would have to include</h2>
+      <p class="lede" data-i18n="s6_lead">Bernhard Horsthemke laid out the requirements in a 2018 comment in Nature Communications. It is short, free to read, and the most useful thing to hand anyone who sends you a headline about inherited trauma.</p>
+
+      <article class="card study" data-kind="review">
+        <div class="tagrow">
+          <span class="tag review">▲ Comment</span>
+          <span class="tag review">Open access</span>
+        </div>
+        <h3>A critical view on transgenerational epigenetic inheritance in humans</h3>
+        <p class="study-meta">Bernhard Horsthemke · Nature Communications 2018 · 9:2973</p>
+        <p class="ref-quote">“Lamarck has never been dead and every so often raises his head”<cite>— Horsthemke, Nat Commun 2018</cite></p>
+        <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_horst">Transgenerational epigenetic inheritance is established in plants, nematodes and flies. In mammals — and in humans especially — the evidence is entangled with ordinary genetic inheritance, shared environments, and culture. Horsthemke argues that most human findings labelled transgenerational never actually reach the F2/F3 standard, and sets out what a study would have to do to untangle the three.</span></div>
+        <a class="paper-link" href="https://www.nature.com/articles/s41467-018-05445-5" target="_blank" rel="noopener">nature.com · 10.1038/s41467-018-05445-5 ↗</a>
+      </article>
+
+      <div class="card" style="border-left:3px solid var(--orange); margin-top:20px">
+        <h3 data-i18n="germ_t">Why the germline is the hard part</h3>
+        <p data-i18n="germ_d">Two structural facts stand between a life event and a grandchild's genome. First, the Weismann barrier: in mammals, germ cells are set aside early and are not updated by what happens to the body's somatic cells. Second, the genome is stripped and rewritten twice — once in the primordial germ cells, and again just after fertilisation. For an acquired methylation mark to be inherited it has to survive both erasures, and only a small set of loci, mostly imprinted ones, is known to do that. This is why a mark measured in blood is not yet an inheritance claim, and why sperm small RNA, which is not erased the same way, has been an easier carrier to demonstrate.</p>
+      </div>
+
+      <ul class="checklist">
+        <li data-i18n="crit1">Use inbred strains and strictly controlled environments, so a genetic difference cannot masquerade as an epigenetic one.</li>
+        <li data-i18n="crit2">After maternal gestational exposure, study F3 or later. After paternal exposure, study at least F2. Anything earlier was directly exposed.</li>
+        <li data-i18n="crit3">Use IVF, embryo transfer and foster mothers where possible, so the phenotype cannot travel through pregnancy or parenting.</li>
+        <li data-i18n="crit4">Identify the actual carrier in the germ cells — and check that germ cell preparations are not contaminated with somatic cells.</li>
+        <li data-i18n="crit5">In humans, accept that ecological and cultural inheritance cannot be ruled out — but genetic effects can and should be excluded explicitly.</li>
+      </ul>
+
+      <p style="margin-top:22px" data-i18n="s6_close">What the field does not need is another intergenerational cohort reporting a p-value at one CpG; it has several of those, pointing in interesting but mechanistically ambiguous directions. What is missing is human data at the F2 or F3 standard, paired with a germline carrier that plausibly survives both rounds of reprogramming — which at the moment looks more like sperm small RNA than like methylation itself.</p>
+    </div>
+  </section>
+
+  <!-- ===== 07 · AT A GLANCE ===== -->
+  <section id="glance">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s7b_eyebrow">07 · At a glance</div>
+      <h2 data-i18n="s7b_title">Every study on this page, side by side</h2>
+      <p class="lede" data-i18n="s7b_lead">The column that decides how much any of this can prove is the fourth one: which generations were actually tested, and whether the last of them was ever exposed.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="th_study">Study</th>
+              <th data-i18n="th_species">Species</th>
+              <th data-i18n="th_locus">Locus measured</th>
+              <th data-i18n="th_gens">Generations tested</th>
+              <th data-i18n="th_type">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Heijmans 2008</td><td data-i18n="sp_human">human</td><td class="data">IGF2 DMR</td><td class="data">F0 → F1</td><td data-i18n="ty_direct">direct exposure (in utero)</td></tr>
+            <tr><td>Yehuda 2016</td><td data-i18n="sp_human">human</td><td class="data">FKBP5 intron 7</td><td class="data">F0 → F1</td><td data-i18n="ty_inter">intergenerational</td></tr>
+            <tr><td>Yehuda 2014</td><td data-i18n="sp_human">human</td><td class="data">NR3C1 exon 1F</td><td class="data">F0 → F1</td><td data-i18n="ty_inter">intergenerational</td></tr>
+            <tr><td>Perroud 2014</td><td data-i18n="sp_human">human</td><td class="data">NR3C1 exon 1F</td><td class="data">F0 → F1</td><td data-i18n="ty_inter">intergenerational</td></tr>
+            <tr><td>Weaver 2004</td><td data-i18n="sp_rat">rat</td><td class="data">GR exon 1<sub>7</sub> promoter</td><td class="data" data-i18n="gen_within">within one generation</td><td data-i18n="ty_dev">developmental, reversible</td></tr>
+            <tr><td>Franklin 2010</td><td data-i18n="sp_mouse">mouse</td><td class="data">Mecp2 · Cnr1 · Crhr2</td><td class="data">F0 → F1 → F2</td><td data-i18n="ty_trans">transgenerational (paternal)</td></tr>
+            <tr><td>Gapp 2014</td><td data-i18n="sp_mouse">mouse</td><td class="data" data-i18n="loc_sncrna">sperm small RNA (not DNAm)</td><td class="data">F0 → F1 → F2</td><td data-i18n="ty_causal">transgenerational + causal</td></tr>
+            <tr><td>Dias &amp; Ressler 2014</td><td data-i18n="sp_mouse">mouse</td><td class="data">Olfr151</td><td class="data">F0 → F1 → F2</td><td data-i18n="ty_trans">transgenerational (paternal)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:34px" data-i18n="bars_title">How many people each human study rests on</h3>
+      <div class="bars">
+        <div class="bar-row">
+          <div class="bar-label" data-i18n="bar1">Heijmans 2008 — sibships compared</div>
+          <div class="bar-track"><div class="bar-fill" style="width:75%"></div></div>
+          <div class="bar-n">60</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label" data-i18n="bar2">Yehuda 2014 — Holocaust offspring</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="bar-n">80</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label" data-i18n="bar3">Perroud 2014 — mother–child pairs per group</div>
+          <div class="bar-track"><div class="bar-fill" style="width:31%"></div></div>
+          <div class="bar-n">25</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label" data-i18n="bar4">Yehuda 2016 — Holocaust offspring</div>
+          <div class="bar-track"><div class="bar-fill" style="width:28%"></div></div>
+          <div class="bar-n">22</div>
+        </div>
+      </div>
+      <p class="quotenote" data-i18n="bars_note">Units differ per study, so compare each bar to its own label rather than to the others. The ceiling is structural: a human trauma cohort is limited by how many people lived through one specific historical event and could later be reached for a blood draw. Mouse studies breed purpose-built cohorts across generations instead — which is exactly why the mechanistic claims come from there.</p>
+    </div>
+  </section>
+
+  <!-- ===== 07 · SUMMARY TABLE ===== -->
+  <section id="summary">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s7_eyebrow">08 · Where the evidence stands</div>
+      <h2 data-i18n="s7_title">Claim by claim</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="th_claim">Claim</th>
+              <th data-i18n="th_animal">In animals</th>
+              <th data-i18n="th_human">In humans</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-i18n="tr1c1">Stress changes DNA methylation in the exposed individual</td>
+              <td data-i18n="tr1c2">Well established, with causal manipulation</td>
+              <td data-i18n="tr1c3">Well supported, mostly in blood</td>
+            </tr>
+            <tr>
+              <td data-i18n="tr2c1">Parental stress changes the offspring's methylation and behaviour</td>
+              <td data-i18n="tr2c2">Established, including via parenting behaviour</td>
+              <td data-i18n="tr2c3">Reported repeatedly; small cohorts, mixed directions</td>
+            </tr>
+            <tr>
+              <td data-i18n="tr3c1">A mark survives in the germline and reaches an unexposed generation</td>
+              <td data-i18n="tr3c2">Demonstrated for sperm small RNA; contested for methylation</td>
+              <td data-i18n="tr3c3">Not demonstrated — the required generations have not been studied</td>
+            </tr>
+            <tr>
+              <td data-i18n="tr4c1">A specific methylation change causes a specific inherited phenotype</td>
+              <td data-i18n="tr4c2">Not yet shown for a trauma phenotype</td>
+              <td data-i18n="tr4c3">Not shown</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 08 · BRIDGE ===== -->
+  <section id="bridge">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s8_eyebrow">09 · Why this sits next to my thesis</div>
+      <h2 data-i18n="s8_title">The missing experiment is a writing experiment</h2>
+      <div class="card">
+        <p data-i18n="bridge_p1">Every study above is correlational at the level that matters most: someone observed a methylation difference and a phenotype together. Nobody put the methyl group there on purpose and watched what followed.</p>
+        <p style="margin-top:14px" data-i18n="bridge_p2">That is precisely what epigenome editing changes. CRISPRoff and ZFPoff deposit methylation at a chosen promoter without cutting DNA, and nanopore sequencing reads the resulting pattern molecule by molecule. On this site, that combination is applied to CD55 — but the general capability is the one this literature has been waiting for: write a mark, read it back, and test whether it does anything.</p>
+        <p style="margin-top:14px" data-i18n="bridge_p3">The honest limit: my work is somatic, in cultured human cells, over days and weeks. It can test whether a methylation mark is stable and consequential in a cell lineage. It cannot test whether one survives a germline. Those are different questions, and this page exists partly so the difference stays visible.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 09 · REFERENCES ===== -->
+  <section id="references">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s9_eyebrow">10 · Sources</div>
+      <h2 data-i18n="s9_title">Papers referenced on this page</h2>
+      <ol class="ref-list">
+        <li class="ref-item" id="ref-1"><span class="ref-num">1</span><div class="ref-body">
+          <h4>Persistent epigenetic differences associated with prenatal exposure to famine in humans</h4>
+          <div class="ref-meta">Heijmans BT, Tobi EW, Stein AD, Putter H, Blauw GJ, Susser ES, Slagboom PE, Lumey LH · PNAS 2008;105(44):17046–17049 · <a href="https://www.pnas.org/doi/10.1073/pnas.0806560105" target="_blank" rel="noopener">10.1073/pnas.0806560105</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-2"><span class="ref-num">2</span><div class="ref-body">
+          <h4>Holocaust exposure induced intergenerational effects on FKBP5 methylation</h4>
+          <div class="ref-meta">Yehuda R, Daskalakis NP, Bierer LM, Bader HN, Klengel T, Holsboer F, Binder EB · Biological Psychiatry 2016;80(5):372–380 · <a href="https://www.sciencedirect.com/science/article/abs/pii/S0006322315006526" target="_blank" rel="noopener">10.1016/j.biopsych.2015.08.005</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-3"><span class="ref-num">3</span><div class="ref-body">
+          <h4>Influences of maternal and paternal PTSD on epigenetic regulation of the glucocorticoid receptor gene in Holocaust survivor offspring</h4>
+          <div class="ref-meta">Yehuda R, Daskalakis NP, Lehrner A, Desarnaud F, Bader HN, Makotkine I, Flory JD, Bierer LM, Meaney MJ · Am J Psychiatry 2014;171(8):872–880 · <a href="https://psychiatryonline.org/doi/10.1176/appi.ajp.2014.13121571" target="_blank" rel="noopener">10.1176/appi.ajp.2014.13121571</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-4"><span class="ref-num">4</span><div class="ref-body">
+          <h4>The Tutsi genocide and transgenerational transmission of maternal stress: epigenetics and biology of the HPA axis</h4>
+          <div class="ref-meta">Perroud N, Rutembesa E, Paoloni-Giacobino A, Mutabaruka J, Mutesa L, Stenz L, Malafosse A, Karege F · World J Biol Psychiatry 2014;15(4):334–345 · <a href="https://www.tandfonline.com/doi/full/10.3109/15622975.2013.866693" target="_blank" rel="noopener">10.3109/15622975.2013.866693</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-5"><span class="ref-num">5</span><div class="ref-body">
+          <h4>Intergenerational transmission of trauma effects: putative role of epigenetic mechanisms</h4>
+          <div class="ref-meta">Yehuda R, Lehrner A · World Psychiatry 2018;17(3):243–257 · open access · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6127768/" target="_blank" rel="noopener">PMC6127768</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-6"><span class="ref-num">6</span><div class="ref-body">
+          <h4>Epigenetic programming by maternal behavior</h4>
+          <div class="ref-meta">Weaver ICG, Cervoni N, Champagne FA, D'Alessio AC, Sharma S, Seckl JR, Dymov S, Szyf M, Meaney MJ · Nature Neuroscience 2004;7(8):847–854 · <a href="https://www.nature.com/articles/nn1276" target="_blank" rel="noopener">10.1038/nn1276</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-7"><span class="ref-num">7</span><div class="ref-body">
+          <h4>Epigenetic transmission of the impact of early stress across generations</h4>
+          <div class="ref-meta">Franklin TB, Russig H, Weiss IC, Gräff J, Linder N, Michalon A, Vizi S, Mansuy IM · Biological Psychiatry 2010;68(5):408–415 · <a href="https://www.sciencedirect.com/science/article/abs/pii/S0006322310005767" target="_blank" rel="noopener">10.1016/j.biopsych.2010.05.036</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-8"><span class="ref-num">8</span><div class="ref-body">
+          <h4>Implication of sperm RNAs in transgenerational inheritance of the effects of early trauma in mice</h4>
+          <div class="ref-meta">Gapp K, Jawaid A, Sarkies P, Bohacek J, Pelczar P, Prados J, Farinelli L, Miska E, Mansuy IM · Nature Neuroscience 2014;17(5):667–669 · <a href="https://www.nature.com/articles/nn.3695" target="_blank" rel="noopener">10.1038/nn.3695</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-9"><span class="ref-num">9</span><div class="ref-body">
+          <h4>Parental olfactory experience influences behavior and neural structure in subsequent generations</h4>
+          <div class="ref-meta">Dias BG, Ressler KJ · Nature Neuroscience 2014;17(1):89–96 · <a href="https://www.nature.com/articles/nn.3594" target="_blank" rel="noopener">10.1038/nn.3594</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-10"><span class="ref-num">10</span><div class="ref-body">
+          <h4>A critical view on transgenerational epigenetic inheritance in humans</h4>
+          <div class="ref-meta">Horsthemke B · Nature Communications 2018;9:2973 · open access · <a href="https://www.nature.com/articles/s41467-018-05445-5" target="_blank" rel="noopener">10.1038/s41467-018-05445-5</a></div>
+        </div></li>
+      </ol>
+      <p class="quotenote" style="margin-top:26px" data-i18n="refs_note">Last checked August 2026. Open-access links are marked; the rest lead to the publisher's abstract.</p>
+    </div>
+  </section>
+
+</main>
 
 <footer>
   <div class="wrap">
-    <ul class="refs">
-      <li><span class="mk filled"></span>Yehuda R, Daskalakis NP, Bierer LM, et al. Holocaust Exposure Induced Intergenerational Effects on FKBP5 Methylation. <em>Biol Psychiatry</em>. 2016;80(5):372–380.</li>
-      <li><span class="mk filled"></span>Perroud N, Rutembesa E, Paoloni-Giacobino A, et al. The Tutsi Genocide and Transgenerational Transmission of Maternal Stress. <em>World J Biol Psychiatry</em>. 2014;15(4):334–345.</li>
-      <li><span class="mk filled"></span>Yehuda R, Lehrner A. Intergenerational Transmission of Trauma Effects: Putative Role of Epigenetic Mechanisms. <em>World Psychiatry</em>. 2018;17(3):243–257.</li>
-      <li><span class="mk filled"></span>Dias BG, Ressler KJ. Parental Olfactory Experience Influences Behavior and Neural Structure in Subsequent Generations. <em>Nat Neurosci</em>. 2014;17(1):89–96.</li>
-      <li><span class="mk filled"></span>Gapp K, Jawaid A, Sarkies P, et al. Implication of Sperm RNAs in Transgenerational Inheritance of the Effects of Early Trauma in Mice. <em>Nat Neurosci</em>. 2014;17(5):667–669.</li>
-      <li><span class="mk filled"></span>Horsthemke B. A Critical View on Transgenerational Epigenetic Inheritance in Humans. <em>Nat Commun</em>. 2018;9:2973.</li>
-    </ul>
-    <p style="margin-top:24px;">epicme.bio — draft page, pending integration · quotes above are single short excerpts (&lt;15 words) per source, for attribution — read the papers linked in the references for the full argument.</p>
+    <span data-i18n="footer_note">epiCme · write → read → learn. This page is a reading guide, not medical or psychological advice.</span>
   </div>
 </footer>
+
+<script>
+/* ---------- bilingual toggle (site convention: data-i18n + epicme_lang) ---------- */
+(function () {
+  var I18N = {
+    en: {
+      s1_p2: "The arithmetic is concrete. If a pregnant woman (F0) lives through a famine or a genocide, her fetus (F1) is already alive — and so are that fetus's own developing germ cells, which will become F2. Three generations are physically present for one event. Only F3 is conceived from material that was never there. On the paternal side the chain is shorter: a man's sperm is exposed, so his child F1 is exposed, and F2 is the first clean generation.",
+      germ_t: "Why the germline is the hard part",
+      germ_d: "Two structural facts stand between a life event and a grandchild's genome. First, the Weismann barrier: in mammals, germ cells are set aside early and are not updated by what happens to the body's somatic cells. Second, the genome is stripped and rewritten twice — once in the primordial germ cells, and again just after fertilisation. For an acquired methylation mark to be inherited it has to survive both erasures, and only a small set of loci, mostly imprinted ones, is known to do that. This is why a mark measured in blood is not yet an inheritance claim, and why sperm small RNA, which is not erased the same way, has been an easier carrier to demonstrate.",
+      s6_close: "What the field does not need is another intergenerational cohort reporting a p-value at one CpG; it has several of those, pointing in interesting but mechanistically ambiguous directions. What is missing is human data at the F2 or F3 standard, paired with a germline carrier that plausibly survives both rounds of reprogramming — which at the moment looks more like sperm small RNA than like methylation itself.",
+      s7b_eyebrow: "07 · At a glance",
+      s7b_title: "Every study on this page, side by side",
+      s7b_lead: "The column that decides how much any of this can prove is the fourth one: which generations were actually tested, and whether the last of them was ever exposed.",
+      th_study: "Study", th_species: "Species", th_locus: "Locus measured",
+      th_gens: "Generations tested", th_type: "Type",
+      sp_human: "human", sp_mouse: "mouse", sp_rat: "rat",
+      gen_within: "within one generation",
+      loc_sncrna: "sperm small RNA (not DNAm)",
+      ty_direct: "direct exposure (in utero)",
+      ty_inter: "intergenerational",
+      ty_dev: "developmental, reversible",
+      ty_trans: "transgenerational (paternal)",
+      ty_causal: "transgenerational + causal",
+      bars_title: "How many people each human study rests on",
+      bar1: "Heijmans 2008 — sibships compared",
+      bar2: "Yehuda 2014 — Holocaust offspring",
+      bar3: "Perroud 2014 — mother–child pairs per group",
+      bar4: "Yehuda 2016 — Holocaust offspring",
+      bars_note: "Units differ per study, so compare each bar to its own label rather than to the others. The ceiling is structural: a human trauma cohort is limited by how many people lived through one specific historical event and could later be reached for a blood draw. Mouse studies breed purpose-built cohorts across generations instead — which is exactly why the mechanistic claims come from there.",
+      "brand-sub": "epigenome · cytosine · methylation",
+      footer_note: "epiCme · write → read → learn. This page is a reading guide, not medical or psychological advice.",
+      "nav-home": "Home", "nav-about": "About", "nav-k562": "K562",
+      "nav-chipseq": "ChIP-seq", "nav-tf": "Mechanisms",
+      "nav-memory": "Methylation & memory",
+      "nav-trauma": "Methylation & trauma",
+
+      hero_eyebrow: "Literature review · methylation series",
+      hero_title_a: "Can a methyl group", hero_title_b: "carry a memory", hero_title_c: "across generations?",
+      hero_lead: "A guided tour of what the human and animal literature actually reports about DNA methylation and inherited trauma — with the original papers, short quotes, and the caveat that belongs next to each one.",
+      hero_note_lbl: "The honest version:",
+      hero_note: "the animal work is strong and controlled; the human work is suggestive, small, and hard to disentangle from everything else parents pass to children. This page keeps those two apart on purpose.",
+
+      s1_eyebrow: "01 · The distinction everything hinges on",
+      s1_title: "Intergenerational is not transgenerational",
+      s1_lead: "Almost every argument in this field is really an argument about which generation you are looking at. If a generation was physically present during the exposure — as a fetus, or as a germ cell inside that fetus — then finding a mark in it is not evidence of inheritance. It is evidence of exposure.",
+      def_inter_t: "Intergenerational",
+      def_inter_d: "The exposed individual and any generation that was directly present during the exposure. Real, measurable, biologically important — but it does not require anything to be transmitted through the germline.",
+      def_trans_t: "Transgenerational",
+      def_trans_d: "The first generation with no direct exposure at any point, including as a germ cell. This is the only generation that can demonstrate inheritance through the germline — and it is the generation most human studies never reach.",
+
+      s2_eyebrow: "02 · Counting the generations",
+      s2_title: "Which generation is the first clean one?",
+      s2_lead: "The answer differs depending on which parent was exposed, because germ cells are already present in a fetus. Pregnant exposure reaches three generations at once. Paternal preconception exposure reaches two.",
+      legend_exposed: "Hatched — directly exposed",
+      legend_clean: "Solid + ✓ — first unexposed generation",
+      legend_conf: "Dashed — confirmatory, not required",
+
+      s3_eyebrow: "03 · Human cohorts",
+      s3_title: "What has been measured in people",
+      s3_lead: "Human studies are observational, the cohorts are small, and the tissue is almost always blood rather than the tissue anyone cares about. They are still the reason the field exists — read each finding with its caveat attached.",
+      quotenote: "Quotes are short excerpts in the original English, linked to the source. Everything else is a paraphrase.",
+      lbl_found: "Found", lbl_caveat: "Caveat",
+
+      f_heij: "People conceived during the 1944–45 Dutch famine still differed in IGF2 methylation from their own unexposed same-sex siblings six decades later. The effect showed up only for periconceptional exposure, not for exposure late in gestation.",
+      c_heij: "This is a mark in the directly exposed generation. It shows an environmental exposure can leave a durable methylation difference in a human — it says nothing about that difference being inherited by anyone.",
+      f_yeh16: "The first study to test directly in humans whether a parent's methylation response to trauma reappears in their adult children at the same genomic site. At one CpG in FKBP5 intron 7 — the glucocorticoid-response region already tied to PTSD risk — survivors were more methylated than controls while their adult children were less methylated than control offspring. The offspring effect survived controlling for the children's own FKBP5 genotype and their own trauma history, so it is not simply inherited sequence or a hard life of their own.",
+      c_yeh16: "The authors flag it themselves: at n = 22 offspring you cannot separate a mark carried in the gametes from an in utero effect, or from simply growing up with a parent who had PTSD. One CpG site, in blood. The opposite-direction result has no agreed mechanism. A hypothesis generator, not a demonstration.",
+      f_yeh14: "Which parent had PTSD changed the direction of the effect. With paternal PTSD alone, offspring had higher methylation at the NR3C1 exon 1F promoter; when both parents had PTSD, methylation was lower. Lower methylation went with stronger cortisol suppression after dexamethasone.",
+      c_yeh14: "Parental PTSD also changes how a child is raised. No observational design can separate a germline mark from a childhood spent with a traumatised parent.",
+      f_perroud: "Women pregnant during the 1994 genocide were compared with Rwandan women of the same ethnicity pregnant in the same period but not exposed. Exposed mothers and their children both showed higher PTSD and depression scores, lower cortisol and glucocorticoid receptor levels, higher mineralocorticoid receptor levels, and higher NR3C1 exon 1F methylation — the same HPA-axis signature appearing in both generations.",
+      c_perroud: "The children were in utero during the genocide, so this is F1 programming, not inheritance — it cannot separate a mark transmitted through the germline from one induced directly by maternal cortisol crossing the placenta. n = 25 per group, cross-sectional, and the exposed families also lived through very different postnatal conditions.",
+      f_yl18: "Notably more hedged than the primary papers that made this author's name in the area. The review separates two mechanisms that popular coverage conflates — developmental programming through maternal care and the in utero environment, versus preconception changes in the parental germline — and walks through the candidate windows: oocytes, which sit in a demethylated and vulnerable state from birth until puberty; sperm marks; and in utero programming via maternal cortisol.",
+      c_yl18: "It is also where the field's central limitation gets said plainly: parental sex, PTSD status and the offspring's developmental timing all shift the direction and size of the methylation difference between studies, in ways that do not yet resolve into one mechanistic story. A position paper as well as a survey — and still the best single entry point.",
+
+      s4_eyebrow: "04 · Animal models",
+      s4_title: "What has been measured in mice and rats",
+      s4_lead: "Here you can control the genome, the environment, and who raises whom — and you can go one step further and move the candidate molecule into a fresh embryo. This is where the mechanistic claims actually come from.",
+      f_weaver: "Pups of high-licking, high-grooming mothers ended up with a demethylated CpG in the NGFI-A binding site of the hippocampal glucocorticoid receptor promoter, more GR expression, and a calmer stress axis in adulthood. Infusing an HDAC inhibitor erased the group difference — methylation, transcription factor binding, GR levels and stress response all moved together.",
+      c_weaver: "Cross-fostering reversed it, which is the point: this is behaviour writing methylation in the pup's own brain each generation, not a mark travelling through sperm or egg. It is the cleanest evidence that experience becomes methylation — and the clearest example of transmission without inheritance.",
+      f_franklin: "Early separation stress produced depressive-like behaviour that persisted into the next generations. In F1 sperm, methylation went up at MeCP2 and CB1 and down at CRFR2 — and the MeCP2 and CRFR2 changes reappeared in the brains of F2 females, alongside reduced expression of those genes.",
+      c_franklin: "A matching mark in sperm and in the next brain is a correlation across tissues, not proof the sperm mark caused the brain phenotype. Group sizes are small (often n = 3–6 for methylation), and the effects were largely female-specific in F2.",
+      f_gapp: "Same MSUS trauma paradigm, but this time the candidate carrier was purified and moved: RNA from the sperm of stressed males, injected into normal fertilised oocytes, reproduced the behavioural and metabolic phenotype in animals with no stressed ancestor at all.",
+      c_gapp: "This is the strongest causal design in the whole field — and the carrier it identifies is small non-coding RNA, not DNA methylation. Worth sitting with: the best-evidenced germline vehicle for inherited stress effects so far is not a methyl mark.",
+      f_dias: "Males were shock-conditioned to acetophenone — a cherry-and-almond-like smell that activates one identified receptor, Olfr151 — then bred, both by natural mating and separately by IVF, to rule out learned behaviour and the in utero environment. Pups that had never met the odour startled more to it and not to others, and so did the grand-pups. Both generations had more neurons detecting that odour and an enlarged brain structure devoted to it, and the Olfr151 region was hypomethylated in the fathers' sperm.",
+      c_dias: "The single most striking result here, and the most contested: independent replication has been patchy, the proposed route from a fear memory to a specific sperm locus has no accepted mechanism, and the reported methylation differences are small. Ressler himself, speaking to the press at the time, put the human extension only as speculation — that a parent's anxiety might reach later generations through marks on stress-hormone receptor genes. Cite it as an open question, not a settled fact.",
+
+      s5_eyebrow: "05 · Three routes, often confused",
+      s5_title: "How an experience can reach a grandchild",
+      s5_lead: "Popular coverage collapses these into one story. Only the third one requires anything to survive in the germline, and it is the only one that would count as epigenetic inheritance.",
+      route1_k: "social", route1_t: "Care and environment",
+      route1_d: "A traumatised parent parents differently. The child's own methylation changes in response to their own childhood. Weaver 2004 is the mechanistic version of this — and cross-fostering switches it off.",
+      route2_k: "in utero", route2_t: "Fetal programming",
+      route2_d: "Maternal stress hormones, nutrition and placental signalling act on a developing fetus during the window when methylation patterns are being set. Heijmans 2008 and Perroud 2014 sit here.",
+      route3_k: "germline", route3_t: "Through sperm or egg",
+      route3_d: "A mark survives in the gamete and shapes the next embryo. The obstacle is that mammalian germlines erase and rewrite most methylation twice — after fertilisation and again during germ cell development. Small RNA has cleared this bar experimentally; methylation has not, convincingly.",
+
+      s6_eyebrow: "06 · The bar",
+      s6_title: "What a convincing result would have to include",
+      s6_lead: "Bernhard Horsthemke laid out the requirements in a 2018 comment in Nature Communications. It is short, free to read, and the most useful thing to hand anyone who sends you a headline about inherited trauma.",
+      f_horst: "Transgenerational epigenetic inheritance is established in plants, nematodes and flies. In mammals — and in humans especially — the evidence is entangled with ordinary genetic inheritance, shared environments, and culture. Horsthemke argues that most human findings labelled transgenerational never actually reach the F2/F3 standard, and sets out what a study would have to do to untangle the three.",
+      crit1: "Use inbred strains and strictly controlled environments, so a genetic difference cannot masquerade as an epigenetic one.",
+      crit2: "After maternal gestational exposure, study F3 or later. After paternal exposure, study at least F2. Anything earlier was directly exposed.",
+      crit3: "Use IVF, embryo transfer and foster mothers where possible, so the phenotype cannot travel through pregnancy or parenting.",
+      crit4: "Identify the actual carrier in the germ cells — and check that germ cell preparations are not contaminated with somatic cells.",
+      crit5: "In humans, accept that ecological and cultural inheritance cannot be ruled out — but genetic effects can and should be excluded explicitly.",
+
+      s7_eyebrow: "08 · Where the evidence stands",
+      s7_title: "Claim by claim",
+      th_claim: "Claim", th_animal: "In animals", th_human: "In humans",
+      tr1c1: "Stress changes DNA methylation in the exposed individual",
+      tr1c2: "Well established, with causal manipulation",
+      tr1c3: "Well supported, mostly in blood",
+      tr2c1: "Parental stress changes the offspring's methylation and behaviour",
+      tr2c2: "Established, including via parenting behaviour",
+      tr2c3: "Reported repeatedly; small cohorts, mixed directions",
+      tr3c1: "A mark survives in the germline and reaches an unexposed generation",
+      tr3c2: "Demonstrated for sperm small RNA; contested for methylation",
+      tr3c3: "Not demonstrated — the required generations have not been studied",
+      tr4c1: "A specific methylation change causes a specific inherited phenotype",
+      tr4c2: "Not yet shown for a trauma phenotype",
+      tr4c3: "Not shown",
+
+      s8_eyebrow: "09 · Why this sits next to my thesis",
+      s8_title: "The missing experiment is a writing experiment",
+      bridge_p1: "Every study above is correlational at the level that matters most: someone observed a methylation difference and a phenotype together. Nobody put the methyl group there on purpose and watched what followed.",
+      bridge_p2: "That is precisely what epigenome editing changes. CRISPRoff and ZFPoff deposit methylation at a chosen promoter without cutting DNA, and nanopore sequencing reads the resulting pattern molecule by molecule. On this site, that combination is applied to CD55 — but the general capability is the one this literature has been waiting for: write a mark, read it back, and test whether it does anything.",
+      bridge_p3: "The honest limit: my work is somatic, in cultured human cells, over days and weeks. It can test whether a methylation mark is stable and consequential in a cell lineage. It cannot test whether one survives a germline. Those are different questions, and this page exists partly so the difference stays visible.",
+
+      s9_eyebrow: "10 · Sources",
+      s9_title: "Papers referenced on this page",
+      refs_note: "Last checked August 2026. Open-access links are marked; the rest lead to the publisher's abstract."
+    },
+    ru: {
+      s1_p2: "Арифметика здесь конкретная. Если беременная женщина (F0) проходит через голод или геноцид, её плод (F1) уже жив — и уже живы собственные развивающиеся половые клетки этого плода, из которых получится F2. Три поколения физически присутствуют при одном событии. Только F3 зачат из материала, которого там не было. По отцовской линии цепочка короче: сперматозоид мужчины подвергается воздействию, значит его ребёнок F1 тоже, и первое чистое поколение — F2.",
+      germ_t: "Почему зародышевая линия — самое трудное место",
+      germ_d: "Между событием в жизни и геномом внука стоят два структурных факта. Первый — барьер Вейсмана: у млекопитающих половые клетки обособляются рано и не обновляются в ответ на то, что происходит с соматическими клетками тела. Второй — геном дважды почти полностью стирается и переписывается: один раз в первичных половых клетках и ещё раз сразу после оплодотворения. Чтобы приобретённая метка метилирования наследовалась, ей нужно пережить оба стирания, а это умеет лишь небольшой набор локусов, в основном импринтированных. Поэтому метка, измеренная в крови, — ещё не заявка на наследование, и поэтому малые РНК сперматозоидов, которые так не стираются, оказалось проще показать в роли переносчика.",
+      s6_close: "Чего области не нужно — так это ещё одной межпоколенческой когорты с p-значением на одном CpG; таких уже несколько, и они указывают в интересные, но механистически неоднозначные стороны. Не хватает данных на людях уровня F2 или F3 в паре с переносчиком в зародышевой линии, который правдоподобно переживает оба раунда репрограммирования — а на сегодня это скорее малые РНК сперматозоидов, чем само метилирование.",
+      s7b_eyebrow: "07 · Одним взглядом",
+      s7b_title: "Все работы этой страницы рядом",
+      s7b_lead: "Колонка, которая решает, что вообще можно доказать, — четвёртая: какие поколения реально проверяли и подвергалось ли последнее из них воздействию.",
+      th_study: "Работа", th_species: "Вид", th_locus: "Что измеряли",
+      th_gens: "Проверенные поколения", th_type: "Тип",
+      sp_human: "человек", sp_mouse: "мышь", sp_rat: "крыса",
+      gen_within: "в пределах одного поколения",
+      loc_sncrna: "малые РНК сперматозоидов (не метилирование)",
+      ty_direct: "прямое воздействие (внутриутробно)",
+      ty_inter: "межпоколенческое",
+      ty_dev: "связано с развитием, обратимо",
+      ty_trans: "трансгенерационное (по отцу)",
+      ty_causal: "трансгенерационное + причинное",
+      bars_title: "На скольких людях держится каждая работа на людях",
+      bar1: "Heijmans 2008 — сравненных сиблингских пар",
+      bar2: "Yehuda 2014 — детей выживших",
+      bar3: "Perroud 2014 — пар мать–ребёнок в группе",
+      bar4: "Yehuda 2016 — детей выживших",
+      bars_note: "Единицы измерения у работ разные, поэтому сравнивайте каждый столбик с его подписью, а не друг с другом. Потолок здесь структурный: размер когорты ограничен тем, сколько людей пережили конкретное историческое событие и до скольких удалось потом дойти за пробиркой крови. Мышиные исследования вместо этого выводят когорты под задачу через поколения — именно поэтому механистические утверждения приходят оттуда.",
+      "brand-sub": "эпигеном · цитозин · метилирование",
+      footer_note: "epiCme · пишем → читаем → учимся. Эта страница — путеводитель по литературе, а не медицинская или психологическая рекомендация.",
+      "nav-home": "Главная", "nav-about": "О проекте", "nav-k562": "K562",
+      "nav-chipseq": "ChIP-seq", "nav-tf": "Механизмы",
+      "nav-memory": "Метилирование и память",
+      "nav-trauma": "Метилирование и травма",
+
+      hero_eyebrow: "Обзор литературы · серия о метилировании",
+      hero_title_a: "Может ли метильная группа", hero_title_b: "нести память", hero_title_c: "через поколения?",
+      hero_lead: "Разбор того, что на самом деле показывают исследования на людях и животных про метилирование ДНК и наследуемую травму — со ссылками на оригинальные статьи, короткими цитатами и оговоркой рядом с каждым результатом.",
+      hero_note_lbl: "Честная версия:",
+      hero_note: "работы на животных сильные и контролируемые; работы на людях наводящие, на маленьких выборках, и их трудно отделить от всего остального, что родители передают детям. Эта страница специально держит их порознь.",
+
+      s1_eyebrow: "01 · Различие, от которого зависит всё",
+      s1_title: "Межпоколенческое — это не трансгенерационное",
+      s1_lead: "Почти любой спор в этой области на самом деле спор о том, на какое поколение вы смотрите. Если поколение физически присутствовало во время воздействия — как плод или как половая клетка внутри этого плода — то найденная в нём метка не доказывает наследование. Она доказывает воздействие.",
+      def_inter_t: "Межпоколенческое",
+      def_inter_d: "Сам подвергшийся воздействию человек и любое поколение, которое непосредственно присутствовало во время воздействия. Реальный, измеримый, биологически важный эффект — но он не требует передачи чего-либо через зародышевую линию.",
+      def_trans_t: "Трансгенерационное",
+      def_trans_d: "Первое поколение без прямого воздействия ни на одном этапе, включая стадию половой клетки. Только оно способно показать наследование через зародышевую линию — и именно до него почти не доходят исследования на людях.",
+
+      s2_eyebrow: "02 · Считаем поколения",
+      s2_title: "Какое поколение первое «чистое»?",
+      s2_lead: "Ответ зависит от того, кто из родителей подвергся воздействию, потому что половые клетки уже присутствуют в плоде. Воздействие во время беременности задевает сразу три поколения. Отцовское воздействие до зачатия — два.",
+      legend_exposed: "Штриховка — прямое воздействие",
+      legend_clean: "Сплошной + ✓ — первое поколение без воздействия",
+      legend_conf: "Пунктир — подтверждающее, но не обязательное",
+
+      s3_eyebrow: "03 · Когорты людей",
+      s3_title: "Что измерено у людей",
+      s3_lead: "Исследования на людях наблюдательные, когорты маленькие, а ткань почти всегда кровь, а не та ткань, которая на самом деле интересует. И всё же именно они создали эту область — читайте каждый результат вместе с его оговоркой.",
+      quotenote: "Цитаты даны короткими фрагментами на языке оригинала (английском) со ссылкой на источник. Всё остальное — пересказ.",
+      lbl_found: "Найдено", lbl_caveat: "Оговорка",
+
+      f_heij: "Люди, зачатые во время голландского голода 1944–45 годов, спустя шесть десятилетий всё ещё отличались по метилированию IGF2 от собственных братьев и сестёр того же пола, не подвергшихся голоду. Эффект был только при воздействии в период зачатия, но не на поздних сроках беременности.",
+      c_heij: "Это метка в поколении, которое подверглось воздействию напрямую. Она показывает, что средовое воздействие оставляет у человека стойкое различие в метилировании — но ничего не говорит о передаче этого различия кому-то ещё.",
+      f_yeh16: "В одном сайте интрона 7 гена FKBP5 выжившие были метилированы сильнее контроля, а их взрослые дети — слабее контрольных детей: эффект есть в обоих поколениях, но направления противоположные.",
+      c_yeh16: "Самое цитируемое исследование на людях в этой области держится на 22 детях и 9 контрольных детях, одном CpG-сайте и крови. У противоположных направлений нет согласованного механизма. Это генератор гипотез, а не доказательство.",
+      f_yeh14: "Направление эффекта зависело от того, у кого из родителей было ПТСР. При ПТСР только у отца метилирование промотора экзона 1F гена NR3C1 у потомков было выше; когда ПТСР было у обоих родителей — ниже. Более низкое метилирование сочеталось с более сильным подавлением кортизола после дексаметазона.",
+      c_yeh14: "ПТСР у родителя меняет и то, как растёт ребёнок. Никакой наблюдательный дизайн не отделит метку зародышевой линии от детства рядом с травмированным родителем.",
+      f_perroud: "У женщин, беременных во время геноцида 1994 года, и у их уже взрослых детей были выше показатели ПТСР и депрессии, ниже уровни кортизола и глюкокортикоидного рецептора и выше метилирование экзона 1F гена NR3C1, чем в подобранных парах без воздействия.",
+      c_perroud: "Дети подверглись воздействию внутриутробно, то есть это программирование F1, а не наследование. По 25 человек в группе, поперечный дизайн, и семьи с воздействием жили потом в совсем других условиях.",
+      f_yl18: "Обзор разделяет два механизма, которые в популярных текстах сливают в один: программирование развития через материнскую заботу и внутриутробную среду — и изменения в зародышевой линии родителя ещё до зачатия. Авторы также утверждают, что стадия развития родителя в момент травмы меняет эффект.",
+      c_yl18: "Написан авторами нескольких из перечисленных выше работ, так что это и позиционная статья, и обзор — но он честно говорит о пределах данных на людях и остаётся лучшей единой точкой входа в литературу.",
+
+      s4_eyebrow: "04 · Модели на животных",
+      s4_title: "Что измерено у мышей и крыс",
+      s4_lead: "Здесь можно контролировать геном, среду и то, кто кого выращивает — и можно пойти дальше и перенести кандидатную молекулу в свежий эмбрион. Именно отсюда берутся механистические утверждения.",
+      f_weaver: "У детёнышей матерей, много вылизывающих и ухаживающих, CpG в сайте связывания NGFI-A в промоторе гиппокампального глюкокортикоидного рецептора оказывался деметилированным, экспрессия GR — выше, а стрессовая ось во взрослом возрасте — спокойнее. Введение ингибитора HDAC стирало различие между группами: метилирование, связывание транскрипционного фактора, уровень GR и стрессовый ответ двигались вместе.",
+      c_weaver: "Перекрёстное вскармливание обращало эффект — и в этом суть: поведение матери каждый раз заново записывает метилирование в мозге детёныша, а не метка путешествует через сперматозоид или яйцеклетку. Это самое чистое доказательство того, что опыт становится метилированием, и самый ясный пример передачи без наследования.",
+      f_franklin: "Ранний стресс разлуки давал депрессивноподобное поведение, которое сохранялось в следующих поколениях. В сперматозоидах F1 метилирование выросло у MeCP2 и CB1 и упало у CRFR2 — а изменения в MeCP2 и CRFR2 снова появились в мозге самок F2 вместе со сниженной экспрессией этих генов.",
+      c_franklin: "Совпадающая метка в сперматозоидах и в мозге следующего поколения — это корреляция между тканями, а не доказательство, что метка вызвала фенотип. Группы маленькие (часто n = 3–6 для метилирования), а эффекты в F2 в основном специфичны для самок.",
+      f_gapp: "Та же парадигма травмы MSUS, но на этот раз кандидатного носителя очистили и перенесли: РНК из сперматозоидов стрессированных самцов, введённая в нормальные оплодотворённые ооциты, воспроизвела поведенческий и метаболический фенотип у животных, у которых вообще не было стрессированного предка.",
+      c_gapp: "Это самый сильный причинный дизайн во всей области — и носитель, который он выявляет, это малые некодирующие РНК, а не метилирование ДНК. Стоит задержаться на этом: лучше всего доказанный переносчик наследуемых эффектов стресса на сегодня — не метильная метка.",
+      f_dias: "Самцов обучали страху на ацетофенон, который активирует один известный рецептор, Olfr151. Их потомки F1 и F2 были чувствительнее именно к этому запаху, и у них было больше нейронов, встроенных именно в этот обонятельный путь. Область Olfr151 была гипометилирована в сперматозоидах отцов, и эффект пережил ЭКО.",
+      c_dias: "Самый яркий результат здесь — и самый оспариваемый: независимые воспроизведения неровные, у предполагаемого пути от воспоминания о страхе к конкретному локусу в сперматозоиде нет принятого механизма, а описанные различия в метилировании невелики. Цитируйте как открытый вопрос, а не как установленный факт.",
+
+      s5_eyebrow: "05 · Три пути, которые часто путают",
+      s5_title: "Как опыт доходит до внука",
+      s5_lead: "Популярные тексты сводят всё это в одну историю. Только третий путь требует, чтобы что-то пережило зародышевую линию, и только он считался бы эпигенетическим наследованием.",
+      route1_k: "социальный", route1_t: "Забота и среда",
+      route1_d: "Травмированный родитель воспитывает иначе. Метилирование ребёнка меняется в ответ на его собственное детство. Weaver 2004 — механистическая версия этого, и перекрёстное вскармливание её выключает.",
+      route2_k: "внутриутробный", route2_t: "Фетальное программирование",
+      route2_d: "Материнские гормоны стресса, питание и плацентарные сигналы действуют на развивающийся плод именно тогда, когда закладываются паттерны метилирования. Сюда относятся Heijmans 2008 и Perroud 2014.",
+      route3_k: "зародышевый", route3_t: "Через сперматозоид или яйцеклетку",
+      route3_d: "Метка выживает в гамете и влияет на следующий эмбрион. Препятствие в том, что у млекопитающих метилирование стирается и переписывается дважды — после оплодотворения и снова при развитии половых клеток. Малые РНК этот барьер экспериментально преодолели, метилирование — убедительно нет.",
+
+      s6_eyebrow: "06 · Планка",
+      s6_title: "Что должно быть в убедительной работе",
+      s6_lead: "Бернхард Хорстемке изложил требования в комментарии 2018 года в Nature Communications. Он короткий, в открытом доступе, и это самое полезное, что можно дать человеку, который прислал вам заголовок про наследуемую травму.",
+      f_horst: "Трансгенерационное эпигенетическое наследование установлено у растений, нематод и мух. У млекопитающих — и особенно у людей — данные перепутаны с обычным генетическим наследованием, общей средой и культурой. Комментарий описывает, что должно сделать исследование, чтобы их распутать.",
+      crit1: "Использовать инбредные линии и строго контролируемую среду, чтобы генетическое различие не выдавало себя за эпигенетическое.",
+      crit2: "После воздействия на беременную самку изучать F3 или дальше. После отцовского воздействия — минимум F2. Всё, что раньше, подверглось воздействию напрямую.",
+      crit3: "Где возможно, использовать ЭКО, перенос эмбрионов и приёмных матерей, чтобы фенотип не мог передаться через беременность или воспитание.",
+      crit4: "Определить реального носителя в половых клетках — и проверить, что препараты половых клеток не загрязнены соматическими.",
+      crit5: "У людей признать, что экологическое и культурное наследование исключить нельзя — но генетические эффекты можно и нужно исключать явно.",
+
+      s7_eyebrow: "08 · Где сейчас доказательства",
+      s7_title: "Утверждение за утверждением",
+      th_claim: "Утверждение", th_animal: "У животных", th_human: "У людей",
+      tr1c1: "Стресс меняет метилирование ДНК у самого человека или животного",
+      tr1c2: "Твёрдо установлено, с причинными манипуляциями",
+      tr1c3: "Хорошо подтверждено, в основном в крови",
+      tr2c1: "Стресс родителя меняет метилирование и поведение потомка",
+      tr2c2: "Установлено, в том числе через родительское поведение",
+      tr2c3: "Сообщалось многократно; маленькие когорты, разные направления",
+      tr3c1: "Метка выживает в зародышевой линии и доходит до поколения без воздействия",
+      tr3c2: "Показано для малых РНК сперматозоидов; для метилирования оспаривается",
+      tr3c3: "Не показано — нужные поколения просто не изучались",
+      tr4c1: "Конкретное изменение метилирования вызывает конкретный наследуемый фенотип",
+      tr4c2: "Для травматического фенотипа пока не показано",
+      tr4c3: "Не показано",
+
+      s8_eyebrow: "09 · Почему это рядом с моей диссертацией",
+      s8_title: "Недостающий эксперимент — это эксперимент на запись",
+      bridge_p1: "Все работы выше корреляционны на самом важном уровне: кто-то наблюдал различие в метилировании и фенотип вместе. Никто не поставил метильную группу туда намеренно и не посмотрел, что будет дальше.",
+      bridge_p2: "Именно это меняет редактирование эпигенома. CRISPRoff и ZFPoff наносят метилирование на выбранный промотор, не разрезая ДНК, а нанопоровое секвенирование считывает получившийся паттерн молекула за молекулой. На этом сайте такая связка применена к CD55 — но сама возможность и есть то, чего эта литература ждала: написать метку, прочитать её обратно и проверить, делает ли она что-нибудь.",
+      bridge_p3: "Честное ограничение: моя работа соматическая, в культуре человеческих клеток, на масштабе дней и недель. Она может проверить, устойчива ли метка и есть ли от неё последствия внутри клеточной линии. Она не может проверить, переживёт ли метка зародышевую линию. Это разные вопросы, и эта страница отчасти существует ровно для того, чтобы разница оставалась видной.",
+
+      s9_eyebrow: "10 · Источники",
+      s9_title: "Статьи, на которые ссылается страница",
+      refs_note: "Проверено в августе 2026 года. Ссылки открытого доступа помечены; остальные ведут на страницу издателя."
+    }
+  };
+
+  var STORAGE_KEY = "epicme_lang";
+
+  function apply(lang) {
+    var dict = I18N[lang] || I18N.en;
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var val = dict[el.getAttribute("data-i18n")];
+      if (typeof val === "string") el.textContent = val;
+    });
+    document.documentElement.setAttribute("lang", lang);
+    document.querySelectorAll("#lang-switch button").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-lang") === lang);
+    });
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) {}
+    if (window.epicmeChat && typeof window.epicmeChat.setContext === "function") {
+      window.epicmeChat.setContext({ page: "methylation-generational-trauma", lang: lang });
+    }
+  }
+
+  var saved = "en";
+  try { saved = localStorage.getItem(STORAGE_KEY) || "en"; } catch (e) {}
+  if (!I18N[saved]) saved = "en";
+
+  document.querySelectorAll("#lang-switch button").forEach(function (b) {
+    b.addEventListener("click", function () { apply(b.getAttribute("data-lang")); });
+  });
+
+  apply(saved);
+})();
+
+/* ---------- chat chips for this page ---------- */
+window.epicmeChatChips = [
+  "What is the difference between intergenerational and transgenerational?",
+  "Why does germline reprogramming make inheritance hard?",
+  "Is the Dias & Ressler mouse result replicated?",
+  "Чем межпоколенческая передача отличается от трансгенерационной?"
+];
+</script>
+<script src="assets/epicme-chat.js" defer></script>
 
 </body>
 </html>

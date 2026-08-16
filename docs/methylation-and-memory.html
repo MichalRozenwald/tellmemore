@@ -1,328 +1,709 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>One Mark, Three Memories — epicme.bio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Mark, Three Memories — DNA methylation as cellular memory — epicme.bio</title>
+<meta name="description" content="CpG methylation as the cell's way of keeping a diary — in the hippocampus, in T cells, and in the stress axis. Three memory systems, one molecular trick.">
+<link rel="stylesheet" href="assets/theme.css">
 <style>
-  :root{
-    --bg: #0b1210;
-    --bg-panel: #101a17;
-    --bg-panel-2: #0e1a1c;
-    --line: #23332f;
-    --ink: #e9efe9;
-    --ink-dim: #a9bab3;
-    --ink-faint: #6f8179;
-    --amber: #e0a458;
-    --cyan: #4fb3bf;
-    --rose: #c97b84;
-    --mark-fill: #e0a458;
-    --mark-open: #4fb3bf;
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'IBM Plex Sans', sans-serif;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
-  ::selection{ background:var(--amber); color:#0b1210; }
+/* ============================================================
+   Page-local styles — only what theme.css does not provide.
+   Colour meaning follows the site convention:
+   orange/filled = methylated (closed), blue/open = unmethylated (open).
+   Never colour alone: every state also carries a symbol and a word.
+   ============================================================ */
 
-  a{ color:var(--cyan); }
+/* language switch + pill nav: same block as index.html */
+.lang-switch{
+  display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+  border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+}
+.lang-switch button{
+  border:none; background:transparent; color:var(--ink-dim);
+  font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+  font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+}
+.lang-switch button.active{ background:var(--blue); color:#06182A; }
+.nav-inner{ flex-wrap:wrap; row-gap:10px; }
 
-  .wrap{ max-width:760px; margin:0 auto; padding:0 24px; }
+.nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+.nav-links a{
+  display:inline-flex; align-items:center;
+  padding:10px 18px; border-radius:999px;
+  border:1.5px solid var(--line); background:var(--surface-2);
+  color:var(--ink-dim); font-size:14.5px; font-weight:600; text-decoration:none;
+  transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+}
+.nav-links a:hover, .nav-links a:focus-visible{
+  border-color:var(--blue); color:var(--ink); background:var(--surface); transform:translateY(-1px);
+}
+.nav-links a.active{ background:var(--blue); border-color:var(--blue); color:#06182A; }
 
-  /* ---------- CpG mark motif: filled = methylated, open = unmethylated ---------- */
-  .mk{
-    display:inline-block; width:0.62em; height:0.62em; border-radius:50%;
-    margin-right:0.5em; vertical-align:middle; flex-shrink:0;
-    border:1.6px solid currentColor;
-  }
-  .mk.filled{ background:currentColor; }
-  .mk.open{ background:transparent; }
+/* CpG mark motif — filled = methylated, open = unmethylated */
+.mk{
+  display:inline-block; width:0.62em; height:0.62em; border-radius:50%;
+  margin-right:0.5em; vertical-align:middle; flex-shrink:0; border:1.6px solid currentColor;
+}
+.mk.filled{ background:currentColor; }
+.mk.open{ background:transparent; }
+.mk.me{ color:var(--orange); }
+.mk.un{ color:var(--blue); }
 
-  header.hero{
-    padding:88px 0 56px;
-    border-bottom:1px solid var(--line);
-    position:relative;
-    overflow:hidden;
-  }
-  .eyebrow{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12.5px;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:var(--ink-faint);
-    display:flex; align-items:center; gap:10px;
-    margin-bottom:22px;
-  }
-  .eyebrow .mk{ color:var(--amber); }
+/* hero */
+.hero{ border-top:none; padding-top:34px; }
+.hero h1{
+  font-size:clamp(30px,5.4vw,50px); line-height:1.05; margin:0 0 20px;
+  letter-spacing:-0.025em; max-width:17ch; font-weight:700;
+}
+.hero h1 em{ font-style:normal; color:var(--blue); }
 
-  h1{
-    font-family:'Fraunces', serif;
-    font-optical-sizing:auto;
-    font-weight:500;
-    font-size:clamp(34px, 6vw, 54px);
-    line-height:1.08;
-    letter-spacing:-0.01em;
-    margin:0 0 22px;
-  }
-  h1 em{ font-style:italic; color:var(--amber); }
+/* the three-strand signature */
+.strand{
+  margin:30px 0 0; background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--radius); padding:20px 22px;
+}
+.strand-row{
+  display:flex; align-items:center; gap:16px; padding:11px 0;
+  border-bottom:1px dashed var(--line);
+}
+.strand-row:last-of-type{ border-bottom:none; }
+.strand-label{
+  width:190px; flex-shrink:0; font-family:'IBM Plex Mono',monospace;
+  font-size:12px; color:var(--ink-dim); line-height:1.4;
+}
+.strand-dots{ display:flex; align-items:center; gap:9px; font-size:20px; }
+.strand-key{
+  margin-top:14px; padding-top:14px; border-top:1px solid var(--line);
+  font-size:12.5px; color:var(--ink-faint); display:flex; flex-wrap:wrap; gap:8px 20px;
+}
+@media (max-width:620px){
+  .strand-row{ flex-wrap:wrap; gap:6px; }
+  .strand-label{ width:100%; }
+}
 
-  .hero p.lede{
-    font-size:18px;
-    color:var(--ink-dim);
-    max-width:56ch;
-    margin:0 0 8px;
-  }
+/* three-state comparison */
+.grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:22px 0; }
+@media (max-width:760px){ .grid3{ grid-template-columns:1fr; } }
+.state{ border-top:3px solid var(--line); }
+.state[data-state="naive"]{ border-top-color:var(--ink-faint); }
+.state[data-state="memory"]{ border-top-color:var(--orange); }
+.state[data-state="exhausted"]{ border-top-color:var(--blue); }
+.state h3{ font-size:16px; margin:8px 0 6px; }
+.state .verdict{
+  margin-top:12px; padding-top:12px; border-top:1px dashed var(--line);
+  font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-dim);
+  display:flex; align-items:center;
+}
 
-  /* CpG strand visual under hero */
-  .strand{
-    margin-top:44px;
-    display:flex;
-    align-items:center;
-    gap:0;
-    flex-wrap:wrap;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
-    color:var(--ink-faint);
-  }
-  .strand-row{ display:flex; align-items:center; gap:10px; padding:6px 0; }
-  .strand-row .mk{ width:9px; height:9px; margin-right:0; }
-  .strand-label{ width:150px; flex-shrink:0; color:var(--ink-dim); }
-  .strand-dots{ display:flex; gap:7px; }
+/* study cards */
+.studies{ display:flex; flex-direction:column; gap:16px; }
+.study{ border-left:4px solid var(--line); }
+.study[data-kind="brain"]{ border-left-color:var(--blue); }
+.study[data-kind="immune"]{ border-left-color:var(--orange); }
+.study[data-kind="stress"]{ border-left-color:var(--yellow); }
+.study .tagrow{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.study .tagrow .tag{ margin-bottom:0; }
+.tag.stress{ background:var(--yellow-dim); color:var(--yellow); }
+.study h3{ font-size:16.5px; line-height:1.35; margin:0 0 8px; }
+.study-meta{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint);
+  line-height:1.55; margin:0 0 14px;
+}
+.study .ref-quote{ margin:0 0 14px; }
+.study .ref-quote cite{
+  display:block; margin-top:6px; font-style:normal;
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-faint);
+}
+.paper-link{
+  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:12px;
+  color:var(--blue); text-decoration:none; border-bottom:1px solid var(--blue-dim); word-break:break-word;
+}
+.paper-link:hover{ border-bottom-color:var(--blue); }
 
-  section{ padding:56px 0; border-bottom:1px solid var(--line); }
-  section:last-of-type{ border-bottom:none; }
+/* labelled rows */
+.row{ display:flex; gap:12px; margin:0 0 10px; }
+.row .lbl{
+  font-family:'Space Grotesk',sans-serif; font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+  font-weight:600; color:var(--ink-faint); flex:0 0 76px; padding-top:3px;
+}
+.row.caveat .lbl{ color:var(--orange); }
+.row .txt{ font-size:14.5px; color:var(--ink-dim); line-height:1.6; }
+@media (max-width:520px){ .row{ flex-direction:column; gap:2px; } .row .lbl{ flex-basis:auto; } }
 
-  .kicker{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px; letter-spacing:0.1em; text-transform:uppercase;
-    color:var(--ink-faint); margin-bottom:10px;
-  }
-  h2{
-    font-family:'Fraunces', serif; font-weight:500;
-    font-size:clamp(24px, 4vw, 30px);
-    margin:0 0 18px; letter-spacing:-0.01em;
-  }
-  h3{
-    font-family:'IBM Plex Sans', sans-serif; font-weight:600;
-    font-size:16.5px; margin:28px 0 8px; color:var(--ink);
-  }
-  p{ color:var(--ink-dim); margin:0 0 14px; font-size:15.5px; }
-  p strong{ color:var(--ink); font-weight:600; }
-  .gene{ font-family:'IBM Plex Mono', monospace; color:var(--amber); font-size:0.92em; }
+/* durability table */
+.table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); }
+table{ border-collapse:collapse; width:100%; min-width:560px; }
+th,td{ padding:12px 15px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; font-size:14px; }
+thead th{
+  font-family:'Space Grotesk',sans-serif; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--ink-faint); background:var(--surface-2); font-weight:600;
+}
+tbody td{ color:var(--ink-dim); }
+tbody td:first-child{ color:var(--ink); font-weight:600; }
+tbody tr:last-child td{ border-bottom:none; }
 
-  .callout{
-    background:var(--bg-panel);
-    border:1px solid var(--line);
-    border-left:3px solid var(--cyan);
-    border-radius:6px;
-    padding:16px 18px;
-    margin:20px 0;
-    font-size:14.5px;
-    color:var(--ink-dim);
-  }
-  .callout .mk{ color:var(--cyan); }
+/* sibling-page pointer */
+.sibling{
+  display:block; text-decoration:none; border:1px solid var(--line); border-left:3px solid var(--blue);
+  border-radius:0 var(--radius) var(--radius) 0; background:var(--surface-2); padding:18px 20px; margin-top:22px;
+  transition:border-color .15s ease, transform .15s ease;
+}
+.sibling:hover{ border-color:var(--blue); transform:translateY(-1px); }
+.sibling .eyebrow-sm{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--ink-faint); display:block; margin-bottom:6px;
+}
+.sibling h3{ margin:0 0 6px; font-size:16px; color:var(--ink); }
+.sibling p{ margin:0; font-size:14px; }
 
-  .caution{
-    background:var(--bg-panel-2);
-    border:1px solid var(--line);
-    border-left:3px solid var(--rose);
-    border-radius:6px;
-    padding:16px 18px;
-    margin:20px 0;
-    font-size:14.5px;
-    color:var(--ink-dim);
-  }
-  .caution .kicker{ color:var(--rose); }
-
-  /* comparison table — colorblind-safe: fill pattern + text label, never color alone */
-  .compare{
-    display:grid;
-    grid-template-columns: 1fr;
-    gap:14px;
-    margin:22px 0 6px;
-  }
-  .compare-card{
-    background:var(--bg-panel);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:18px 20px;
-  }
-  .compare-card .tag{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11.5px; text-transform:uppercase; letter-spacing:0.08em;
-    color:var(--ink-faint); margin-bottom:6px;
-  }
-  .compare-card h4{
-    font-family:'Fraunces', serif; font-weight:500; font-size:19px;
-    margin:0 0 8px; color:var(--ink);
-  }
-  .compare-card p{ margin:0; font-size:14.5px; }
-  .state-row{
-    display:flex; align-items:center; gap:8px;
-    font-family:'IBM Plex Mono', monospace; font-size:12.5px;
-    color:var(--ink-dim); margin-top:12px;
-  }
-  .state-row span.label{ color:var(--ink-faint); }
-
-  ul.refs{
-    list-style:none; margin:0; padding:0;
-    font-size:13.5px; color:var(--ink-faint);
-  }
-  ul.refs li{
-    padding:10px 0; border-top:1px solid var(--line);
-    display:flex; gap:10px;
-  }
-  ul.refs li:first-child{ border-top:none; }
-  ul.refs .mk{ margin-top:4px; }
-
-  footer{
-    padding:40px 0 80px;
-    font-size:13px; color:var(--ink-faint);
-  }
-  footer a{ color:var(--ink-dim); }
-
-  @media (min-width:640px){
-    .compare{ grid-template-columns: 1fr 1fr 1fr; }
-  }
+.smallprint{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint);
+  border-top:1px dashed var(--line); border-bottom:1px dashed var(--line);
+  padding:9px 0; margin:0 0 20px;
+}
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <div class="wrap">
-    <div class="eyebrow"><span class="mk filled"></span> epicme.bio — field notes</div>
-    <h1>One molecular mark,<br><em>three kinds of memory</em></h1>
-    <p class="lede">CpG methylation shows up wherever a cell needs to remember something — a synapse that fired, an antigen it fought off, or a body that once went through something hard. Same chemistry (a methyl group on a cytosine before a guanine), three completely different memory systems.</p>
-
-    <div class="strand">
-      <div class="strand-row">
-        <div class="strand-label">neuron · synapse</div>
-        <div class="strand-dots">
-          <span class="mk open" style="color:var(--cyan)"></span><span class="mk filled" style="color:var(--amber)"></span><span class="mk open" style="color:var(--cyan)"></span><span class="mk open" style="color:var(--cyan)"></span><span class="mk filled" style="color:var(--amber)"></span>
-        </div>
-      </div>
-      <div class="strand-row">
-        <div class="strand-label">T cell · antigen</div>
-        <div class="strand-dots">
-          <span class="mk filled" style="color:var(--amber)"></span><span class="mk filled" style="color:var(--amber)"></span><span class="mk open" style="color:var(--cyan)"></span><span class="mk filled" style="color:var(--amber)"></span><span class="mk open" style="color:var(--cyan)"></span>
-        </div>
-      </div>
-      <div class="strand-row">
-        <div class="strand-label">HPA axis · stress</div>
-        <div class="strand-dots">
-          <span class="mk open" style="color:var(--cyan)"></span><span class="mk open" style="color:var(--cyan)"></span><span class="mk filled" style="color:var(--amber)"></span><span class="mk open" style="color:var(--cyan)"></span><span class="mk filled" style="color:var(--amber)"></span>
-        </div>
-      </div>
+<!-- ===== NAV — identical to index.html ===== -->
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru">RU</button>
+      <button type="button" data-lang="en" class="active">EN</button>
     </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="day6.html">Day 6</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day6VSday35.html">Day 35 vs Day 6</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="cd55-tf-tcells.html" data-i18n="nav-tf">Механизмы</a>
+      <a href="methylation-and-memory.html" data-i18n="nav-memory" class="active" aria-current="page">Метилирование и память</a>
+      <a href="methylation-generational-trauma.html" data-i18n="nav-trauma">Метилирование и травма</a>
+    </nav>
   </div>
 </header>
 
-<section id="neuron">
-  <div class="wrap">
-    <div class="kicker">01 — cognitive memory</div>
-    <h2>How a synapse writes something down</h2>
-    <p>For a long time, DNA methylation was treated as a developmental lock — set early, then static for the life of the cell. That view doesn't survive contact with the adult hippocampus. <strong>Methylation there is fast and dynamic</strong>, added and removed within hours of a learning event.</p>
+<main>
 
-    <p>The workhorse is <span class="gene">DNMT3A</span>, the adult brain's dominant de novo methyltransferase. Two isoforms do different jobs: <span class="gene">DNMT3A2</span> behaves like an immediate-early gene, switching on right after neuronal activity and laying down new methyl marks at over a thousand promoters; <span class="gene">DNMT3A1</span> is constitutively present but gets degraded in an activity-dependent way, and silencing it disrupts memory recall. Knocking out <span class="gene">DNMT3A</span> (alone or with <span class="gene">DNMT1</span>) in forebrain neurons impairs contextual fear memory and spatial memory in mice.</p>
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="kicker" data-i18n="hero_eyebrow">Field notes · methylation series</div>
+      <h1><span data-i18n="hero_t1">One molecular mark,</span> <em data-i18n="hero_t2">three kinds of memory</em></h1>
+      <p class="lede" data-i18n="hero_lead">CpG methylation turns up wherever a cell needs to remember something — a synapse that fired, an antigen it fought off, a body that once went through something hard. The same chemistry, a methyl group on a cytosine before a guanine, running three completely different memory systems.</p>
 
-    <p>Methylation isn't a one-way ratchet, either. <span class="gene">TET</span> enzymes (TET1–3, with TET3 dominant in cortex and hippocampus) oxidize 5-methylcytosine back toward an unmethylated state. A well-studied loop: activity induces a transient double-strand break at the immediate-early gene <span class="gene">EGR1</span>'s promoter, which recruits TET1 to demethylate and activate hundreds of nearby genes — at the same time DNMT3A2 is methylating a different set. <strong>Learning is the two enzyme families pulling in opposite directions at different loci, simultaneously.</strong></p>
-
-    <div class="callout">
-      <span class="mk filled"></span><strong>Two time scales.</strong> Hippocampal methylation looks like a short-lived, working step in memory <em>consolidation</em> — a scratchpad. The more permanent copy is thought to shift to cortex over time, which is one molecular echo of systems-level memory consolidation (the same process behind why very old memories survive hippocampal damage but recent ones don't).
-    </div>
-
-    <h3>Where this touches your CD55 work</h3>
-    <p>Nanopore gives you native 5mC calls without bisulfite conversion — the exact readout this literature is built on, just usually via bisulfite pyrosequencing or WGBS. A "neurons remember with methylation too" panel is a natural way to widen epicme.bio beyond immune cells without leaving your actual technical wheelhouse.</p>
-  </div>
-</section>
-
-<section id="immune">
-  <div class="wrap">
-    <div class="kicker">02 — immune memory</div>
-    <h2>The memory your T cells already have</h2>
-    <p>This is the version closest to home. A naive CD8⁺ T cell that meets its antigen differentiates into an effector cell, and that transition is written into the genome as a broad wave of methylation change. If the antigen clears, a subset becomes a long-lived <strong>memory T cell</strong> that keeps a "multipotent" epigenetic signature layered under its effector-associated marks — poised to reactivate fast on re-exposure, without needing to relearn its program from scratch.</p>
-
-    <p>If the antigen doesn't clear — chronic infection, or a tumor — the same starting cell instead becomes <strong>exhausted</strong>. And exhaustion has its own, distinct, remarkably stable methylation landscape. The clearest single example is <span class="gene">PDCD1</span> (PD-1): its promoter demethylates during the effector phase in both fates, but only <em>memory</em> cells go back and remethylate it. Exhausted CD8⁺ T cells keep it demethylated and transcriptionally open — even after the virus is undetectable. The mark, not the antigen, becomes the record.</p>
-
-    <div class="compare">
-      <div class="compare-card">
-        <div class="tag">naive</div>
-        <h4>Unwritten</h4>
-        <p><span class="gene">PDCD1</span> methylated; effector loci closed.</p>
-        <div class="state-row"><span class="mk filled" style="color:var(--amber)"></span><span class="label">PD-1 locus: methylated</span></div>
+      <div class="strand">
+        <div class="strand-row">
+          <div class="strand-label" data-i18n="strand1">neuron · synapse</div>
+          <div class="strand-dots">
+            <span class="mk open un"></span><span class="mk filled me"></span><span class="mk open un"></span><span class="mk open un"></span><span class="mk filled me"></span>
+          </div>
+        </div>
+        <div class="strand-row">
+          <div class="strand-label" data-i18n="strand2">T cell · antigen</div>
+          <div class="strand-dots">
+            <span class="mk filled me"></span><span class="mk filled me"></span><span class="mk open un"></span><span class="mk filled me"></span><span class="mk open un"></span>
+          </div>
+        </div>
+        <div class="strand-row">
+          <div class="strand-label" data-i18n="strand3">HPA axis · stress</div>
+          <div class="strand-dots">
+            <span class="mk open un"></span><span class="mk open un"></span><span class="mk filled me"></span><span class="mk open un"></span><span class="mk filled me"></span>
+          </div>
+        </div>
+        <div class="strand-key">
+          <span><span class="mk filled me"></span><span data-i18n="key_me">filled, orange — methylated</span></span>
+          <span><span class="mk open un"></span><span data-i18n="key_un">open, blue — unmethylated</span></span>
+        </div>
       </div>
-      <div class="compare-card">
-        <div class="tag">memory</div>
-        <h4>Filed away</h4>
-        <p>Effector-phase demethylation is reversed; poised, not active.</p>
-        <div class="state-row"><span class="mk filled" style="color:var(--amber)"></span><span class="label">PD-1 locus: re-methylated</span></div>
-      </div>
-      <div class="compare-card">
-        <div class="tag">exhausted</div>
-        <h4>Stuck open</h4>
-        <p>Demethylation locks in; inhibitory program becomes constitutive.</p>
-        <div class="state-row"><span class="mk open" style="color:var(--cyan)"></span><span class="label">PD-1 locus: unmethylated</span></div>
+
+      <div class="disclaimer">
+        <strong data-i18n="hero_note_lbl">Scope:</strong>
+        <span data-i18n="hero_note">everything here happens inside one lifetime, in somatic cells. Whether any of it crosses into the next generation is a separate question, on a separate page.</span>
       </div>
     </div>
+  </section>
 
-    <p>This is why checkpoint blockade alone often only partially rescues exhausted T cells: you can block PD-1 signaling, but you haven't erased the methylation program underneath it. It's also why <span class="gene">DNMT3A</span> deletion or DNMT inhibitors (e.g. decitabine) in CAR-T cells is an active engineering strategy — remove the "de novo methylator" and cells stay closer to a memory-like, rejuvenatable state under chronic antigen exposure, rather than sliding into exhaustion.</p>
+  <!-- ===== 01 · COGNITIVE ===== -->
+  <section id="neuron">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s1_eyebrow">01 · Cognitive memory</div>
+      <h2 data-i18n="s1_title">How a synapse writes something down</h2>
+      <p class="lede" data-i18n="s1_lead">Methylation was long treated as a developmental lock — set early, then static for the life of the cell. That view does not survive contact with the adult hippocampus, where marks are added and removed within hours of a learning event.</p>
+      <p class="smallprint" data-i18n="quotenote">Quotes are short excerpts in the original English, one per source, each linked to the paper. Everything else is a paraphrase.</p>
 
-    <div class="callout">
-      <span class="mk open" style="color:var(--cyan)"></span>The same enzyme you're studying in CD55 knockdown — the CRISPRoff/ZFP-off methylation machinery — is mechanistically the same lever T cells pull on themselves during differentiation. Your donor T cells already carry this history in their methylome before you ever touch them.
+      <div class="studies">
+
+        <article class="card study" data-kind="brain">
+          <div class="tagrow">
+            <span class="tag blue">◆ Mouse</span>
+            <span class="tag blue">Dnmt1 · Dnmt3a</span>
+          </div>
+          <h3>Dnmt1 and Dnmt3a maintain DNA methylation and regulate synaptic function in adult forebrain neurons</h3>
+          <p class="study-meta">Feng, Zhou, Campbell, Le, Li, Sweatt, Silva &amp; Fan · Nature Neuroscience 2010</p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_feng">Deleting either methyltransferase alone in forebrain neurons left learning largely intact. Deleting both impaired spatial learning and memory and weakened the late phase of long-term potentiation at Schaffer collateral synapses — the first clear demonstration that the adult brain needs an active methylation machinery to work, not just to develop.</span></div>
+          <a class="paper-link" href="https://www.nature.com/articles/nn.2514" target="_blank" rel="noopener">nature.com · 10.1038/nn.2514 ↗</a>
+        </article>
+
+        <article class="card study" data-kind="brain">
+          <div class="tagrow">
+            <span class="tag blue">◆ Mouse</span>
+            <span class="tag blue">Dnmt3a2 · ageing</span>
+          </div>
+          <h3>Rescue of aging-associated decline in Dnmt3a2 expression restores cognitive abilities</h3>
+          <p class="study-meta">Oliveira, Hemstedt &amp; Bading · Nature Neuroscience 2012 · 15:1111–1113</p>
+          <p class="ref-quote">“Dnmt3a2 is an activity-regulated immediate early gene”<cite>— Oliveira et al., Nat Neurosci 2012</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_oliveira">Of the two DNMT3A isoforms, Dnmt3a2 switches on within minutes of neuronal activity, like Fos or Egr1. Hippocampal levels of it fall with age — and restoring them in old mice reversed learning and memory deficits, while lowering them in young mice impaired memory formation. The enzyme is not background maintenance; its abundance sets cognitive capacity.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_oliveira">A viral overexpression rescue in mice shows sufficiency in that system, not that declining Dnmt3a2 is the cause of human cognitive ageing.</span></div>
+          <a class="paper-link" href="https://www.nature.com/articles/nn.3151" target="_blank" rel="noopener">nature.com · 10.1038/nn.3151 ↗</a>
+        </article>
+
+        <article class="card study" data-kind="brain">
+          <div class="tagrow">
+            <span class="tag blue">◆ Mouse · neurons</span>
+            <span class="tag blue">Topo IIβ</span>
+          </div>
+          <h3>Activity-induced DNA breaks govern the expression of neuronal early-response genes</h3>
+          <p class="study-meta">Madabhushi, Gao, Pfenning et al. (Tsai lab) · Cell 2015 · 161(7):1592–1605</p>
+          <p class="ref-quote">“DSB formation is a physiological event that rapidly resolves topological constraints”<cite>— Madabhushi et al., Cell 2015</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_madabhushi">Stimulating neurons triggers deliberate double-strand breaks in the promoters of early-response genes including Fos, Npas4 and Egr1. Cutting those promoters on purpose switches the genes on with no external stimulus at all, and the breaks depend on topoisomerase IIβ. Writing an experience down involves physically unknotting the DNA at specific promoters.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_madabhushi">This paper is about topology, not methylation — the mechanism runs through Topo IIβ. It sits here because it is the same set of loci, on the same timescale, and because it shows how far the genome will go to make a transient signal durable. Treat the connection to demethylation as an open question, not a demonstrated pathway.</span></div>
+          <a class="paper-link" href="https://www.cell.com/fulltext/S0092-8674(15)00622-4" target="_blank" rel="noopener">cell.com · 10.1016/j.cell.2015.05.032 ↗</a>
+        </article>
+
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--blue); margin-top:20px">
+        <h3 data-i18n="two_t">Two enzyme families, two directions, at once</h3>
+        <p data-i18n="two_d">DNMT3A adds marks while the TET enzymes (TET1–3) oxidise 5-methylcytosine back toward an unmethylated state. Learning is not methylation going up; it is both families working simultaneously at different loci. That also means hippocampal methylation looks like a short-lived working step in consolidation — a scratchpad — while the more permanent copy is thought to shift to cortex over time. It is one molecular echo of why very old memories survive hippocampal damage and recent ones do not.</p>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="trauma">
-  <div class="wrap">
-    <div class="kicker">03 — biological embedding</div>
-    <h2>When an experience becomes a cell</h2>
-    <p>This is the part you asked about directly, and it's the most interesting <em>and</em> the most contested corner of the field. The core claim isn't that trauma "changes your DNA" — sequence is untouched — it's that psychologically significant experience can shift the methylation state of specific stress-regulatory genes, measurably, in blood.</p>
+  <!-- ===== 02 · IMMUNE ===== -->
+  <section id="immune">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s2_eyebrow">02 · Immune memory</div>
+      <h2 data-i18n="s2_title">The memory your T cells already have</h2>
+      <p class="lede" data-i18n="s2_lead">This is the version closest to my own work. A naive CD8⁺ T cell that meets its antigen rewrites large parts of its methylome on the way to becoming an effector — and what happens next depends entirely on whether the antigen ever goes away.</p>
 
-    <h3><span class="gene">FKBP5</span> — the stress thermostat</h3>
-    <p>FKBP5 is a co-chaperone that dampens glucocorticoid receptor signaling — it's part of the negative feedback loop that normally shuts a cortisol spike back down. Its intron 7 carries glucocorticoid response elements, and methylation there is allele-dependent: carriers of a particular risk variant (rs1360780 T allele) who also experienced childhood trauma show demethylation at this site, in both peripheral blood and hippocampal progenitor cells — and demethylation means <em>more</em> FKBP5, a weaker brake on the stress response, present decades after the original exposure. Encouragingly, this mark isn't fixed: intervention studies (trauma-focused psychotherapy, an 8-week mindfulness program) have found FKBP5 methylation shifting in step with symptom improvement.</p>
+      <div class="grid3">
+        <div class="card state" data-state="naive">
+          <span class="tag" style="background:var(--surface-2); color:var(--ink-faint)" data-i18n="st1_tag">naive</span>
+          <h3 data-i18n="st1_t">Unwritten</h3>
+          <p data-i18n="st1_d">PDCD1 methylated, effector loci closed. Nothing has happened yet.</p>
+          <div class="verdict"><span class="mk filled me"></span><span data-i18n="st1_v">PD-1 locus: methylated</span></div>
+        </div>
+        <div class="card state" data-state="memory">
+          <span class="tag orange" data-i18n="st2_tag">memory</span>
+          <h3 data-i18n="st2_t">Filed away</h3>
+          <p data-i18n="st2_d">The antigen cleared. Effector-phase demethylation gets reversed — the cell goes back and re-methylates. Poised, not active.</p>
+          <div class="verdict"><span class="mk filled me"></span><span data-i18n="st2_v">PD-1 locus: re-methylated</span></div>
+        </div>
+        <div class="card state" data-state="exhausted">
+          <span class="tag blue" data-i18n="st3_tag">exhausted</span>
+          <h3 data-i18n="st3_t">Stuck open</h3>
+          <p data-i18n="st3_d">The antigen never cleared. Demethylation locks in and the inhibitory programme becomes constitutive.</p>
+          <div class="verdict"><span class="mk open un"></span><span data-i18n="st3_v">PD-1 locus: unmethylated</span></div>
+        </div>
+      </div>
 
-    <h3><span class="gene">NR3C1</span> and the maternal-care lineage</h3>
-    <p>The foundational finding here (Meaney's rodent work, later echoed in human postmortem brain from suicide victims with a history of childhood abuse) is early caregiving quality leaving a lasting methylation signature at the glucocorticoid receptor promoter, tuning HPA-axis reactivity for the rest of the animal's — or person's — life.</p>
+      <div class="studies">
 
-    <h3>Reading the blood as a proxy for the brain</h3>
-    <p>The honest caveat researchers keep repeating: <strong>tissue matters</strong>. Whole-blood methylation is a proxy, not a direct readout of what's happening in cortex or hippocampus. But it isn't a wild guess either — for FKBP5 specifically, methylation at the key intron 7 regulatory region shows meaningfully high correlation between blood and brain tissue (prefrontal cortex, hippocampus), which is a big part of why it's treated as a plausible peripheral biomarker at all.</p>
+        <article class="card study" data-kind="immune">
+          <div class="tagrow">
+            <span class="tag orange">● Mouse + human</span>
+            <span class="tag orange">PDCD1 / Pdcd1</span>
+          </div>
+          <h3>Chronic virus infection enforces demethylation of the locus that encodes PD-1 in antigen-specific CD8⁺ T cells</h3>
+          <p class="study-meta">Youngblood, Oestreich, Ha et al. (Ahmed lab) · Immunity 2011 · 35:400–412 · acute vs chronic LCMV, plus human virus-specific cells</p>
+          <p class="ref-quote">“Exhausted virus-specific CD8+ T cells retain an unmethylated Pdcd1 regulatory region”<cite>— Youngblood et al., Immunity 2011</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_youngblood">Demethylation of the PD-1 locus tracks the strength and duration of T-cell receptor signalling during the effector phase, in both fates. Only cells that go on to become memory re-methylate it. Exhausted cells keep it open even after virus titres fall — the mark, not the antigen, becomes the record.</span></div>
+          <a class="paper-link" href="https://www.cell.com/immunity/fulltext/S1074-7613(11)00360-8" target="_blank" rel="noopener">cell.com · 10.1016/j.immuni.2011.06.015 ↗</a>
+        </article>
 
-    <div class="caution">
-      <div class="kicker">worth holding onto</div>
-      Most of this literature is correlational and cross-sectional. Effect sizes at individual CpGs are typically small; findings often don't replicate cleanly across cohorts; and causal direction is genuinely hard to pin down — does trauma cause the methylation change, does baseline methylation shape trauma vulnerability, or both, mediated by something else (genotype, prior stress, current symptoms)? "Biological embedding" is a real and active research program, not settled fact at the level of any single gene.
+        <article class="card study" data-kind="immune">
+          <div class="tagrow">
+            <span class="tag orange">● Mouse</span>
+            <span class="tag orange">DNMT3A cKO</span>
+            <span class="tag orange">WGBS</span>
+          </div>
+          <h3>De novo epigenetic programs inhibit PD-1 blockade-mediated T cell rejuvenation</h3>
+          <p class="study-meta">Ghoneim, Fan, Moustaki et al. (Youngblood lab) · Cell 2017 · 170(1):142–157</p>
+          <p class="ref-quote">“fully exhausted during prolonged antigen exposure remain refractory to ICB-mediated rejuvenation”<cite>— Ghoneim et al., Cell 2017</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_ghoneim">Whole-genome bisulfite sequencing across the effector-to-exhaustion transition found heritable de novo methylation programmes that limit how far a T cell can expand under PD-1 blockade. Deleting Dnmt3a, or pre-treating with the hypomethylating agent decitabine, let cells keep effector function through chronic stimulation. This is why checkpoint blockade alone often only partly rescues exhausted cells: you can block the signalling, but the methylation programme underneath is still there.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_ghoneim">Mouse infection and tumour models. Decitabine is genome-wide, not targeted — the observed benefit does not tell you which of the thousands of affected loci matter.</span></div>
+          <a class="paper-link" href="https://www.cell.com/cell/fulltext/S0092-8674(17)30648-7" target="_blank" rel="noopener">cell.com · 10.1016/j.cell.2017.06.007 ↗</a>
+        </article>
+
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--orange); margin-top:20px">
+        <h3 data-i18n="imm_t">The same lever I pull on CD55</h3>
+        <p data-i18n="imm_d">The machinery behind CRISPRoff and ZFPoff — a KRAB repressor fused to a DNMT domain — is mechanistically the same lever a T cell pulls on itself while differentiating. The donor T cells in my Day 6 and Day 35 experiments already carry this history in their methylome before I touch them. Editing CD55 is writing one deliberate mark into a genome that has been writing its own for years.</p>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="threads">
-  <div class="wrap">
-    <div class="kicker">connecting thread</div>
-    <h2>Same mark, same logic</h2>
-    <p>All three systems reuse the identical trick: <strong>make a transient state durable by writing it into methylation, at a specific locus, in a specific cell type.</strong> A synapse's momentary activity becomes a promoter's stable methyl mark. An antigen encounter becomes PD-1's locked-open (or locked-closed) state. A period of chronic stress becomes FKBP5's demethylated intron. None of these are the genome being rewritten — all are the same molecule, cytosine plus a methyl group at a CpG, functioning as the cell's way of keeping a diary.</p>
-    <p>The open question worth sitting with for epicme.bio: what makes a mark <em>reversible</em> (hippocampal consolidation, FKBP5 under therapy) versus <em>"locked"</em> (exhausted-T-cell PD-1)? That's not just a neat parallel — it's a real mechanistic question about chromatin stability that your own Nanopore methylation data on CD55 editing durability could actually speak to.</p>
-  </div>
-</section>
+  <!-- ===== 03 · STRESS ===== -->
+  <section id="stress">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s3_eyebrow">03 · Biological embedding</div>
+      <h2 data-i18n="s3_title">When an experience becomes a cell</h2>
+      <p class="lede" data-i18n="s3_lead">The most interesting and the most contested corner of the field. The claim is not that hardship changes your DNA — the sequence is untouched. It is that psychologically significant experience shifts the methylation state of specific stress-regulatory genes, measurably, decades later.</p>
+
+      <div class="studies">
+
+        <article class="card study" data-kind="stress">
+          <div class="tagrow">
+            <span class="tag stress">▲ Human</span>
+            <span class="tag stress">FKBP5 intron 7</span>
+            <span class="tag stress">rs1360780</span>
+          </div>
+          <h3>Allele-specific FKBP5 DNA demethylation mediates gene–childhood trauma interactions</h3>
+          <p class="study-meta">Klengel, Mehta, Anacker et al. (Binder lab) · Nature Neuroscience 2013 · 16(1):33–41</p>
+          <p class="ref-quote">“allele-specific, childhood trauma-dependent DNA demethylation”<cite>— Klengel et al., Nat Neurosci 2013</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_klengel">FKBP5 is a co-chaperone that damps down glucocorticoid receptor signalling — part of the brake that shuts a cortisol spike back off. Its intron 7 carries glucocorticoid response elements, and demethylation there was found only in carriers of a particular risk variant who had also experienced childhood trauma. Less methylation means more FKBP5, which means a weaker brake on the stress response, present decades after the exposure. Genotype and environment are not additive here; the mark appears where both are present.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_klengel">The mark is not necessarily permanent — intervention studies have reported FKBP5 methylation shifting alongside symptom improvement, which cuts both ways: it makes the mark look responsive rather than fixed, and it makes causal direction harder to pin down.</span></div>
+          <a class="paper-link" href="https://www.nature.com/articles/nn.3275" target="_blank" rel="noopener">nature.com · 10.1038/nn.3275 ↗</a>
+        </article>
+
+        <article class="card study" data-kind="stress">
+          <div class="tagrow">
+            <span class="tag stress">▲ Human · postmortem</span>
+            <span class="tag stress">NR3C1</span>
+            <span class="tag stress">NGFI-A site</span>
+          </div>
+          <h3>Epigenetic regulation of the glucocorticoid receptor in human brain associates with childhood abuse</h3>
+          <p class="study-meta">McGowan, Sasaki, D'Alessio, Dymov, Labonté, Szyf, Turecki &amp; Meaney · Nature Neuroscience 2009 · 12(3):342–348 · postmortem hippocampus</p>
+          <p class="ref-quote">“increased cytosine methylation of an NR3C1 promoter”<cite>— McGowan et al., Nat Neurosci 2009</cite></p>
+          <div class="row"><span class="lbl" data-i18n="lbl_found">Found</span><span class="txt" data-i18n="f_mcgowan">The human counterpart of Meaney's rat maternal-care work. Hippocampus from suicide victims with a history of childhood abuse showed lower glucocorticoid receptor mRNA and more methylation at the neuron-specific NR3C1 promoter than hippocampus from suicide victims without that history, or from controls. Constructs methylated to mimic that state bound less NGFI-A and drove less transcription — the same transcription factor site as in the rat.</span></div>
+          <div class="row caveat"><span class="lbl" data-i18n="lbl_caveat">Caveat</span><span class="txt" data-i18n="c_mcgowan">Postmortem, cross-sectional, small, and childhood abuse is confounded with everything else that accompanies it. What the paper establishes cleanly is that the rat finding has a human analogue at the same site — not that abuse caused the methylation.</span></div>
+          <a class="paper-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2944040/" target="_blank" rel="noopener">PMC2944040 · 10.1038/nn.2270 ↗</a>
+        </article>
+
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--orange); margin-top:20px">
+        <h3 data-i18n="blood_t">Reading blood as a proxy for brain</h3>
+        <p data-i18n="blood_d">The caveat researchers keep repeating: tissue matters. Whole-blood methylation is a proxy, not a readout of cortex or hippocampus, and for most loci the correspondence between the two is weak. FKBP5 is treated as one of the more defensible cases, which is part of why it keeps appearing in this literature — but a blood measurement is a hypothesis about the brain, not a measurement of it.</p>
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--yellow); margin-top:16px">
+        <h3 data-i18n="hold_t">Worth holding onto</h3>
+        <p data-i18n="hold_d">Most of this literature is correlational and cross-sectional. Effect sizes at individual CpGs are typically small, findings often fail to replicate cleanly across cohorts, and causal direction is genuinely open: does adversity cause the methylation change, does baseline methylation shape vulnerability to adversity, or are both downstream of something else — genotype, earlier stress, current symptoms? Biological embedding is an active research programme, not settled fact at the level of any single gene.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 04 · THE COMMON LOGIC ===== -->
+  <section id="logic">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s4_eyebrow">04 · The common logic</div>
+      <h2 data-i18n="s4_title">Same mark, same trick, three systems</h2>
+      <p class="lede" data-i18n="s4_lead">All three reuse one move: make a transient state durable by writing it into methylation, at a specific locus, in a specific cell type. What differs is how long the writing lasts.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="th_system">System</th>
+              <th data-i18n="th_trigger">What gets written down</th>
+              <th data-i18n="th_locus">Where</th>
+              <th data-i18n="th_dur">Durability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-i18n="r1a">Hippocampal neuron</td>
+              <td data-i18n="r1b">A moment of synaptic activity</td>
+              <td class="data">Fos · Npas4 · Egr1 · IEG promoters</td>
+              <td data-i18n="r1d">Hours to days — a scratchpad, rewritten constantly</td>
+            </tr>
+            <tr>
+              <td data-i18n="r2a">Memory T cell</td>
+              <td data-i18n="r2b">An antigen that was cleared</td>
+              <td class="data">PDCD1 and effector loci</td>
+              <td data-i18n="r2d">Years — deliberately reversed, then held poised</td>
+            </tr>
+            <tr>
+              <td data-i18n="r3a">Exhausted T cell</td>
+              <td data-i18n="r3b">An antigen that never cleared</td>
+              <td class="data">PDCD1 regulatory region</td>
+              <td data-i18n="r3d">Locked — survives antigen clearance and PD-1 blockade</td>
+            </tr>
+            <tr>
+              <td data-i18n="r4a">HPA axis</td>
+              <td data-i18n="r4b">A period of adversity, often in childhood</td>
+              <td class="data">FKBP5 intron 7 · NR3C1 exon 1F</td>
+              <td data-i18n="r4d">Decades — but apparently still movable</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--blue); margin-top:22px">
+        <h3 data-i18n="open_t">The open question worth sitting with</h3>
+        <p data-i18n="open_d">What decides whether a mark stays reversible or locks? Hippocampal consolidation is reversible by design. FKBP5 seems to move under therapy. Exhausted-cell PD-1 does not move even when the antigen is gone and the checkpoint is blocked. That is not a neat parallel — it is a mechanistic question about chromatin stability, and it is one my own data speaks to directly: CRISPRoff writes a mark at CD55 on purpose, and nanopore then measures, molecule by molecule, how long it survives. Day 6 versus Day 35 is a durability experiment.</p>
+      </div>
+
+      <a class="sibling" href="methylation-generational-trauma.html">
+        <span class="eyebrow-sm" data-i18n="sib_eyebrow">Related page</span>
+        <h3 data-i18n="sib_t">Does any of this reach the next generation? →</h3>
+        <p data-i18n="sib_d">Everything above happens in somatic cells within one lifetime. FKBP5 and NR3C1 appear on both pages, but the question there is different: whether a mark survives the germline and shows up in a child who was never exposed. Short answer so far: for methylation, not demonstrated.</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== 05 · REFERENCES ===== -->
+  <section id="references">
+    <div class="wrap">
+      <div class="kicker" data-i18n="s5_eyebrow">05 · Sources</div>
+      <h2 data-i18n="s5_title">Papers referenced on this page</h2>
+      <ol class="ref-list">
+        <li class="ref-item" id="ref-1"><span class="ref-num">1</span><div class="ref-body">
+          <h4>Dnmt1 and Dnmt3a maintain DNA methylation and regulate synaptic function in adult forebrain neurons</h4>
+          <div class="ref-meta">Feng J, Zhou Y, Campbell SL, Le T, Li E, Sweatt JD, Silva AJ, Fan G · Nature Neuroscience 2010;13(4):423–430 · <a href="https://www.nature.com/articles/nn.2514" target="_blank" rel="noopener">10.1038/nn.2514</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-2"><span class="ref-num">2</span><div class="ref-body">
+          <h4>Rescue of aging-associated decline in Dnmt3a2 expression restores cognitive abilities</h4>
+          <div class="ref-meta">Oliveira AMM, Hemstedt TJ, Bading H · Nature Neuroscience 2012;15(8):1111–1113 · <a href="https://www.nature.com/articles/nn.3151" target="_blank" rel="noopener">10.1038/nn.3151</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-3"><span class="ref-num">3</span><div class="ref-body">
+          <h4>Dnmt3a2: a hub for enhancing cognitive functions</h4>
+          <div class="ref-meta">Oliveira AMM, Hemstedt TJ, Freitag HE, Bading H · Molecular Psychiatry 2016;21(8):1130–1136 · <a href="https://www.nature.com/articles/mp2015175" target="_blank" rel="noopener">10.1038/mp.2015.175</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-4"><span class="ref-num">4</span><div class="ref-body">
+          <h4>Activity-induced DNA breaks govern the expression of neuronal early-response genes</h4>
+          <div class="ref-meta">Madabhushi R, Gao F, Pfenning AR, et al., Kellis M, Tsai LH · Cell 2015;161(7):1592–1605 · <a href="https://www.cell.com/fulltext/S0092-8674(15)00622-4" target="_blank" rel="noopener">10.1016/j.cell.2015.05.032</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-5"><span class="ref-num">5</span><div class="ref-body">
+          <h4>Chronic virus infection enforces demethylation of the locus that encodes PD-1 in antigen-specific CD8⁺ T cells</h4>
+          <div class="ref-meta">Youngblood B, Oestreich KJ, Ha SJ, et al., Boss JM, Ahmed R · Immunity 2011;35(3):400–412 · <a href="https://www.cell.com/immunity/fulltext/S1074-7613(11)00360-8" target="_blank" rel="noopener">10.1016/j.immuni.2011.06.015</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-6"><span class="ref-num">6</span><div class="ref-body">
+          <h4>De novo epigenetic programs inhibit PD-1 blockade-mediated T cell rejuvenation</h4>
+          <div class="ref-meta">Ghoneim HE, Fan Y, Moustaki A, et al., Thomas PG, Youngblood B · Cell 2017;170(1):142–157.e19 · <a href="https://www.cell.com/cell/fulltext/S0092-8674(17)30648-7" target="_blank" rel="noopener">10.1016/j.cell.2017.06.007</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-7"><span class="ref-num">7</span><div class="ref-body">
+          <h4>Allele-specific FKBP5 DNA demethylation mediates gene–childhood trauma interactions</h4>
+          <div class="ref-meta">Klengel T, Mehta D, Anacker C, et al., Rein T, Binder EB · Nature Neuroscience 2013;16(1):33–41 · <a href="https://www.nature.com/articles/nn.3275" target="_blank" rel="noopener">10.1038/nn.3275</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-8"><span class="ref-num">8</span><div class="ref-body">
+          <h4>Epigenetic regulation of the glucocorticoid receptor in human brain associates with childhood abuse</h4>
+          <div class="ref-meta">McGowan PO, Sasaki A, D'Alessio AC, Dymov S, Labonté B, Szyf M, Turecki G, Meaney MJ · Nature Neuroscience 2009;12(3):342–348 · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2944040/" target="_blank" rel="noopener">PMC2944040 (open access)</a></div>
+        </div></li>
+        <li class="ref-item" id="ref-9"><span class="ref-num">9</span><div class="ref-body">
+          <h4>Synaptic control of DNA methylation involves activity-dependent degradation of DNMT3A1 in the nucleus</h4>
+          <div class="ref-meta">Bayraktar G, Yuanxiang P, Confettura AD, et al., Kreutz MR · Neuropsychopharmacology 2020;45(12):2120–2130 · <a href="https://www.nature.com/articles/s41386-020-0780-2" target="_blank" rel="noopener">10.1038/s41386-020-0780-2</a></div>
+        </div></li>
+      </ol>
+      <p class="smallprint" style="margin-top:26px" data-i18n="refs_note">Last checked August 2026. Open-access links are marked; the rest lead to the publisher's page.</p>
+    </div>
+  </section>
+
+</main>
 
 <footer>
   <div class="wrap">
-    <ul class="refs">
-      <li><span class="mk filled"></span>Zocher et al., Miller &amp; Sweatt (Dnmt3a/Tet in hippocampal memory) — Neuropsychopharmacology 2024; PMC5709999; PMC4903882</li>
-      <li><span class="mk filled"></span>Youngblood, Ahmed et al. (PD-1 promoter methylation in memory vs. exhausted CD8⁺ T cells) — PMC5021389; Trends in Immunology 2019</li>
-      <li><span class="mk filled"></span>Klengel et al. (FKBP5 × childhood trauma), Yusupov et al. 2024 (blood–brain FKBP5-DNAm correlation) — Frontiers in Genetics 2026</li>
-      <li><span class="mk filled"></span>McGowan et al. (NR3C1 methylation, early-life adversity, human postmortem hippocampus)</li>
-    </ul>
-    <p style="margin-top:24px;">epicme.bio — draft page, pending integration · colorblind-safe by design: every state pairs an open/filled mark with a text label, never color alone.</p>
+    <span data-i18n="footer_note">epicme.bio · write → read → learn. Colourblind-safe by design: every state pairs an open or filled mark with a word, never colour alone.</span>
   </div>
 </footer>
+
+<script>
+(function () {
+  var I18N = {
+    en: {
+      "brand-sub": "epigenome · cytosine · methylation",
+      "nav-home": "Home", "nav-about": "About", "nav-k562": "K562",
+      "nav-chipseq": "ChIP-seq", "nav-tf": "Mechanisms",
+      "nav-memory": "Methylation & memory", "nav-trauma": "Methylation & trauma",
+
+      hero_eyebrow: "Field notes · methylation series",
+      hero_t1: "One molecular mark,", hero_t2: "three kinds of memory",
+      hero_lead: "CpG methylation turns up wherever a cell needs to remember something — a synapse that fired, an antigen it fought off, a body that once went through something hard. The same chemistry, a methyl group on a cytosine before a guanine, running three completely different memory systems.",
+      strand1: "neuron · synapse", strand2: "T cell · antigen", strand3: "HPA axis · stress",
+      key_me: "filled, orange — methylated", key_un: "open, blue — unmethylated",
+      hero_note_lbl: "Scope:",
+      hero_note: "everything here happens inside one lifetime, in somatic cells. Whether any of it crosses into the next generation is a separate question, on a separate page.",
+
+      s1_eyebrow: "01 · Cognitive memory",
+      s1_title: "How a synapse writes something down",
+      s1_lead: "Methylation was long treated as a developmental lock — set early, then static for the life of the cell. That view does not survive contact with the adult hippocampus, where marks are added and removed within hours of a learning event.",
+      quotenote: "Quotes are short excerpts in the original English, one per source, each linked to the paper. Everything else is a paraphrase.",
+      lbl_found: "Found", lbl_caveat: "Caveat",
+
+      f_feng: "Deleting either methyltransferase alone in forebrain neurons left learning largely intact. Deleting both impaired spatial learning and memory and weakened the late phase of long-term potentiation at Schaffer collateral synapses — the first clear demonstration that the adult brain needs an active methylation machinery to work, not just to develop.",
+      f_oliveira: "Of the two DNMT3A isoforms, Dnmt3a2 switches on within minutes of neuronal activity, like Fos or Egr1. Hippocampal levels of it fall with age — and restoring them in old mice reversed learning and memory deficits, while lowering them in young mice impaired memory formation. The enzyme is not background maintenance; its abundance sets cognitive capacity.",
+      c_oliveira: "A viral overexpression rescue in mice shows sufficiency in that system, not that declining Dnmt3a2 is the cause of human cognitive ageing.",
+      f_madabhushi: "Stimulating neurons triggers deliberate double-strand breaks in the promoters of early-response genes including Fos, Npas4 and Egr1. Cutting those promoters on purpose switches the genes on with no external stimulus at all, and the breaks depend on topoisomerase IIβ. Writing an experience down involves physically unknotting the DNA at specific promoters.",
+      c_madabhushi: "This paper is about topology, not methylation — the mechanism runs through Topo IIβ. It sits here because it is the same set of loci, on the same timescale, and because it shows how far the genome will go to make a transient signal durable. Treat the connection to demethylation as an open question, not a demonstrated pathway.",
+      two_t: "Two enzyme families, two directions, at once",
+      two_d: "DNMT3A adds marks while the TET enzymes (TET1–3) oxidise 5-methylcytosine back toward an unmethylated state. Learning is not methylation going up; it is both families working simultaneously at different loci. That also means hippocampal methylation looks like a short-lived working step in consolidation — a scratchpad — while the more permanent copy is thought to shift to cortex over time. It is one molecular echo of why very old memories survive hippocampal damage and recent ones do not.",
+
+      s2_eyebrow: "02 · Immune memory",
+      s2_title: "The memory your T cells already have",
+      s2_lead: "This is the version closest to my own work. A naive CD8⁺ T cell that meets its antigen rewrites large parts of its methylome on the way to becoming an effector — and what happens next depends entirely on whether the antigen ever goes away.",
+      st1_tag: "naive", st1_t: "Unwritten", st1_d: "PDCD1 methylated, effector loci closed. Nothing has happened yet.", st1_v: "PD-1 locus: methylated",
+      st2_tag: "memory", st2_t: "Filed away", st2_d: "The antigen cleared. Effector-phase demethylation gets reversed — the cell goes back and re-methylates. Poised, not active.", st2_v: "PD-1 locus: re-methylated",
+      st3_tag: "exhausted", st3_t: "Stuck open", st3_d: "The antigen never cleared. Demethylation locks in and the inhibitory programme becomes constitutive.", st3_v: "PD-1 locus: unmethylated",
+      f_youngblood: "Demethylation of the PD-1 locus tracks the strength and duration of T-cell receptor signalling during the effector phase, in both fates. Only cells that go on to become memory re-methylate it. Exhausted cells keep it open even after virus titres fall — the mark, not the antigen, becomes the record.",
+      f_ghoneim: "Whole-genome bisulfite sequencing across the effector-to-exhaustion transition found heritable de novo methylation programmes that limit how far a T cell can expand under PD-1 blockade. Deleting Dnmt3a, or pre-treating with the hypomethylating agent decitabine, let cells keep effector function through chronic stimulation. This is why checkpoint blockade alone often only partly rescues exhausted cells: you can block the signalling, but the methylation programme underneath is still there.",
+      c_ghoneim: "Mouse infection and tumour models. Decitabine is genome-wide, not targeted — the observed benefit does not tell you which of the thousands of affected loci matter.",
+      imm_t: "The same lever I pull on CD55",
+      imm_d: "The machinery behind CRISPRoff and ZFPoff — a KRAB repressor fused to a DNMT domain — is mechanistically the same lever a T cell pulls on itself while differentiating. The donor T cells in my Day 6 and Day 35 experiments already carry this history in their methylome before I touch them. Editing CD55 is writing one deliberate mark into a genome that has been writing its own for years.",
+
+      s3_eyebrow: "03 · Biological embedding",
+      s3_title: "When an experience becomes a cell",
+      s3_lead: "The most interesting and the most contested corner of the field. The claim is not that hardship changes your DNA — the sequence is untouched. It is that psychologically significant experience shifts the methylation state of specific stress-regulatory genes, measurably, decades later.",
+      f_klengel: "FKBP5 is a co-chaperone that damps down glucocorticoid receptor signalling — part of the brake that shuts a cortisol spike back off. Its intron 7 carries glucocorticoid response elements, and demethylation there was found only in carriers of a particular risk variant who had also experienced childhood trauma. Less methylation means more FKBP5, which means a weaker brake on the stress response, present decades after the exposure. Genotype and environment are not additive here; the mark appears where both are present.",
+      c_klengel: "The mark is not necessarily permanent — intervention studies have reported FKBP5 methylation shifting alongside symptom improvement, which cuts both ways: it makes the mark look responsive rather than fixed, and it makes causal direction harder to pin down.",
+      f_mcgowan: "The human counterpart of Meaney's rat maternal-care work. Hippocampus from suicide victims with a history of childhood abuse showed lower glucocorticoid receptor mRNA and more methylation at the neuron-specific NR3C1 promoter than hippocampus from suicide victims without that history, or from controls. Constructs methylated to mimic that state bound less NGFI-A and drove less transcription — the same transcription factor site as in the rat.",
+      c_mcgowan: "Postmortem, cross-sectional, small, and childhood abuse is confounded with everything else that accompanies it. What the paper establishes cleanly is that the rat finding has a human analogue at the same site — not that abuse caused the methylation.",
+      blood_t: "Reading blood as a proxy for brain",
+      blood_d: "The caveat researchers keep repeating: tissue matters. Whole-blood methylation is a proxy, not a readout of cortex or hippocampus, and for most loci the correspondence between the two is weak. FKBP5 is treated as one of the more defensible cases, which is part of why it keeps appearing in this literature — but a blood measurement is a hypothesis about the brain, not a measurement of it.",
+      hold_t: "Worth holding onto",
+      hold_d: "Most of this literature is correlational and cross-sectional. Effect sizes at individual CpGs are typically small, findings often fail to replicate cleanly across cohorts, and causal direction is genuinely open: does adversity cause the methylation change, does baseline methylation shape vulnerability to adversity, or are both downstream of something else — genotype, earlier stress, current symptoms? Biological embedding is an active research programme, not settled fact at the level of any single gene.",
+
+      s4_eyebrow: "04 · The common logic",
+      s4_title: "Same mark, same trick, three systems",
+      s4_lead: "All three reuse one move: make a transient state durable by writing it into methylation, at a specific locus, in a specific cell type. What differs is how long the writing lasts.",
+      th_system: "System", th_trigger: "What gets written down", th_locus: "Where", th_dur: "Durability",
+      r1a: "Hippocampal neuron", r1b: "A moment of synaptic activity", r1d: "Hours to days — a scratchpad, rewritten constantly",
+      r2a: "Memory T cell", r2b: "An antigen that was cleared", r2d: "Years — deliberately reversed, then held poised",
+      r3a: "Exhausted T cell", r3b: "An antigen that never cleared", r3d: "Locked — survives antigen clearance and PD-1 blockade",
+      r4a: "HPA axis", r4b: "A period of adversity, often in childhood", r4d: "Decades — but apparently still movable",
+      open_t: "The open question worth sitting with",
+      open_d: "What decides whether a mark stays reversible or locks? Hippocampal consolidation is reversible by design. FKBP5 seems to move under therapy. Exhausted-cell PD-1 does not move even when the antigen is gone and the checkpoint is blocked. That is not a neat parallel — it is a mechanistic question about chromatin stability, and it is one my own data speaks to directly: CRISPRoff writes a mark at CD55 on purpose, and nanopore then measures, molecule by molecule, how long it survives. Day 6 versus Day 35 is a durability experiment.",
+      sib_eyebrow: "Related page",
+      sib_t: "Does any of this reach the next generation? →",
+      sib_d: "Everything above happens in somatic cells within one lifetime. FKBP5 and NR3C1 appear on both pages, but the question there is different: whether a mark survives the germline and shows up in a child who was never exposed. Short answer so far: for methylation, not demonstrated.",
+
+      s5_eyebrow: "05 · Sources",
+      s5_title: "Papers referenced on this page",
+      refs_note: "Last checked August 2026. Open-access links are marked; the rest lead to the publisher's page.",
+      footer_note: "epicme.bio · write → read → learn. Colourblind-safe by design: every state pairs an open or filled mark with a word, never colour alone."
+    },
+    ru: {
+      "brand-sub": "эпигеном · цитозин · метилирование",
+      "nav-home": "Главная", "nav-about": "О проекте", "nav-k562": "K562",
+      "nav-chipseq": "ChIP-seq", "nav-tf": "Механизмы",
+      "nav-memory": "Метилирование и память", "nav-trauma": "Метилирование и травма",
+
+      hero_eyebrow: "Полевые заметки · серия о метилировании",
+      hero_t1: "Одна молекулярная метка —", hero_t2: "три вида памяти",
+      hero_lead: "CpG-метилирование появляется везде, где клетке нужно что-то запомнить: сработавший синапс, антиген, с которым она справилась, тело, однажды прошедшее через что-то тяжёлое. Одна и та же химия — метильная группа на цитозине перед гуанином — управляет тремя совершенно разными системами памяти.",
+      strand1: "нейрон · синапс", strand2: "T-клетка · антиген", strand3: "HPA-ось · стресс",
+      key_me: "закрашенный, оранжевый — метилирован", key_un: "полый, синий — не метилирован",
+      hero_note_lbl: "Рамки:",
+      hero_note: "всё, что здесь описано, происходит в пределах одной жизни, в соматических клетках. Переходит ли что-то из этого в следующее поколение — отдельный вопрос и отдельная страница.",
+
+      s1_eyebrow: "01 · Когнитивная память",
+      s1_title: "Как синапс что-то записывает",
+      s1_lead: "Метилирование долго считали замком, который защёлкивается в развитии и дальше не меняется всю жизнь клетки. Этот взгляд не выдерживает встречи со взрослым гиппокампом, где метки ставятся и снимаются в течение часов после обучения.",
+      quotenote: "Цитаты даны короткими фрагментами на языке оригинала (английском), по одной на источник, со ссылкой на статью. Всё остальное — пересказ.",
+      lbl_found: "Найдено", lbl_caveat: "Оговорка",
+
+      f_feng: "Удаление любой из метилтрансфераз по отдельности в нейронах переднего мозга почти не мешало обучению. Удаление обеих нарушало пространственное обучение и память и ослабляло позднюю фазу долговременной потенциации на коллатералях Шаффера — первое ясное доказательство, что взрослому мозгу активная машинерия метилирования нужна для работы, а не только для развития.",
+      f_oliveira: "Из двух изоформ DNMT3A именно Dnmt3a2 включается за минуты после нейронной активности, как Fos или Egr1. С возрастом её уровень в гиппокампе падает — и восстановление уровня у старых мышей обращало дефициты обучения и памяти, а снижение у молодых мешало формировать память. Этот фермент — не фоновое обслуживание: его количество задаёт когнитивные возможности.",
+      c_oliveira: "Спасение через вирусную сверхэкспрессию у мышей показывает достаточность в этой системе, а не то, что падение Dnmt3a2 — причина когнитивного старения у людей.",
+      f_madabhushi: "Стимуляция нейронов запускает намеренные двунитевые разрывы в промоторах генов раннего ответа, включая Fos, Npas4 и Egr1. Если разрезать эти промоторы специально, гены включаются вообще без внешнего стимула, а сами разрывы зависят от топоизомеразы IIβ. Записать опыт — значит в том числе физически распутать ДНК в конкретных промоторах.",
+      c_madabhushi: "Эта работа про топологию, а не про метилирование: механизм идёт через Topo IIβ. Она здесь потому, что это те же локусы и тот же временной масштаб, и потому что показывает, на что геном готов пойти ради превращения кратковременного сигнала в устойчивый. Связь с деметилированием — открытый вопрос, а не показанный путь.",
+      two_t: "Два семейства ферментов, два направления, одновременно",
+      two_d: "DNMT3A ставит метки, а ферменты TET (TET1–3) окисляют 5-метилцитозин обратно к неметилированному состоянию. Обучение — это не рост метилирования, а работа обоих семейств одновременно в разных локусах. Отсюда же следует, что метилирование в гиппокампе выглядит как короткоживущий рабочий шаг консолидации — черновик, — а более постоянная копия, как считается, со временем смещается в кору. Это молекулярное эхо того, почему очень старые воспоминания переживают повреждение гиппокампа, а недавние нет.",
+
+      s2_eyebrow: "02 · Иммунная память",
+      s2_title: "Память, которая уже есть у твоих T-клеток",
+      s2_lead: "Эта версия ближе всего к моей собственной работе. Наивная CD8⁺ T-клетка, встретившая свой антиген, переписывает большие куски метилома по пути в эффекторное состояние — а что будет дальше, целиком зависит от того, уйдёт ли антиген.",
+      st1_tag: "наивная", st1_t: "Ещё не записано", st1_d: "PDCD1 метилирован, эффекторные локусы закрыты. Пока ничего не произошло.", st1_v: "локус PD-1: метилирован",
+      st2_tag: "память", st2_t: "Убрано в архив", st2_d: "Антиген ушёл. Деметилирование эффекторной фазы отматывается назад — клетка возвращается и заново метилирует. Наготове, но не активна.", st2_v: "локус PD-1: реметилирован",
+      st3_tag: "истощение", st3_t: "Заклинило открытым", st3_d: "Антиген так и не ушёл. Деметилирование фиксируется, и ингибирующая программа становится постоянной.", st3_v: "локус PD-1: не метилирован",
+      f_youngblood: "Деметилирование локуса PD-1 следует за силой и длительностью сигнала T-клеточного рецептора в эффекторной фазе — и в той, и в другой судьбе. Реметилируют его только те клетки, что становятся памятью. Истощённые держат его открытым даже после падения титра вируса: записью становится метка, а не антиген.",
+      f_ghoneim: "Полногеномное бисульфитное секвенирование на переходе от эффектора к истощению выявило наследуемые программы de novo метилирования, которые ограничивают, насколько T-клетка может размножиться под блокадой PD-1. Удаление Dnmt3a или предобработка гипометилирующим агентом децитабином позволяли клеткам сохранять эффекторную функцию при хронической стимуляции. Вот почему одна блокада чекпойнта часто спасает истощённые клетки лишь частично: сигнал заблокировать можно, а программа метилирования под ним остаётся.",
+      c_ghoneim: "Мышиные модели инфекции и опухоли. Децитабин действует на весь геном, а не адресно, так что польза не говорит, какие из тысяч затронутых локусов важны.",
+      imm_t: "Тот же рычаг, что я дёргаю на CD55",
+      imm_d: "Машинерия CRISPRoff и ZFPoff — репрессор KRAB, слитый с доменом DNMT — механистически тот же рычаг, который T-клетка дёргает сама на себе при дифференцировке. Донорские T-клетки в моих экспериментах Day 6 и Day 35 уже несут эту историю в метиломе до того, как я к ним прикасаюсь. Редактировать CD55 — значит вписать одну намеренную метку в геном, который годами писал свои.",
+
+      s3_eyebrow: "03 · Биологическое встраивание",
+      s3_title: "Когда опыт становится клеткой",
+      s3_lead: "Самый интересный и самый спорный угол области. Утверждение не в том, что тяжёлый опыт меняет ДНК — последовательность не тронута. Оно в том, что психологически значимый опыт сдвигает состояние метилирования конкретных генов регуляции стресса, измеримо, спустя десятилетия.",
+      f_klengel: "FKBP5 — ко-шаперон, приглушающий сигнал глюкокортикоидного рецептора, часть тормоза, который гасит выброс кортизола. В его интроне 7 есть глюкокортикоид-ответные элементы, и деметилирование там нашли только у носителей определённого рискового варианта, которые вдобавок пережили детскую травму. Меньше метилирования — больше FKBP5 — слабее тормоз стрессового ответа, и так спустя десятилетия после события. Генотип и среда здесь не складываются: метка появляется там, где есть и то и другое.",
+      c_klengel: "Метка не обязательно постоянна — в исследованиях вмешательств метилирование FKBP5 сдвигалось вместе с улучшением симптомов. Это работает в обе стороны: метка выглядит отзывчивой, а не зафиксированной, но и причинное направление становится труднее установить.",
+      f_mcgowan: "Человеческий аналог крысиных работ Мини про материнскую заботу. В гиппокампе людей, покончивших с собой и имевших в анамнезе насилие в детстве, было меньше мРНК глюкокортикоидного рецептора и больше метилирования нейрон-специфичного промотора NR3C1, чем у тех, у кого такого анамнеза не было, и чем в контроле. Конструкции, метилированные так, чтобы имитировать это состояние, хуже связывали NGFI-A и слабее запускали транскрипцию — тот же сайт транскрипционного фактора, что и у крыс.",
+      c_mcgowan: "Посмертно, поперечный дизайн, маленькая выборка, и насилие в детстве спутано со всем, что его сопровождает. Что работа устанавливает чисто — так это что у крысиной находки есть человеческий аналог в том же сайте, а не то, что насилие вызвало метилирование.",
+      blood_t: "Читать кровь как приближение к мозгу",
+      blood_d: "Оговорка, которую исследователи повторяют снова и снова: ткань имеет значение. Метилирование цельной крови — это приближение, а не считывание коры или гиппокампа, и для большинства локусов соответствие между ними слабое. FKBP5 считается одним из более защитимых случаев, отчасти поэтому он так часто и всплывает в этой литературе, — но измерение в крови остаётся гипотезой о мозге, а не измерением мозга.",
+      hold_t: "О чём стоит помнить",
+      hold_d: "Почти вся эта литература корреляционная и поперечная. Размеры эффекта на отдельных CpG обычно маленькие, находки часто плохо воспроизводятся между когортами, а причинное направление действительно открыто: невзгоды вызывают изменение метилирования, исходное метилирование задаёт уязвимость к невзгодам, или и то и другое следствие чего-то третьего — генотипа, более раннего стресса, текущих симптомов? Биологическое встраивание — активная исследовательская программа, а не установленный факт на уровне какого-то одного гена.",
+
+      s4_eyebrow: "04 · Общая логика",
+      s4_title: "Одна метка, один приём, три системы",
+      s4_lead: "Все три переиспользуют один ход: сделать временное состояние устойчивым, записав его в метилирование, в конкретном локусе, в конкретном типе клеток. Различается только то, насколько долго держится запись.",
+      th_system: "Система", th_trigger: "Что записывается", th_locus: "Где", th_dur: "Стойкость",
+      r1a: "Нейрон гиппокампа", r1b: "Момент синаптической активности", r1d: "Часы–дни: черновик, который постоянно переписывается",
+      r2a: "T-клетка памяти", r2b: "Антиген, с которым справились", r2d: "Годы: намеренно отматывается назад и держится наготове",
+      r3a: "Истощённая T-клетка", r3b: "Антиген, который так и не ушёл", r3d: "Заперто: переживает и уход антигена, и блокаду PD-1",
+      r4a: "HPA-ось", r4b: "Период невзгод, часто в детстве", r4d: "Десятилетия — но, судя по всему, всё ещё подвижно",
+      open_t: "Открытый вопрос, на котором стоит задержаться",
+      open_d: "Что решает, останется метка обратимой или защёлкнется? Консолидация в гиппокампе обратима по устройству. FKBP5, похоже, сдвигается под терапией. А PD-1 в истощённой клетке не сдвигается, даже когда антиген ушёл и чекпойнт заблокирован. Это не изящная параллель, а механистический вопрос про стабильность хроматина — и мои собственные данные говорят по нему напрямую: CRISPRoff ставит метку на CD55 намеренно, а нанопор потом измеряет молекула за молекулой, сколько она держится. Day 6 против Day 35 — это эксперимент про стойкость.",
+      sib_eyebrow: "Смежная страница",
+      sib_t: "Доходит ли что-то из этого до следующего поколения? →",
+      sib_d: "Всё, что выше, происходит в соматических клетках в пределах одной жизни. FKBP5 и NR3C1 встречаются на обеих страницах, но вопрос там другой: переживает ли метка зародышевую линию и появляется ли у ребёнка, который сам ничего не переживал. Краткий ответ на сегодня: для метилирования — не показано.",
+
+      s5_eyebrow: "05 · Источники",
+      s5_title: "Статьи, на которые ссылается страница",
+      refs_note: "Проверено в августе 2026 года. Ссылки открытого доступа помечены; остальные ведут на страницу издателя.",
+      footer_note: "epicme.bio · пишем → читаем → учимся. Безопасно для дальтонизма по замыслу: каждое состояние сопровождается полым или закрашенным знаком и словом, а не только цветом."
+    }
+  };
+
+  var STORAGE_KEY = "epicme_lang";
+
+  function apply(lang) {
+    var dict = I18N[lang] || I18N.en;
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var val = dict[el.getAttribute("data-i18n")];
+      if (typeof val === "string") el.textContent = val;
+    });
+    document.documentElement.setAttribute("lang", lang);
+    document.querySelectorAll("#lang-switch button").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-lang") === lang);
+    });
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) {}
+    if (window.epicmeChat && typeof window.epicmeChat.setContext === "function") {
+      window.epicmeChat.setContext({ page: "methylation-and-memory", lang: lang });
+    }
+  }
+
+  var saved = "en";
+  try { saved = localStorage.getItem(STORAGE_KEY) || "en"; } catch (e) {}
+  if (!I18N[saved]) saved = "en";
+
+  document.querySelectorAll("#lang-switch button").forEach(function (b) {
+    b.addEventListener("click", function () { apply(b.getAttribute("data-lang")); });
+  });
+
+  apply(saved);
+})();
+
+window.epicmeChatChips = [
+  "Why does an exhausted T cell keep PD-1 demethylated?",
+  "What is the difference between DNMT3A1 and DNMT3A2?",
+  "How well does blood methylation predict brain methylation?",
+  "Почему метка в гиппокампе обратима, а в истощённой T-клетке нет?"
+];
+</script>
+<script src="assets/epicme-chat.js" defer></script>
 
 </body>
 </html>
