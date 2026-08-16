@@ -128,6 +128,55 @@
   .page-card:hover .go .arrow{ transform:translateX(3px); }
 
   .draft-note{ font-size:12.5px; color:var(--ink-faint); margin-top:8px; }
+
+  /* ---------- Factors / mechanisms section ----------
+     No new hues: only --blue / --orange / --yellow from the shared
+     palette, and every colored element is also distinguished by
+     shape, border style or a text label. ---------- */
+  .sub-h{ font-size:17px; margin:32px 0 10px; color:var(--ink); }
+  .tf-tablewrap{
+    overflow-x:auto; border:1px solid var(--line);
+    border-radius:var(--radius); background:var(--surface);
+  }
+  .tf-tablewrap table{ border-collapse:collapse; width:100%; min-width:660px; }
+  .tf-tablewrap th, .tf-tablewrap td{
+    text-align:left; padding:10px 14px; border-bottom:1px solid var(--line);
+    vertical-align:top; font-size:13.5px; color:var(--ink-dim); line-height:1.5;
+  }
+  .tf-tablewrap th{
+    font-family:'Space Grotesk',sans-serif; font-size:12.5px; font-weight:600;
+    color:var(--ink); background:var(--surface-2);
+  }
+  .tf-tablewrap tr:last-child td{ border-bottom:none; }
+  .tf-tablewrap td strong{ color:var(--ink); font-weight:600; }
+  .tf-tablewrap td .pos{ font-family:'IBM Plex Mono',monospace; font-size:12px; }
+
+  .coordlist{ list-style:none; margin:0; padding:0; }
+  .coordlist li{
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-dim);
+    padding:8px 0; border-bottom:1px solid var(--line);
+  }
+  .coordlist li:last-child{ border-bottom:none; }
+  .coordlist li b{ color:var(--blue); font-weight:600; }
+
+  .mech-list{
+    list-style:none; margin:0; padding:0; counter-reset:m;
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  }
+  @media (max-width:700px){ .mech-list{ grid-template-columns:1fr; } }
+  .mech-list li{
+    counter-increment:m; position:relative;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+    padding:13px 15px 13px 48px; font-size:14px; color:var(--ink-dim); line-height:1.5;
+  }
+  .mech-list li::before{
+    content:"M" counter(m); position:absolute; left:14px; top:14px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; color:var(--blue);
+  }
+  .mech-list li strong{
+    display:block; margin-bottom:3px; color:var(--ink);
+    font-family:'Space Grotesk',sans-serif; font-weight:600;
+  }
 </style>
 </head>
 <body>
@@ -151,6 +200,7 @@
       <a href="day6VSday35.html">Day 35 vs Day 6</a>
       <a href="k562.html" data-i18n="nav-k562">K562</a>
       <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="cd55-tf-tcells.html" data-i18n="nav-tf">Механизмы</a>
     </nav>
   </div>
 </header>
@@ -225,6 +275,66 @@
         <span class="go"><span data-i18n="chipseq-go">Смотреть ChIP-seq</span> <span class="arrow">→</span></span>
       </a>
     </div>
+  </section>
+
+  <section id="factors">
+    <div class="kicker-shaped read"><span class="shape"></span><span class="lbl" data-i18n="tf-kicker">Read — почему профиль такой</span></div>
+    <h2 data-i18n="tf-h2">Кто сидит на промоторе CD55 — и почему метилирование ложится неровно</h2>
+    <p class="lede" data-i18n="tf-lede">Метилирование после CRISPRoff не размазано ровным слоем: одни CpG уходят почти в ноль, а соседние в 30 п.н. едва двигаются. Здесь собрано, что публично известно про транскрипционные факторы на этом промоторе, и семь механизмов, которые объясняют форму профиля — почти все проверяются на данных, которые уже есть.</p>
+
+    <a class="start-card" href="cd55-tf-tcells.html" style="text-decoration:none; margin-bottom:8px;">
+      <div class="txt">
+        <h3 data-i18n="tf-card-h3">Транскрипционные факторы и семь механизмов</h3>
+        <p data-i18n="tf-card-p">Карта промотора в масштабе, координаты гайда CRISPRoff относительно TSS, список публичных наборов данных с прямыми ссылками и план из шести анализов.</p>
+      </div>
+      <span class="btn ghost" data-i18n="tf-card-go">Открыть →</span>
+    </a>
+
+    <h3 class="sub-h" data-i18n="tf-table-h3">Что известно про факторы на этом промоторе</h3>
+    <div class="tf-tablewrap" data-i18n="tf-table">
+      <table>
+        <thead><tr><th>Фактор</th><th>Сайт</th><th>Доказательства</th><th>Клетки</th><th>Значимость для T-клеток</th></tr></thead>
+        <tbody>
+          <tr><td><strong>KLF4</strong></td><td class="pos">парные CACCC: −106/−95 (A), −228/−214, −310/−302 (B), −567/−549, −667/−652 (C)</td><td>ChIP показывает занятость всех трёх сайтов A–C; урезанный промотор 190 п.н. с одним сайтом A даёт почти ту же активность, что полные 848 п.н.</td><td>HUVEC, репортёр в K562</td><td><strong>Высокая.</strong> При активации CD4⁺ KLF4 падает синхронно с CD55 — значит занятость сайта зависит от того, как стимулировали донорские клетки.</td></tr>
+          <tr><td><strong>CREB / p-CREB + CBP</strong></td><td class="pos">CRE рядом с сайтами A, B и C</td><td>ChIP: p-CREB и CBP идут следом за KLF4 на всех трёх сайтах</td><td>HUVEC</td><td><strong>Высокая.</strong> Путь идёт через аденилатциклазу, которую сам CD55 регулирует через C3aR/C5aR — то есть петля обратной связи прямо в CD4⁺ T-клетках.</td></tr>
+          <tr><td><strong>SP1</strong></td><td class="pos">GC-бокс(ы), проксимальный промотор</td><td>Мутагенез промотора; конститутивная экспрессия мышиного Daf1 приписана SP1</td><td>Huh7.5, спленоциты мыши</td><td>Средняя. Сайты GC-богатые и содержат CpG — идеальный субстрат для CRISPRoff; классически считается, что метилирование связывание SP1 не блокирует.</td></tr>
+          <tr><td><strong>NF-κB (RelA)</strong></td><td class="pos">предсказанный сайт в 2 kb 5′-фланка, подтверждён ChIP</td><td>ChIP с антителом к NF-κB и сайт-специфичными праймерами</td><td>LOVO / HCT116 (рак толстой кишки)</td><td>Средне-высокая. NF-κB центральный при активации T-клеток, но точное смещение относительно TSS в работе не приведено — на наши CpG не ложится.</td></tr>
+          <tr><td><strong>TFCP2</strong></td><td class="pos">предсказанный сайт, 5′-фланк</td><td>Мутация сайта снижает активность промотора на 66%</td><td>HCT116 / LOVO</td><td>Низко-средняя. Эффект сильный, но контекст — рак толстой кишки; для нас нужен ChIP в T-клетках.</td></tr>
+          <tr><td><strong>AP-1</strong></td><td class="pos">сайт в проксимальном промоторе</td><td>Точечная мутация не повлияла на индукцию через HCV core</td><td>Huh7.5</td><td>Низкая как доказательство, высокая как гипотеза: AP-1 — один из основных факторов активации T-клеток.</td></tr>
+          <tr><td><strong>HIF-1α</strong></td><td class="pos">апикальная индукция CD55 при гипоксии</td><td>HIF-зависимая индукция CD55</td><td>кишечный эпителий</td><td>Низкая для T-клеток, но важна для любой гипоксичной культуры или тканевого контекста.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-h" data-i18n="tf-gap-h3">Кого на этом промоторе никто не проверял</h3>
+    <p data-i18n="tf-gap-p">Ни одна публикация не помещает на промотор CD55 <strong>NFAT, ETS1, RUNX1, TCF7/LEF1, GATA3, STAT5 или CTCF</strong>. Это отсутствие доказательств, а не доказательство отсутствия: вся механистика выше сделана на эндотелии, эпителии и линиях рака толстой кишки — в T-клетках этот промотор просто не изучали. Правильный ход — не спекулировать, а прогнать наше окно через ChIP-Atlas, ReMap и UniBind с фильтром по клеткам крови и посмотреть, что вернётся. Кстати, CTCF уже проверен на самом K562 в нашем собственном ChIP-seq-разборе — пика там нет, но это ещё не T-клетки.</p>
+
+    <h3 class="sub-h" data-i18n="tf-meth-h3">Метилирование не просто «выключает» факторы</h3>
+    <p data-i18n="tf-meth-p">Систематический скрининг 542 человеческих факторов методом methyl-SELEX дал более сложную картину, и она специфически важна для T-клеток: связывание семейств <strong>bHLH, bZIP и ETS</strong> метилирование подавляет за счёт стерического конфликта, а <strong>homeodomain, POU и NFAT</strong>, наоборот, предпочитают метилированный CpG. То есть метка, которую кладёт CRISPRoff, не выселяет всех подряд — она может перераспределить, кто вообще способен сесть на этот участок.</p>
+
+    <h3 class="sub-h" data-i18n="tf-coords-h3">Координаты, к которым всё привязано</h3>
+    <ul class="coordlist" data-i18n="tf-coords">
+      <li><b>TSS</b> ≈ chr1:207,321,620 (GRCh38) · T2T-CHM13v2.0 chr1:206,586,916</li>
+      <li><b>Окно анализа</b> chr1:207,318,092–207,324,450 (GRCh38), 137 CpG</li>
+      <li><b>Протоспейсер CRISPRoff</b> chr1:207,321,713–207,321,732 = +93…+112 от TSS</li>
+      <li><b>Сайты KLF</b> A −106/−95 · B −310/−302 · C −667/−652; TATA на −81</li>
+      <li><b>Пик дифференциального сигнала</b> CpG #78–83 = +58…+84 — обрывается за 9 п.н. до протоспейсера</li>
+      <li><b>Значимый блок</b> CpG #20–132 = −1 077…+1 935</li>
+      <li><b>Сдвиг GRCh38 − T2T</b> на этом локусе: 734 704 п.н., одинаковый на обоих концах</li>
+    </ul>
+
+    <h3 class="sub-h" data-i18n="tf-mech-h3">Семь механизмов неровного профиля</h3>
+    <ol class="mech-list" data-i18n="tf-mech">
+      <li><strong>След самого редактора</strong> dCas9 закрывает собой 20–30 п.н.; под ним метилирования почти нет, пики сидят сбоку от PAM.</li>
+      <li><strong>Предпочтения DNMT3A по фланкам</strong> Соседние ±2 п.н. меняют скорость до 100 раз: TACGYC хорошо, CGG плохо.</li>
+      <li><strong>Нуклеосомы и период 10 п.н.</strong> Фермент работает по линкерной ДНК; длина линкера и поворот спирали решают, какие CpG смотрят наружу.</li>
+      <li><strong>Занятые сайты факторов</strong> KLF4, CREB, SP1 и NF-κB физически загораживают свои CpG от метилтрансферазы.</li>
+      <li><strong>Исходный хроматин</strong> H3K4me3 отталкивает ADD-домен DNMT3A, H3K36me2 притягивает PWWP: активный промотор — враждебная территория.</li>
+      <li><strong>Деметилирование и сбои поддержания</strong> TET выедает метку, DNMT1 не всегда успевает при делении. «Не записалось» ≠ «записалось и стёрлось».</li>
+      <li><strong>Гетерогенность между молекулами</strong> Средние 40% — это «40% на каждой» или «100% на 40% молекул»? Нанопор видит это напрямую.</li>
+    </ol>
+
+    <div class="disclaimer" data-i18n="tf-note"><strong>Важно:</strong> вся механистика по KLF4, CREB и CBP получена на эндотелиальных клетках и репортёрных конструкциях, а не на первичных человеческих T-клетках. Перенос на нашу систему — допущение, пока T-клеточный ChIP не скажет обратного. На странице механизмов это помечено отдельно, и ни одно число там не измерено заново — это гипотезы с прописанными способами проверки.</div>
   </section>
 
   <section id="learn">
@@ -323,6 +433,24 @@ const I18N = {
     'trauma-p': 'Оставляет ли травма след в метилировании ДНК следующего поколения? Когортные исследования на людях, механистика на мышах и критика зародышевой биологии.',
     'draft-note': 'черновик, пока не встроен в основной нарратив',
     'draft-note2': 'черновик, пока не встроен в основной нарратив',
+    'nav-tf': 'Механизмы',
+    'tf-kicker': 'Read — почему профиль такой',
+    'tf-h2': 'Кто сидит на промоторе CD55 — и почему метилирование ложится неровно',
+    'tf-lede': 'Метилирование после CRISPRoff не размазано ровным слоем: одни CpG уходят почти в ноль, а соседние в 30 п.н. едва двигаются. Здесь собрано, что публично известно про транскрипционные факторы на этом промоторе, и семь механизмов, которые объясняют форму профиля — почти все проверяются на данных, которые уже есть.',
+    'tf-card-h3': 'Транскрипционные факторы и семь механизмов',
+    'tf-card-p': 'Карта промотора в масштабе, координаты гайда CRISPRoff относительно TSS, список публичных наборов данных с прямыми ссылками и план из шести анализов.',
+    'tf-card-go': 'Открыть →',
+    'tf-table-h3': 'Что известно про факторы на этом промоторе',
+    'tf-table': '<table><thead><tr><th>Фактор</th><th>Сайт</th><th>Доказательства</th><th>Клетки</th><th>Значимость для T-клеток</th></tr></thead><tbody><tr><td><strong>KLF4</strong></td><td class="pos">парные CACCC: −106/−95 (A), −228/−214, −310/−302 (B), −567/−549, −667/−652 (C)</td><td>ChIP показывает занятость всех трёх сайтов A–C; урезанный промотор 190 п.н. с одним сайтом A даёт почти ту же активность, что полные 848 п.н.</td><td>HUVEC, репортёр в K562</td><td><strong>Высокая.</strong> При активации CD4⁺ KLF4 падает синхронно с CD55 — значит занятость сайта зависит от того, как стимулировали донорские клетки.</td></tr><tr><td><strong>CREB / p-CREB + CBP</strong></td><td class="pos">CRE рядом с сайтами A, B и C</td><td>ChIP: p-CREB и CBP идут следом за KLF4 на всех трёх сайтах</td><td>HUVEC</td><td><strong>Высокая.</strong> Путь идёт через аденилатциклазу, которую сам CD55 регулирует через C3aR/C5aR — то есть петля обратной связи прямо в CD4⁺ T-клетках.</td></tr><tr><td><strong>SP1</strong></td><td class="pos">GC-бокс(ы), проксимальный промотор</td><td>Мутагенез промотора; конститутивная экспрессия мышиного Daf1 приписана SP1</td><td>Huh7.5, спленоциты мыши</td><td>Средняя. Сайты GC-богатые и содержат CpG — идеальный субстрат для CRISPRoff; классически считается, что метилирование связывание SP1 не блокирует.</td></tr><tr><td><strong>NF-κB (RelA)</strong></td><td class="pos">предсказанный сайт в 2 kb 5′-фланка, подтверждён ChIP</td><td>ChIP с антителом к NF-κB и сайт-специфичными праймерами</td><td>LOVO / HCT116 (рак толстой кишки)</td><td>Средне-высокая. NF-κB центральный при активации T-клеток, но точное смещение относительно TSS в работе не приведено — на наши CpG не ложится.</td></tr><tr><td><strong>TFCP2</strong></td><td class="pos">предсказанный сайт, 5′-фланк</td><td>Мутация сайта снижает активность промотора на 66%</td><td>HCT116 / LOVO</td><td>Низко-средняя. Эффект сильный, но контекст — рак толстой кишки; для нас нужен ChIP в T-клетках.</td></tr><tr><td><strong>AP-1</strong></td><td class="pos">сайт в проксимальном промоторе</td><td>Точечная мутация не повлияла на индукцию через HCV core</td><td>Huh7.5</td><td>Низкая как доказательство, высокая как гипотеза: AP-1 — один из основных факторов активации T-клеток.</td></tr><tr><td><strong>HIF-1α</strong></td><td class="pos">апикальная индукция CD55 при гипоксии</td><td>HIF-зависимая индукция CD55</td><td>кишечный эпителий</td><td>Низкая для T-клеток, но важна для любой гипоксичной культуры или тканевого контекста.</td></tr></tbody></table>',
+    'tf-gap-h3': 'Кого на этом промоторе никто не проверял',
+    'tf-gap-p': 'Ни одна публикация не помещает на промотор CD55 <strong>NFAT, ETS1, RUNX1, TCF7/LEF1, GATA3, STAT5 или CTCF</strong>. Это отсутствие доказательств, а не доказательство отсутствия: вся механистика выше сделана на эндотелии, эпителии и линиях рака толстой кишки — в T-клетках этот промотор просто не изучали. Правильный ход — не спекулировать, а прогнать наше окно через ChIP-Atlas, ReMap и UniBind с фильтром по клеткам крови и посмотреть, что вернётся. Кстати, CTCF уже проверен на самом K562 в нашем собственном ChIP-seq-разборе — пика там нет, но это ещё не T-клетки.',
+    'tf-meth-h3': 'Метилирование не просто «выключает» факторы',
+    'tf-meth-p': 'Систематический скрининг 542 человеческих факторов методом methyl-SELEX дал более сложную картину, и она специфически важна для T-клеток: связывание семейств <strong>bHLH, bZIP и ETS</strong> метилирование подавляет за счёт стерического конфликта, а <strong>homeodomain, POU и NFAT</strong>, наоборот, предпочитают метилированный CpG. То есть метка, которую кладёт CRISPRoff, не выселяет всех подряд — она может перераспределить, кто вообще способен сесть на этот участок.',
+    'tf-coords-h3': 'Координаты, к которым всё привязано',
+    'tf-coords': '<li><b>TSS</b> ≈ chr1:207,321,620 (GRCh38) · T2T-CHM13v2.0 chr1:206,586,916</li><li><b>Окно анализа</b> chr1:207,318,092–207,324,450 (GRCh38), 137 CpG</li><li><b>Протоспейсер CRISPRoff</b> chr1:207,321,713–207,321,732 = +93…+112 от TSS</li><li><b>Сайты KLF</b> A −106/−95 · B −310/−302 · C −667/−652; TATA на −81</li><li><b>Пик дифференциального сигнала</b> CpG #78–83 = +58…+84 — обрывается за 9 п.н. до протоспейсера</li><li><b>Значимый блок</b> CpG #20–132 = −1 077…+1 935</li><li><b>Сдвиг GRCh38 − T2T</b> на этом локусе: 734 704 п.н., одинаковый на обоих концах</li>',
+    'tf-mech-h3': 'Семь механизмов неровного профиля',
+    'tf-mech': '<li><strong>След самого редактора</strong> dCas9 закрывает собой 20–30 п.н.; под ним метилирования почти нет, пики сидят сбоку от PAM.</li><li><strong>Предпочтения DNMT3A по фланкам</strong> Соседние ±2 п.н. меняют скорость до 100 раз: TACGYC хорошо, CGG плохо.</li><li><strong>Нуклеосомы и период 10 п.н.</strong> Фермент работает по линкерной ДНК; длина линкера и поворот спирали решают, какие CpG смотрят наружу.</li><li><strong>Занятые сайты факторов</strong> KLF4, CREB, SP1 и NF-κB физически загораживают свои CpG от метилтрансферазы.</li><li><strong>Исходный хроматин</strong> H3K4me3 отталкивает ADD-домен DNMT3A, H3K36me2 притягивает PWWP: активный промотор — враждебная территория.</li><li><strong>Деметилирование и сбои поддержания</strong> TET выедает метку, DNMT1 не всегда успевает при делении. «Не записалось» ≠ «записалось и стёрлось».</li><li><strong>Гетерогенность между молекулами</strong> Средние 40% — это «40% на каждой» или «100% на 40% молекул»? Нанопор видит это напрямую.</li>',
+    'tf-note': '<strong>Важно:</strong> вся механистика по KLF4, CREB и CBP получена на эндотелиальных клетках и репортёрных конструкциях, а не на первичных человеческих T-клетках. Перенос на нашу систему — допущение, пока T-клеточный ChIP не скажет обратного. На странице механизмов это помечено отдельно, и ни одно число там не измерено заново — это гипотезы с прописанными способами проверки.',
     'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. Эта страница — точка входа: полная библиография — на страницах <a href="about.html">о проекте</a> и <a href="about-cd55.html">CD55 explorer</a>.'
   },
   en: {
@@ -380,6 +508,24 @@ const I18N = {
     'trauma-p': 'Does trauma leave a mark in a child\u2019s DNA methylation? Human cohort studies, mouse mechanistic work, and the germline-biology critique.',
     'draft-note': 'draft, not yet folded into the main narrative',
     'draft-note2': 'draft, not yet folded into the main narrative',
+    'nav-tf': 'Mechanisms',
+    'tf-kicker': 'Read — why the profile looks like this',
+    'tf-h2': 'What sits on the CD55 promoter — and why methylation lands unevenly',
+    'tf-lede': 'Methylation after CRISPRoff is not a flat coat: some CpGs drop almost to zero while neighbours 30 bp away barely move. This section gathers what is publicly known about transcription factors at this promoter, plus seven mechanisms that account for the shape of the profile — nearly all of them testable on data we already hold.',
+    'tf-card-h3': 'Transcription factors and seven mechanisms',
+    'tf-card-p': 'The promoter mapped to scale, the CRISPRoff guide coordinates relative to the TSS, a list of public datasets with direct links, and a plan of six analyses.',
+    'tf-card-go': 'Open →',
+    'tf-table-h3': 'What is known about factors at this promoter',
+    'tf-table': '<table><thead><tr><th>Factor</th><th>Site</th><th>Evidence</th><th>Cells</th><th>Relevance to T cells</th></tr></thead><tbody><tr><td><strong>KLF4</strong></td><td class="pos">paired CACCC: −106/−95 (A), −228/−214, −310/−302 (B), −567/−549, −667/−652 (C)</td><td>ChIP shows occupancy at all three A–C sites; a truncated 190 bp promoter carrying only site A gives nearly the same activity as the full 848 bp</td><td>HUVEC, K562 reporter</td><td><strong>High.</strong> KLF4 falls in step with CD55 when CD4⁺ cells are activated, so occupancy depends on how the donor cells were stimulated.</td></tr><tr><td><strong>CREB / p-CREB + CBP</strong></td><td class="pos">CRE elements beside sites A, B and C</td><td>ChIP: p-CREB and CBP follow KLF4 at all three sites</td><td>HUVEC</td><td><strong>High.</strong> The route runs through adenylyl cyclase, which CD55 itself controls via C3aR/C5aR — a feedback loop operating inside CD4⁺ T cells.</td></tr><tr><td><strong>SP1</strong></td><td class="pos">GC box(es), proximal promoter</td><td>Promoter mutagenesis; constitutive expression of murine Daf1 attributed to SP1</td><td>Huh7.5, mouse splenocytes</td><td>Medium. The sites are GC-rich and CpG-containing — prime CRISPRoff substrate; SP1 binding is classically reported as insensitive to methylation.</td></tr><tr><td><strong>NF-κB (RelA)</strong></td><td class="pos">predicted site in the 2 kb 5′ flank, ChIP-validated</td><td>ChIP with an NF-κB antibody and site-specific primers</td><td>LOVO / HCT116 (colon cancer)</td><td>Medium-high. NF-κB is central to T-cell activation, but the paper gives no offset that can be mapped onto our CpGs.</td></tr><tr><td><strong>TFCP2</strong></td><td class="pos">predicted site, 5′ flank</td><td>Mutating the site cuts promoter activity by 66%</td><td>HCT116 / LOVO</td><td>Low-medium. Strong effect, colon cancer context; a T-cell ChIP is what would make it matter here.</td></tr><tr><td><strong>AP-1</strong></td><td class="pos">site in the proximal promoter</td><td>A point mutation had no effect on HCV core-driven induction</td><td>Huh7.5</td><td>Low as evidence, high as a hypothesis: AP-1 is a core T-cell activation factor.</td></tr><tr><td><strong>HIF-1α</strong></td><td class="pos">apical CD55 induction under hypoxia</td><td>HIF-dependent induction of CD55</td><td>intestinal epithelium</td><td>Low for T cells, but relevant to any hypoxic culture or tissue context.</td></tr></tbody></table>',
+    'tf-gap-h3': 'Who has never been checked at this promoter',
+    'tf-gap-p': 'No published study places <strong>NFAT, ETS1, RUNX1, TCF7/LEF1, GATA3, STAT5 or CTCF</strong> on the CD55 promoter. That is an absence of evidence, not evidence of absence: all the mechanistic work above was done in endothelium, epithelium and colon cancer lines — nobody has studied this promoter in T cells. The right move is not to speculate but to run our window through ChIP-Atlas, ReMap and UniBind filtered to blood cell types, and see what comes back. CTCF, incidentally, has already been checked in K562 itself in our own ChIP-seq breakdown — no peak there, though that is still not T cells.',
+    'tf-meth-h3': 'Methylation does not simply switch factors off',
+    'tf-meth-p': 'A systematic methyl-SELEX screen of 542 human factors gave a messier picture, and the mess is specifically relevant to T cells: methylation suppresses binding by the <strong>bHLH, bZIP and ETS</strong> families through steric clash, while <strong>homeodomain, POU and NFAT</strong> factors prefer methylated CpG. So the mark CRISPRoff deposits does not evict everyone — it can redistribute which factors are able to engage the region at all.',
+    'tf-coords-h3': 'The coordinates everything hangs off',
+    'tf-coords': '<li><b>TSS</b> ≈ chr1:207,321,620 (GRCh38) · T2T-CHM13v2.0 chr1:206,586,916</li><li><b>Analysis window</b> chr1:207,318,092–207,324,450 (GRCh38), 137 CpGs</li><li><b>CRISPRoff protospacer</b> chr1:207,321,713–207,321,732 = +93…+112 from the TSS</li><li><b>KLF sites</b> A −106/−95 · B −310/−302 · C −667/−652; TATA at −81</li><li><b>Peak differential signal</b> CpG #78–83 = +58…+84 — stops 9 bp before the protospacer</li><li><b>Significant block</b> CpG #20–132 = −1,077…+1,935</li><li><b>GRCh38 − T2T offset</b> at this locus: 734,704 bp, identical at both endpoints</li>',
+    'tf-mech-h3': 'Seven mechanisms for a bumpy profile',
+    'tf-mech': '<li><strong>Footprint of the editor itself</strong> dCas9 covers 20–30 bp; almost no methylation underneath it, with the maxima sitting off to the side of the PAM.</li><li><strong>DNMT3A flanking preferences</strong> The neighbouring ±2 bp swing the rate up to 100-fold: TACGYC good, CGG poor.</li><li><strong>Nucleosomes and the 10 bp repeat</strong> The enzyme works on linker DNA; linker length and helical twist decide which CpGs face outward.</li><li><strong>Occupied factor sites</strong> KLF4, CREB, SP1 and NF-κB physically shield their own CpGs from the methyltransferase.</li><li><strong>Pre-existing chromatin</strong> H3K4me3 repels the DNMT3A ADD domain, H3K36me2 attracts the PWWP: an active promoter is hostile territory.</li><li><strong>Erasure and maintenance failure</strong> TET eats the mark away and DNMT1 does not always keep up through division. Never written is not the same as written then erased.</li><li><strong>Molecule-to-molecule heterogeneity</strong> Does an average of 40% mean 40% on every molecule, or 100% on 40% of them? Nanopore sees this directly.</li>',
+    'tf-note': '<strong>Important:</strong> all the mechanistic work on KLF4, CREB and CBP was done in endothelial cells and reporter constructs, not in primary human T cells. Carrying it over to our system is an assumption until a T-cell ChIP says otherwise. The mechanisms page flags this explicitly, and no number on it has been measured afresh — these are hypotheses with their tests written out.',
     'footer': 'epicme.bio — an open science project and PhD work by Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. This page is the entry point: the full bibliography lives on the <a href="about.html">about</a> and <a href="about-cd55.html">CD55 explorer</a> pages.'
   }
 };

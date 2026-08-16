@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="tf-title-1">CD55 TSS — транскрипционные факторы, хроматин и форма метилирования после CRISPRoff | epiCme</title>
+<meta name="description" content="Публичные данные о транскрипционных факторах и хроматине на промоторе CD55 человека и семь проверяемых механизмов того, почему метилирование после CRISPRoff ложится на CpG неравномерно в T-клетках человека.">
+
+<!-- Fallback tokens mirroring assets/theme.css, in case it fails to load.
+     theme.css is linked after this block, so the shared file always wins. -->
+<style>
+:root{
+  --bg:#0B1310; --surface:#111C18; --surface-2:#16221D; --line:#24352E;
+  --ink:#E9EEEA; --ink-dim:#A9B8B0; --ink-faint:#6E8079;
+  --blue:#56B4E9; --blue-deep:#0072B2; --blue-dim:#56B4E933;
+  --orange:#E69F00; --orange-dim:#E69F0033; --yellow:#F0E442; --yellow-dim:#F0E44233;
+  --radius:14px;
+}
+</style>
+<link rel="stylesheet" href="assets/theme.css">
+
+<style>
+/* ---------- page-specific ---------- */
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Source Serif 4',Georgia,serif; font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 96px}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--yellow);outline-offset:3px;border-radius:4px}
+
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;line-height:1.2;letter-spacing:-.01em}
+h1{font-size:clamp(30px,5.4vw,48px);margin:.2em 0 .3em;font-weight:700}
+h2{font-size:clamp(23px,3.6vw,31px);margin:2.6em 0 .5em;font-weight:700}
+h3{font-size:19px;margin:1.9em 0 .35em;font-weight:600}
+p{margin:.7em 0}
+.lede{font-size:clamp(18px,2.3vw,21px);color:var(--ink);max-width:66ch}
+.dim{color:var(--ink-dim)}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:.88em}
+
+/* language switch — JS toggle, same pattern as index.html */
+.lang-switch{
+  display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+  border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+}
+.lang-switch button{
+  border:none; background:transparent; color:var(--ink-dim); cursor:pointer;
+  font-size:14px; font-weight:700; padding:8px 16px; border-radius:999px;
+  font-family:'Space Grotesk',sans-serif; letter-spacing:.03em; transition:all .15s ease;
+}
+.lang-switch button.active{ background:var(--blue); color:#06182A; }
+
+/* nav — same big pill buttons as the home page */
+.nav-links{display:flex;flex-wrap:wrap;gap:8px}
+.nav-links a{
+  display:inline-flex;align-items:center;padding:10px 18px;border-radius:999px;
+  border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink-dim);
+  font-size:14.5px;font-weight:600;text-decoration:none;
+  transition:border-color .15s ease,color .15s ease,background .15s ease,transform .15s ease;
+}
+.nav-links a:hover,.nav-links a:focus-visible{border-color:var(--blue);color:var(--ink);background:var(--surface);transform:translateY(-1px)}
+.nav-links a.active{background:var(--blue);border-color:var(--blue);color:#06182A}
+.nav-inner{flex-wrap:wrap;row-gap:10px}
+@media (max-width:640px){.nav-links{display:flex}}
+.page-anchors{display:flex;flex-wrap:wrap;gap:6px;margin:20px 0 8px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.page-anchors a{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-dim);text-decoration:none;border:1px solid var(--line);padding:5px 10px;border-radius:6px}
+.page-anchors a:hover{color:var(--ink);border-color:var(--blue)}
+
+/* eyebrow */
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:34px 0 0}
+
+/* panels */
+.panel{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:18px 0}
+.panel.caveat{border-left:4px solid var(--orange)}
+.panel.note{border-left:4px solid var(--yellow)}
+.panel h3{margin-top:0}
+.panel .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);display:block;margin-bottom:6px}
+
+/* figure */
+.figbox{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);padding:16px 14px 10px;margin:22px 0}
+.figbox svg{width:100%;height:auto;display:block}
+figcaption{font-size:14px;color:var(--ink-dim);margin-top:10px;padding:0 6px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:12px 6px 2px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-dim)}
+.legend span{display:flex;align-items:center;gap:7px}
+.legend i{width:15px;height:12px;border-radius:2px;display:inline-block;border:1px solid var(--line)}
+
+/* mechanism cards */
+.mech{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface-2);margin:14px 0;overflow:hidden}
+.mech>summary{
+  cursor:pointer;list-style:none;padding:16px 20px;display:flex;gap:14px;align-items:flex-start;
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;
+}
+.mech>summary::-webkit-details-marker{display:none}
+.mech>summary::after{content:"+";margin-left:auto;font-family:'IBM Plex Mono',monospace;color:var(--blue);font-size:20px;line-height:1}
+.mech[open]>summary::after{content:"–"}
+.mech .mid{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--surface);background:var(--blue);border-radius:5px;padding:3px 7px;flex:0 0 auto;margin-top:2px}
+.mech .body{padding:0 20px 18px;border-top:1px solid var(--line);margin-top:2px}
+.mech dl{margin:14px 0 0}
+.mech dt{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-top:14px}
+.mech dd{margin:4px 0 0}
+
+/* tables */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);margin:18px 0}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14.5px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:'Space Grotesk',sans-serif;font-size:13px;letter-spacing:.03em;color:var(--ink);background:var(--surface-2);position:sticky;top:0}
+tbody tr:last-child td{border-bottom:none}
+td .mono{color:var(--ink-dim)}
+
+/* code */
+pre{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.6;color:var(--ink)}
+code{font-family:'IBM Plex Mono',monospace;font-size:.9em}
+.codehead{display:flex;align-items:center;gap:12px;margin:20px 0 -8px}
+.copybtn{font-family:'Space Grotesk',sans-serif;font-size:12px;background:var(--surface-2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+.copybtn:hover{border-color:var(--blue)}
+
+ul,ol{padding-left:22px}
+li{margin:.35em 0}
+.refs{font-size:14.5px}
+.refs li{margin:.5em 0}
+hr{border:none;border-top:1px solid var(--line);margin:44px 0}
+footer{color:var(--ink-dim);font-size:14px;padding-top:26px;border-top:1px solid var(--line);margin-top:48px}
+
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 15px 72px}
+  .panel{padding:16px}
+  .mech>summary{font-size:16px;padding:14px 15px}
+  .mech .body{padding:0 15px 16px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="day6.html">Day 6</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day6VSday35.html">Day 35 vs Day 6</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="cd55-tf-tcells.html" class="active" data-i18n="nav-mechanisms">Механизмы</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+
+
+<nav class="page-anchors" aria-label="On this page">
+  <a href="#map" data-i18n="tf-a-1">Карта промотора</a>
+  <a href="#guide" data-i18n="tf-a-2">Гайд на карте</a>
+  <a href="#why" data-i18n="tf-a-3">Семь механизмов</a>
+  <a href="#tfs" data-i18n="tf-a-4">Список факторов</a>
+  <a href="#tcell" data-i18n="tf-a-5">Биология T-клеток</a>
+  <a href="#data" data-i18n="tf-a-6">Публичные данные</a>
+  <a href="#plan" data-i18n="tf-a-7">План анализов</a>
+  <a href="#limits" data-i18n="tf-a-8">Чем это не является</a>
+  <a href="#refs" data-i18n="tf-a-9">Источники</a>
+</nav>
+
+<p class="eyebrow" data-i18n="tf-p-1">Write → Read → Learn · чтение локуса</p>
+<h1 data-i18n="tf-h1-1">Почему CRISPRoff метилирует не все CpG одинаково?</h1>
+<p class="lede" data-i18n="tf-p-2">Наши профили метилирования CD55 не плоские. Одни CpG уходят из почти нулевого уровня в сильное метилирование, а соседи в 30&nbsp;п.н. едва двигаются. Здесь собраны публичные доказательства — транскрипционные факторы на TSS CD55, архитектура хроматина и собственная химия DNMT3A — и превращены в семь механизмов, которые можно реально проверить на таблице из 137 CpG, которая у нас уже есть.</p>
+
+<div class="panel caveat">
+  <span class="tag" data-i18n="tf-span-1">Честная оговорка</span>
+  <p style="margin:0" data-i18n="tf-p-3">На этой странице <strong>нет нового анализа данных</strong> и нет скачанных геномных треков — у сессии, которая её собирала, не было доступа к геномным порталам. Что здесь есть: синтез литературы, архитектура промотора CD55 с опубликованными координатами, прямые ссылки и акцешены на наборы данных, которые стоит скачать, и полностью прописанный план анализов. Каждое «предсказание» ниже — гипотеза, ожидающая проверки, а не результат.</p>
+</div>
+
+<!-- ============ PROMOTER MAP ============ -->
+<h2 id="map" data-i18n="tf-h2-1">Промотор CD55 в масштабе</h2>
+
+<p data-i18n="tf-p-4">An&nbsp;и соавт. (2024) картировали пять парных элементов CACCC (KLF) в промоторе CD55 человека и с помощью ChIP показали, что KLF4, фосфо-CREB и CBP сидят на трёх из них, расположенных рядом с сайтами CRE. Их позиции относительно старта транскрипции: −106/−95, −228/−214, −310/−302, −567/−549 и −667/−652; три сайта рядом с CRE обозначены A (−106/−95), B (−310/−302) и C (−667/−652). Сам старт транскрипции лежит на 81 п.н. ниже TATA-бокса.</p>
+
+<p data-i18n="tf-p-5">Поверх этого — наш собственный дифференциальный сигнал: непрерывный значимый блок на CpG #20–132 (от −1077 до +1935 относительно TSS) и самый резкий пик на CpG #78–83 (+58…+84).</p>
+
+<div class="figbox">
+<svg viewBox="0 0 1000 318" role="img" aria-label="Map of the human CD55 promoter from minus 1200 to plus 2100 base pairs relative to the transcription start site, showing five paired KLF CACCC elements, three adjacent CRE sites, the TATA box, and the differentially methylated CpG block from our data.">
+  <defs>
+    <pattern id="hatchKLF" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <rect width="7" height="7" fill="#F0E442"/>
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#0B1310" stroke-width="2.6"/>
+    </pattern>
+    <pattern id="dotCRE" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#0072B2"/>
+      <circle cx="3" cy="3" r="1.5" fill="#0B1310"/>
+    </pattern>
+    <pattern id="crossPeak" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#E69F00"/>
+      <path d="M0,0 L6,6 M6,0 L0,6" stroke="#0B1310" stroke-width="1.3"/>
+    </pattern>
+    <marker id="arrowTSS" markerWidth="9" markerHeight="9" refX="1" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#56B4E9"/>
+    </marker>
+  </defs>
+
+  <!-- row: differential block -->
+  <text x="60" y="26" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="12" data-i18n="tf-text-1">наш дифференциальный сигнал (CRISPRoff vs без редактирования)</text>
+  <rect x="93.5" y="34" width="821.5" height="20" rx="4" fill="#56B4E9" fill-opacity="0.26" stroke="#56B4E9" stroke-width="1.2"/>
+  <text x="100" y="48.5" fill="#E9EEEA" font-family="IBM Plex Mono, monospace" font-size="11.5" data-i18n="tf-text-2">значимый блок CpG #20–132</text>
+  <rect x="401" y="30" width="12" height="28" rx="2" fill="url(#crossPeak)" stroke="#E69F00" stroke-width="1.2"/>
+  <line x1="407" y1="30" x2="407" y2="18" stroke="#E69F00" stroke-width="1.4"/>
+  <text x="413" y="16" fill="#E69F00" font-family="IBM Plex Mono, monospace" font-size="11.5" data-i18n="tf-text-3">пик CpG #78–83 (+58…+84)</text>
+
+  <!-- axis -->
+  <line x1="60" y1="92" x2="960" y2="92" stroke="#24352E" stroke-width="2"/>
+  <g font-family="IBM Plex Mono, monospace" font-size="11" fill="#A9B8B0">
+    <line x1="114.5" y1="87" x2="114.5" y2="97" stroke="#24352E" stroke-width="1.6"/><text x="114.5" y="112" text-anchor="middle">−1000</text>
+    <line x1="250"   y1="87" x2="250"   y2="97" stroke="#24352E" stroke-width="1.6"/><text x="250"   y="112" text-anchor="middle">−500</text>
+    <line x1="523.6" y1="87" x2="523.6" y2="97" stroke="#24352E" stroke-width="1.6"/><text x="523.6" y="112" text-anchor="middle">+500</text>
+    <line x1="659.9" y1="87" x2="659.9" y2="97" stroke="#24352E" stroke-width="1.6"/><text x="659.9" y="112" text-anchor="middle">+1000</text>
+    <line x1="796.2" y1="87" x2="796.2" y2="97" stroke="#24352E" stroke-width="1.6"/><text x="796.2" y="112" text-anchor="middle">+1500</text>
+    <line x1="932.5" y1="87" x2="932.5" y2="97" stroke="#24352E" stroke-width="1.6"/><text x="932.5" y="112" text-anchor="middle">+2000</text>
+  </g>
+  <!-- TSS -->
+  <line x1="387.3" y1="72" x2="387.3" y2="92" stroke="#56B4E9" stroke-width="2"/>
+  <line x1="387.3" y1="72" x2="425" y2="72" stroke="#56B4E9" stroke-width="2" marker-end="url(#arrowTSS)"/>
+  <text x="387.3" y="66" fill="#56B4E9" font-family="Space Grotesk, sans-serif" font-size="13" font-weight="600">TSS</text>
+  <text x="60" y="130" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="10.5" data-i18n="tf-text-4">п.н. относительно TSS · CD55 на + цепи · TSS ≈ GRCh38 chr1:207 321 620</text>
+
+  <!-- KLF paired CACCC sites -->
+  <text x="60" y="160" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="12" data-i18n="tf-text-5">парные элементы CACCC / KLF (An et al. 2024)</text>
+  <g stroke="#F0E442" stroke-width="1.2" fill="url(#hatchKLF)">
+    <rect x="203" y="170" width="10" height="22" rx="2"/>
+    <rect x="230" y="170" width="10" height="22" rx="2"/>
+    <rect x="300" y="170" width="8"  height="22" rx="2"/>
+    <rect x="323" y="170" width="8"  height="22" rx="2"/>
+    <rect x="356" y="170" width="8"  height="22" rx="2"/>
+  </g>
+  <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#F0E442">
+    <text x="208" y="206" text-anchor="middle">C</text>
+    <text x="235" y="206" text-anchor="middle">−567</text>
+    <text x="304" y="206" text-anchor="middle">B</text>
+    <text x="327" y="206" text-anchor="middle">−228</text>
+    <text x="360" y="206" text-anchor="middle">A</text>
+  </g>
+  <g font-family="IBM Plex Mono, monospace" font-size="10" fill="#A9B8B0">
+    <text x="208" y="219" text-anchor="middle">−667</text>
+    <text x="304" y="219" text-anchor="middle">−310</text>
+    <text x="360" y="219" text-anchor="middle">−106</text>
+  </g>
+
+  <!-- CRE sites -->
+  <text x="60" y="248" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="12" data-i18n="tf-text-6">сайты CRE рядом с KLF A, B, C — совместная занятость p-CREB + CBP по ChIP</text>
+  <g stroke="#0072B2" stroke-width="1.2" stroke-dasharray="3 2" fill="url(#dotCRE)">
+    <rect x="214" y="258" width="14" height="18" rx="2"/>
+    <rect x="309" y="258" width="14" height="18" rx="2"/>
+    <rect x="366" y="258" width="14" height="18" rx="2"/>
+  </g>
+  <text x="392" y="271" fill="#0072B2" font-family="IBM Plex Mono, monospace" font-size="10.5" data-i18n="tf-text-7">CRE (рядом; точные координаты в источнике не даны)</text>
+
+  <!-- TATA -->
+  <rect x="360" y="286" width="16" height="16" rx="2" fill="#A9B8B0" stroke="#A9B8B0"/>
+  <text x="382" y="298" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="10.5" data-i18n="tf-text-8">TATA (TSS на +81 ниже по цепи)</text>
+</svg>
+<div class="legend">
+  <span data-i18n="tf-span-2"><i style="background:#56B4E9;opacity:.6"></i> значимый блок CpG (наши данные)</span>
+  <span data-i18n="tf-span-3"><i style="background:#E69F00"></i> пиковые дифференциальные CpG</span>
+  <span data-i18n="tf-span-4"><i style="background:#F0E442"></i> KLF / CACCC (штриховка)</span>
+  <span data-i18n="tf-span-5"><i style="background:#0072B2"></i> CRE (точки, пунктирная рамка)</span>
+  <span data-i18n="tf-span-6"><i style="background:#A9B8B0"></i> TATA-бокс</span>
+</div>
+<figcaption data-i18n="tf-figcaption-1">Каждый элемент различается ещё и паттерном заливки и стилем рамки, не только цветом. Позиции KLF и CRE — из An et al., Front Immunol 2024; смещение TSS↔TATA — из Ewulonu et al., PNAS 1991 (по ссылке в той же статье). Оба диапазона CpG — из наших сравнений CRISPRoff-vs-unedited и ZFPoff. Секвенированный ампликон (GRCh38 chr1:207 318 092–207 324 450) простирается дальше в 5′-сторону, чем эта рамка.</figcaption>
+</div>
+
+<div class="panel note">
+  <span class="tag" data-i18n="tf-span-7">Шпаргалка по координатам</span>
+  <ul style="margin:0">
+    <li class="mono" data-i18n="tf-li-1">TSS ≈ chr1:207 321 620 (GRCh38) — выведено из нашего пикового CpG на +58 = chr1:207 321 678</li>
+    <li class="mono" data-i18n="tf-li-2">Ампликон / окно анализа: chr1:207 318 092–207 324 450 (GRCh38), 137 CpG</li>
+    <li class="mono" data-i18n="tf-li-3">Сайт KLF A −106/−95 → ≈ chr1:207 321 514–207 321 525</li>
+    <li class="mono" data-i18n="tf-li-4">Сайт KLF B −310/−302 → ≈ chr1:207 321 310–207 321 318</li>
+    <li class="mono" data-i18n="tf-li-5">Сайт KLF C −667/−652 → ≈ chr1:207 320 953–207 320 968</li>
+    <li class="mono" data-i18n="tf-li-6">Протоспейсер CRISPRoff: chr1:207 321 713–207 321 732 (GRCh38) = +93…+112</li>
+    <li class="mono" data-i18n="tf-li-7">Тот же протоспейсер на T2T-CHM13v2.0: chr1:206 587 009–206 587 028 → TSS ≈ chr1:206 586 916</li>
+    <li class="mono" data-i18n="tf-li-8">Сдвиг GRCh38 − T2T на этом локусе: 734 704 п.н. (одинаковый на обоих концах)</li>
+    <li style="margin-top:8px" data-i18n="tf-li-9">Наши BAM — на T2T-CHM13v2.0 (~chr1:206 582 974–206 590 974). Публичные треки почти все на GRCh38 — перед наложением сделайте liftover в одну или другую сторону и проверьте название контига (<span class="mono">chr1</span> vs <span class="mono">NC_060925.1</span>).</li>
+  </ul>
+</div>
+
+<!-- ============ GUIDE ============ -->
+<h2 id="guide" data-i18n="tf-a-2">Гайд на карте</h2>
+
+<p data-i18n="tf-p-6">Спейсер CRISPRoff — <span class="mono">GCTGCGACTCGGCGGAGTCC</span>, он ложится на GRCh38 chr1:207 321 713–207 321 732 — <strong>+93…+112 относительно TSS</strong>. Координаты в T2T, которые были даны вместе с ним (chr1:206 587 009–206 587 028), отличаются ровно на 734 704 п.н. на обоих концах — это перепроверяет liftover и даёт TSS в T2T на chr1:206 586 916.</p>
+
+<p data-i18n="tf-p-7">Это единственное число меняет картину. Наши самые резкие дифференциальные CpG, #78–83, идут от +58 до +84 — <strong>они обрываются за 9&nbsp;п.н. до начала протоспейсера</strong>. Самый сильный сигнал во всём профиле сидит сразу за пределами следа самого редактора, с 5′-стороны — ровно там, где литература по dCas9–DNMT3A предсказывает боковой максимум.</p>
+
+<div class="figbox">
+<svg viewBox="0 0 1000 262" role="img" aria-label="Zoomed view of the region from plus 10 to plus 190 base pairs relative to the CD55 transcription start site, showing the observed differential methylation peak at CpG 78 to 83, the dCas9 protospacer footprint at plus 93 to plus 112, the two possible PAM positions depending on strand, and the flanking methylation maxima predicted from published dCas9-DNMT3A geometry.">
+  <defs>
+    <pattern id="crossPeak2" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#E69F00"/>
+      <path d="M0,0 L6,6 M6,0 L0,6" stroke="#0B1310" stroke-width="1.3"/>
+    </pattern>
+    <pattern id="foot" width="8" height="8" patternTransform="rotate(-45)" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#24352E"/>
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#6E8079" stroke-width="2.4"/>
+    </pattern>
+  </defs>
+
+  <!-- prediction guide lines, drawn first so everything else sits on top -->
+  <g stroke-width="1.6">
+    <line x1="346.8" y1="30" x2="346.8" y2="230" stroke="#F0E442" stroke-dasharray="2 3"/>
+    <line x1="668.1" y1="30" x2="668.1" y2="230" stroke="#F0E442" stroke-dasharray="2 3"/>
+    <line x1="460.6" y1="30" x2="460.6" y2="230" stroke="#56B4E9" stroke-dasharray="7 5"/>
+    <line x1="781.8" y1="30" x2="781.8" y2="230" stroke="#56B4E9" stroke-dasharray="6 5"/>
+  </g>
+
+  <!-- observed -->
+  <text x="70" y="24" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="12" data-i18n="tf-text-9">наблюдаемое: самые резкие дифференциальные CpG</text>
+  <rect x="307.3" y="34" width="128.6" height="22" rx="3" fill="url(#crossPeak2)" stroke="#E69F00" stroke-width="1.3"/>
+  <text x="441" y="49" fill="#E69F00" font-family="IBM Plex Mono, monospace" font-size="11.5">CpG #78–83 · +58…+84</text>
+
+  <!-- axis -->
+  <line x1="70" y1="82" x2="960" y2="82" stroke="#24352E" stroke-width="2"/>
+  <g font-family="IBM Plex Mono, monospace" font-size="11" fill="#A9B8B0">
+    <line x1="144.2" y1="77" x2="144.2" y2="87" stroke="#24352E" stroke-width="1.6"/><text x="144.2" y="101" text-anchor="middle">+25</text>
+    <line x1="267.8" y1="77" x2="267.8" y2="87" stroke="#24352E" stroke-width="1.6"/><text x="267.8" y="101" text-anchor="middle">+50</text>
+    <line x1="391.3" y1="77" x2="391.3" y2="87" stroke="#24352E" stroke-width="1.6"/><text x="391.3" y="101" text-anchor="middle">+75</text>
+    <line x1="514.9" y1="77" x2="514.9" y2="87" stroke="#24352E" stroke-width="1.6"/><text x="514.9" y="101" text-anchor="middle">+100</text>
+    <line x1="638.4" y1="77" x2="638.4" y2="87" stroke="#24352E" stroke-width="1.6"/><text x="638.4" y="101" text-anchor="middle">+125</text>
+    <line x1="762.0" y1="77" x2="762.0" y2="87" stroke="#24352E" stroke-width="1.6"/><text x="762.0" y="101" text-anchor="middle">+150</text>
+    <line x1="885.5" y1="77" x2="885.5" y2="87" stroke="#24352E" stroke-width="1.6"/><text x="885.5" y="101" text-anchor="middle">+175</text>
+  </g>
+
+  <!-- editor geometry -->
+  <text x="70" y="128" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="12" data-i18n="tf-text-10">геометрия редактора</text>
+  <rect x="480.4" y="138" width="93.9" height="26" rx="3" fill="url(#foot)" stroke="#6E8079" stroke-width="1.4"/>
+  <text x="527" y="155" fill="#E9EEEA" font-family="IBM Plex Mono, monospace" font-size="10.5" text-anchor="middle" data-i18n="tf-text-11">протоспейсер</text>
+  <text x="527" y="180" fill="#6E8079" font-family="IBM Plex Mono, monospace" font-size="10.5" text-anchor="middle" data-i18n="tf-text-12">+93…+112 · защищено по картам</text>
+  <rect x="579.2" y="138" width="19.9" height="26" rx="3" fill="none" stroke="#0072B2" stroke-width="1.6" stroke-dasharray="4 3"/>
+  <text x="604" y="155" fill="#0072B2" font-family="IBM Plex Mono, monospace" font-size="10.5" data-i18n="tf-text-13">PAM (+ цепь)</text>
+  <rect x="465.6" y="138" width="9.9" height="26" rx="3" fill="none" stroke="#0072B2" stroke-width="1.6" stroke-dasharray="4 3"/>
+  <text x="461" y="132" fill="#0072B2" font-family="IBM Plex Mono, monospace" font-size="10.5" text-anchor="end" data-i18n="tf-text-14">PAM (− цепь)</text>
+
+  <!-- CpGs inside the footprint -->
+  <g stroke="#E69F00" stroke-width="2.2">
+    <line x1="500.2" y1="192" x2="500.2" y2="206"/>
+    <line x1="510.1" y1="192" x2="510.1" y2="206"/>
+    <line x1="524.9" y1="192" x2="524.9" y2="206"/>
+    <line x1="539.7" y1="192" x2="539.7" y2="206"/>
+    <line x1="549.6" y1="192" x2="549.6" y2="206"/>
+  </g>
+  <text x="70" y="203" fill="#E69F00" font-family="IBM Plex Mono, monospace" font-size="10.5" data-i18n="tf-text-15">3 CpG внутри следа: +97/+102/+105 или +99/+102/+107</text>
+
+  <!-- prediction labels -->
+  <text x="70" y="228" fill="#A9B8B0" font-family="IBM Plex Mono, monospace" font-size="12" data-i18n="tf-text-16">предсказанные боковые максимумы</text>
+  <g font-family="IBM Plex Mono, monospace" font-size="10.5">
+    <text x="346.8" y="248" fill="#F0E442" text-anchor="middle">+66</text>
+    <text x="668.1" y="248" fill="#F0E442" text-anchor="middle">+131</text>
+    <text x="460.6" y="248" fill="#56B4E9" text-anchor="middle">+89</text>
+    <text x="781.8" y="248" fill="#56B4E9" text-anchor="middle">+154</text>
+    <text x="960" y="214" fill="#F0E442" text-anchor="end" data-i18n="tf-text-17">пунктир = PAM на − цепи</text>
+    <text x="960" y="230" fill="#56B4E9" text-anchor="end" data-i18n="tf-text-18">штрих = PAM на + цепи</text>
+  </g>
+</svg>
+<div class="legend">
+  <span data-i18n="tf-span-8"><i style="background:#E69F00"></i> наблюдаемый пик (крест-штриховка)</span>
+  <span data-i18n="tf-span-9"><i style="background:#6E8079"></i> след протоспейсера dCas9 (штриховка)</span>
+  <span data-i18n="tf-span-10"><i style="border:1.5px dashed #0072B2;background:none"></i> кандидат на PAM</span>
+  <span data-i18n="tf-span-11"><i style="background:#E69F00"></i> CpG внутри следа</span>
+  <span data-i18n="tf-span-12"><i style="background:#F0E442"></i> предсказание, − цепь</span>
+  <span data-i18n="tf-span-13"><i style="background:#56B4E9"></i> предсказание, + цепь</span>
+</div>
+<figcaption data-i18n="tf-figcaption-2">Предсказанные максимумы размещены примерно на 25 п.н. с 5′-стороны и 40 п.н. с 3′-стороны от PAM — смещения, опубликованные для слияний dCas9–Dnmt3a3L. Поскольку цепь спейсера пока не установлена, показаны оба варианта положения PAM. На этой схеме нет ни одного измеренного значения метилирования — единственный измеренный элемент — оранжевый блок, взятый из нашего собственного дифференциального анализа.</figcaption>
+</div>
+
+<div class="panel note">
+  <span class="tag" data-i18n="tf-span-14">От вопроса про цепь зависит качество совпадения</span>
+  <p style="margin-top:0" data-i18n="tf-p-8">SpCas9 нужен NGG сразу с 3′-стороны от протоспейсера на той цепи, которой соответствует спейсер. Есть два варианта, и они отстоят друг от друга на 23 п.н.:</p>
+  <ul>
+    <li data-i18n="tf-li-10"><strong>Спейсер на + цепи</strong> → PAM на +113…+115. Опубликованный 5′-максимум пришёлся бы на ≈ +89; центр нашего пика (+71) отстоит от PAM на 43 п.н. Та же сторона, правильный порядок, но примерно на 18 п.н. дальше ожидаемого.</li>
+    <li data-i18n="tf-li-11"><strong>Спейсер на − цепи</strong> → PAM на +90…+92. Опубликованный 5′-максимум пришёлся бы на ≈ +66; центр нашего пика отстоит от PAM на 20 п.н. Это практически учебниковое смещение.</li>
+  </ul>
+  <p style="margin-bottom:0" data-i18n="tf-p-9">Один <span class="mono">samtools faidx</span> по chr1:207 321 705–207 321 740 решает вопрос за секунду — нужно проверить, что написано на + цепи: <span class="mono">GCTGCGACTCGGCGGAGTCC</span> или обратный комплемент <span class="mono">GGACTCCGCCGAGTCGCAGC</span>, и где падает ближайший NGG. Стоит сделать это до любой финальной схемы, потому что вся ось X механизма M1 держится на этом.</p>
+</div>
+
+<div class="panel">
+  <span class="tag" data-i18n="tf-span-15">Три CpG, на которые смотреть в первую очередь</span>
+  <p style="margin-top:0" data-i18n="tf-p-10">В спейсере есть три динуклеотида CpG. На + цепи они сидят либо на <span class="mono">+97 / +102 / +105</span> (спейсер на +), либо на <span class="mono">+99 / +102 / +107</span> (спейсер на −) — <span class="mono">+102</span> остаётся CpG при любом прочтении, поэтому это самая надёжная одиночная позиция для проверки.</p>
+  <p style="margin-bottom:0" data-i18n="tf-p-11">M1 предсказывает, что эти три сайта <em>заметно менее метилированы, чем их ближайшие соседи</em>, потому что на них сидит dCas9. В нашей нумерации CpG это должны быть сайты сразу после #83. Если провал есть — это след, измеренный прямо на одиночных молекулах, и, насколько я могу судить, такого измерения с длинными ридами ещё никто не публиковал. Если провала нет — M1 на этом локусе не работает, и пик +58…+84 нужно объяснять иначе (очевидная альтернатива — M5, плечо H3K4me3, которое лежит почти там же).</p>
+</div>
+
+<!-- ============ MECHANISMS ============ -->
+<h2 id="why" data-i18n="tf-h2-2">Семь механизмов неровного профиля</h2>
+<p class="dim" data-i18n="tf-p-12">В каждой карточке: в чём механизм, какие есть публичные доказательства, что он предсказывает для нашего профиля CD55, и как это проверить на данных, которые у нас уже есть. Разверните, чтобы прочитать.</p>
+
+<details class="mech" open>
+  <summary data-i18n="tf-summary-1"><span class="mid">M1</span>След самого редактора</summary>
+  <div class="body">
+    <dl>
+      <dt data-i18n="tf-dt-1">Механизм</dt>
+      <dd data-i18n="tf-dd-1">dCas9 вместе с R-петлёй занимает примерно 20–30 п.н. ДНК. Привязанный каталитический модуль DNMT3A/3L дотягивается от этого якоря наружу, поэтому фермент не может действовать на ДНК, на которой сам сидит, — он действует на ближайшую свободную ДНК по обе стороны.</dd>
+      <dt data-i18n="tf-dt-2">Доказательства</dt>
+      <dd data-i18n="tf-dd-2">Stepper и соавт. измерили это напрямую для dCas9–Dnmt3a3L: 20–30 п.н. под dCas9 остаются практически неметилированными, а самое сильное метилирование ложится по обе стороны — примерно на 25 п.н. с одного фланга PAM и около 40 п.н. с другого. Независимое исследование dCas9–DNMT3A нашло полосу активности шириной 25–35 п.н. с центром примерно в 27 п.н. ниже PAM по цепи.</dd>
+      <dt data-i18n="tf-dt-3">Предсказывает</dt>
+      <dd data-i18n="tf-dd-3">Воспроизводимый провал на протоспейсере с плечами по бокам, на фиксированных расстояниях от PAM — самая предсказуемая с точки зрения геометрии деталь во всём профиле. Она должна быть в CRISPRoff и <em>отсутствовать или сидеть иначе</em> в ZFPoff, у которого след цинкового пальца другого размера и на другой последовательности.</dd>
+      <dt data-i18n="tf-dt-4">Проверка на наших данных</dt>
+      <dd data-i18n="tf-dd-4">Спейсер теперь картирован — GRCh38 chr1:207 321 713–207 321 732, то есть <strong>+93…+112</strong> от TSS (<a href="#guide">разобрано здесь</a>). Перестройте Δметилирования относительно расстояния от PAM вместо расстояния от TSS и проверьте три CpG внутри протоспейсера на провал. Наш наблюдаемый пик обрывается за 9 п.н. до протоспейсера — это уже предсказанная геометрия. Новое секвенирование не требуется.</dd>
+    </dl>
+  </div>
+</details>
+
+<details class="mech">
+  <summary data-i18n="tf-summary-2"><span class="mid">M2</span>Предпочтения DNMT3A по последовательности</summary>
+  <div class="body">
+    <dl>
+      <dt data-i18n="tf-dt-1">Механизм</dt>
+      <dd data-i18n="tf-dd-5">Каталитический домен контактирует с несколькими основаниями по обе стороны от целевого CpG. Одни фланки — отличный субстрат, другие — почти неподдающийся, независимо от хроматина, позиции или способа таргетирования.</dd>
+      <dt data-i18n="tf-dt-2">Доказательства</dt>
+      <dd data-i18n="tf-dd-6">Углублённые энзимологические работы показали, что основания от −2 до +8 меняют скорость реакции более чем на два порядка: на −2 предпочтителен тимин, на −1 — цитозин или аденин, на +1…+3 — цитозин, а гуанин почти везде нежелателен. По всему геному DNMT3A лучше всего работает на TACGYC, а DNMT3B — на TACGRC, и это предпочтение сохраняется независимо от того, куда в геноме рекрутирован фермент. Более раннее эписомальное исследование оценило эффект в 34-кратный разброс между отдельными сайтами, который для DNMT3A задают основания на −2 и +2.</dd>
+      <dt data-i18n="tf-dt-3">Предсказывает</dt>
+      <dd data-i18n="tf-dd-7">Δметилирования по каждому CpG должна коррелировать с фланкирующей последовательностью ±2, причём пиримидин на +2 должен работать лучше. Поскольку CRISPRoff несёт DNMT3A (не 3B), фланки типа CGC/CGT должны опережать CGG/CGA.</dd>
+      <dt data-i18n="tf-dt-4">Проверка на наших данных</dt>
+      <dd data-i18n="tf-dd-8">Извлечь из референса контекст ±3 п.н. для всех 137 CpG, закодировать каждый сайт по основанию на +2 и сравнить Δметилирования между четырьмя группами. Это анализ на один вечер, и это самый сильный доступный контроль «профиль не случаен» — положительный результат объяснит реальную долю дисперсии ещё до всяких аргументов про хроматин.</dd>
+    </dl>
+  </div>
+</details>
+
+<details class="mech">
+  <summary data-i18n="tf-summary-3"><span class="mid">M3</span>Нуклеосомы, линкеры и период 10 п.н.</summary>
+  <div class="body">
+    <dl>
+      <dt data-i18n="tf-dt-1">Механизм</dt>
+      <dd data-i18n="tf-dd-9">De novo метилирование происходит преимущественно на ДНК между нуклеосомами, а геометрия димера DNMT3A вместе с поворотом спирали ДНК делает так, что одни CpG смотрят наружу (доступны), а другие — внутрь (экранированы).</dd>
+      <dt data-i18n="tf-dt-2">Доказательства</dt>
+      <dd data-i18n="tf-dd-10">Структура Dnmt3a–Dnmt3L предполагает, что димер Dnmt3a может дотянуться до двух CpG, разделённых одним витком спирали, за одно событие связывания — это проявляется как периодическая рябь относительного метилирования вдоль ряда сайтов. Недавняя крио-ЭМ вместе с биохимией показала, что расстояние между нуклеосомами задаёт метилирование линкера: короткие линкеры позволяют комплексу «мостить» две нуклеосомы и перекрывать ДНК между ними, а длинные линкеры дают ему взаимодействовать с каждой нуклеосомой по отдельности и метилировать линкер. Сама геометрия нуклеосомы даёт периодический паттерн стерических столкновений, совпадающий с 10-п.н. периодом спирали, в пользу CpG, чьи основания смотрят от гистонового кора наружу.</dd>
+      <dt data-i18n="tf-dt-3">Предсказывает</dt>
+      <dd data-i18n="tf-dd-11">Остаточная периодичность ~10 п.н. в профиле Δ по CpG после вычитания эффектов расстояния до PAM и фланкирующей последовательности; и участки с низким метилированием шириной примерно 150 п.н., соответствующие хорошо позиционированным нуклеосомам.</dd>
+      <dt data-i18n="tf-dt-4">Проверка на наших данных</dt>
+      <dd data-i18n="tf-dd-12">Автокорреляция или периодограмма Ломба–Скаргла для Δметилирования относительно геномной позиции (расстояния между CpG нерегулярны, поэтому нужен метод, устойчивый к неравномерной выборке). Честная оговорка: эписомальное исследование не нашло значимой связи между расстоянием между CpG и эффективностью метилирования — сайты в 8–10 п.н. друг от друга метилировались не лучше остальных. Так что это по-настоящему открытый вопрос, а не устоявшееся предсказание.</dd>
+    </dl>
+  </div>
+</details>
+
+<details class="mech">
+  <summary data-i18n="tf-summary-4"><span class="mid">M4</span>Транскрипционные факторы на пути</summary>
+  <div class="body">
+    <dl>
+      <dt data-i18n="tf-dt-1">Механизм</dt>
+      <dd data-i18n="tf-dd-13">Связанный транскрипционный фактор — это стерическая преграда, а некоторые факторы вдобавок привлекают ферменты TET. В любом случае занятый мотив обычно остаётся гипометилированным относительно окружения — классический «след» в профиле метилирования.</dd>
+      <dt data-i18n="tf-dt-2">Доказательства</dt>
+      <dd data-i18n="tf-dd-14">Связывание ТФ влияет на локальное метилирование и физически блокируя метилтрансферазу, и приводя ферменты TET к месту связывания. Именно на CGI устойчивость ооцитов к de novo метилированию совпадает с CGCGC — сайтом узнавания E2f1/E2f2 — независимо от активности промотора, H3K4me3, Cfp1 или потенциала R-петель: чистая демонстрация того, что один мотив может обеспечивать защиту. Футпринтинг на одиночных молекулах показывает, что связь скорее сайт-специфична, чем универсальна: антикорреляция между 5mC и связыванием ТФ проявляется лишь на части сайтов связывания по геному.</dd>
+      <dt data-i18n="tf-dt-3">Предсказывает</dt>
+      <dd data-i18n="tf-dd-15">Локальные провалы на сайтах KLF A/B/C и соседних с ними CRE — то есть около −106/−95, −310/−302 и −667/−652 — в донорских T-клетках, где заняты KLF4 и CREB. В наших данных соседние с KLF CpG #35, #54 и #65 лежат в пределах ~15 п.н. от трёх опубликованных сайтов CACCC.</dd>
+      <dt data-i18n="tf-dt-4">Проверка на наших данных</dt>
+      <dd data-i18n="tf-dd-16">Аннотировать каждый из 137 CpG расстоянием до ближайшего опубликованного элемента KLF/CRE, затем проверить, систематически ли менее отзывчивы на CRISPRoff CpG рядом с мотивами. Поскольку уровень активации меняет уровень KLF4 в T-клетках (см. ниже), это предсказывает эффект, зависящий от донора и стимуляции — что можно проверить, сравнив Day 6 и Day 35.</dd>
+    </dl>
+  </div>
+</details>
+
+<details class="mech">
+  <summary data-i18n="tf-summary-5"><span class="mid">M5</span>Уже существовавшее состояние хроматина</summary>
+  <div class="body">
+    <dl>
+      <dt data-i18n="tf-dt-1">Механизм</dt>
+      <dd data-i18n="tf-dd-17">DNMT3A «читает» гистоны через два домена: домен ADD отталкивается от H3K4me3 (метки, покрывающей активные промоторы), а домен PWWP притягивается к H3K36me2/3. Поэтому активный, богатый H3K4me3 промотор CD55 по своей природе враждебная территория для фермента, и CRISPRoff приходится это преодолевать — неравномерно.</dd>
+      <dt data-i18n="tf-dt-2">Доказательства</dt>
+      <dd data-i18n="tf-dd-18">H3K4me3 не подпускает de novo метилтрансферазы к неметилированным CpG-островкам, а H3K36me3 притягивает DNMT3B в транскрибируемые тела генов. В работе на динуклеосомах показано, что когда комплекс мостит две близко расположенные нуклеосомы, его домены PWWP больше не могут сканировать H3K36me2 — это добавляет ещё одно структурное ограничение. Именно домен KRAB в составе CRISPRoff это меняет: KRAB связывает TRIM28, который привлекает машинерию гетерохроматина и откладывает H3K9me3, а митотически наследуемая часть сайленсинга CRISPRoff держится на плече ДНК-метилирования.</dd>
+      <dt data-i18n="tf-dt-3">Предсказывает</dt>
+      <dd data-i18n="tf-dd-19">Самый крутой сигнал H3K4me3 — прямо на TSS — должен метилироваться труднее всего на раннем этапе, а фланки и «берега» должны переключаться первыми, с последующим заполнением. Наш пик сидит чуть ниже TSS по цепи, на +58…+84, что совместимо и с «плечом пика H3K4me3», и с «плечом следа dCas9» (M1) — эти два варианта нужно разделить.</dd>
+      <dt data-i18n="tf-dt-4">Проверка на наших данных</dt>
+      <dd data-i18n="tf-dd-20">Наложить публичные H3K4me3, H3K27ac и H3K9me3 для CD4⁺/CD8⁺ T-клеток человека (BLUEPRINT, Roadmap, ENCODE) на окно CD55 и сопоставить сигнал с Δ по каждому CpG. Также сравнить Day 6 и Day 35: если этот механизм доминирует, порядок переключения CpG должен следовать уже существовавшему градиенту хроматина.</dd>
+    </dl>
+  </div>
+</details>
+
+<details class="mech">
+  <summary data-i18n="tf-summary-6"><span class="mid">M6</span>Стирание и сбои поддержания</summary>
+  <div class="body">
+    <dl>
+      <dt data-i18n="tf-dt-1">Механизм</dt>
+      <dd data-i18n="tf-dd-21">Метилирование, записанное на нулевой день, должно пережить репликацию (DNMT1 на полуметилированной цепи) и активное удаление (окисление TET до 5hmC и дальше). Ни один из этих процессов не идёт равномерно вдоль локуса, поэтому метка, записанная ровно, может считываться неровно недели спустя.</dd>
+      <dt data-i18n="tf-dt-2">Доказательства</dt>
+      <dd data-i18n="tf-dd-22">Собственный инструмент реверсии CRISPRoff работает именно так: память можно стереть с помощью CRISPRon, который снимает метилирование и заново привлекает транскрипционную машинерию. Локализация DNMT3A1 связана с оборотом метки: её связывание совпадает с повышенным 5-гидроксиметилцитозином, что указывает на активный оборот, а не статичную метку в этих сайтах.</dd>
+      <dt data-i18n="tf-dt-3">Предсказывает</dt>
+      <dd data-i18n="tf-dd-23">Позиции, теряющие метилирование между Day 6 и Day 35, — это другой, отличимый набор от позиций, которые вообще не метилировались. «Никогда не записано» и «записано и потом стёрто» — это разные сигнатуры.</dd>
+      <dt data-i18n="tf-dt-4">Проверка на наших данных</dt>
+      <dd data-i18n="tf-dd-24">У нас уже есть сравнение Day 6 vs Day 35 — но там донор смешан (confounded) с временной точкой, поэтому текущий дизайн не позволяет разделить это чисто. Нужна временная серия на одном и том же доноре. Это стоит пометить как открытый вопрос, а не выдавать за результат. Прогон нанопора, который вдобавок вызывает 5hmC, разделил бы «стёрто» и «никогда не записано» напрямую.</dd>
+    </dl>
+  </div>
+</details>
+
+<details class="mech">
+  <summary data-i18n="tf-summary-7"><span class="mid">M7</span>Молекулы, а не средние</summary>
+  <div class="body">
+    <dl>
+      <dt data-i18n="tf-dt-1">Механизм</dt>
+      <dd data-i18n="tf-dd-25">Среднее по каждому CpG схлопывает два очень разных мира: градуированное частичное метилирование на каждой молекуле — против переключателя «всё или ничего», присутствующего на части молекул. Только второй вариант совместим с переключательным характером сайленсинга, который даёт CRISPRoff.</dd>
+      <dt data-i18n="tf-dt-2">Доказательства</dt>
+      <dd data-i18n="tf-dd-26">Футпринтинг на одиночных молекулах существует именно поэтому: такие энхансеры сидят сразу в двух состояниях — на части молекул ДНК метилирована и покрыта нуклеосомой, на остальных — в альтернативной конфигурации. Футпринтинг промоторов метилтрансферазой точно так же даёт разрешение до отдельных молекул промотора, сохраняя связь между сайтами на одной и той же молекуле, и вскрывает положения нуклеосом, которые нуклеазные методы размывают в одно целое.</dd>
+      <dt data-i18n="tf-dt-3">Предсказывает</dt>
+      <dd data-i18n="tf-dd-27">Бимодальное распределение долей метилирования по молекулам в окне CD55, где две моды соответствуют отредактированным и «ускользнувшим» молекулам — и коррелированное состояние метилирования <em>вдоль</em> отдельной молекулы, а не независимые «подбрасывания монеты» по каждому CpG.</dd>
+      <dt data-i18n="tf-dt-4">Проверка на наших данных</dt>
+      <dd data-i18n="tf-dd-28">Вот для чего на самом деле нужна наша платформа. Кластеризовать молекулы по полному бинарному вектору из 137 CpG вместо усреднения по столбцам; проверить долю mCpG на молекулу на бимодальность; посчитать попарное со-метилирование между CpG <em>i</em> и CpG <em>j</em> на одном и том же риде как функцию их расстояния. Длина затухания корреляции — это прямое, не зависящее от модели измерение того, как далеко распространяется домен сайленсинга на одной хромосоме, — и ничего подобного из литературы по массовому бисульфиту получить нельзя.</dd>
+    </dl>
+  </div>
+</details>
+
+<!-- ============ TF INVENTORY ============ -->
+<h2 id="tfs" data-i18n="tf-h2-3">Транскрипционные факторы, описанные на промоторе CD55</h2>
+<p data-i18n="tf-p-13">Что реально опубликовано, отранжировано по тому, насколько доказательства напрямую относятся к T-клеткам человека. Почти вся механистическая работа сделана на эндотелиальных клетках, эпителии или линиях рака толстой кишки — колонка про T-клетки как раз показывает честные пробелы.</p>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th data-i18n="tf-th-1">Фактор</th><th data-i18n="tf-th-2">Сайт / позиция</th><th data-i18n="tf-dt-2">Доказательства</th><th data-i18n="tf-th-3">Изученные клетки</th><th data-i18n="tf-th-4">Значимость для T-клеток</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>KLF4</strong></td>
+      <td class="mono" data-i18n="tf-td-1">парные CACCC на −106/−95 (A), −310/−302 (B), −667/−652 (C), плюс −228/−214 и −567/−549</td>
+      <td data-i18n="tf-td-2">занятость по ChIP на всех трёх сайтах A–C; урезанный промотор 190 п.н. только с сайтом A воспроизводит большую часть активности полных 848 п.н.</td>
+      <td data-i18n="tf-td-3">HUVEC, репортёр в K562</td>
+      <td data-i18n="tf-td-4"><strong>Высокая.</strong> KLF4 падает в активированных спленоцитах CD4⁺ синхронно с мРНК CD55. Состояние активации должно менять занятость сайта — а значит, и след.</td>
+    </tr>
+    <tr>
+      <td><strong>CREB / p-CREB + CBP</strong></td>
+      <td class="mono" data-i18n="tf-td-5">сайты CRE рядом с KLF A, B, C</td>
+      <td data-i18n="tf-td-6">ChIP: обогащение p-CREB и CBP следовало за обогащением KLF4 на всех трёх сайтах</td>
+      <td>HUVEC</td>
+      <td data-i18n="tf-td-7"><strong>Высокая.</strong> Путь p-CREB идёт через аденилатциклазу, которую сам CD55 регулирует через C3aR/C5aR — петля обратной связи, работающая в T-клетках CD4⁺.</td>
+    </tr>
+    <tr>
+      <td><strong>SP1</strong></td>
+      <td class="mono" data-i18n="tf-td-8">GC-бокс(ы), проксимальный промотор</td>
+      <td data-i18n="tf-td-9">мутагенез промотора; конститутивная экспрессия мышиного Daf1 приписана SP1</td>
+      <td data-i18n="tf-td-10">Huh7.5, спленоциты мыши</td>
+      <td data-i18n="tf-td-11">Средняя. Сайты SP1 содержат CpG и богаты GC — идеальный субстрат для CRISPRoff, а связывание SP1 классически считается нечувствительным к метилированию.</td>
+    </tr>
+    <tr>
+      <td><strong>NF-κB (RelA)</strong></td>
+      <td class="mono" data-i18n="tf-td-12">предсказанный сайт в 2 kb 5′-фланка; подтверждён ChIP</td>
+      <td data-i18n="tf-td-13">ChIP с антителом к NF-κB и промотор-специфичными праймерами подтвердил занятость на CD55</td>
+      <td data-i18n="tf-td-14">LOVO / HCT116, рак толстой кишки</td>
+      <td data-i18n="tf-td-15">Средне-высокая. NF-κB централен для активации T-клеток; точное смещение не опубликовано в системе координат, которую можно наложить на наши CpG.</td>
+    </tr>
+    <tr>
+      <td><strong>TFCP2</strong></td>
+      <td class="mono" data-i18n="tf-td-16">предсказанный сайт, 5′-фланк</td>
+      <td data-i18n="tf-td-17">мутация сайта TFCP2 снизила активность промотора CD55 на 66%</td>
+      <td>HCT116 / LOVO</td>
+      <td data-i18n="tf-td-18">Низко-средняя. Эффект сильный, но контекст — рак толстой кишки; чтобы это имело значение здесь, нужен ChIP в T-клетках.</td>
+    </tr>
+    <tr>
+      <td><strong>AP-1</strong></td>
+      <td class="mono" data-i18n="tf-td-19">описанный сайт, проксимальный промотор</td>
+      <td data-i18n="tf-td-20">точечная мутация не повлияла на индукцию через HCV core</td>
+      <td>Huh7.5</td>
+      <td data-i18n="tf-td-21">Низкая как доказательство, высокая как гипотеза — AP-1 один из основных факторов активации T-клеток.</td>
+    </tr>
+    <tr>
+      <td><strong>HIF-1α</strong></td>
+      <td class="mono" data-i18n="tf-td-22">апикальная индукция CD55, гипоксия</td>
+      <td data-i18n="tf-td-23">HIF-зависимая индукция апикального CD55</td>
+      <td data-i18n="tf-td-24">кишечный эпителий</td>
+      <td data-i18n="tf-td-25">Низкая для T-клеток, но важна для любой гипоксичной культуры или тканевого контекста.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <span class="tag" data-i18n="tf-span-16">Кого в этом списке пока нет — и стоит проверить</span>
+  <p style="margin-top:0" data-i18n="tf-p-14">Ни одна публикация не помещает <strong>NFAT, ETS1, RUNX1, TCF7/LEF1, GATA3, STAT5 или CTCF</strong> именно на промотор CD55. Это отсутствие доказательств, а не доказательство отсутствия — ни одна из работ выше не смотрела в T-клетках. Правильный ход — не гадать, а прогнать наше точное окно через перечисленные ниже T-клеточные ChIP-компендиумы и посмотреть, что вернётся. Если у какого-то фактора там найдётся реальный пик в CD4⁺ или клетках Jurkat, его мотив попадёт на карту, а его CpG будут отмечены в анализе следов.</p>
+</div>
+
+<!-- ============ T CELL BIOLOGY ============ -->
+<h2 id="tcell" data-i18n="tf-h2-4">Почему T-клеточный контекст меняет предсказание</h2>
+
+<h3 data-i18n="tf-h3-1">CD55 в T-клетках — не пассажир</h3>
+<p data-i18n="tf-p-15">Это регулятор тех самых клеток, которые мы редактируем. CD55 задаёт, насколько громко работает аутокринная сигнализация рецепторов C3a/C5a: при низком CD55 эта сигнализация усиливается и запускаются эффекторные ответы; при высоком CD55 сигнализация приглушена и предпочтение отдаётся коммитированию в Foxp3⁺ регуляторные клетки. Независимо от этого, вовлечение CD55 вместе с CD3 — сшивающим антителом или естественным лигандом CD97 — повышает пролиферацию человеческих T-клеток CD4⁺ из крови вместе с CD69, CD25, IL-10 и GM-CSF.</p>
+<p data-i18n="tf-p-16">Отсюда два следствия для нас. Во-первых, сайленсинг CD55 — это функциональное возмущение, а не нейтральное считывание: отредактированные клетки могут смещаться к эффекторному фенотипу, а это меняет набор ТФ, который затем формирует метилирование. Во-вторых, KLF4 и CD55 падают вместе при активации, поэтому занятость промотора факторами в момент действия CRISPRoff зависит от того, как были простимулированы донорские клетки.</p>
+
+<h3 data-i18n="tf-h3-2">Метилирование и связывание ТФ работают в обе стороны</h3>
+<p data-i18n="tf-p-17">Обычная история — метилирование блокирует ТФ. Систематический ответ более запутанный, и эта запутанность особенно важна для T-клеток: скрининг 542 человеческих ТФ методом methyl-SELEX выявил большую группу, которая на самом деле предпочитает метилированный CpG, — в основном в расширенном семействе homeodomain, где 5-метильная группа образует прямой гидрофобный контакт. В разбивке по семействам связывание bHLH, bZIP и ETS в целом подавлялось метилированием CpG за счёт стерического конфликта, а факторы homeodomain, POU и NFAT предпочитали именно метилированный вариант.</p>
+<p data-i18n="tf-p-18">То, что NFAT предпочитает метилированный CpG, — примечательная деталь именно для T-клеточного локуса. Это значит, что метка, которую откладывает CRISPRoff на CD55, не просто всех выселяет — она может перераспределить, какие факторы вообще способны сесть на участок. Есть ли в нашем окне мотив NFAT — это именно то, что нужно проверить в JASPAR/UniBind, а не предполагать.</p>
+
+<h3 data-i18n="tf-h3-3">Плечо KRAB важно не меньше плеча DNMT</h3>
+<p data-i18n="tf-p-19">KRAB связывает TRIM28 — повсеместный каркасный белок, который привлекает машинерию гетерохроматина и запускает H3K9me3; CRISPRoff превосходит и один dCas9-KRAB (сильный, но временный эффект), и один dCas9-DNMT3A/3L (слабый, но наследуемый) — именно поэтому важен мультидоменный дизайн. Пространственный охват распространения H3K9me3 и пространственный охват метилирования CpG не обязаны совпадать, и там, где они расходятся, это информативно. Nuñez и соавт. использовали именно эту логику: широкое окно таргетирования на промоторе H2B позволило проследить, как устанавливаются, распространяются и поддерживаются H3K9me3 и метилирование CpG.</p>
+
+<!-- ============ DATA ============ -->
+<h2 id="data" data-i18n="tf-h2-5">Публичные данные, которые стоит скачать для этого окна</h2>
+<p data-i18n="tf-p-20">Всё ниже покрывает либо локус CD55 в T-клетках, либо механистические параметры, нужные моделям выше. В запросах использовать <span class="mono">chr1:207 318 092–207 324 450</span> (GRCh38) с отступом ~5 kb.</p>
+
+<div class="tablewrap">
+<table>
+  <thead><tr><th data-i18n="tf-th-5">Ресурс</th><th data-i18n="tf-th-6">Что даёт</th><th data-i18n="tf-th-7">Почему важно здесь</th></tr></thead>
+  <tbody>
+    <tr><td><a href="https://screen.wenglab.org/">ENCODE SCREEN</a></td><td data-i18n="tf-td-26">зарегистрированные cCRE с сигналом DNase/H3K4me3/H3K27ac/CTCF по биообразцам</td><td data-i18n="tf-td-27">Самый быстрый способ увидеть, является ли TSS CD55 промотор-подобным cCRE в наивных T-клетках CD4⁺/CD8⁺, и где его границы относительно наших 137 CpG.</td></tr>
+    <tr><td><a href="https://www.encodeproject.org/" data-i18n="tf-a-10">портал ENCODE</a></td><td data-i18n="tf-td-28">сырые и обработанные ChIP-seq, DNase-seq, ATAC-seq; биообразцы Jurkat и первичных T-клеток</td><td data-i18n="tf-td-29">Прямое доказательство занятости ТФ на T-клеточном фоне — именно тот пробел, который оставляет опубликованная литература по промотору CD55.</td></tr>
+    <tr><td><a href="https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&position=chr1%3A207318092-207324450" data-i18n="tf-a-11">UCSC Genome Browser (окно уже загружено)</a></td><td data-i18n="tf-td-30">CpG-островки, ReMap, JASPAR TFBS, консервативность, сводные треки ENCODE в одном виде</td><td data-i18n="tf-td-31">Подтверждает статус CpG-островка у промотора — литература по CRISPRoff говорит, что это не требуется для сайленсинга, но это меняет картину рекрутирования DNMT3A.</td></tr>
+    <tr><td><a href="https://chip-atlas.org/">ChIP-Atlas</a></td><td data-i18n="tf-td-32">переобработанные публичные ChIP-seq, с фильтром по классу клеток (Blood)</td><td data-i18n="tf-td-33">«Какие факторы вообще когда-либо ловились по ChIP на этом интервале в клетках крови» — один запрос отвечает на открытый вопрос из раздела выше.</td></tr>
+    <tr><td><a href="https://remap.univ-amu.fr/">ReMap 2022</a> · <a href="https://unibind.uio.no/">UniBind</a></td><td data-i18n="tf-td-34">курированные пики ТФ; UniBind добавляет прямые сайты связывания, подтверждённые мотивом</td><td data-i18n="tf-td-35">UniBind — более строгий фильтр (мотив + пик), поэтому именно его находки стоит наносить на карту промотора.</td></tr>
+    <tr><td><a href="https://jaspar.elixir.no/">JASPAR 2024</a> · <a href="https://hocomoco12.autosome.org/">HOCOMOCO v12</a></td><td data-i18n="tf-td-36">позиционные весовые матрицы</td><td data-i18n="tf-td-37">Просканировать последовательность ампликона на KLF4, SP1, CREB1, RELA, TFCP2, NFATC1/2, ETS1, RUNX1, TCF7, GATA3 и отметить, какие CpG попадают внутрь находок.</td></tr>
+    <tr><td><a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE118189">Calderon et al. 2019 — GSE118189</a></td><td data-i18n="tf-td-38">ATAC-seq + RNA-seq для до 32 популяций иммунных клеток, в покое и после стимуляции</td><td data-i18n="tf-td-39">Лучший из всех ресурсов для вопроса «открыт ли промотор CD55 в <em>моём</em> состоянии клетки» — субпопуляции CD4⁺/CD8⁺ в покое vs после стимуляции — ровно та ось, по которой различаются наши доноры.</td></tr>
+    <tr><td><a href="https://dice-database.org/">DICE</a></td><td data-i18n="tf-td-40">RNA-seq по 15 отсортированным типам иммунных клеток человека, плюс eQTL</td><td data-i18n="tf-td-41">Базовая экспрессия CD55 по субпопуляциям T-клеток — знаменатель для интерпретации того, насколько сильно мы реально заглушили ген.</td></tr>
+    <tr><td><a href="https://www.blueprint-epigenome.eu/">BLUEPRINT</a> · <a href="http://www.roadmapepigenomics.org/">Roadmap Epigenomics</a></td><td data-i18n="tf-td-42">метиломы WGBS плюс H3K4me3/H3K27ac/H3K9me3/H3K36me3 для T-клеток CD4⁺ и CD8⁺</td><td data-i18n="tf-td-43">Базовое неотредактированное метилирование и состояние хроматина, от которого зависит M5. А также референс, на котором можно проверить, что «наши неотредактированные контроли выглядят нормально».</td></tr>
+    <tr><td><a href="https://www.sciencedirect.com/science/article/pii/S0092867421003536" data-i18n="tf-a-12">Nuñez et al. 2021, Cell — дополнительные таблицы</a></td><td data-i18n="tf-td-44">полногеномные скрины CRISPRoff; таблица дифференциально метилированных регионов CpG из полногеномного бисульфитного секвенирования; скрины тайлинга промоторов</td><td data-i18n="tf-td-45">Эмпирическая форма окна таргетирования из статьи самого инструмента — прямое сравнение для нашей геометрии по CpG и ближайшее к позитивному контролю для M1.</td></tr>
+    <tr><td><a href="https://www.science.org/doi/10.1126/science.aaj2239" data-i18n="tf-a-13">Yin et al. 2017, Science — таблицы methyl-SELEX</a></td><td data-i18n="tf-td-46">классификация по каждому ТФ: подавляется метилированием, усиливается им, или нечувствителен</td><td data-i18n="tf-td-47">Превращает общую фразу «метилирование блокирует ТФ» в конкретное предсказание для каждого фактора, который ChIP-компендиумы поместят в наше окно.</td></tr>
+    <tr><td><a href="https://www.proteinatlas.org/ENSG00000196352-CD55">Human Protein Atlas — CD55</a></td><td data-i18n="tf-td-48">экспрессия по отдельным клеткам и типам иммунных клеток, локализация белка</td><td data-i18n="tf-td-49">Быстрая проверка на здравый смысл для ожиданий по поверхностной экспрессии рядом с нашими данными проточной цитометрии.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="codehead">
+  <h3 style="margin:0" data-i18n="tf-h3-4">Скрипт для скачивания на Skynet</h3>
+  <button class="copybtn" type="button" data-copy="#fetchsh" data-i18n="tf-button-1">Скопировать скрипт</button>
+</div>
+<p class="dim" style="margin-top:6px" data-i18n="tf-p-21">Запускать там, где <em>есть</em> сеть. Скрипт вырезает окно CD55 из удалённых bigWig и BED вместо скачивания файлов на весь геном. URL-акцешены с порталов ENCODE/BLUEPRINT нужно подставить самому — они меняются, поэтому скрипт специально держит их в одном редактируемом блоке сверху.</p>
+<pre id="fetchsh"><code data-i18n="tf-code-1">#!/usr/bin/env bash
+# окно промотора CD55 — скачать публичные T-клеточные треки (GRCh38)
+set -euo pipefail
+
+CHR=chr1; START=207313000; END=207329000        # ампликон +/- ~5 kb
+REGION="${CHR}:${START}-${END}"
+OUT=cd55_public; mkdir -p "$OUT"; cd "$OUT"
+
+# ---- 1. референсная последовательность окна (анализ фланков, M2) ----
+samtools faidx /path/to/GRCh38.fa "$REGION" &gt; cd55_window.fa
+
+# ---- 2. перечислить все CpG в окне с их контекстом +/-3 п.н. ----
+python3 - &lt;&lt;'PY'
+from pathlib import Path
+seq = "".join(l.strip() for l in Path("cd55_window.fa").read_text().splitlines()[1:]).upper()
+start = 207313000  # держать в синхроне с $START выше; координаты faidx 1-based
+rows = []
+for i in range(3, len(seq) - 4):
+    if seq[i:i+2] == "CG":
+        rows.append((start + i, seq[i-3:i+5], seq[i+2]))   # позиция, контекст, база на +2
+Path("cd55_cpg_context.tsv").write_text(
+    "pos\tcontext_m3_p4\tplus2_base\n" + "\n".join(f"{p}\t{c}\t{b}" for p, c, b in rows)
+)
+print(f"{len(rows)} CpG записано")
+PY
+
+# ---- 3. треки хроматина: подставить URL и вырезать окно удалённо ----
+declare -A TRACKS=(
+  [CD4_H3K4me3]="https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig"
+  [CD4_H3K27ac]="https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig"
+  [CD4_H3K9me3]="https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig"
+  [CD4_ATAC]="https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig"
+)
+for name in "${!TRACKS[@]}"; do
+  bigWigToBedGraph -chrom="$CHR" -start="$START" -end="$END" "${TRACKS[$name]}" "${name}.bedGraph"
+done
+
+# ---- 4. поиск мотивов (M4) ----
+# один раз скачать файл JASPAR CORE vertebrates в формате MEME, затем:
+#   fimo --thresh 1e-4 --oc fimo_out JASPAR2024_CORE_vertebrates.meme cd55_window.fa
+
+echo "done -&gt; $(pwd)"
+</code></pre>
+
+<!-- ============ PLAN ============ -->
+<h2 id="plan" data-i18n="tf-h2-6">Шесть анализов в порядке выполнения</h2>
+<p data-i18n="tf-p-22">Порядок — по соотношению пользы к усилиям. Первые три не требуют вообще никаких новых данных.</p>
+
+<div class="tablewrap">
+<table>
+  <thead><tr><th data-i18n="tf-th-8">№</th><th data-i18n="tf-th-9">Анализ</th><th data-i18n="tf-th-10">Проверяет</th><th data-i18n="tf-th-11">Нужно</th><th data-i18n="tf-th-12">Результат, если гипотеза верна</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">1</td><td data-i18n="tf-td-50">Перепривязать Δметилирования к расстоянию от PAM (CRISPRoff) и от сайта узнавания ZFP (ZFPoff)</td><td>M1</td><td data-i18n="tf-td-51">координаты sgRNA/ZFP + существующая таблица по CpG</td><td data-i18n="tf-td-52">Геометрический след как свойство инструмента, а не локуса — и первое настоящее механистическое применение того, что у нас есть две модальности.</td></tr>
+    <tr><td class="mono">2</td><td data-i18n="tf-td-53">Состав фланкирующих оснований ±2 / ±3 против Δ по каждому CpG</td><td>M2</td><td data-i18n="tf-td-54">только референсная последовательность</td><td data-i18n="tf-td-55">Количественно оценённый вклад самой последовательности в профиль. Вероятно, объяснит реальную долю дисперсии.</td></tr>
+    <tr><td class="mono">3</td><td data-i18n="tf-td-56">Кластеризация по молекулам и затухание попарного со-метилирования вдоль рида</td><td>M7</td><td data-i18n="tf-td-57">уже имеющиеся риды нанопора</td><td data-i18n="tf-td-58">Бимодальность и длина распространения в п.н. — измерение, которое можно сделать только на длинных одномолекульных ридах.</td></tr>
+    <tr><td class="mono">4</td><td data-i18n="tf-td-59">Аннотация мотивов для всех 137 CpG (JASPAR/UniBind) + расстояние до опубликованных сайтов KLF/CRE</td><td>M4</td><td data-i18n="tf-td-60">поиск мотивов, один вечер</td><td data-i18n="tf-td-61">Именованные кандидаты в следы с координатами, готовые лечь на карту выше.</td></tr>
+    <tr><td class="mono">5</td><td data-i18n="tf-td-62">Наложить H3K4me3, H3K27ac, ATAC для CD4⁺/CD8⁺ на окно; сопоставить с Δ</td><td>M5</td><td data-i18n="tf-td-63">скачивание публичных треков</td><td data-i18n="tf-td-64">Предсказывает ли уже существовавшая метка активного промотора устойчивость к редактированию.</td></tr>
+    <tr><td class="mono">6</td><td data-i18n="tf-td-65">Анализ периодичности остатков после вычитания эффектов 1, 2 и 5</td><td>M3</td><td data-i18n="tf-td-66">результаты анализов 1–2 и 5</td><td data-i18n="tf-td-67">Структура масштаба нуклеосомы — труднее всего обнаружить и легче всего обмануться. Делать последним, на остатках, с пермутационным нулём.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel note">
+  <span class="tag" data-i18n="tf-span-17">Методическая заметка</span>
+  <p style="margin:0" data-i18n="tf-p-23">Анализы 1, 2 и 5 дают <em>аддитивные</em> ковариаты. Их нужно подгонять совместно (одна модель Δ по каждому CpG с расстоянием до PAM, фланкирующим контекстом и сигналом хроматина как отдельными членами), а не последовательно — иначе эффект, проверенный первым, заберёт себе общую дисперсию, и последующие покажутся слабее, чем они есть на самом деле. Сообщать частные эффекты и использовать пермутационный нуль, построенный перемешиванием меток CpG внутри окна, а не параметрическое p-значение.</p>
+</div>
+
+<!-- ============ LIMITS ============ -->
+<h2 id="limits" data-i18n="tf-h2-7">Чем эта страница не является</h2>
+<ul>
+  <li data-i18n="tf-li-12"><strong>Не результат.</strong> Ни один трек не был скачан, ни одно число здесь не вычислено. Каждый механизм — гипотеза с прописанным способом проверки.</li>
+  <li data-i18n="tf-li-13"><strong>Не T-клеточные доказательства для сайтов ТФ.</strong> Картирование KLF4/CREB/CBP сделано на эндотелии и репортёрных конструкциях. Перенос на первичные T-клетки человека — допущение, пока T-клеточный ChIP не скажет обратного.</li>
+  <li data-i18n="tf-li-14"><strong>Не полный список факторов.</strong> Отсутствие NFAT, ETS или RUNX в таблице отражает отсутствие T-клеточных исследований этого промотора, а не отсутствие связывания.</li>
+  <li data-i18n="tf-li-15"><strong>Не решение проблемы смешения донора и временной точки.</strong> Day 6 и Day 35 — разные доноры; в частности, M6 нельзя закрыть при текущем дизайне.</li>
+  <li data-i18n="tf-li-16"><strong>С координатами нужна аккуратность.</strong> Наши выравнивания на T2T-CHM13v2.0; почти всё, на что здесь есть ссылки, — GRCh38. Делать liftover осознанно и проверять, что TSS ложится туда, где ожидается, прежде чем что-либо накладывать.</li>
+</ul>
+
+<!-- ============ REFS ============ -->
+<h2 id="refs" data-i18n="tf-a-9">Источники</h2>
+<ol class="refs">
+  <li data-i18n="tf-li-17">An F-Q, Zhou G, Harland MT, et&nbsp;al. KLF4 and CD55 expression and function depend on each other. <em>Front Immunol</em> 2024;14:1290684. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10884306/">PMC10884306</a> — координаты сайтов CACCC/CRE, ChIP по KLF4/p-CREB/CBP, данные по активации CD4⁺.</li>
+  <li data-i18n="tf-li-18">Nuñez JK, Chen J, Pommier GC, et&nbsp;al. Genome-wide programmable transcriptional memory by CRISPR-based epigenome editing. <em>Cell</em> 2021. <a href="https://www.sciencedirect.com/science/article/pii/S0092867421003536">Article</a> — механизм CRISPRoff, окно таргетирования, таблицы DMR по WGBS.</li>
+  <li data-i18n="tf-li-19">Stepper P, Kungulovski G, Jurkowska RZ, et&nbsp;al. Efficient targeted DNA methylation with chimeric dCas9–Dnmt3a–Dnmt3L. <em>Nucleic Acids Res</em> 2017;45:1703. <a href="https://academic.oup.com/nar/article/45/4/1703/2605790">Article</a> — защитный след dCas9 и боковые пики метилирования.</li>
+  <li data-i18n="tf-li-20">Vojta A, Dobrinić P, Tadić V, et&nbsp;al. Repurposing the CRISPR-Cas9 system for targeted DNA methylation. <em>Nucleic Acids Res</em> 2016;44:5615. <a href="https://academic.oup.com/nar/article/44/12/5615/2457488">Article</a> — пик метилирования 25–35 п.н. с центром в 27 п.н. от PAM.</li>
+  <li data-i18n="tf-li-21">Adam S, Bräcker J, Klingel V, et&nbsp;al. DNMT3A forms interaction networks with the CpG site and flanking sequence elements. <em>J Biol Chem</em> 2022. <a href="https://www.jbc.org/article/S0021-9258(22)00905-X/fulltext">Article</a> — эффекты фланкирующей последовательности &gt;100-кратные, по каждой позиции.</li>
+  <li data-i18n="tf-li-22">Mallona I, Ilie IM, Karemaker ID, et&nbsp;al. Flanking sequence preference modulates de novo DNA methylation in the mouse genome. <em>Nucleic Acids Res</em> 2021;49:145. <a href="https://academic.oup.com/nar/article/49/1/145/6027824">Article</a> — TACGYC против TACGRC.</li>
+  <li data-i18n="tf-li-23">Wienholz BL, Kareta MS, Moarefi AH, et&nbsp;al. DNMT3L modulates flanking sequence preference for DNMT3A/3B in vivo. <em>PLoS Genet</em> 2010;6:e1001106. <a href="https://journals.plos.org/plosgenetics/article?id=10.1371%2Fjournal.pgen.1001106">Article</a> — отбор по −2/+2; также отрицательный результат по расстоянию между CpG.</li>
+  <li data-i18n="tf-li-24">Jia D, Jurkowska RZ, Zhang X, et&nbsp;al. Structure of Dnmt3a bound to Dnmt3L suggests a model for de novo DNA methylation. <em>Nature</em> 2007. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2712830/">PMC2712830</a> — модель периодичности ~10 п.н.</li>
+  <li data-i18n="tf-li-25">Nucleosome spacing regulates linker methylation by DNMT3A2/3B3. <em>Mol Cell</em> 2026. <a href="https://www.cell.com/molecular-cell/abstract/S1097-2765(26)00094-8">Article</a> — длина линкера как управляющая переменная; распознавание H3K36me2 блокируется мостиком между нуклеосомами.</li>
+  <li data-i18n="tf-li-26">Structural DNMT–nucleosome contacts are related to DNA methylation patterns. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12427118/">PMC12427118</a> — предпочтение CpG, смотрящих наружу, и стерическая волна 10 п.н.</li>
+  <li data-i18n="tf-li-27">Manzo M, Wirz J, Ambrosi C, et&nbsp;al. Isoform-specific localization of DNMT3A regulates methylation fidelity at bivalent CpG islands. <em>EMBO J</em> 2017. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5709737/">PMC5709737</a> — исключение по H3K4me3, оборот 5hmC.</li>
+  <li data-i18n="tf-li-28">Kreibich E, Kleinendorst R, Barzaghi G, et&nbsp;al. Single-molecule footprinting identifies context-dependent regulation of enhancers by DNA methylation. <em>Mol Cell</em> 2023. <a href="https://www.cell.com/molecular-cell/fulltext/S1097-2765(23)00040-0">Article</a> — двойные состояния, связь 5mC–ТФ только на части сайтов.</li>
+  <li data-i18n="tf-li-29">Fatemi M, Pao MM, Jeong S, et&nbsp;al. Footprinting of mammalian promoters with a CpG methyltransferase. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1292996/">PMC1292996</a> — принцип футпринтинга промотора на одиночных молекулах.</li>
+  <li data-i18n="tf-li-30">Yin Y, Morgunova E, Jolma A, et&nbsp;al. Impact of cytosine methylation on DNA binding specificities of human transcription factors. <em>Science</em> 2017;356:eaaj2239. <a href="https://www.science.org/doi/10.1126/science.aaj2239">Article</a> — methyl-SELEX по 542 ТФ.</li>
+  <li data-i18n="tf-li-31">Li L, Zhang Y, Wang J, et&nbsp;al. The genetic and epigenetic regulation of CD55 and its pathway analysis in colon cancer. <em>Front Immunol</em> 2022. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9889927/">PMC9889927</a> — TFCP2 и NF-κB на промоторе CD55.</li>
+  <li>Capasso M, Durrant LG, Stacey M, et&nbsp;al. Costimulation via CD55 on human CD4⁺ T cells mediated by CD97. <em>J Immunol</em> 2006. <a href="https://pubmed.ncbi.nlm.nih.gov/16818763/">PMID 16818763</a>.</li>
+  <li>Calderon D, Nguyen MLT, Mezger A, et&nbsp;al. Landscape of stimulation-responsive chromatin across diverse human immune cells. <em>Nat Genet</em> 2019. <a href="https://www.nature.com/articles/s41588-019-0505-9">Article</a> · <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE118189">GSE118189</a>.</li>
+  <li data-i18n="tf-li-32">Ewulonu UK, Ravi L, Medof ME. Characterization of the decay-accelerating factor gene promoter region. <em>PNAS</em> 1991;88:4675. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC51728/">PMC51728</a> — позиционирование TATA-бокса и TSS.</li>
+</ol>
+
+<footer>
+  <p data-i18n="tf-p-24">epiCme · редактирование эпигенома CD55, прочитанное на разрешении одиночных молекул. Эта страница — рабочий документ с гипотезами и будет обновляться по мере получения результатов из плана анализов.</p>
+</footer>
+
+</div>
+
+<script>
+const I18N = {
+  ru: {
+    "brand-sub": "эпигеном · цитозин · метилирование",
+    "nav-about": "О проекте",
+    "nav-home": "Главная",
+    "nav-k562": "K562",
+    "nav-chipseq": "ChIP-seq",
+    "nav-mechanisms": "Механизмы",
+    "tf-a-1": "Карта промотора",
+    "tf-a-10": "портал ENCODE",
+    "tf-a-11": "UCSC Genome Browser (окно уже загружено)",
+    "tf-a-12": "Nuñez et al. 2021, Cell — дополнительные таблицы",
+    "tf-a-13": "Yin et al. 2017, Science — таблицы methyl-SELEX",
+    "tf-a-2": "Гайд на карте",
+    "tf-a-3": "Семь механизмов",
+    "tf-a-4": "Список факторов",
+    "tf-a-5": "Биология T-клеток",
+    "tf-a-6": "Публичные данные",
+    "tf-a-7": "План анализов",
+    "tf-a-8": "Чем это не является",
+    "tf-a-9": "Источники",
+    "tf-button-1": "Скопировать скрипт",
+    "tf-code-1": "#!/usr/bin/env bash\n# окно промотора CD55 — скачать публичные T-клеточные треки (GRCh38)\nset -euo pipefail\n\nCHR=chr1; START=207313000; END=207329000        # ампликон +/- ~5 kb\nREGION=\"${CHR}:${START}-${END}\"\nOUT=cd55_public; mkdir -p \"$OUT\"; cd \"$OUT\"\n\n# ---- 1. референсная последовательность окна (анализ фланков, M2) ----\nsamtools faidx /path/to/GRCh38.fa \"$REGION\" &gt; cd55_window.fa\n\n# ---- 2. перечислить все CpG в окне с их контекстом +/-3 п.н. ----\npython3 - &lt;&lt;'PY'\nfrom pathlib import Path\nseq = \"\".join(l.strip() for l in Path(\"cd55_window.fa\").read_text().splitlines()[1:]).upper()\nstart = 207313000  # держать в синхроне с $START выше; координаты faidx 1-based\nrows = []\nfor i in range(3, len(seq) - 4):\n    if seq[i:i+2] == \"CG\":\n        rows.append((start + i, seq[i-3:i+5], seq[i+2]))   # позиция, контекст, база на +2\nPath(\"cd55_cpg_context.tsv\").write_text(\n    \"pos\\tcontext_m3_p4\\tplus2_base\\n\" + \"\\n\".join(f\"{p}\\t{c}\\t{b}\" for p, c, b in rows)\n)\nprint(f\"{len(rows)} CpG записано\")\nPY\n\n# ---- 3. треки хроматина: подставить URL и вырезать окно удалённо ----\ndeclare -A TRACKS=(\n  [CD4_H3K4me3]=\"https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig\"\n  [CD4_H3K27ac]=\"https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig\"\n  [CD4_H3K9me3]=\"https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig\"\n  [CD4_ATAC]=\"https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig\"\n)\nfor name in \"${!TRACKS[@]}\"; do\n  bigWigToBedGraph -chrom=\"$CHR\" -start=\"$START\" -end=\"$END\" \"${TRACKS[$name]}\" \"${name}.bedGraph\"\ndone\n\n# ---- 4. поиск мотивов (M4) ----\n# один раз скачать файл JASPAR CORE vertebrates в формате MEME, затем:\n#   fimo --thresh 1e-4 --oc fimo_out JASPAR2024_CORE_vertebrates.meme cd55_window.fa\n\necho \"done -&gt; $(pwd)\"\n",
+    "tf-dd-1": "dCas9 вместе с R-петлёй занимает примерно 20–30 п.н. ДНК. Привязанный каталитический модуль DNMT3A/3L дотягивается от этого якоря наружу, поэтому фермент не может действовать на ДНК, на которой сам сидит, — он действует на ближайшую свободную ДНК по обе стороны.",
+    "tf-dd-10": "Структура Dnmt3a–Dnmt3L предполагает, что димер Dnmt3a может дотянуться до двух CpG, разделённых одним витком спирали, за одно событие связывания — это проявляется как периодическая рябь относительного метилирования вдоль ряда сайтов. Недавняя крио-ЭМ вместе с биохимией показала, что расстояние между нуклеосомами задаёт метилирование линкера: короткие линкеры позволяют комплексу «мостить» две нуклеосомы и перекрывать ДНК между ними, а длинные линкеры дают ему взаимодействовать с каждой нуклеосомой по отдельности и метилировать линкер. Сама геометрия нуклеосомы даёт периодический паттерн стерических столкновений, совпадающий с 10-п.н. периодом спирали, в пользу CpG, чьи основания смотрят от гистонового кора наружу.",
+    "tf-dd-11": "Остаточная периодичность ~10 п.н. в профиле Δ по CpG после вычитания эффектов расстояния до PAM и фланкирующей последовательности; и участки с низким метилированием шириной примерно 150 п.н., соответствующие хорошо позиционированным нуклеосомам.",
+    "tf-dd-12": "Автокорреляция или периодограмма Ломба–Скаргла для Δметилирования относительно геномной позиции (расстояния между CpG нерегулярны, поэтому нужен метод, устойчивый к неравномерной выборке). Честная оговорка: эписомальное исследование не нашло значимой связи между расстоянием между CpG и эффективностью метилирования — сайты в 8–10 п.н. друг от друга метилировались не лучше остальных. Так что это по-настоящему открытый вопрос, а не устоявшееся предсказание.",
+    "tf-dd-13": "Связанный транскрипционный фактор — это стерическая преграда, а некоторые факторы вдобавок привлекают ферменты TET. В любом случае занятый мотив обычно остаётся гипометилированным относительно окружения — классический «след» в профиле метилирования.",
+    "tf-dd-14": "Связывание ТФ влияет на локальное метилирование и физически блокируя метилтрансферазу, и приводя ферменты TET к месту связывания. Именно на CGI устойчивость ооцитов к de novo метилированию совпадает с CGCGC — сайтом узнавания E2f1/E2f2 — независимо от активности промотора, H3K4me3, Cfp1 или потенциала R-петель: чистая демонстрация того, что один мотив может обеспечивать защиту. Футпринтинг на одиночных молекулах показывает, что связь скорее сайт-специфична, чем универсальна: антикорреляция между 5mC и связыванием ТФ проявляется лишь на части сайтов связывания по геному.",
+    "tf-dd-15": "Локальные провалы на сайтах KLF A/B/C и соседних с ними CRE — то есть около −106/−95, −310/−302 и −667/−652 — в донорских T-клетках, где заняты KLF4 и CREB. В наших данных соседние с KLF CpG #35, #54 и #65 лежат в пределах ~15 п.н. от трёх опубликованных сайтов CACCC.",
+    "tf-dd-16": "Аннотировать каждый из 137 CpG расстоянием до ближайшего опубликованного элемента KLF/CRE, затем проверить, систематически ли менее отзывчивы на CRISPRoff CpG рядом с мотивами. Поскольку уровень активации меняет уровень KLF4 в T-клетках (см. ниже), это предсказывает эффект, зависящий от донора и стимуляции — что можно проверить, сравнив Day 6 и Day 35.",
+    "tf-dd-17": "DNMT3A «читает» гистоны через два домена: домен ADD отталкивается от H3K4me3 (метки, покрывающей активные промоторы), а домен PWWP притягивается к H3K36me2/3. Поэтому активный, богатый H3K4me3 промотор CD55 по своей природе враждебная территория для фермента, и CRISPRoff приходится это преодолевать — неравномерно.",
+    "tf-dd-18": "H3K4me3 не подпускает de novo метилтрансферазы к неметилированным CpG-островкам, а H3K36me3 притягивает DNMT3B в транскрибируемые тела генов. В работе на динуклеосомах показано, что когда комплекс мостит две близко расположенные нуклеосомы, его домены PWWP больше не могут сканировать H3K36me2 — это добавляет ещё одно структурное ограничение. Именно домен KRAB в составе CRISPRoff это меняет: KRAB связывает TRIM28, который привлекает машинерию гетерохроматина и откладывает H3K9me3, а митотически наследуемая часть сайленсинга CRISPRoff держится на плече ДНК-метилирования.",
+    "tf-dd-19": "Самый крутой сигнал H3K4me3 — прямо на TSS — должен метилироваться труднее всего на раннем этапе, а фланки и «берега» должны переключаться первыми, с последующим заполнением. Наш пик сидит чуть ниже TSS по цепи, на +58…+84, что совместимо и с «плечом пика H3K4me3», и с «плечом следа dCas9» (M1) — эти два варианта нужно разделить.",
+    "tf-dd-2": "Stepper и соавт. измерили это напрямую для dCas9–Dnmt3a3L: 20–30 п.н. под dCas9 остаются практически неметилированными, а самое сильное метилирование ложится по обе стороны — примерно на 25 п.н. с одного фланга PAM и около 40 п.н. с другого. Независимое исследование dCas9–DNMT3A нашло полосу активности шириной 25–35 п.н. с центром примерно в 27 п.н. ниже PAM по цепи.",
+    "tf-dd-20": "Наложить публичные H3K4me3, H3K27ac и H3K9me3 для CD4⁺/CD8⁺ T-клеток человека (BLUEPRINT, Roadmap, ENCODE) на окно CD55 и сопоставить сигнал с Δ по каждому CpG. Также сравнить Day 6 и Day 35: если этот механизм доминирует, порядок переключения CpG должен следовать уже существовавшему градиенту хроматина.",
+    "tf-dd-21": "Метилирование, записанное на нулевой день, должно пережить репликацию (DNMT1 на полуметилированной цепи) и активное удаление (окисление TET до 5hmC и дальше). Ни один из этих процессов не идёт равномерно вдоль локуса, поэтому метка, записанная ровно, может считываться неровно недели спустя.",
+    "tf-dd-22": "Собственный инструмент реверсии CRISPRoff работает именно так: память можно стереть с помощью CRISPRon, который снимает метилирование и заново привлекает транскрипционную машинерию. Локализация DNMT3A1 связана с оборотом метки: её связывание совпадает с повышенным 5-гидроксиметилцитозином, что указывает на активный оборот, а не статичную метку в этих сайтах.",
+    "tf-dd-23": "Позиции, теряющие метилирование между Day 6 и Day 35, — это другой, отличимый набор от позиций, которые вообще не метилировались. «Никогда не записано» и «записано и потом стёрто» — это разные сигнатуры.",
+    "tf-dd-24": "У нас уже есть сравнение Day 6 vs Day 35 — но там донор смешан (confounded) с временной точкой, поэтому текущий дизайн не позволяет разделить это чисто. Нужна временная серия на одном и том же доноре. Это стоит пометить как открытый вопрос, а не выдавать за результат. Прогон нанопора, который вдобавок вызывает 5hmC, разделил бы «стёрто» и «никогда не записано» напрямую.",
+    "tf-dd-25": "Среднее по каждому CpG схлопывает два очень разных мира: градуированное частичное метилирование на каждой молекуле — против переключателя «всё или ничего», присутствующего на части молекул. Только второй вариант совместим с переключательным характером сайленсинга, который даёт CRISPRoff.",
+    "tf-dd-26": "Футпринтинг на одиночных молекулах существует именно поэтому: такие энхансеры сидят сразу в двух состояниях — на части молекул ДНК метилирована и покрыта нуклеосомой, на остальных — в альтернативной конфигурации. Футпринтинг промоторов метилтрансферазой точно так же даёт разрешение до отдельных молекул промотора, сохраняя связь между сайтами на одной и той же молекуле, и вскрывает положения нуклеосом, которые нуклеазные методы размывают в одно целое.",
+    "tf-dd-27": "Бимодальное распределение долей метилирования по молекулам в окне CD55, где две моды соответствуют отредактированным и «ускользнувшим» молекулам — и коррелированное состояние метилирования <em>вдоль</em> отдельной молекулы, а не независимые «подбрасывания монеты» по каждому CpG.",
+    "tf-dd-28": "Вот для чего на самом деле нужна наша платформа. Кластеризовать молекулы по полному бинарному вектору из 137 CpG вместо усреднения по столбцам; проверить долю mCpG на молекулу на бимодальность; посчитать попарное со-метилирование между CpG <em>i</em> и CpG <em>j</em> на одном и том же риде как функцию их расстояния. Длина затухания корреляции — это прямое, не зависящее от модели измерение того, как далеко распространяется домен сайленсинга на одной хромосоме, — и ничего подобного из литературы по массовому бисульфиту получить нельзя.",
+    "tf-dd-3": "Воспроизводимый провал на протоспейсере с плечами по бокам, на фиксированных расстояниях от PAM — самая предсказуемая с точки зрения геометрии деталь во всём профиле. Она должна быть в CRISPRoff и <em>отсутствовать или сидеть иначе</em> в ZFPoff, у которого след цинкового пальца другого размера и на другой последовательности.",
+    "tf-dd-4": "Спейсер теперь картирован — GRCh38 chr1:207 321 713–207 321 732, то есть <strong>+93…+112</strong> от TSS (<a href=\"#guide\">разобрано здесь</a>). Перестройте Δметилирования относительно расстояния от PAM вместо расстояния от TSS и проверьте три CpG внутри протоспейсера на провал. Наш наблюдаемый пик обрывается за 9 п.н. до протоспейсера — это уже предсказанная геометрия. Новое секвенирование не требуется.",
+    "tf-dd-5": "Каталитический домен контактирует с несколькими основаниями по обе стороны от целевого CpG. Одни фланки — отличный субстрат, другие — почти неподдающийся, независимо от хроматина, позиции или способа таргетирования.",
+    "tf-dd-6": "Углублённые энзимологические работы показали, что основания от −2 до +8 меняют скорость реакции более чем на два порядка: на −2 предпочтителен тимин, на −1 — цитозин или аденин, на +1…+3 — цитозин, а гуанин почти везде нежелателен. По всему геному DNMT3A лучше всего работает на TACGYC, а DNMT3B — на TACGRC, и это предпочтение сохраняется независимо от того, куда в геноме рекрутирован фермент. Более раннее эписомальное исследование оценило эффект в 34-кратный разброс между отдельными сайтами, который для DNMT3A задают основания на −2 и +2.",
+    "tf-dd-7": "Δметилирования по каждому CpG должна коррелировать с фланкирующей последовательностью ±2, причём пиримидин на +2 должен работать лучше. Поскольку CRISPRoff несёт DNMT3A (не 3B), фланки типа CGC/CGT должны опережать CGG/CGA.",
+    "tf-dd-8": "Извлечь из референса контекст ±3 п.н. для всех 137 CpG, закодировать каждый сайт по основанию на +2 и сравнить Δметилирования между четырьмя группами. Это анализ на один вечер, и это самый сильный доступный контроль «профиль не случаен» — положительный результат объяснит реальную долю дисперсии ещё до всяких аргументов про хроматин.",
+    "tf-dd-9": "De novo метилирование происходит преимущественно на ДНК между нуклеосомами, а геометрия димера DNMT3A вместе с поворотом спирали ДНК делает так, что одни CpG смотрят наружу (доступны), а другие — внутрь (экранированы).",
+    "tf-dt-1": "Механизм",
+    "tf-dt-2": "Доказательства",
+    "tf-dt-3": "Предсказывает",
+    "tf-dt-4": "Проверка на наших данных",
+    "tf-figcaption-1": "Каждый элемент различается ещё и паттерном заливки и стилем рамки, не только цветом. Позиции KLF и CRE — из An et al., Front Immunol 2024; смещение TSS↔TATA — из Ewulonu et al., PNAS 1991 (по ссылке в той же статье). Оба диапазона CpG — из наших сравнений CRISPRoff-vs-unedited и ZFPoff. Секвенированный ампликон (GRCh38 chr1:207 318 092–207 324 450) простирается дальше в 5′-сторону, чем эта рамка.",
+    "tf-figcaption-2": "Предсказанные максимумы размещены примерно на 25 п.н. с 5′-стороны и 40 п.н. с 3′-стороны от PAM — смещения, опубликованные для слияний dCas9–Dnmt3a3L. Поскольку цепь спейсера пока не установлена, показаны оба варианта положения PAM. На этой схеме нет ни одного измеренного значения метилирования — единственный измеренный элемент — оранжевый блок, взятый из нашего собственного дифференциального анализа.",
+    "tf-h1-1": "Почему CRISPRoff метилирует не все CpG одинаково?",
+    "tf-h2-1": "Промотор CD55 в масштабе",
+    "tf-h2-2": "Семь механизмов неровного профиля",
+    "tf-h2-3": "Транскрипционные факторы, описанные на промоторе CD55",
+    "tf-h2-4": "Почему T-клеточный контекст меняет предсказание",
+    "tf-h2-5": "Публичные данные, которые стоит скачать для этого окна",
+    "tf-h2-6": "Шесть анализов в порядке выполнения",
+    "tf-h2-7": "Чем эта страница не является",
+    "tf-h3-1": "CD55 в T-клетках — не пассажир",
+    "tf-h3-2": "Метилирование и связывание ТФ работают в обе стороны",
+    "tf-h3-3": "Плечо KRAB важно не меньше плеча DNMT",
+    "tf-h3-4": "Скрипт для скачивания на Skynet",
+    "tf-li-1": "TSS ≈ chr1:207 321 620 (GRCh38) — выведено из нашего пикового CpG на +58 = chr1:207 321 678",
+    "tf-li-10": "<strong>Спейсер на + цепи</strong> → PAM на +113…+115. Опубликованный 5′-максимум пришёлся бы на ≈ +89; центр нашего пика (+71) отстоит от PAM на 43 п.н. Та же сторона, правильный порядок, но примерно на 18 п.н. дальше ожидаемого.",
+    "tf-li-11": "<strong>Спейсер на − цепи</strong> → PAM на +90…+92. Опубликованный 5′-максимум пришёлся бы на ≈ +66; центр нашего пика отстоит от PAM на 20 п.н. Это практически учебниковое смещение.",
+    "tf-li-12": "<strong>Не результат.</strong> Ни один трек не был скачан, ни одно число здесь не вычислено. Каждый механизм — гипотеза с прописанным способом проверки.",
+    "tf-li-13": "<strong>Не T-клеточные доказательства для сайтов ТФ.</strong> Картирование KLF4/CREB/CBP сделано на эндотелии и репортёрных конструкциях. Перенос на первичные T-клетки человека — допущение, пока T-клеточный ChIP не скажет обратного.",
+    "tf-li-14": "<strong>Не полный список факторов.</strong> Отсутствие NFAT, ETS или RUNX в таблице отражает отсутствие T-клеточных исследований этого промотора, а не отсутствие связывания.",
+    "tf-li-15": "<strong>Не решение проблемы смешения донора и временной точки.</strong> Day 6 и Day 35 — разные доноры; в частности, M6 нельзя закрыть при текущем дизайне.",
+    "tf-li-16": "<strong>С координатами нужна аккуратность.</strong> Наши выравнивания на T2T-CHM13v2.0; почти всё, на что здесь есть ссылки, — GRCh38. Делать liftover осознанно и проверять, что TSS ложится туда, где ожидается, прежде чем что-либо накладывать.",
+    "tf-li-17": "An F-Q, Zhou G, Harland MT, et&nbsp;al. KLF4 and CD55 expression and function depend on each other. <em>Front Immunol</em> 2024;14:1290684. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC10884306/\">PMC10884306</a> — координаты сайтов CACCC/CRE, ChIP по KLF4/p-CREB/CBP, данные по активации CD4⁺.",
+    "tf-li-18": "Nuñez JK, Chen J, Pommier GC, et&nbsp;al. Genome-wide programmable transcriptional memory by CRISPR-based epigenome editing. <em>Cell</em> 2021. <a href=\"https://www.sciencedirect.com/science/article/pii/S0092867421003536\">Article</a> — механизм CRISPRoff, окно таргетирования, таблицы DMR по WGBS.",
+    "tf-li-19": "Stepper P, Kungulovski G, Jurkowska RZ, et&nbsp;al. Efficient targeted DNA methylation with chimeric dCas9–Dnmt3a–Dnmt3L. <em>Nucleic Acids Res</em> 2017;45:1703. <a href=\"https://academic.oup.com/nar/article/45/4/1703/2605790\">Article</a> — защитный след dCas9 и боковые пики метилирования.",
+    "tf-li-2": "Ампликон / окно анализа: chr1:207 318 092–207 324 450 (GRCh38), 137 CpG",
+    "tf-li-20": "Vojta A, Dobrinić P, Tadić V, et&nbsp;al. Repurposing the CRISPR-Cas9 system for targeted DNA methylation. <em>Nucleic Acids Res</em> 2016;44:5615. <a href=\"https://academic.oup.com/nar/article/44/12/5615/2457488\">Article</a> — пик метилирования 25–35 п.н. с центром в 27 п.н. от PAM.",
+    "tf-li-21": "Adam S, Bräcker J, Klingel V, et&nbsp;al. DNMT3A forms interaction networks with the CpG site and flanking sequence elements. <em>J Biol Chem</em> 2022. <a href=\"https://www.jbc.org/article/S0021-9258(22)00905-X/fulltext\">Article</a> — эффекты фланкирующей последовательности &gt;100-кратные, по каждой позиции.",
+    "tf-li-22": "Mallona I, Ilie IM, Karemaker ID, et&nbsp;al. Flanking sequence preference modulates de novo DNA methylation in the mouse genome. <em>Nucleic Acids Res</em> 2021;49:145. <a href=\"https://academic.oup.com/nar/article/49/1/145/6027824\">Article</a> — TACGYC против TACGRC.",
+    "tf-li-23": "Wienholz BL, Kareta MS, Moarefi AH, et&nbsp;al. DNMT3L modulates flanking sequence preference for DNMT3A/3B in vivo. <em>PLoS Genet</em> 2010;6:e1001106. <a href=\"https://journals.plos.org/plosgenetics/article?id=10.1371%2Fjournal.pgen.1001106\">Article</a> — отбор по −2/+2; также отрицательный результат по расстоянию между CpG.",
+    "tf-li-24": "Jia D, Jurkowska RZ, Zhang X, et&nbsp;al. Structure of Dnmt3a bound to Dnmt3L suggests a model for de novo DNA methylation. <em>Nature</em> 2007. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC2712830/\">PMC2712830</a> — модель периодичности ~10 п.н.",
+    "tf-li-25": "Nucleosome spacing regulates linker methylation by DNMT3A2/3B3. <em>Mol Cell</em> 2026. <a href=\"https://www.cell.com/molecular-cell/abstract/S1097-2765(26)00094-8\">Article</a> — длина линкера как управляющая переменная; распознавание H3K36me2 блокируется мостиком между нуклеосомами.",
+    "tf-li-26": "Structural DNMT–nucleosome contacts are related to DNA methylation patterns. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC12427118/\">PMC12427118</a> — предпочтение CpG, смотрящих наружу, и стерическая волна 10 п.н.",
+    "tf-li-27": "Manzo M, Wirz J, Ambrosi C, et&nbsp;al. Isoform-specific localization of DNMT3A regulates methylation fidelity at bivalent CpG islands. <em>EMBO J</em> 2017. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC5709737/\">PMC5709737</a> — исключение по H3K4me3, оборот 5hmC.",
+    "tf-li-28": "Kreibich E, Kleinendorst R, Barzaghi G, et&nbsp;al. Single-molecule footprinting identifies context-dependent regulation of enhancers by DNA methylation. <em>Mol Cell</em> 2023. <a href=\"https://www.cell.com/molecular-cell/fulltext/S1097-2765(23)00040-0\">Article</a> — двойные состояния, связь 5mC–ТФ только на части сайтов.",
+    "tf-li-29": "Fatemi M, Pao MM, Jeong S, et&nbsp;al. Footprinting of mammalian promoters with a CpG methyltransferase. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC1292996/\">PMC1292996</a> — принцип футпринтинга промотора на одиночных молекулах.",
+    "tf-li-3": "Сайт KLF A −106/−95 → ≈ chr1:207 321 514–207 321 525",
+    "tf-li-30": "Yin Y, Morgunova E, Jolma A, et&nbsp;al. Impact of cytosine methylation on DNA binding specificities of human transcription factors. <em>Science</em> 2017;356:eaaj2239. <a href=\"https://www.science.org/doi/10.1126/science.aaj2239\">Article</a> — methyl-SELEX по 542 ТФ.",
+    "tf-li-31": "Li L, Zhang Y, Wang J, et&nbsp;al. The genetic and epigenetic regulation of CD55 and its pathway analysis in colon cancer. <em>Front Immunol</em> 2022. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC9889927/\">PMC9889927</a> — TFCP2 и NF-κB на промоторе CD55.",
+    "tf-li-32": "Ewulonu UK, Ravi L, Medof ME. Characterization of the decay-accelerating factor gene promoter region. <em>PNAS</em> 1991;88:4675. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC51728/\">PMC51728</a> — позиционирование TATA-бокса и TSS.",
+    "tf-li-4": "Сайт KLF B −310/−302 → ≈ chr1:207 321 310–207 321 318",
+    "tf-li-5": "Сайт KLF C −667/−652 → ≈ chr1:207 320 953–207 320 968",
+    "tf-li-6": "Протоспейсер CRISPRoff: chr1:207 321 713–207 321 732 (GRCh38) = +93…+112",
+    "tf-li-7": "Тот же протоспейсер на T2T-CHM13v2.0: chr1:206 587 009–206 587 028 → TSS ≈ chr1:206 586 916",
+    "tf-li-8": "Сдвиг GRCh38 − T2T на этом локусе: 734 704 п.н. (одинаковый на обоих концах)",
+    "tf-li-9": "Наши BAM — на T2T-CHM13v2.0 (~chr1:206 582 974–206 590 974). Публичные треки почти все на GRCh38 — перед наложением сделайте liftover в одну или другую сторону и проверьте название контига (<span class=\"mono\">chr1</span> vs <span class=\"mono\">NC_060925.1</span>).",
+    "tf-p-1": "Write → Read → Learn · чтение локуса",
+    "tf-p-10": "В спейсере есть три динуклеотида CpG. На + цепи они сидят либо на <span class=\"mono\">+97 / +102 / +105</span> (спейсер на +), либо на <span class=\"mono\">+99 / +102 / +107</span> (спейсер на −) — <span class=\"mono\">+102</span> остаётся CpG при любом прочтении, поэтому это самая надёжная одиночная позиция для проверки.",
+    "tf-p-11": "M1 предсказывает, что эти три сайта <em>заметно менее метилированы, чем их ближайшие соседи</em>, потому что на них сидит dCas9. В нашей нумерации CpG это должны быть сайты сразу после #83. Если провал есть — это след, измеренный прямо на одиночных молекулах, и, насколько я могу судить, такого измерения с длинными ридами ещё никто не публиковал. Если провала нет — M1 на этом локусе не работает, и пик +58…+84 нужно объяснять иначе (очевидная альтернатива — M5, плечо H3K4me3, которое лежит почти там же).",
+    "tf-p-12": "В каждой карточке: в чём механизм, какие есть публичные доказательства, что он предсказывает для нашего профиля CD55, и как это проверить на данных, которые у нас уже есть. Разверните, чтобы прочитать.",
+    "tf-p-13": "Что реально опубликовано, отранжировано по тому, насколько доказательства напрямую относятся к T-клеткам человека. Почти вся механистическая работа сделана на эндотелиальных клетках, эпителии или линиях рака толстой кишки — колонка про T-клетки как раз показывает честные пробелы.",
+    "tf-p-14": "Ни одна публикация не помещает <strong>NFAT, ETS1, RUNX1, TCF7/LEF1, GATA3, STAT5 или CTCF</strong> именно на промотор CD55. Это отсутствие доказательств, а не доказательство отсутствия — ни одна из работ выше не смотрела в T-клетках. Правильный ход — не гадать, а прогнать наше точное окно через перечисленные ниже T-клеточные ChIP-компендиумы и посмотреть, что вернётся. Если у какого-то фактора там найдётся реальный пик в CD4⁺ или клетках Jurkat, его мотив попадёт на карту, а его CpG будут отмечены в анализе следов.",
+    "tf-p-15": "Это регулятор тех самых клеток, которые мы редактируем. CD55 задаёт, насколько громко работает аутокринная сигнализация рецепторов C3a/C5a: при низком CD55 эта сигнализация усиливается и запускаются эффекторные ответы; при высоком CD55 сигнализация приглушена и предпочтение отдаётся коммитированию в Foxp3⁺ регуляторные клетки. Независимо от этого, вовлечение CD55 вместе с CD3 — сшивающим антителом или естественным лигандом CD97 — повышает пролиферацию человеческих T-клеток CD4⁺ из крови вместе с CD69, CD25, IL-10 и GM-CSF.",
+    "tf-p-16": "Отсюда два следствия для нас. Во-первых, сайленсинг CD55 — это функциональное возмущение, а не нейтральное считывание: отредактированные клетки могут смещаться к эффекторному фенотипу, а это меняет набор ТФ, который затем формирует метилирование. Во-вторых, KLF4 и CD55 падают вместе при активации, поэтому занятость промотора факторами в момент действия CRISPRoff зависит от того, как были простимулированы донорские клетки.",
+    "tf-p-17": "Обычная история — метилирование блокирует ТФ. Систематический ответ более запутанный, и эта запутанность особенно важна для T-клеток: скрининг 542 человеческих ТФ методом methyl-SELEX выявил большую группу, которая на самом деле предпочитает метилированный CpG, — в основном в расширенном семействе homeodomain, где 5-метильная группа образует прямой гидрофобный контакт. В разбивке по семействам связывание bHLH, bZIP и ETS в целом подавлялось метилированием CpG за счёт стерического конфликта, а факторы homeodomain, POU и NFAT предпочитали именно метилированный вариант.",
+    "tf-p-18": "То, что NFAT предпочитает метилированный CpG, — примечательная деталь именно для T-клеточного локуса. Это значит, что метка, которую откладывает CRISPRoff на CD55, не просто всех выселяет — она может перераспределить, какие факторы вообще способны сесть на участок. Есть ли в нашем окне мотив NFAT — это именно то, что нужно проверить в JASPAR/UniBind, а не предполагать.",
+    "tf-p-19": "KRAB связывает TRIM28 — повсеместный каркасный белок, который привлекает машинерию гетерохроматина и запускает H3K9me3; CRISPRoff превосходит и один dCas9-KRAB (сильный, но временный эффект), и один dCas9-DNMT3A/3L (слабый, но наследуемый) — именно поэтому важен мультидоменный дизайн. Пространственный охват распространения H3K9me3 и пространственный охват метилирования CpG не обязаны совпадать, и там, где они расходятся, это информативно. Nuñez и соавт. использовали именно эту логику: широкое окно таргетирования на промоторе H2B позволило проследить, как устанавливаются, распространяются и поддерживаются H3K9me3 и метилирование CpG.",
+    "tf-p-2": "Наши профили метилирования CD55 не плоские. Одни CpG уходят из почти нулевого уровня в сильное метилирование, а соседи в 30&nbsp;п.н. едва двигаются. Здесь собраны публичные доказательства — транскрипционные факторы на TSS CD55, архитектура хроматина и собственная химия DNMT3A — и превращены в семь механизмов, которые можно реально проверить на таблице из 137 CpG, которая у нас уже есть.",
+    "tf-p-20": "Всё ниже покрывает либо локус CD55 в T-клетках, либо механистические параметры, нужные моделям выше. В запросах использовать <span class=\"mono\">chr1:207 318 092–207 324 450</span> (GRCh38) с отступом ~5 kb.",
+    "tf-p-21": "Запускать там, где <em>есть</em> сеть. Скрипт вырезает окно CD55 из удалённых bigWig и BED вместо скачивания файлов на весь геном. URL-акцешены с порталов ENCODE/BLUEPRINT нужно подставить самому — они меняются, поэтому скрипт специально держит их в одном редактируемом блоке сверху.",
+    "tf-p-22": "Порядок — по соотношению пользы к усилиям. Первые три не требуют вообще никаких новых данных.",
+    "tf-p-23": "Анализы 1, 2 и 5 дают <em>аддитивные</em> ковариаты. Их нужно подгонять совместно (одна модель Δ по каждому CpG с расстоянием до PAM, фланкирующим контекстом и сигналом хроматина как отдельными членами), а не последовательно — иначе эффект, проверенный первым, заберёт себе общую дисперсию, и последующие покажутся слабее, чем они есть на самом деле. Сообщать частные эффекты и использовать пермутационный нуль, построенный перемешиванием меток CpG внутри окна, а не параметрическое p-значение.",
+    "tf-p-24": "epiCme · редактирование эпигенома CD55, прочитанное на разрешении одиночных молекул. Эта страница — рабочий документ с гипотезами и будет обновляться по мере получения результатов из плана анализов.",
+    "tf-p-3": "На этой странице <strong>нет нового анализа данных</strong> и нет скачанных геномных треков — у сессии, которая её собирала, не было доступа к геномным порталам. Что здесь есть: синтез литературы, архитектура промотора CD55 с опубликованными координатами, прямые ссылки и акцешены на наборы данных, которые стоит скачать, и полностью прописанный план анализов. Каждое «предсказание» ниже — гипотеза, ожидающая проверки, а не результат.",
+    "tf-p-4": "An&nbsp;и соавт. (2024) картировали пять парных элементов CACCC (KLF) в промоторе CD55 человека и с помощью ChIP показали, что KLF4, фосфо-CREB и CBP сидят на трёх из них, расположенных рядом с сайтами CRE. Их позиции относительно старта транскрипции: −106/−95, −228/−214, −310/−302, −567/−549 и −667/−652; три сайта рядом с CRE обозначены A (−106/−95), B (−310/−302) и C (−667/−652). Сам старт транскрипции лежит на 81 п.н. ниже TATA-бокса.",
+    "tf-p-5": "Поверх этого — наш собственный дифференциальный сигнал: непрерывный значимый блок на CpG #20–132 (от −1077 до +1935 относительно TSS) и самый резкий пик на CpG #78–83 (+58…+84).",
+    "tf-p-6": "Спейсер CRISPRoff — <span class=\"mono\">GCTGCGACTCGGCGGAGTCC</span>, он ложится на GRCh38 chr1:207 321 713–207 321 732 — <strong>+93…+112 относительно TSS</strong>. Координаты в T2T, которые были даны вместе с ним (chr1:206 587 009–206 587 028), отличаются ровно на 734 704 п.н. на обоих концах — это перепроверяет liftover и даёт TSS в T2T на chr1:206 586 916.",
+    "tf-p-7": "Это единственное число меняет картину. Наши самые резкие дифференциальные CpG, #78–83, идут от +58 до +84 — <strong>они обрываются за 9&nbsp;п.н. до начала протоспейсера</strong>. Самый сильный сигнал во всём профиле сидит сразу за пределами следа самого редактора, с 5′-стороны — ровно там, где литература по dCas9–DNMT3A предсказывает боковой максимум.",
+    "tf-p-8": "SpCas9 нужен NGG сразу с 3′-стороны от протоспейсера на той цепи, которой соответствует спейсер. Есть два варианта, и они отстоят друг от друга на 23 п.н.:",
+    "tf-p-9": "Один <span class=\"mono\">samtools faidx</span> по chr1:207 321 705–207 321 740 решает вопрос за секунду — нужно проверить, что написано на + цепи: <span class=\"mono\">GCTGCGACTCGGCGGAGTCC</span> или обратный комплемент <span class=\"mono\">GGACTCCGCCGAGTCGCAGC</span>, и где падает ближайший NGG. Стоит сделать это до любой финальной схемы, потому что вся ось X механизма M1 держится на этом.",
+    "tf-span-1": "Честная оговорка",
+    "tf-span-10": "<i style=\"border:1.5px dashed #0072B2;background:none\"></i> кандидат на PAM",
+    "tf-span-11": "<i style=\"background:#E69F00\"></i> CpG внутри следа",
+    "tf-span-12": "<i style=\"background:#F0E442\"></i> предсказание, − цепь",
+    "tf-span-13": "<i style=\"background:#56B4E9\"></i> предсказание, + цепь",
+    "tf-span-14": "От вопроса про цепь зависит качество совпадения",
+    "tf-span-15": "Три CpG, на которые смотреть в первую очередь",
+    "tf-span-16": "Кого в этом списке пока нет — и стоит проверить",
+    "tf-span-17": "Методическая заметка",
+    "tf-span-2": "<i style=\"background:#56B4E9;opacity:.6\"></i> значимый блок CpG (наши данные)",
+    "tf-span-3": "<i style=\"background:#E69F00\"></i> пиковые дифференциальные CpG",
+    "tf-span-4": "<i style=\"background:#F0E442\"></i> KLF / CACCC (штриховка)",
+    "tf-span-5": "<i style=\"background:#0072B2\"></i> CRE (точки, пунктирная рамка)",
+    "tf-span-6": "<i style=\"background:#A9B8B0\"></i> TATA-бокс",
+    "tf-span-7": "Шпаргалка по координатам",
+    "tf-span-8": "<i style=\"background:#E69F00\"></i> наблюдаемый пик (крест-штриховка)",
+    "tf-span-9": "<i style=\"background:#6E8079\"></i> след протоспейсера dCas9 (штриховка)",
+    "tf-summary-1": "<span class=\"mid\">M1</span>След самого редактора",
+    "tf-summary-2": "<span class=\"mid\">M2</span>Предпочтения DNMT3A по последовательности",
+    "tf-summary-3": "<span class=\"mid\">M3</span>Нуклеосомы, линкеры и период 10 п.н.",
+    "tf-summary-4": "<span class=\"mid\">M4</span>Транскрипционные факторы на пути",
+    "tf-summary-5": "<span class=\"mid\">M5</span>Уже существовавшее состояние хроматина",
+    "tf-summary-6": "<span class=\"mid\">M6</span>Стирание и сбои поддержания",
+    "tf-summary-7": "<span class=\"mid\">M7</span>Молекулы, а не средние",
+    "tf-td-1": "парные CACCC на −106/−95 (A), −310/−302 (B), −667/−652 (C), плюс −228/−214 и −567/−549",
+    "tf-td-10": "Huh7.5, спленоциты мыши",
+    "tf-td-11": "Средняя. Сайты SP1 содержат CpG и богаты GC — идеальный субстрат для CRISPRoff, а связывание SP1 классически считается нечувствительным к метилированию.",
+    "tf-td-12": "предсказанный сайт в 2 kb 5′-фланка; подтверждён ChIP",
+    "tf-td-13": "ChIP с антителом к NF-κB и промотор-специфичными праймерами подтвердил занятость на CD55",
+    "tf-td-14": "LOVO / HCT116, рак толстой кишки",
+    "tf-td-15": "Средне-высокая. NF-κB централен для активации T-клеток; точное смещение не опубликовано в системе координат, которую можно наложить на наши CpG.",
+    "tf-td-16": "предсказанный сайт, 5′-фланк",
+    "tf-td-17": "мутация сайта TFCP2 снизила активность промотора CD55 на 66%",
+    "tf-td-18": "Низко-средняя. Эффект сильный, но контекст — рак толстой кишки; чтобы это имело значение здесь, нужен ChIP в T-клетках.",
+    "tf-td-19": "описанный сайт, проксимальный промотор",
+    "tf-td-2": "занятость по ChIP на всех трёх сайтах A–C; урезанный промотор 190 п.н. только с сайтом A воспроизводит большую часть активности полных 848 п.н.",
+    "tf-td-20": "точечная мутация не повлияла на индукцию через HCV core",
+    "tf-td-21": "Низкая как доказательство, высокая как гипотеза — AP-1 один из основных факторов активации T-клеток.",
+    "tf-td-22": "апикальная индукция CD55, гипоксия",
+    "tf-td-23": "HIF-зависимая индукция апикального CD55",
+    "tf-td-24": "кишечный эпителий",
+    "tf-td-25": "Низкая для T-клеток, но важна для любой гипоксичной культуры или тканевого контекста.",
+    "tf-td-26": "зарегистрированные cCRE с сигналом DNase/H3K4me3/H3K27ac/CTCF по биообразцам",
+    "tf-td-27": "Самый быстрый способ увидеть, является ли TSS CD55 промотор-подобным cCRE в наивных T-клетках CD4⁺/CD8⁺, и где его границы относительно наших 137 CpG.",
+    "tf-td-28": "сырые и обработанные ChIP-seq, DNase-seq, ATAC-seq; биообразцы Jurkat и первичных T-клеток",
+    "tf-td-29": "Прямое доказательство занятости ТФ на T-клеточном фоне — именно тот пробел, который оставляет опубликованная литература по промотору CD55.",
+    "tf-td-3": "HUVEC, репортёр в K562",
+    "tf-td-30": "CpG-островки, ReMap, JASPAR TFBS, консервативность, сводные треки ENCODE в одном виде",
+    "tf-td-31": "Подтверждает статус CpG-островка у промотора — литература по CRISPRoff говорит, что это не требуется для сайленсинга, но это меняет картину рекрутирования DNMT3A.",
+    "tf-td-32": "переобработанные публичные ChIP-seq, с фильтром по классу клеток (Blood)",
+    "tf-td-33": "«Какие факторы вообще когда-либо ловились по ChIP на этом интервале в клетках крови» — один запрос отвечает на открытый вопрос из раздела выше.",
+    "tf-td-34": "курированные пики ТФ; UniBind добавляет прямые сайты связывания, подтверждённые мотивом",
+    "tf-td-35": "UniBind — более строгий фильтр (мотив + пик), поэтому именно его находки стоит наносить на карту промотора.",
+    "tf-td-36": "позиционные весовые матрицы",
+    "tf-td-37": "Просканировать последовательность ампликона на KLF4, SP1, CREB1, RELA, TFCP2, NFATC1/2, ETS1, RUNX1, TCF7, GATA3 и отметить, какие CpG попадают внутрь находок.",
+    "tf-td-38": "ATAC-seq + RNA-seq для до 32 популяций иммунных клеток, в покое и после стимуляции",
+    "tf-td-39": "Лучший из всех ресурсов для вопроса «открыт ли промотор CD55 в <em>моём</em> состоянии клетки» — субпопуляции CD4⁺/CD8⁺ в покое vs после стимуляции — ровно та ось, по которой различаются наши доноры.",
+    "tf-td-4": "<strong>Высокая.</strong> KLF4 падает в активированных спленоцитах CD4⁺ синхронно с мРНК CD55. Состояние активации должно менять занятость сайта — а значит, и след.",
+    "tf-td-40": "RNA-seq по 15 отсортированным типам иммунных клеток человека, плюс eQTL",
+    "tf-td-41": "Базовая экспрессия CD55 по субпопуляциям T-клеток — знаменатель для интерпретации того, насколько сильно мы реально заглушили ген.",
+    "tf-td-42": "метиломы WGBS плюс H3K4me3/H3K27ac/H3K9me3/H3K36me3 для T-клеток CD4⁺ и CD8⁺",
+    "tf-td-43": "Базовое неотредактированное метилирование и состояние хроматина, от которого зависит M5. А также референс, на котором можно проверить, что «наши неотредактированные контроли выглядят нормально».",
+    "tf-td-44": "полногеномные скрины CRISPRoff; таблица дифференциально метилированных регионов CpG из полногеномного бисульфитного секвенирования; скрины тайлинга промоторов",
+    "tf-td-45": "Эмпирическая форма окна таргетирования из статьи самого инструмента — прямое сравнение для нашей геометрии по CpG и ближайшее к позитивному контролю для M1.",
+    "tf-td-46": "классификация по каждому ТФ: подавляется метилированием, усиливается им, или нечувствителен",
+    "tf-td-47": "Превращает общую фразу «метилирование блокирует ТФ» в конкретное предсказание для каждого фактора, который ChIP-компендиумы поместят в наше окно.",
+    "tf-td-48": "экспрессия по отдельным клеткам и типам иммунных клеток, локализация белка",
+    "tf-td-49": "Быстрая проверка на здравый смысл для ожиданий по поверхностной экспрессии рядом с нашими данными проточной цитометрии.",
+    "tf-td-5": "сайты CRE рядом с KLF A, B, C",
+    "tf-td-50": "Перепривязать Δметилирования к расстоянию от PAM (CRISPRoff) и от сайта узнавания ZFP (ZFPoff)",
+    "tf-td-51": "координаты sgRNA/ZFP + существующая таблица по CpG",
+    "tf-td-52": "Геометрический след как свойство инструмента, а не локуса — и первое настоящее механистическое применение того, что у нас есть две модальности.",
+    "tf-td-53": "Состав фланкирующих оснований ±2 / ±3 против Δ по каждому CpG",
+    "tf-td-54": "только референсная последовательность",
+    "tf-td-55": "Количественно оценённый вклад самой последовательности в профиль. Вероятно, объяснит реальную долю дисперсии.",
+    "tf-td-56": "Кластеризация по молекулам и затухание попарного со-метилирования вдоль рида",
+    "tf-td-57": "уже имеющиеся риды нанопора",
+    "tf-td-58": "Бимодальность и длина распространения в п.н. — измерение, которое можно сделать только на длинных одномолекульных ридах.",
+    "tf-td-59": "Аннотация мотивов для всех 137 CpG (JASPAR/UniBind) + расстояние до опубликованных сайтов KLF/CRE",
+    "tf-td-6": "ChIP: обогащение p-CREB и CBP следовало за обогащением KLF4 на всех трёх сайтах",
+    "tf-td-60": "поиск мотивов, один вечер",
+    "tf-td-61": "Именованные кандидаты в следы с координатами, готовые лечь на карту выше.",
+    "tf-td-62": "Наложить H3K4me3, H3K27ac, ATAC для CD4⁺/CD8⁺ на окно; сопоставить с Δ",
+    "tf-td-63": "скачивание публичных треков",
+    "tf-td-64": "Предсказывает ли уже существовавшая метка активного промотора устойчивость к редактированию.",
+    "tf-td-65": "Анализ периодичности остатков после вычитания эффектов 1, 2 и 5",
+    "tf-td-66": "результаты анализов 1–2 и 5",
+    "tf-td-67": "Структура масштаба нуклеосомы — труднее всего обнаружить и легче всего обмануться. Делать последним, на остатках, с пермутационным нулём.",
+    "tf-td-7": "<strong>Высокая.</strong> Путь p-CREB идёт через аденилатциклазу, которую сам CD55 регулирует через C3aR/C5aR — петля обратной связи, работающая в T-клетках CD4⁺.",
+    "tf-td-8": "GC-бокс(ы), проксимальный промотор",
+    "tf-td-9": "мутагенез промотора; конститутивная экспрессия мышиного Daf1 приписана SP1",
+    "tf-text-1": "наш дифференциальный сигнал (CRISPRoff vs без редактирования)",
+    "tf-text-10": "геометрия редактора",
+    "tf-text-11": "протоспейсер",
+    "tf-text-12": "+93…+112 · защищено по картам",
+    "tf-text-13": "PAM (+ цепь)",
+    "tf-text-14": "PAM (− цепь)",
+    "tf-text-15": "3 CpG внутри следа: +97/+102/+105 или +99/+102/+107",
+    "tf-text-16": "предсказанные боковые максимумы",
+    "tf-text-17": "пунктир = PAM на − цепи",
+    "tf-text-18": "штрих = PAM на + цепи",
+    "tf-text-2": "значимый блок CpG #20–132",
+    "tf-text-3": "пик CpG #78–83 (+58…+84)",
+    "tf-text-4": "п.н. относительно TSS · CD55 на + цепи · TSS ≈ GRCh38 chr1:207 321 620",
+    "tf-text-5": "парные элементы CACCC / KLF (An et al. 2024)",
+    "tf-text-6": "сайты CRE рядом с KLF A, B, C — совместная занятость p-CREB + CBP по ChIP",
+    "tf-text-7": "CRE (рядом; точные координаты в источнике не даны)",
+    "tf-text-8": "TATA (TSS на +81 ниже по цепи)",
+    "tf-text-9": "наблюдаемое: самые резкие дифференциальные CpG",
+    "tf-th-1": "Фактор",
+    "tf-th-10": "Проверяет",
+    "tf-th-11": "Нужно",
+    "tf-th-12": "Результат, если гипотеза верна",
+    "tf-th-2": "Сайт / позиция",
+    "tf-th-3": "Изученные клетки",
+    "tf-th-4": "Значимость для T-клеток",
+    "tf-th-5": "Ресурс",
+    "tf-th-6": "Что даёт",
+    "tf-th-7": "Почему важно здесь",
+    "tf-th-8": "№",
+    "tf-th-9": "Анализ",
+    "tf-title-1": "CD55 TSS — транскрипционные факторы, хроматин и форма метилирования после CRISPRoff | epiCme"
+  },
+  en: {
+    "brand-sub": "epigenome · cytosine · methylation",
+    "nav-about": "About",
+    "nav-home": "Home",
+    "nav-k562": "K562",
+    "nav-chipseq": "ChIP-seq",
+    "nav-mechanisms": "Mechanisms",
+    "tf-a-1": "Promoter map",
+    "tf-a-10": "ENCODE portal",
+    "tf-a-11": "UCSC Genome Browser (window preloaded)",
+    "tf-a-12": "Nuñez et al. 2021, Cell — supplementary tables",
+    "tf-a-13": "Yin et al. 2017, Science — methyl-SELEX tables",
+    "tf-a-2": "The guide, mapped",
+    "tf-a-3": "Seven mechanisms",
+    "tf-a-4": "TF inventory",
+    "tf-a-5": "T-cell biology",
+    "tf-a-6": "Public datasets",
+    "tf-a-7": "Analysis plan",
+    "tf-a-8": "What this is not",
+    "tf-a-9": "Sources",
+    "tf-button-1": "Copy script",
+    "tf-code-1": "#!/usr/bin/env bash\n# CD55 promoter window — pull public T-cell tracks (GRCh38)\nset -euo pipefail\n\nCHR=chr1; START=207313000; END=207329000        # amplicon +/- ~5 kb\nREGION=\"${CHR}:${START}-${END}\"\nOUT=cd55_public; mkdir -p \"$OUT\"; cd \"$OUT\"\n\n# ---- 1. reference sequence for the window (flanking-base analysis, M2) ----\nsamtools faidx /path/to/GRCh38.fa \"$REGION\" &gt; cd55_window.fa\n\n# ---- 2. list every CpG in the window with its +/-3 bp context ----\npython3 - &lt;&lt;'PY'\nfrom pathlib import Path\nseq = \"\".join(l.strip() for l in Path(\"cd55_window.fa\").read_text().splitlines()[1:]).upper()\nstart = 207313000  # keep in sync with $START above; faidx coords are 1-based\nrows = []\nfor i in range(3, len(seq) - 4):\n    if seq[i:i+2] == \"CG\":\n        rows.append((start + i, seq[i-3:i+5], seq[i+2]))   # pos, context, +2 base\nPath(\"cd55_cpg_context.tsv\").write_text(\n    \"pos\\tcontext_m3_p4\\tplus2_base\\n\" + \"\\n\".join(f\"{p}\\t{c}\\t{b}\" for p, c, b in rows)\n)\nprint(f\"{len(rows)} CpGs written\")\nPY\n\n# ---- 3. chromatin tracks: edit these URLs, then slice remotely ----\ndeclare -A TRACKS=(\n  [CD4_H3K4me3]=\"https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig\"\n  [CD4_H3K27ac]=\"https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig\"\n  [CD4_H3K9me3]=\"https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig\"\n  [CD4_ATAC]=\"https://www.encodeproject.org/files/ENCFFxxxxxx/@@download/ENCFFxxxxxx.bigWig\"\n)\nfor name in \"${!TRACKS[@]}\"; do\n  bigWigToBedGraph -chrom=\"$CHR\" -start=\"$START\" -end=\"$END\" \"${TRACKS[$name]}\" \"${name}.bedGraph\"\ndone\n\n# ---- 4. motif scan (M4) ----\n# fetch JASPAR CORE vertebrates MEME file once, then:\n#   fimo --thresh 1e-4 --oc fimo_out JASPAR2024_CORE_vertebrates.meme cd55_window.fa\n\necho \"done -&gt; $(pwd)\"\n",
+    "tf-dd-1": "dCas9 with an R-loop occupies roughly 20–30 bp of DNA. The tethered DNMT3A/3L catalytic module reaches out from that anchor, so the enzyme cannot act on the DNA it is sitting on — it acts on the nearest free DNA on either side.",
+    "tf-dd-10": "The Dnmt3a–Dnmt3L structure suggested that the Dnmt3a dimer can reach two CpGs a helical turn apart in a single binding event, which surfaces as a periodic ripple in relative methylation along a run of sites. Recent cryo-EM plus biochemistry showed that nucleosome spacing sets linker methylation: short linkers let the complex bridge two nucleosomes and occlude the DNA between them, while long linkers let it engage each nucleosome separately and methylate the linker. Nucleosome geometry alone produces a periodic pattern of steric clashes matching the 10 bp helical repeat, favouring CpGs whose faces point away from the histone core.",
+    "tf-dd-11": "Residual periodicity at ~10 bp in the per-CpG Δ profile after removing the PAM-distance and flanking-sequence effects; and methylation-poor stretches roughly 150 bp wide corresponding to well-positioned nucleosomes.",
+    "tf-dd-12": "Autocorrelation or Lomb–Scargle periodogram of Δmethylation against genomic position (CpG spacing is irregular, so use a method that tolerates uneven sampling). Note the honest counterpoint: an episomal study found no significant link between CpG spacing and methylation efficiency, with sites 8–10 bp apart no better methylated than the rest. So this is a genuinely open question, not a settled prediction.",
+    "tf-dd-13": "A bound transcription factor is a steric block, and some factors additionally recruit TET enzymes. Either way, an occupied motif tends to stay hypomethylated relative to its surroundings — the classic \"footprint\" in a methylation profile.",
+    "tf-dd-14": "TF binding influences local methylation both by physically blocking the methyltransferase and by bringing TET enzymes to the bound site. At CGIs specifically, resistance to de novo methylation in oocytes tracks with CGCGC, the E2f1/E2f2 recognition site, independently of promoter activity, H3K4me3, Cfp1 or R-loop potential — a clean demonstration that a motif alone can confer protection. Single-molecule footprinting shows the relationship is site-specific rather than universal: the anticorrelation between 5mC and TF binding shows up at only a fraction of binding sites genome-wide.",
+    "tf-dd-15": "Local dips at KLF sites A/B/C and their adjacent CREs — i.e. around −106/−95, −310/−302 and −667/−652 — in donor T cells where KLF4 and CREB are engaged. In our data, KLF-adjacent CpGs #35, #54 and #65 sit within ~15 bp of the three published CACCC sites.",
+    "tf-dd-16": "Annotate each of the 137 CpGs by distance to the nearest published KLF/CRE element, then ask whether motif-proximal CpGs are systematically less responsive to CRISPRoff. Because activation state changes KLF4 levels in T cells (see below), this predicts a donor- and stimulation-dependent effect — which is testable across Day 6 vs Day 35.",
+    "tf-dd-17": "DNMT3A reads histones through two domains: the ADD domain is repelled by H3K4me3 (the mark that covers active promoters) and the PWWP domain is attracted to H3K36me2/3. An active, H3K4me3-rich CD55 promoter is therefore intrinsically hostile territory for the enzyme, and CRISPRoff has to overcome that — unevenly.",
+    "tf-dd-18": "H3K4me3 keeps the de novo methyltransferases off unmethylated CpG islands, while H3K36me3 draws DNMT3B into transcribed gene bodies. In the dinucleosome work, when the complex bridges two closely spaced nucleosomes its PWWP domains can no longer scan for H3K36me2, adding a further structural constraint. The KRAB half of CRISPRoff is what shifts this: KRAB binds TRIM28, which pulls in heterochromatin machinery and lays down H3K9me3, and the mitotically heritable part of CRISPRoff silencing rests on the DNA methylation arm.",
+    "tf-dd-19": "The steepest H3K4me3 signal — right at the TSS — should be the hardest to methylate early, with the flanks and shores converting first, then filling in. Our peak sits just downstream of the TSS at +58…+84, which is compatible with either \"shoulder of the H3K4me3 peak\" or \"shoulder of the dCas9 footprint\" (M1); these two need to be disentangled.",
+    "tf-dd-2": "Stepper et&nbsp;al. mapped this directly for dCas9–Dnmt3a3L: the 20–30 bp held under dCas9 stays essentially unmethylated, and the strongest methylation lands to either side — roughly 25 bp out on one flank of the PAM and about 40 bp on the other. An independent dCas9–DNMT3A study found a band of activity some 25–35 bp wide whose centre falls about 27 bp downstream of the PAM.",
+    "tf-dd-20": "Overlay public human CD4⁺/CD8⁺ T-cell H3K4me3, H3K27ac and H3K9me3 (BLUEPRINT, Roadmap, ENCODE) over the CD55 window and correlate signal with per-CpG Δ. Also compare Day 6 with Day 35: if this mechanism dominates, the order in which CpGs convert should follow the pre-existing chromatin gradient.",
+    "tf-dd-21": "Methylation written on day 0 has to survive replication (DNMT1 on the hemimethylated strand) and active removal (TET oxidation to 5hmC and onward). Neither process is uniform along the locus, so a mark that is written evenly can be read out unevenly weeks later.",
+    "tf-dd-22": "CRISPRoff's own reversal tool works exactly this way: the memory can be wiped with CRISPRon, which strips the methylation and re-recruits transcriptional machinery. DNMT3A1 localisation is coupled to turnover: its binding coincides with raised 5-hydroxymethylcytosine, pointing to active turnover rather than a static mark at those sites.",
+    "tf-dd-23": "Positions that lose methylation between Day 6 and Day 35 are a different, identifiable set from positions that never got methylated. \"Never written\" and \"written then erased\" have different signatures.",
+    "tf-dd-24": "We already have the Day 6 vs Day 35 comparison — but donor is confounded with timepoint there, so this cannot be cleanly resolved with the current design. It needs a matched-donor timecourse. Flag it, don't over-claim it. A nanopore run that also calls 5hmC would separate \"erased\" from \"never written\" directly.",
+    "tf-dd-25": "A per-CpG average collapses two very different worlds: graded partial methylation on every molecule, versus an all-or-nothing switch present on a subset of molecules. Only the second is compatible with the switch-like silencing CRISPRoff produces.",
+    "tf-dd-26": "Single-molecule footprinting exists precisely because of this: such enhancers sit in two states at once: on some molecules the DNA is methylated and nucleosome-covered, on the rest it is in the alternative configuration. Methyltransferase footprinting of promoters likewise gives resolution down to individual promoter molecules, with the linkage between sites on the same molecule preserved, exposing nucleosome positions that nuclease assays blur together.",
+    "tf-dd-27": "Bimodal per-molecule methylation fractions across the CD55 window, with the two modes corresponding to edited and escaped molecules — and correlated methylation state <em>along</em> individual molecules rather than independent per-CpG coin flips.",
+    "tf-dd-28": "This is what our platform is actually for. Cluster molecules by their full 137-CpG binary vector rather than averaging columns; test per-molecule mCpG fraction for bimodality; compute pairwise co-methylation between CpG <em>i</em> and CpG <em>j</em> on the same read as a function of their separation. The correlation decay length is a direct, model-free measurement of how far the silencing domain spreads on a single chromosome — and nothing in the bulk-bisulfite literature can produce it.",
+    "tf-dd-3": "A reproducible notch at the protospacer with flanking shoulders, at fixed offsets from the PAM — the single most geometrically predictable feature in the whole profile. It should be present in CRISPRoff and <em>absent or differently placed</em> in ZFPoff, whose zinc-finger footprint is a different size and sits at a different sequence.",
+    "tf-dd-4": "The spacer is now mapped — GRCh38 chr1:207,321,713–207,321,732, i.e. <strong>+93 to +112</strong> from the TSS (<a href=\"#guide\">worked through here</a>). Re-plot Δmethylation against distance from the PAM instead of from the TSS, and check the three CpGs that fall inside the protospacer for a dip. Our observed peak stops 9 bp short of the protospacer, which is already the predicted geometry. No new sequencing needed.",
+    "tf-dd-5": "The catalytic domain contacts several bases either side of the target CpG. Some flanks are excellent substrates, some are almost refractory — independent of chromatin, position or targeting.",
+    "tf-dd-6": "Deep-enzymology work found that bases from −2 out to +8 swing the reaction rate by more than two orders of magnitude, with thymine favoured at −2, cytosine or adenine at −1, cytosine through +1 to +3, and guanine unwelcome almost everywhere. Genome-wide, DNMT3A works best on TACGYC and DNMT3B on TACGRC, and the preference survives regardless of where in the genome the enzyme is recruited. An earlier episomal study put the effect at a 34-fold spread between individual sites, set for DNMT3A by whatever sits at −2 and +2.",
+    "tf-dd-7": "Per-CpG Δmethylation should correlate with the ±2 flanking sequence, with pyrimidine at +2 doing better. Because CRISPRoff carries DNMT3A (not 3B), the CGC/CGT-type flanks should outperform CGG/CGA.",
+    "tf-dd-8": "Pull the ±3 bp context for all 137 CpGs from the reference, code each site by its +2 base, and compare Δmethylation across the four groups. This is a one-afternoon analysis and it is the strongest available \"the profile is not random\" control — a positive result would explain a real fraction of the variance before any chromatin argument is invoked.",
+    "tf-dd-9": "De novo methylation happens preferentially on the DNA between nucleosomes, and the geometry of the DNMT3A dimer plus the helical twist of DNA make some CpGs face outward (reachable) and others inward (shielded).",
+    "tf-dt-1": "Mechanism",
+    "tf-dt-2": "Evidence",
+    "tf-dt-3": "Predicts",
+    "tf-dt-4": "Test with our data",
+    "tf-figcaption-1": "Every element is also distinguished by fill pattern and border style, not colour alone. Positions of KLF and CRE elements are from An et al., Front Immunol 2024; the TSS↔TATA offset is from Ewulonu et al., PNAS 1991 as cited there. The two CpG spans are from our own CRISPRoff-vs-unedited and ZFPoff comparisons. The sequenced amplicon (GRCh38 chr1:207,318,092–207,324,450) extends further 5′ than this frame.",
+    "tf-figcaption-2": "Predicted maxima are placed at roughly 25 bp on the 5′ side and 40 bp on the 3′ side of the PAM, the offsets reported for dCas9–Dnmt3a3L fusions. Because the strand of the spacer is not yet pinned down, both PAM placements are shown. Nothing in this figure is measured methylation — the only measured element is the orange block, which comes from our own differential analysis.",
+    "tf-h1-1": "Why doesn't CRISPRoff methylate every CpG the same?",
+    "tf-h2-1": "The CD55 promoter, to scale",
+    "tf-h2-2": "Seven mechanisms for a bumpy profile",
+    "tf-h2-3": "Transcription factors reported at the CD55 promoter",
+    "tf-h2-4": "Why the T-cell context changes the prediction",
+    "tf-h2-5": "Public datasets worth pulling for this window",
+    "tf-h2-6": "Six analyses, in the order they should be run",
+    "tf-h2-7": "What this page is not",
+    "tf-h3-1": "CD55 is not a passenger in T cells",
+    "tf-h3-2": "Methylation and TF binding run both ways",
+    "tf-h3-3": "The KRAB arm matters as much as the DNMT arm",
+    "tf-h3-4": "Fetch script for Skynet",
+    "tf-li-1": "TSS ≈ chr1:207,321,620 (GRCh38) — derived from our peak CpG at +58 = chr1:207,321,678",
+    "tf-li-10": "<strong>Spacer on the + strand</strong> → PAM at +113…+115. The published 5′ maximum would fall at ≈ +89; our peak centre (+71) sits 43 bp from the PAM. Same side, right order, but ~18 bp further out than expected.",
+    "tf-li-11": "<strong>Spacer on the − strand</strong> → PAM at +90…+92. The published 5′ maximum would fall at ≈ +66; our peak centre sits 20 bp from the PAM. That is essentially the textbook offset.",
+    "tf-li-12": "<strong>Not a result.</strong> No track was downloaded and no number was computed here. Every mechanism is a hypothesis with a specified test.",
+    "tf-li-13": "<strong>Not T-cell-specific evidence for the TF sites.</strong> The KLF4/CREB/CBP mapping is endothelial and reporter work. Its transfer to primary human T cells is an assumption until a T-cell ChIP dataset says otherwise.",
+    "tf-li-14": "<strong>Not a complete factor list.</strong> The absence of NFAT, ETS or RUNX from the table reflects the absence of T-cell studies of this promoter, not the absence of binding.",
+    "tf-li-15": "<strong>Not a resolution of the donor/timepoint confound.</strong> Day 6 and Day 35 are different donors; M6 in particular cannot be settled with the current design.",
+    "tf-li-16": "<strong>Coordinates need care.</strong> Our alignments are T2T-CHM13v2.0; nearly everything linked here is GRCh38. Lift over deliberately and verify the TSS lands where you expect before overlaying anything.",
+    "tf-li-17": "An F-Q, Zhou G, Harland MT, et&nbsp;al. KLF4 and CD55 expression and function depend on each other. <em>Front Immunol</em> 2024;14:1290684. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC10884306/\">PMC10884306</a> — CACCC/CRE site coordinates, KLF4/p-CREB/CBP ChIP, CD4⁺ activation data.",
+    "tf-li-18": "Nuñez JK, Chen J, Pommier GC, et&nbsp;al. Genome-wide programmable transcriptional memory by CRISPR-based epigenome editing. <em>Cell</em> 2021. <a href=\"https://www.sciencedirect.com/science/article/pii/S0092867421003536\">Article</a> — CRISPRoff mechanism, targeting window, WGBS DMR tables.",
+    "tf-li-19": "Stepper P, Kungulovski G, Jurkowska RZ, et&nbsp;al. Efficient targeted DNA methylation with chimeric dCas9–Dnmt3a–Dnmt3L. <em>Nucleic Acids Res</em> 2017;45:1703. <a href=\"https://academic.oup.com/nar/article/45/4/1703/2605790\">Article</a> — the dCas9 protection footprint and flanking methylation peaks.",
+    "tf-li-2": "Amplicon / analysis window: chr1:207,318,092–207,324,450 (GRCh38), 137 CpGs",
+    "tf-li-20": "Vojta A, Dobrinić P, Tadić V, et&nbsp;al. Repurposing the CRISPR-Cas9 system for targeted DNA methylation. <em>Nucleic Acids Res</em> 2016;44:5615. <a href=\"https://academic.oup.com/nar/article/44/12/5615/2457488\">Article</a> — 25–35 bp methylation peak centred 27 bp from the PAM.",
+    "tf-li-21": "Adam S, Bräcker J, Klingel V, et&nbsp;al. DNMT3A forms interaction networks with the CpG site and flanking sequence elements. <em>J Biol Chem</em> 2022. <a href=\"https://www.jbc.org/article/S0021-9258(22)00905-X/fulltext\">Article</a> — &gt;100-fold flanking-sequence effects, position-by-position.",
+    "tf-li-22": "Mallona I, Ilie IM, Karemaker ID, et&nbsp;al. Flanking sequence preference modulates de novo DNA methylation in the mouse genome. <em>Nucleic Acids Res</em> 2021;49:145. <a href=\"https://academic.oup.com/nar/article/49/1/145/6027824\">Article</a> — TACGYC vs TACGRC.",
+    "tf-li-23": "Wienholz BL, Kareta MS, Moarefi AH, et&nbsp;al. DNMT3L modulates flanking sequence preference for DNMT3A/3B in vivo. <em>PLoS Genet</em> 2010;6:e1001106. <a href=\"https://journals.plos.org/plosgenetics/article?id=10.1371%2Fjournal.pgen.1001106\">Article</a> — −2/+2 selection; also the negative result on CpG spacing.",
+    "tf-li-24": "Jia D, Jurkowska RZ, Zhang X, et&nbsp;al. Structure of Dnmt3a bound to Dnmt3L suggests a model for de novo DNA methylation. <em>Nature</em> 2007. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC2712830/\">PMC2712830</a> — the ~10 bp periodicity model.",
+    "tf-li-25": "Nucleosome spacing regulates linker methylation by DNMT3A2/3B3. <em>Mol Cell</em> 2026. <a href=\"https://www.cell.com/molecular-cell/abstract/S1097-2765(26)00094-8\">Article</a> — linker length as the control variable; H3K36me2 recognition blocked by bridging.",
+    "tf-li-26": "Structural DNMT–nucleosome contacts are related to DNA methylation patterns. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC12427118/\">PMC12427118</a> — outward-facing CpG preference and the 10 bp steric wave.",
+    "tf-li-27": "Manzo M, Wirz J, Ambrosi C, et&nbsp;al. Isoform-specific localization of DNMT3A regulates methylation fidelity at bivalent CpG islands. <em>EMBO J</em> 2017. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC5709737/\">PMC5709737</a> — H3K4me3 exclusion, 5hmC turnover.",
+    "tf-li-28": "Kreibich E, Kleinendorst R, Barzaghi G, et&nbsp;al. Single-molecule footprinting identifies context-dependent regulation of enhancers by DNA methylation. <em>Mol Cell</em> 2023. <a href=\"https://www.cell.com/molecular-cell/fulltext/S1097-2765(23)00040-0\">Article</a> — dual states, 5mC–TF association only at a subset of sites.",
+    "tf-li-29": "Fatemi M, Pao MM, Jeong S, et&nbsp;al. Footprinting of mammalian promoters with a CpG methyltransferase. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC1292996/\">PMC1292996</a> — single-molecule promoter footprinting principle.",
+    "tf-li-3": "KLF site A −106/−95 → ≈ chr1:207,321,514–207,321,525",
+    "tf-li-30": "Yin Y, Morgunova E, Jolma A, et&nbsp;al. Impact of cytosine methylation on DNA binding specificities of human transcription factors. <em>Science</em> 2017;356:eaaj2239. <a href=\"https://www.science.org/doi/10.1126/science.aaj2239\">Article</a> — methyl-SELEX across 542 TFs.",
+    "tf-li-31": "Li L, Zhang Y, Wang J, et&nbsp;al. The genetic and epigenetic regulation of CD55 and its pathway analysis in colon cancer. <em>Front Immunol</em> 2022. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC9889927/\">PMC9889927</a> — TFCP2 and NF-κB at the CD55 promoter.",
+    "tf-li-32": "Ewulonu UK, Ravi L, Medof ME. Characterization of the decay-accelerating factor gene promoter region. <em>PNAS</em> 1991;88:4675. <a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC51728/\">PMC51728</a> — TATA box and TSS positioning.",
+    "tf-li-4": "KLF site B −310/−302 → ≈ chr1:207,321,310–207,321,318",
+    "tf-li-5": "KLF site C −667/−652 → ≈ chr1:207,320,953–207,320,968",
+    "tf-li-6": "CRISPRoff protospacer: chr1:207,321,713–207,321,732 (GRCh38) = +93…+112",
+    "tf-li-7": "Same protospacer on T2T-CHM13v2.0: chr1:206,587,009–206,587,028 → TSS ≈ chr1:206,586,916",
+    "tf-li-8": "GRCh38 − T2T offset at this locus: 734,704 bp (constant across both endpoints)",
+    "tf-li-9": "Our BAMs are on T2T-CHM13v2.0 (~chr1:206,582,974–206,590,974). Public tracks are almost all GRCh38 — lift over one way or the other before overlaying, and check contig naming (<span class=\"mono\">chr1</span> vs <span class=\"mono\">NC_060925.1</span>).",
+    "tf-p-1": "Write → Read → Learn · reading the locus",
+    "tf-p-10": "The spacer contains three CpG dinucleotides. On the + strand they sit at either <span class=\"mono\">+97 / +102 / +105</span> (spacer on +) or <span class=\"mono\">+99 / +102 / +107</span> (spacer on −) — <span class=\"mono\">+102</span> is a CpG under both readings, so it is the safest single position to check.",
+    "tf-p-11": "M1 predicts these three are <em>conspicuously less methylated than their immediate neighbours</em>, because dCas9 is sitting on them. In our CpG numbering they should be the sites just past #83. If they show a dip, that is the footprint, measured directly on single molecules — and as far as I can tell nobody has published that measurement with long reads. If they show no dip, M1 is wrong at this locus and the peak at +58…+84 needs a different explanation (M5, the H3K4me3 shoulder, is the obvious alternative and sits in almost the same place).",
+    "tf-p-12": "Each card: what the mechanism is, the public evidence for it, what it predicts for our CD55 profile, and how to test it with data we already hold. Expand to read.",
+    "tf-p-13": "What's actually published, ranked by how directly the evidence bears on human T cells. Nearly all of the mechanistic work was done in endothelial cells, epithelial cells or colon cancer lines — the T-cell column is where the honest gaps show up.",
+    "tf-p-14": "No published study places <strong>NFAT, ETS1, RUNX1, TCF7/LEF1, GATA3, STAT5 or CTCF</strong> at the CD55 promoter specifically. That is an absence of evidence, not evidence of absence — none of the papers above looked in T cells. The right move is not to speculate but to query the T-cell ChIP compendia listed below over our exact window and see what comes back. If a factor shows a real peak there in CD4⁺ or Jurkat cells, its motif goes on the map and its CpGs get flagged in the footprint analysis.",
+    "tf-p-15": "It is a regulator of the cells we are editing. CD55 sets how loudly autocrine C3a/C5a receptor signalling runs: when CD55 is low that signalling is potentiated and effector responses follow; when CD55 is high the signalling is damped and Foxp3⁺ regulatory commitment is favoured. Independently, engaging CD55 alongside CD3 — with cross-linking antibody or with its natural ligand CD97 — raises proliferation of human blood CD4⁺ T cells together with CD69, CD25, IL-10 and GM-CSF.",
+    "tf-p-16": "Two consequences for us. First, silencing CD55 is a functional perturbation, not a neutral readout — the edited cells may drift toward an effector phenotype, which changes the TF milieu that then shapes methylation. Second, KLF4 and CD55 fall together on activation, so the promoter's TF occupancy at the moment CRISPRoff acts depends on how the donor cells were stimulated.",
+    "tf-p-17": "The usual story is that methylation blocks TFs. The systematic answer is messier, and the messiness is specifically relevant to T cells: a methylation-sensitive SELEX screen across 542 human TFs turned up a large set that actually prefer methylated CpG, concentrated in the extended homeodomain family, where the 5-methyl group makes direct hydrophobic contact. In the breakdown, bHLH, bZIP and ETS binding was generally suppressed by CpG methylation through steric clash, while homeodomain, POU and NFAT factors preferred the methylated version.",
+    "tf-p-18": "NFAT preferring methylated CpG is a striking detail for a T-cell locus. It means CRISPRoff-deposited methylation at CD55 does not simply evict everything — it could redistribute which factors can engage. Whether any NFAT motif exists in our window is exactly the kind of thing to check in JASPAR/UniBind rather than assume.",
+    "tf-p-19": "KRAB binds TRIM28, a ubiquitous scaffold that recruits heterochromatin modifiers and drives H3K9me3; CRISPRoff outperforms both dCas9-KRAB alone (strong but transient) and dCas9-DNMT3A/3L alone (weak but heritable), which is what makes the multi-domain design matter. The spatial extent of H3K9me3 spreading and the spatial extent of CpG methylation need not coincide — and where they diverge is informative. Nuñez et&nbsp;al. used exactly this logic, used the wide targeting window at the H2B promoter to follow how H3K9me3 and CpG methylation are established, spread and maintained.",
+    "tf-p-2": "Our CD55 methylation profiles are not flat. Some CpGs go from near-zero to heavily methylated; neighbours 30&nbsp;bp away barely move. This page collects the public evidence — transcription factors at the CD55 TSS, chromatin architecture, and DNMT3A's own chemistry — and turns it into seven mechanisms we can actually test against the 137-CpG table we already have.",
+    "tf-p-20": "Everything below covers either the CD55 locus in T cells or the mechanistic parameters the models above need. Queries should use <span class=\"mono\">chr1:207,318,092–207,324,450</span> (GRCh38) with ~5 kb padding.",
+    "tf-p-21": "Run this where there <em>is</em> network. It slices the CD55 window out of remote bigWigs and BEDs instead of downloading whole-genome files. Fill in the accession URLs from the ENCODE/BLUEPRINT portals — those change, so the script deliberately keeps them in one editable block at the top.",
+    "tf-p-22": "Ordered by ratio of insight to effort. The first three need no new data at all.",
+    "tf-p-23": "Analyses 1, 2 and 5 produce <em>additive</em> covariates. Fit them jointly (a single model of per-CpG Δ with PAM distance, flanking context and chromatin signal as terms) rather than sequentially — otherwise whichever effect is tested first absorbs shared variance and the later ones look weaker than they are. Report partial effects, and use a permutation null built by shuffling CpG labels within the window, not a parametric p-value.",
+    "tf-p-24": "epiCme · CD55 epigenome editing, read at single-molecule resolution. This page is a working hypothesis document and will be revised as the analyses in the plan return results.",
+    "tf-p-3": "This page contains <strong>no new data analysis</strong> and no downloaded genomics tracks — the session that built it had no network access to genome portals. What it does contain: a literature synthesis, the CD55 promoter architecture with published coordinates, direct links and accessions for the datasets worth pulling, and a fully specified analysis plan. Every \"prediction\" below is a hypothesis awaiting a test, not a result.",
+    "tf-p-4": "An&nbsp;et&nbsp;al. (2024) mapped five paired CACCC (KLF) elements in the human CD55 promoter and showed by ChIP that KLF4, phospho-CREB and CBP all sit at the three of them that lie next to CRE sites. Their positions relative to the start site are −106/−95, −228/−214, −310/−302, −567/−549 and −667/−652; the three CRE-adjacent ones are labelled A (−106/−95), B (−310/−302) and C (−667/−652). The start site itself lies 81 bp downstream of the TATA box.",
+    "tf-p-5": "Laid over that, our own differential signal: the contiguous significant block at CpG #20–132 (−1,077 to +1,935 relative to TSS) and the sharpest peak at CpG #78–83 (+58 to +84).",
+    "tf-p-6": "The CRISPRoff spacer is <span class=\"mono\">GCTGCGACTCGGCGGAGTCC</span>, and it lands at GRCh38 chr1:207,321,713–207,321,732 — <strong>+93 to +112 relative to the TSS</strong>. The T2T coordinates it was given with (chr1:206,587,009–206,587,028) differ by exactly 734,704 bp at both endpoints, which cross-checks the liftover and puts the TSS at T2T chr1:206,586,916.",
+    "tf-p-7": "That single number changes the picture. Our sharpest differential CpGs, #78–83, run from +58 to +84 — <strong>they stop 9&nbsp;bp before the protospacer starts</strong>. The strongest signal in the whole profile sits immediately outside the editor's own footprint, on the 5′ side, which is exactly where the dCas9–DNMT3A literature says the flanking maximum should be.",
+    "tf-p-8": "SpCas9 needs its NGG immediately 3′ of the protospacer on the strand the spacer matches. Two possibilities, and they are 23 bp apart:",
+    "tf-p-9": "One <span class=\"mono\">samtools faidx</span> of chr1:207,321,705–207,321,740 settles it in a second — check whether <span class=\"mono\">GCTGCGACTCGGCGGAGTCC</span> or its reverse complement <span class=\"mono\">GGACTCCGCCGAGTCGCAGC</span> is what's written on the + strand, and where the nearest NGG falls. Worth doing before any figure gets made, because the entire M1 x-axis hangs off it.",
+    "tf-span-1": "Honest framing",
+    "tf-span-10": "<i style=\"border:1.5px dashed #0072B2;background:none\"></i> candidate PAM",
+    "tf-span-11": "<i style=\"background:#E69F00\"></i> CpGs inside the footprint",
+    "tf-span-12": "<i style=\"background:#F0E442\"></i> prediction, − strand",
+    "tf-span-13": "<i style=\"background:#56B4E9\"></i> prediction, + strand",
+    "tf-span-14": "The strand question decides how good the fit is",
+    "tf-span-15": "Three CpGs to look at first",
+    "tf-span-16": "Not yet on this list, and worth checking",
+    "tf-span-17": "Design note",
+    "tf-span-2": "<i style=\"background:#56B4E9;opacity:.6\"></i> significant CpG block (our data)",
+    "tf-span-3": "<i style=\"background:#E69F00\"></i> peak differential CpGs",
+    "tf-span-4": "<i style=\"background:#F0E442\"></i> KLF / CACCC (hatched)",
+    "tf-span-5": "<i style=\"background:#0072B2\"></i> CRE (dotted, dashed border)",
+    "tf-span-6": "<i style=\"background:#A9B8B0\"></i> TATA box",
+    "tf-span-7": "Coordinate cheat sheet",
+    "tf-span-8": "<i style=\"background:#E69F00\"></i> observed peak (cross-hatch)",
+    "tf-span-9": "<i style=\"background:#6E8079\"></i> dCas9 protospacer footprint (hatched)",
+    "tf-summary-1": "<span class=\"mid\">M1</span>The editor's own footprint",
+    "tf-summary-2": "<span class=\"mid\">M2</span>DNMT3A's sequence preferences",
+    "tf-summary-3": "<span class=\"mid\">M3</span>Nucleosomes, linkers, and 10-bp periodicity",
+    "tf-summary-4": "<span class=\"mid\">M4</span>Transcription factors standing in the way",
+    "tf-summary-5": "<span class=\"mid\">M5</span>The chromatin state that was already there",
+    "tf-summary-6": "<span class=\"mid\">M6</span>Erasure and maintenance failure",
+    "tf-summary-7": "<span class=\"mid\">M7</span>Molecules, not averages",
+    "tf-td-1": "CACCC pairs at −106/−95 (A), −310/−302 (B), −667/−652 (C), plus −228/−214 and −567/−549",
+    "tf-td-10": "Huh7.5, murine splenocytes",
+    "tf-td-11": "Medium. SP1 sites are CpG-containing and GC-rich — prime CRISPRoff substrate, and classically reported as methylation-insensitive for binding.",
+    "tf-td-12": "Predicted site in 2 kb 5′ flank; ChIP-validated",
+    "tf-td-13": "ChIP using an NF-κB antibody with promoter-specific primers confirmed occupancy at CD55",
+    "tf-td-14": "LOVO / HCT116 colon cancer",
+    "tf-td-15": "Medium–high. NF-κB is central to T-cell activation; exact offset not published in a frame we can map onto our CpGs.",
+    "tf-td-16": "Predicted site, 5′ flank",
+    "tf-td-17": "Mutating the TFCP2 site cut CD55 promoter activity by 66%",
+    "tf-td-18": "Low–medium. Strong effect but colon-cancer context; would need T-cell ChIP to matter here.",
+    "tf-td-19": "Reported site, proximal promoter",
+    "tf-td-2": "ChIP occupancy at all three A–C sites; truncated 190 bp promoter containing only site A reproduces most of the full 848 bp activity",
+    "tf-td-20": "Point mutation had no effect on HCV-core-driven induction",
+    "tf-td-21": "Low as evidence, high as a hypothesis — AP-1 is a core T-cell activation factor.",
+    "tf-td-22": "Apical CD55 induction, hypoxia",
+    "tf-td-23": "HIF-dependent induction of apical CD55",
+    "tf-td-24": "Intestinal epithelium",
+    "tf-td-25": "Low for T cells, but relevant to any hypoxic culture or tissue context.",
+    "tf-td-26": "Registered cCREs with DNase/H3K4me3/H3K27ac/CTCF signal per biosample",
+    "tf-td-27": "Fastest way to see whether the CD55 TSS is a promoter-like cCRE in naive CD4⁺/CD8⁺ T cells, and where its boundaries fall relative to our 137 CpGs.",
+    "tf-td-28": "Raw and processed ChIP-seq, DNase-seq, ATAC-seq; Jurkat and primary T-cell biosamples",
+    "tf-td-29": "Direct TF occupancy evidence in a T-lineage background — the gap the published CD55 promoter literature leaves open.",
+    "tf-td-3": "HUVEC, K562 reporter",
+    "tf-td-30": "CpG islands, ReMap, JASPAR TFBS, conservation, ENCODE composite tracks in one view",
+    "tf-td-31": "Confirms CpG-island status of the promoter — which the CRISPRoff literature says is not required for silencing, but which changes the DNMT3A recruitment picture.",
+    "tf-td-32": "Re-processed public ChIP-seq, filterable by cell class (Blood)",
+    "tf-td-33": "\"Which factors have ever been ChIPped onto this interval in blood cells\" — a single query answers the open question in the section above.",
+    "tf-td-34": "Curated TF peaks; UniBind adds motif-supported direct binding sites",
+    "tf-td-35": "UniBind is the stricter filter — motif + peak — so its calls are the ones worth putting on the promoter map.",
+    "tf-td-36": "Position weight matrices",
+    "tf-td-37": "Scan the amplicon sequence for KLF4, SP1, CREB1, RELA, TFCP2, NFATC1/2, ETS1, RUNX1, TCF7, GATA3 and record which CpGs fall inside hits.",
+    "tf-td-38": "ATAC-seq + RNA-seq for up to 32 immune cell populations, resting and stimulated",
+    "tf-td-39": "The single best resource for \"is the CD55 promoter open in <em>my</em> cell state\" — resting vs stimulated CD4⁺/CD8⁺ subsets, which is exactly the axis our donors vary on.",
+    "tf-td-4": "<strong>High.</strong> KLF4 falls in activated CD4⁺ splenocytes in step with CD55 mRNA. Activation state should change occupancy — and therefore footprint.",
+    "tf-td-40": "RNA-seq across 15 sorted human immune cell types, plus eQTLs",
+    "tf-td-41": "Baseline CD55 expression per T-cell subset — the denominator for interpreting how much silencing we actually achieved.",
+    "tf-td-42": "WGBS methylomes plus H3K4me3/H3K27ac/H3K9me3/H3K36me3 for CD4⁺ and CD8⁺ T cells",
+    "tf-td-43": "The unedited baseline methylation and the chromatin state that M5 depends on. Also the reference against which \"our unedited controls look normal\" can be checked.",
+    "tf-td-44": "Genome-wide CRISPRoff screens; a table of differentially methylated CpG regions from whole-genome bisulfite sequencing; promoter tiling screens",
+    "tf-td-45": "The empirical targeting-window shape from the tool's own paper — a direct comparison for our per-CpG geometry, and the closest thing to a positive control for M1.",
+    "tf-td-46": "Per-TF classification: methyl-inhibited, methyl-enhanced, or insensitive",
+    "tf-td-47": "Turns \"methylation blocks TFs\" into a specific per-factor prediction for whichever factors the ChIP compendia put in our window.",
+    "tf-td-48": "Single-cell and immune-cell expression, protein localisation",
+    "tf-td-49": "Quick sanity layer for surface-expression expectations alongside our flow data.",
+    "tf-td-5": "CRE elements adjacent to KLF sites A, B, C",
+    "tf-td-50": "Re-anchor Δmethylation on distance from PAM (CRISPRoff) and from the ZFP recognition site (ZFPoff)",
+    "tf-td-51": "sgRNA/ZFP coordinates + existing per-CpG table",
+    "tf-td-52": "A geometric footprint that is a property of the tool, not the locus — and the first genuine mechanistic use of having two modalities.",
+    "tf-td-53": "±2 / ±3 flanking-base composition vs per-CpG Δ",
+    "tf-td-54": "Reference sequence only",
+    "tf-td-55": "A sequence-intrinsic component of the profile, quantified. Probably explains a real slice of the variance.",
+    "tf-td-56": "Per-molecule clustering and pairwise co-methylation decay along reads",
+    "tf-td-57": "Existing nanopore reads",
+    "tf-td-58": "Bimodality and a spreading length in bp — the measurement only single-molecule long reads can make.",
+    "tf-td-59": "Motif annotation of all 137 CpGs (JASPAR/UniBind) + distance to published KLF/CRE sites",
+    "tf-td-6": "ChIP: p-CREB and CBP enrichment tracked KLF4 enrichment at all three sites",
+    "tf-td-60": "Motif scan, one afternoon",
+    "tf-td-61": "Named candidate footprints with coordinates, ready to overlay on the map above.",
+    "tf-td-62": "Overlay CD4⁺/CD8⁺ H3K4me3, H3K27ac, ATAC over the window; correlate with Δ",
+    "tf-td-63": "Public track download",
+    "tf-td-64": "Whether the pre-existing active-promoter mark predicts resistance to editing.",
+    "tf-td-65": "Periodicity analysis of residuals after removing effects 1, 2 and 5",
+    "tf-td-66": "Outputs of 1–2 and 5",
+    "tf-td-67": "Nucleosome-scale structure — the hardest to detect and the easiest to fool yourself about. Run it last, on residuals, with a permutation null.",
+    "tf-td-7": "<strong>High.</strong> The p-CREB route runs through adenylyl cyclase, which CD55 itself controls via C3aR/C5aR — a feedback loop that operates in CD4⁺ T cells.",
+    "tf-td-8": "GC-box(es), proximal promoter",
+    "tf-td-9": "Promoter mutagenesis; murine Daf1 constitutive expression attributed to SP1",
+    "tf-text-1": "our differential signal (CRISPRoff vs unedited)",
+    "tf-text-10": "editor geometry",
+    "tf-text-11": "protospacer",
+    "tf-text-12": "+93…+112 · protected in published maps",
+    "tf-text-13": "PAM (+ strand)",
+    "tf-text-14": "PAM (− strand)",
+    "tf-text-15": "3 CpGs inside the footprint: +97/+102/+105 or +99/+102/+107",
+    "tf-text-16": "predicted flanking maxima",
+    "tf-text-17": "dotted = − strand PAM",
+    "tf-text-18": "dashed = + strand PAM",
+    "tf-text-2": "CpG #20–132 significant block",
+    "tf-text-3": "peak CpG #78–83 (+58…+84)",
+    "tf-text-4": "bp relative to TSS · CD55 on the + strand · TSS ≈ GRCh38 chr1:207,321,620",
+    "tf-text-5": "paired CACCC / KLF elements (An et al. 2024)",
+    "tf-text-6": "CRE sites adjacent to KLF sites A, B, C — p-CREB + CBP co-occupancy by ChIP",
+    "tf-text-7": "CRE (adjacent; exact offsets not given in source)",
+    "tf-text-8": "TATA (TSS sits +81 downstream)",
+    "tf-text-9": "observed: sharpest differential CpGs",
+    "tf-th-1": "Factor",
+    "tf-th-10": "Tests",
+    "tf-th-11": "Needs",
+    "tf-th-12": "Outcome if positive",
+    "tf-th-2": "Site / position",
+    "tf-th-3": "Cell type studied",
+    "tf-th-4": "Relevance to T cells",
+    "tf-th-5": "Resource",
+    "tf-th-6": "What it gives",
+    "tf-th-7": "Why it matters here",
+    "tf-th-8": "#",
+    "tf-th-9": "Analysis",
+    "tf-title-1": "CD55 TSS — transcription factors, chromatin and the shape of CRISPRoff methylation | epiCme"
+  }
+};
+
+const CHIPS = {
+  ru: [
+    "Почему метилирование после CRISPRoff неравномерно по CpG?",
+    "Что такое эффект следа dCas9?",
+    "Какие транскрипционные факторы связываются с промотором CD55?",
+    "Как проверить гипотезу про фланкирующую последовательность?",
+    "Что могло бы опровергнуть механизм M1?"
+  ],
+  en: [
+    "Why is CRISPRoff methylation uneven across CpGs?",
+    "What is the dCas9 footprint effect?",
+    "Which transcription factors bind the CD55 promoter?",
+    "How would I test the flanking-sequence hypothesis?",
+    "What would falsify mechanism M1?"
+  ]
+};
+
+const COPY_LABELS = {
+  ru: { copied: 'Скопировано', failed: 'Не скопировалось' },
+  en: { copied: 'Copied', failed: 'Copy failed' }
+};
+
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const dict = I18N[lang];
+    if(!dict || !(key in dict)) return;
+    if(el.tagName === 'TITLE'){ document.title = dict[key]; }
+    else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('#lang-switch button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  window.epicmeChatChips = CHIPS[lang] || CHIPS.ru;
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){ /* ignore */ }
+}
+
+document.querySelectorAll('#lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+
+// restore saved language choice (shared across the site via localStorage; falls back to ru)
+(function(){
+  let saved = 'ru';
+  try{ saved = localStorage.getItem('epicme_lang') || 'ru'; }catch(e){ /* ignore */ }
+  window.epicmeChatChips = CHIPS[saved] || CHIPS.ru;
+  if(saved === 'en') applyLang('en');
+})();
+
+// copy-to-clipboard for the fetch script
+document.querySelectorAll('.copybtn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var target = document.querySelector(btn.dataset.copy);
+    if (!target) return;
+    var text = target.innerText;
+    var lang = document.documentElement.getAttribute('lang') || 'ru';
+    var labels = COPY_LABELS[lang] || COPY_LABELS.ru;
+    var done = function () {
+      var old = btn.textContent;
+      btn.textContent = labels.copied;
+      setTimeout(function () { btn.textContent = old; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { btn.textContent = labels.failed; });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { btn.textContent = labels.failed; }
+      document.body.removeChild(ta);
+    }
+  });
+});
+</script>
+<script src="assets/epicme-chat.js" defer></script>
+</body>
+</html>
