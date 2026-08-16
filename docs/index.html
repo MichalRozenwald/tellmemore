@@ -218,6 +218,7 @@
       <a href="day6VSday35.html">Day 35 vs Day 6</a>
       <a href="k562.html" data-i18n="nav-k562">K562</a>
       <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="public-methylation.html" data-i18n="nav-public">Публичные данные</a>
       <a href="cd55-tf-tcells.html" data-i18n="nav-tf">Механизмы</a>
       <a href="methylation-and-memory.html" data-i18n="nav-memory">Метилирование и память</a>
       <a href="methylation-generational-trauma.html" data-i18n="nav-trauma">Метилирование и травма</a>
@@ -357,6 +358,40 @@
     <div class="disclaimer" data-i18n="tf-note"><strong>Важно:</strong> вся механистика по KLF4, CREB и CBP получена на эндотелиальных клетках и репортёрных конструкциях, а не на первичных человеческих T-клетках. Перенос на нашу систему — допущение, пока T-клеточный ChIP не скажет обратного. На странице механизмов это помечено отдельно, и ни одно число там не измерено заново — это гипотезы с прописанными способами проверки.</div>
   </section>
 
+
+  <section id="public">
+    <div class="kicker-shaped learn"><span class="shape"></span><span class="lbl" data-i18n="pub-kicker">Learn — чужие данные на нашем окне</span></div>
+    <h2 data-i18n="pub-h2">Как выглядит этот промотор у тех, кто его не редактировал</h2>
+    <p class="lede" data-i18n="pub-lede">Прежде чем говорить, что CRISPRoff и ZFPoff что-то изменили, нужна базовая линия: сколько метилирования лежит на этих же 137 CpG в клетках, которых никто не трогал. Отдельная страница собирает публичные bisulfite (WGBS) и EM-seq данные ровно на наше окно 6 500 п.н. — в первую очередь Т-клетки и K562, а вместе с ними десятки других отсортированных типов человеческих клеток.</p>
+
+    <a class="start-card" href="public-methylation.html" style="text-decoration:none; margin-bottom:8px;">
+      <div class="txt">
+        <h3 data-i18n="pub-card-h3">Публичные bisulfite и EM-seq данные на окне CD55</h3>
+        <p data-i18n="pub-card-p">Каталог выверенных датасетов с прямыми ссылками в первичные репозитории, координаты в T2T и hg38 с переключателем между ними, ссылки, открывающие окно сразу в геномном браузере, и команды, которыми срез вырезается из удалённых файлов без их скачивания.</p>
+      </div>
+      <span class="btn ghost" data-i18n="pub-card-go">Открыть →</span>
+    </a>
+
+    <h3 class="sub-h" data-i18n="pub-what-h3">Что там собрано</h3>
+    <div class="grid2">
+      <div class="card">
+        <span class="tag blue" data-i18n="pub-t-tag">Приоритет · Т-клетки</span>
+        <h3 data-i18n="pub-t-h">Т-клетки</h3>
+        <p data-i18n="pub-t-p">Первичные CD3⁺ из ENCODE; атлас метилирования человека Loyfer 2023 — глубокий WGBS по 39 отсортированным типам клеток, включая CD4, CD8 и наивные Т; отсортированная кровь BLUEPRINT; серия DEEP по дифференцировке CD4-памяти. Это и есть та самая базовая линия «до редактора».</p>
+      </div>
+      <div class="card">
+        <span class="tag amber" data-i18n="pub-k-tag">Приоритет · K562</span>
+        <h3 data-i18n="pub-k-h">K562 и референсы платформ</h3>
+        <p data-i18n="pub-k-p">Метилом K562 из ENCODE — тот самый, который берут за ground truth в бенчмарках нанопора, но это несортированная популяция, а не наши фракции CD55-LOW и CD55-HIGH. Рядом — парный эксперимент NEB: одна и та же ДНК NA12878, прогнанная и как EM-seq, и как WGBS, так что разницу платформ на нашем окне можно измерить, а не предположить.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-h" data-i18n="pub-why-h3">Зачем это в проекте</h3>
+    <p data-i18n="pub-why-p">Три вещи, которых своими данными не получить. <strong>Базовая линия:</strong> где промотор CD55 неметилирован по умолчанию, а где несёт метку и безо всякого редактирования. <strong>Проверка платформы:</strong> наши вызовы нанопоровые и модельно-зависимые, и совпадение с бисульфитом на тех же координатах говорит больше, чем любая внутренняя метрика. <strong>Контекст типа клеток:</strong> если базовая линия в Т-клетках и в K562 разная, то часть разницы между нашими наборами — это клетка, а не редактор.</p>
+
+    <div class="disclaimer" data-i18n="pub-note"><strong>Честно про статус:</strong> страница пока каталог, а не переанализ. Ни одно значение метилирования там не нарисовано, потому что ни один файл ещё не скачан и не посчитан на нашем окне — вместо цифр лежит скрипт, который вырезает срез из удалённых bigWig range-запросами, и раздел «Загруженные треки», который заполнится ровно тогда, когда скрипт отработает. Вторая оговорка: публичные Т-клетки — это разные доноры, субпопуляции и состояния активации, а K562 из ENCODE несортированный, так что всё это фон для локуса, а не компаратор для наших групп.</div>
+  </section>
+
   <section id="beyond">
     <div class="kicker-shaped learn"><span class="shape"></span><span class="lbl" data-i18n="beyond-kicker">Additionally, about methylation — за пределами CD55</span></div>
     <h2 data-i18n="beyond-h2">Две заметки: одна про память, одна про поколения</h2>
@@ -422,6 +457,23 @@
    ============================================================ */
 const I18N = {
   ru: {
+    'nav-public': 'Публичные данные',
+    'pub-kicker': 'Learn — чужие данные на нашем окне',
+    'pub-h2': 'Как выглядит этот промотор у тех, кто его не редактировал',
+    'pub-lede': 'Прежде чем говорить, что CRISPRoff и ZFPoff что-то изменили, нужна базовая линия: сколько метилирования лежит на этих же 137 CpG в клетках, которых никто не трогал. Отдельная страница собирает публичные bisulfite (WGBS) и EM-seq данные ровно на наше окно 6 500 п.н. — в первую очередь Т-клетки и K562, а вместе с ними десятки других отсортированных типов человеческих клеток.',
+    'pub-card-h3': 'Публичные bisulfite и EM-seq данные на окне CD55',
+    'pub-card-p': 'Каталог выверенных датасетов с прямыми ссылками в первичные репозитории, координаты в T2T и hg38 с переключателем между ними, ссылки, открывающие окно сразу в геномном браузере, и команды, которыми срез вырезается из удалённых файлов без их скачивания.',
+    'pub-card-go': 'Открыть →',
+    'pub-what-h3': 'Что там собрано',
+    'pub-t-tag': 'Приоритет · Т-клетки',
+    'pub-t-h': 'Т-клетки',
+    'pub-t-p': 'Первичные CD3⁺ из ENCODE; атлас метилирования человека Loyfer 2023 — глубокий WGBS по 39 отсортированным типам клеток, включая CD4, CD8 и наивные Т; отсортированная кровь BLUEPRINT; серия DEEP по дифференцировке CD4-памяти. Это и есть та самая базовая линия «до редактора».',
+    'pub-k-tag': 'Приоритет · K562',
+    'pub-k-h': 'K562 и референсы платформ',
+    'pub-k-p': 'Метилом K562 из ENCODE — тот самый, который берут за ground truth в бенчмарках нанопора, но это несортированная популяция, а не наши фракции CD55-LOW и CD55-HIGH. Рядом — парный эксперимент NEB: одна и та же ДНК NA12878, прогнанная и как EM-seq, и как WGBS, так что разницу платформ на нашем окне можно измерить, а не предположить.',
+    'pub-why-h3': 'Зачем это в проекте',
+    'pub-why-p': 'Три вещи, которых своими данными не получить. <strong>Базовая линия:</strong> где промотор CD55 неметилирован по умолчанию, а где несёт метку и безо всякого редактирования. <strong>Проверка платформы:</strong> наши вызовы нанопоровые и модельно-зависимые, и совпадение с бисульфитом на тех же координатах говорит больше, чем любая внутренняя метрика. <strong>Контекст типа клеток:</strong> если базовая линия в Т-клетках и в K562 разная, то часть разницы между нашими наборами — это клетка, а не редактор.',
+    'pub-note': '<strong>Честно про статус:</strong> страница пока каталог, а не переанализ. Ни одно значение метилирования там не нарисовано, потому что ни один файл ещё не скачан и не посчитан на нашем окне — вместо цифр лежит скрипт, который вырезает срез из удалённых bigWig range-запросами, и раздел «Загруженные треки», который заполнится ровно тогда, когда скрипт отработает. Вторая оговорка: публичные Т-клетки — это разные доноры, субпопуляции и состояния активации, а K562 из ENCODE несортированный, так что всё это фон для локуса, а не компаратор для наших групп.',
     'title': 'epicme.bio — эпигеном · цитозин · метилирование',
     'brand-sub': 'эпигеном · цитозин · метилирование',
     'nav-home': 'Главная',
@@ -509,6 +561,23 @@ const I18N = {
     'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. Эта страница — точка входа: полная библиография — на страницах <a href="about.html">о проекте</a> и <a href="about-cd55.html">CD55 explorer</a>.'
   },
   en: {
+    'nav-public': 'Public data',
+    'pub-kicker': 'Learn — other people’s data on our window',
+    'pub-h2': 'What this promoter looks like in cells nobody edited',
+    'pub-lede': 'Before claiming that CRISPRoff and ZFPoff changed anything, you need the baseline: how much methylation sits on these same 137 CpGs in cells nobody touched. A separate page collects public bisulfite (WGBS) and EM-seq data over exactly our 6,500 bp window — T cells and K562 first, and with them dozens of other sorted human cell types.',
+    'pub-card-h3': 'Public bisulfite and EM-seq data over the CD55 window',
+    'pub-card-p': 'A catalogue of verified datasets linking straight into the primary repositories, coordinates in T2T and hg38 with a switch between them, links that open the window directly in a genome browser, and the commands that cut the slice out of remote files without downloading them.',
+    'pub-card-go': 'Open →',
+    'pub-what-h3': 'What is in it',
+    'pub-t-tag': 'Priority · T cells',
+    'pub-t-h': 'T cells',
+    'pub-t-p': 'Primary CD3⁺ cells from ENCODE; the Loyfer 2023 human methylation atlas — deep WGBS across 39 sorted cell types including CD4, CD8 and naive T; BLUEPRINT sorted blood; the DEEP series on CD4 memory differentiation. This is the before-the-editor baseline.',
+    'pub-k-tag': 'Priority · K562',
+    'pub-k-h': 'K562 and platform references',
+    'pub-k-p': 'The ENCODE K562 methylome — the same one used as ground truth in nanopore benchmarks, though it is an unsorted population rather than our CD55-LOW and CD55-HIGH fractions. Alongside it sits the matched NEB experiment: one NA12878 DNA sample run both as EM-seq and as WGBS, so the platform difference over our window can be measured instead of assumed.',
+    'pub-why-h3': 'Why the project needs it',
+    'pub-why-p': 'Three things our own data cannot give. <strong>A baseline:</strong> where the CD55 promoter is unmethylated by default and where it carries the mark with no editing at all. <strong>A platform check:</strong> our calls are nanopore and model-dependent, and agreement with bisulfite at the same coordinates says more than any internal metric. <strong>Cell-type context:</strong> if the baseline differs between T cells and K562, part of the difference between our datasets is the cell, not the editor.',
+    'pub-note': '<strong>Status, stated plainly:</strong> the page is a catalogue, not a re-analysis. Not one methylation value is drawn there, because no file has been downloaded and quantified over our window yet — in place of numbers there is a script that pulls the slice out of remote bigWigs by range request, and a “Loaded tracks” section that fills in exactly when that script has run. A second caveat: public T cells span different donors, subsets and activation states, and the ENCODE K562 is unsorted — so all of it is background for the locus, not a comparator for our groups.',
     'title': 'epicme.bio — epigenome · cytosine · methylation',
     'brand-sub': 'epigenome · cytosine · methylation',
     'nav-home': 'Home',

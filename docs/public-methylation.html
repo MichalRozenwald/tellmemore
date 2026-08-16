@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public bisulfite &amp; EM-seq data over the CD55 ROI — epiCme</title>
+<meta name="description" content="Catalogue of public bisulfite (WGBS/RRBS) and EM-seq CpG methylation datasets covering the 6,500 bp / 137-CpG CD55 region of interest, with T2T and hg38 coordinates and extraction recipes.">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* ---- page-local tokens (fallbacks keep the page readable if theme.css is missing) ---- */
+  :root{
+    /* every token resolves against assets/theme.css; the fallbacks only matter
+       if this page is opened without it. The palette stays inside the theme's
+       three accent hues on purpose — no green, purple or extra red. */
+    --pm-ink:       var(--ink, #E9EEEA);
+    --pm-muted:     var(--ink-dim, #A9B8B0);
+    --pm-faint:     var(--ink-faint, #6E8079);
+    --pm-surface:   var(--surface, #111C18);
+    --pm-surface-2: var(--surface-2, #16221D);
+    --pm-line:      var(--line, #24352E);
+    --pm-blue:      var(--blue, #56B4E9);        /* unmethylated / active / primary */
+    --pm-blue-deep: var(--blue-deep, #0072B2);
+    --pm-orange:    var(--orange, #E69F00);      /* methylated / silenced / caution */
+    --pm-yellow:    var(--yellow, #F0E442);
+    --pm-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  body.pm-standalone{
+    margin:0; background:var(--bg, #0B1310); color:var(--pm-ink);
+    font-family:'Source Serif 4', Georgia, serif; line-height:1.65;
+  }
+  .pm-wrap{max-width:1080px; margin:0 auto; padding:0 20px 80px;}
+  .pm h1,.pm h2,.pm h3,.pm .display{font-family:"Space Grotesk", system-ui, sans-serif; line-height:1.2;}
+
+  .pm-anchors{display:flex; flex-wrap:wrap; gap:14px; padding:14px 0 4px; border-bottom:1px solid var(--pm-line);}
+  .pm-anchors a{color:var(--pm-blue); text-decoration:none; font-size:.85rem; font-family:var(--pm-mono);}
+  .pm-anchors a:hover{text-decoration:underline;}
+
+  /* ---- header: same lang switch and pill nav as the rest of the site ---- */
+  .lang-switch{
+    display:inline-flex; background:var(--pm-surface-2); border:1px solid var(--pm-line);
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+  }
+  .lang-switch button{
+    border:none; background:transparent; color:var(--pm-muted);
+    font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+  }
+  .lang-switch button.active{ background:var(--pm-blue); color:#06182A; }
+  .nav-inner{ flex-wrap:wrap; row-gap:10px; }
+  .nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+  .nav-links a{
+    display:inline-flex; align-items:center; padding:10px 18px; border-radius:999px;
+    border:1.5px solid var(--pm-line); background:var(--pm-surface-2); color:var(--pm-muted);
+    font-size:14.5px; font-weight:600; text-decoration:none;
+    transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{
+    border-color:var(--pm-blue); color:var(--pm-ink); background:var(--pm-surface); transform:translateY(-1px);
+  }
+  .nav-links a.active{ background:var(--pm-blue); border-color:var(--pm-blue); color:#06182A; }
+
+  /* ---- hero ---- */
+  .pm-hero{padding:34px 0 8px;}
+  .pm-eyebrow{font-family:var(--pm-mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--pm-blue);}
+  .pm-hero h1{font-size:clamp(1.9rem,4.6vw,3rem); margin:.35em 0 .3em;}
+  .pm-lede{font-size:1.08rem; color:var(--pm-ink); max-width:62ch;}
+
+  /* ---- signature: ROI ribbon ---- */
+  .pm-ribbon{
+    margin:26px 0 8px; padding:18px; border:1px solid var(--pm-line);
+    border-radius:14px; background:var(--pm-surface);
+  }
+  .pm-ribbon-head{display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  .pm-asm{display:inline-flex; border:1px solid var(--pm-line); border-radius:10px; overflow:hidden;}
+  .pm-asm button{
+    font-family:var(--pm-mono); font-size:.78rem; padding:7px 13px; cursor:pointer;
+    background:transparent; color:var(--pm-muted); border:0;
+  }
+  .pm-asm button[aria-pressed="true"]{background:var(--pm-blue); color:#08121a;}
+  .pm-ruler{position:relative; height:64px;}
+  .pm-ruler svg{width:100%; height:64px; display:block;}
+  .pm-coordline{
+    font-family:var(--pm-mono); font-size:.95rem; color:var(--pm-ink);
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:10px;
+  }
+  .pm-copy{
+    font-family:var(--pm-mono); font-size:.72rem; padding:5px 10px; cursor:pointer;
+    background:transparent; color:var(--pm-blue); border:1px solid var(--pm-line); border-radius:7px;
+  }
+  .pm-copy:hover{border-color:var(--pm-blue);}
+
+  /* ---- sections ---- */
+  .pm section{padding-top:38px;}
+  .pm h2{font-size:1.5rem; margin:0 0 .5em; padding-bottom:.35em; border-bottom:2px solid var(--pm-line);}
+  .pm h3{font-size:1.08rem; margin:1.4em 0 .4em; color:var(--pm-blue);}
+
+  .pm-note{
+    border-left:4px solid var(--pm-orange); background:rgba(230,159,0,.07);
+    padding:14px 16px; border-radius:0 10px 10px 0; margin:18px 0; font-size:.97rem;
+  }
+  .pm-note.blue{border-left-color:var(--pm-blue); background:rgba(86,180,233,.07);}
+  .pm-note strong{font-family:"Space Grotesk", system-ui, sans-serif;}
+
+  /* ---- link cards ---- */
+  .pm-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin-top:16px;}
+  .pm-card{
+    display:block; padding:16px; border:1px solid var(--pm-line); border-radius:12px;
+    background:var(--pm-surface); text-decoration:none; color:var(--pm-ink); transition:border-color .15s, transform .15s;
+  }
+  .pm-card:hover{border-color:var(--pm-blue); transform:translateY(-2px);}
+  .pm-card .t{font-family:"Space Grotesk", system-ui, sans-serif; font-weight:600; display:block; margin-bottom:5px;}
+  .pm-card .d{font-size:.88rem; color:var(--pm-muted);}
+
+  /* ---- filters + table ---- */
+  .pm-filters{display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 6px;}
+  .pm-filters button{
+    font-family:var(--pm-mono); font-size:.76rem; padding:7px 12px; cursor:pointer; border-radius:999px;
+    background:transparent; color:var(--pm-muted); border:1px solid var(--pm-line);
+  }
+  .pm-filters button[aria-pressed="true"]{background:var(--pm-blue); color:#fff; border-color:var(--pm-blue);}
+  .pm-count{font-family:var(--pm-mono); font-size:.78rem; color:var(--pm-muted); margin:4px 0 12px;}
+  .pm-tablewrap{overflow-x:auto; border:1px solid var(--pm-line); border-radius:12px;}
+  table.pm-table{border-collapse:collapse; width:100%; min-width:760px; font-size:.9rem;}
+  table.pm-table th{
+    text-align:left; padding:11px 12px; background:var(--pm-surface-2); color:var(--pm-muted);
+    font-family:var(--pm-mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase;
+    border-bottom:1px solid var(--pm-line); white-space:nowrap;
+  }
+  table.pm-table td{padding:12px; border-bottom:1px solid var(--pm-line); vertical-align:top;}
+  table.pm-table tr:last-child td{border-bottom:0;}
+  table.pm-table a{color:var(--pm-blue);}
+  .pm-acc{font-family:var(--pm-mono); font-size:.82rem; display:block; margin-top:3px; word-break:break-all;}
+  .pm-badge{
+    display:inline-block; font-family:var(--pm-mono); font-size:.68rem; padding:3px 8px;
+    border-radius:6px; border:1px solid; white-space:nowrap;
+  }
+  .pm-badge.bs{color:var(--pm-blue);   border-color:var(--pm-blue);}
+  .pm-badge.em{color:var(--pm-yellow); border-color:var(--pm-yellow);}
+  .pm-badge.arr{color:var(--pm-orange);border-color:var(--pm-orange);}
+  .pm-badge.ont{color:var(--pm-muted); border-color:var(--pm-muted); border-style:dashed;}
+  .pm-open{color:var(--pm-blue); font-family:var(--pm-mono); font-size:.76rem;}
+  .pm-closed{color:var(--pm-orange); font-family:var(--pm-mono); font-size:.76rem;}
+  .pm-note-cell{color:var(--pm-muted); font-size:.85rem; display:block; margin-top:5px;}
+
+  /* ---- code ---- */
+  pre.pm-code{
+    background:#0a0d12; border:1px solid var(--pm-line); border-radius:10px;
+    padding:14px 16px; overflow-x:auto; font-family:var(--pm-mono); font-size:.82rem;
+    line-height:1.55; color:#cfd8e3;
+  }
+  pre.pm-code .c{color:var(--pm-muted);}
+  .pm-codehead{display:flex; justify-content:space-between; align-items:center; gap:10px; margin:18px 0 6px;}
+  .pm-codehead h3{margin:0;}
+
+  .pm-trackcard{border:1px solid var(--pm-line); border-radius:12px; background:var(--pm-surface); padding:14px 16px; margin:14px 0;}
+  .pm-trackhead{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;}
+  .pm-trackhead .t{font-family:"Space Grotesk", system-ui, sans-serif; font-weight:600;}
+  svg.pm-track{width:100%; height:74px; display:block; margin:6px 0 2px;}
+  ul.pm-list{padding-left:1.15em;}
+  ul.pm-list li{margin:.45em 0;}
+  .pm-src{font-size:.87rem; color:var(--pm-muted);}
+  .pm-src a{color:var(--pm-blue); word-break:break-all;}
+  footer.pm-foot{margin-top:56px; padding-top:20px; border-top:1px solid var(--pm-line); color:var(--pm-muted); font-size:.85rem;}
+
+  @media (max-width:640px){
+    .pm-ribbon{padding:14px;}
+    .pm-coordline{font-size:.82rem;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .pm-card{transition:none;}
+    .pm-card:hover{transform:none;}
+  }
+  :focus-visible{outline:2px solid var(--pm-blue); outline-offset:2px;}
+</style>
+</head>
+<body class="pm-standalone">
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand_sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" data-i18n="nav_home">Главная</a>
+      <a href="about.html" data-i18n="nav_about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="day6.html">Day 6</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day6VSday35.html">Day 35 vs Day 6</a>
+      <a href="k562.html">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav_chipseq">ChIP-seq</a>
+      <a href="cd55-tf-tcells.html" data-i18n="nav_tf">Механизмы</a>
+      <a href="methylation-and-memory.html" data-i18n="nav_memory">Метилирование и память</a>
+      <a href="methylation-generational-trauma.html" data-i18n="nav_trauma">Метилирование и травма</a>
+      <a href="public-methylation.html" class="active" data-i18n="nav_public">Публичные данные</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pm-wrap pm">
+  <div class="pm-anchors">
+    <a href="#coords" data-i18n="anch_coords">// coordinates</a>
+    <a href="#browse" data-i18n="anch_browse">// open in a browser</a>
+    <a href="#catalog" data-i18n="anch_catalog">// dataset catalogue</a>
+    <a href="#tracks" data-i18n="anch_tracks">// loaded tracks</a>
+    <a href="#recipes" data-i18n="anch_recipes">// extraction recipes</a>
+    <a href="#platforms" data-i18n="anch_platforms">// BS vs EM-seq vs ONT</a>
+    <a href="#caveats" data-i18n="anch_caveats">// caveats</a>
+    <a href="#sources" data-i18n="anch_sources">// sources</a>
+  </div>
+
+  <!-- ===================== HERO ===================== -->
+  <header class="pm-hero">
+    <div class="pm-eyebrow" data-i18n="eyebrow">Read · public reference methylomes</div>
+    <h1 data-i18n="h1">Public bisulfite &amp; EM-seq data over the CD55 window</h1>
+    <p class="pm-lede" data-i18n="lede">
+      Where to find published CpG methylation for the same 6,500 bp / 137-CpG region we sequence with nanopore —
+      across T cells, K562 and dozens of other sorted human cell types. Every entry links to the primary
+      repository, with the exact coordinates and the commands to cut the window out.
+    </p>
+  </header>
+
+  <!-- signature: ROI ribbon with assembly switch -->
+  <div class="pm-ribbon">
+    <div class="pm-ribbon-head">
+      <div class="pm-eyebrow" data-i18n="roi_label">Region of interest</div>
+      <div class="pm-asm" role="group" aria-label="Assembly">
+        <button type="button" data-asm="hg38" aria-pressed="true">GRCh38 / hg38</button>
+        <button type="button" data-asm="t2t" aria-pressed="false">T2T-CHM13v2.0</button>
+      </div>
+    </div>
+
+    <div class="pm-ruler">
+      <svg viewBox="0 0 1000 64" role="img" aria-labelledby="rulerTitle">
+        <title id="rulerTitle" data-i18n="ruler_title">6,500 bp window around the CD55 promoter containing 137 CpGs</title>
+        <line x1="10" y1="40" x2="990" y2="40" stroke="#2a323d" stroke-width="2"/>
+        <g id="cpgTicks" stroke="#56B4E9" stroke-width="1.6" opacity="0.75"></g>
+        <line x1="510" y1="18" x2="510" y2="52" stroke="#E69F00" stroke-width="2.5"/>
+        <polygon points="510,18 510,28 528,23" fill="#E69F00"/>
+        <text x="534" y="22" fill="#E69F00" font-family="IBM Plex Mono, monospace" font-size="12">TSS →</text>
+        <text x="10" y="62" fill="#9aa6b2" font-family="IBM Plex Mono, monospace" font-size="11" id="rulerLeft">—</text>
+        <text x="990" y="62" fill="#9aa6b2" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="end" id="rulerRight">—</text>
+        <text x="500" y="12" fill="#9aa6b2" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle" data-i18n="ruler_cpg">137 CpGs · 6,500 bp</text>
+      </svg>
+    </div>
+
+    <div class="pm-coordline">
+      <span id="asmName" class="pm-eyebrow">GRCh38 / hg38</span>
+      <code id="roiString">chr1:207318058-207324558</code>
+      <button type="button" class="pm-copy" data-copy="#roiString" data-i18n="copy">copy</button>
+      <button type="button" class="pm-copy" id="copyBed" data-i18n="copy_bed">copy as BED</button>
+    </div>
+  </div>
+
+  <div class="pm-note">
+    <strong data-i18n="honest_h">What this page is — and is not.</strong>
+    <span data-i18n="honest_b">This is a verified index of where the public data live, not a re-analysis of it.
+    No methylation values are plotted here, because none of these datasets have been downloaded and processed for this
+    window yet. Everything below was checked against the primary repository. Section 4 renders real values as soon as the
+    extractor script has been run and its JSON committed — until then it stays empty on purpose.</span>
+  </div>
+
+  <!-- ===================== COORDINATES ===================== -->
+  <section id="coords">
+    <h2 data-i18n="s1_h">1 · Coordinates, and the assembly trap</h2>
+    <p data-i18n="s1_p1">
+      The window is the same 6,500 bp / 137 CpGs used throughout this site. Most public methylomes are aligned to
+      GRCh38 or, for anything older than about 2016, to GRCh37/hg19 — so the assembly is the first thing to get right.
+    </p>
+
+    <div class="pm-cards">
+      <div class="pm-card">
+        <span class="t">T2T-CHM13v2.0 <span class="pm-badge ont">hs1</span></span>
+        <span class="d"><code>chr1:206583354-206589854</code></span>
+        <span class="d" data-i18n="s1_t2t">Our nanopore reference. UCSC calls this assembly <code>hs1</code>.</span>
+      </div>
+      <div class="pm-card">
+        <span class="t">GRCh38 / hg38 <span class="pm-badge bs">hg38</span></span>
+        <span class="d"><code>chr1:207318058-207324558</code></span>
+        <span class="d" data-i18n="s1_hg38">The lingua franca of public methylomes — ENCODE, the methylation atlas, BLUEPRINT reprocessing.</span>
+      </div>
+      <div class="pm-card">
+        <span class="t">GRCh37 / hg19 <span class="pm-badge arr">liftOver</span></span>
+        <span class="d" data-i18n="s1_hg19">Not listed here on purpose. Roadmap Epigenomics, TCGA 450K and most pre-2016 GEO submissions are hg19; convert the hg38 window yourself rather than trusting a number typed from memory.</span>
+      </div>
+    </div>
+
+    <div class="pm-note blue" data-i18n="s1_offby">
+      Watch the off-by-one: BED and bigWig are 0-based half-open, while the coordinates above are written in the
+      1-based inclusive style the genome browsers use. A CpG is two bases, so also decide up front whether you are
+      reporting the C on the plus strand, the G on the minus strand, or the strand-collapsed pair.
+    </div>
+  </section>
+
+  <!-- ===================== BROWSE ===================== -->
+  <section id="browse">
+    <h2 data-i18n="s2_h">2 · Open the window in a browser</h2>
+    <p data-i18n="s2_p1">
+      The fastest look before downloading anything. Each link jumps straight to the region; the first one also loads
+      the Human Methylation Atlas track hub, which puts sorted CD4 T, CD8 T, naive T, B, NK and monocyte methylomes
+      on screen at once.
+    </p>
+    <div class="pm-cards">
+      <a class="pm-card" target="_blank" rel="noopener" id="lnkAtlas"
+         href="https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&position=chr1%3A207318058-207324558&hubUrl=https://files.cs.huji.ac.il/tommy/Meth_Atlas_hg38/hub.txt">
+        <span class="t">UCSC hg38 + Methylation Atlas hub</span>
+        <span class="d" data-i18n="s2_c1">39 sorted human cell types, WGBS, at our window. If the hub does not attach, add <code>hub.txt</code> manually under My Data → Track Hubs.</span>
+      </a>
+      <a class="pm-card" target="_blank" rel="noopener"
+         href="https://genome.ucsc.edu/cgi-bin/hgTracks?db=hs1&position=chr1%3A206583354-206589854">
+        <span class="t">UCSC T2T (hs1)</span>
+        <span class="d" data-i18n="s2_c2">The window in our own reference — useful for checking gene models and repeats against the nanopore coordinates.</span>
+      </a>
+      <a class="pm-card" target="_blank" rel="noopener"
+         href="https://www.encodeproject.org/search/?type=Experiment&assay_title=WGBS">
+        <span class="t">ENCODE · all WGBS experiments</span>
+        <span class="d" data-i18n="s2_c3">Filter by biosample on the left to reach K562, T cells and primary tissues. Each experiment page carries per-CpG bed and bigWig files.</span>
+      </a>
+      <a class="pm-card" target="_blank" rel="noopener" href="https://genome.ucsc.edu/cgi-bin/hgLiftOver">
+        <span class="t">UCSC liftOver</span>
+        <span class="d" data-i18n="s2_c4">Convert the hg38 window to hg19 before touching Roadmap or any older GEO submission.</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===================== CATALOG ===================== -->
+  <section id="catalog">
+    <h2 data-i18n="s3_h">3 · Dataset catalogue</h2>
+    <p data-i18n="s3_p1">
+      Whole-genome assays (WGBS, EM-seq) cover this window by construction; array and capture assays may not have a
+      single probe here, so those rows are flagged. Filter by what you need.
+    </p>
+
+    <div class="pm-filters" role="group" aria-label="Filter by cell type">
+      <button type="button" data-filter="cell" data-value="all" aria-pressed="true" data-i18n="f_all">All cell types</button>
+      <button type="button" data-filter="cell" data-value="tcell" aria-pressed="false" data-i18n="f_t">T cells</button>
+      <button type="button" data-filter="cell" data-value="k562" aria-pressed="false" data-i18n="f_k562">K562</button>
+      <button type="button" data-filter="cell" data-value="blood" aria-pressed="false" data-i18n="f_blood">Other blood</button>
+      <button type="button" data-filter="cell" data-value="other" aria-pressed="false" data-i18n="f_other">Other / reference</button>
+    </div>
+    <div class="pm-filters" role="group" aria-label="Filter by assay">
+      <button type="button" data-filter="assay" data-value="all" aria-pressed="true" data-i18n="f_aall">All assays</button>
+      <button type="button" data-filter="assay" data-value="bs" aria-pressed="false">WGBS / RRBS</button>
+      <button type="button" data-filter="assay" data-value="em" aria-pressed="false" data-i18n="f_em">EM-seq / enzymatic</button>
+      <button type="button" data-filter="assay" data-value="arr" aria-pressed="false" data-i18n="f_arr">Arrays</button>
+    </div>
+
+    <p class="pm-count" id="rowCount">—</p>
+
+    <div class="pm-tablewrap">
+      <table class="pm-table">
+        <thead>
+          <tr>
+            <th data-i18n="th_ds">Dataset</th>
+            <th data-i18n="th_cell">Cell type</th>
+            <th data-i18n="th_assay">Assay</th>
+            <th data-i18n="th_asm">Assembly</th>
+            <th data-i18n="th_access">Access</th>
+          </tr>
+        </thead>
+        <tbody id="dsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+
+  <!-- ===================== LOADED TRACKS ===================== -->
+  <section id="tracks">
+    <h2 data-i18n="st_h">4 · Loaded tracks</h2>
+    <p data-i18n="st_p1">
+      Once <code>fetch_public_cd55_roi.py</code> has run, its output lands in
+      <code>docs/data/public_cd55_roi.json</code> and every dataset below is drawn straight from it —
+      one mark per CpG, positioned by base pair across the window.
+    </p>
+    <div id="tracksStatus"></div>
+    <div id="tracksLegend" hidden>
+      <p class="pm-count">
+        <span class="pm-badge bs" data-i18n="st_leg_low">▁ low methylation (blue)</span>
+        &nbsp;
+        <span class="pm-badge ont" data-i18n="st_leg_high">▇ high methylation (orange)</span>
+        &nbsp;<span data-i18n="st_leg_note">— bar height repeats the value, so colour is never the only cue</span>
+      </p>
+    </div>
+    <div id="tracksBody"></div>
+  </section>
+
+  <!-- ===================== RECIPES ===================== -->
+  <section id="recipes">
+    <h2 data-i18n="s4_h">5 · Cutting the window out</h2>
+    <p data-i18n="s4_p1">
+      All snippets use the hg38 window. Swap in the T2T coordinates only for files that were actually aligned to
+      T2T-CHM13v2.0 — and check the contig naming in the header first (<code>chr1</code> vs <code>NC_060925.1</code>).
+    </p>
+
+    <div class="pm-codehead"><h3 data-i18n="r1_h">From a bigWig (ENCODE, Roadmap, BLUEPRINT)</h3></div>
+<pre class="pm-code"><span class="c"># hg38 window</span>
+CHR=chr1; START=207318058; END=207324558
+
+<span class="c"># methylation fraction and read depth come as two separate bigWigs</span>
+bigWigToBedGraph -chrom=$CHR -start=$START -end=$END frac.bigWig  roi.frac.bedGraph
+bigWigToBedGraph -chrom=$CHR -start=$START -end=$END cov.bigWig   roi.cov.bedGraph
+
+<span class="c"># join on position; drop CpGs below your depth cutoff before averaging</span>
+join -j2 &lt;(sort -k2,2 roi.frac.bedGraph) &lt;(sort -k2,2 roi.cov.bedGraph) &gt; roi.joined.txt</pre>
+
+    <div class="pm-codehead"><h3 data-i18n="r2_h">From a per-CpG BED (ENCODE bedMethyl-style)</h3></div>
+<pre class="pm-code"><span class="c"># ENCODE WGBS experiments ship a per-CpG bed; sort, compress, index once</span>
+sort -k1,1 -k2,2n ENCFFxxxxxx.bed | bgzip &gt; cpg.bed.gz
+tabix -p bed cpg.bed.gz
+tabix cpg.bed.gz chr1:207318058-207324558 &gt; roi.cpg.bed</pre>
+
+    <div class="pm-codehead"><h3 data-i18n="r3_h">From raw EM-seq / WGBS reads (SRA)</h3></div>
+<pre class="pm-code"><span class="c"># e.g. the matched NEB EM-seq vs WGBS pair on NA12878</span>
+fasterq-dump --split-files SRR10532145
+bwameth.py --reference GRCh38.fa SRR10532145_1.fastq SRR10532145_2.fastq \
+  | samtools sort -o em.bam -
+samtools index em.bam
+
+<span class="c"># per-CpG calls restricted to the window</span>
+MethylDackel extract -r chr1:207318058-207324558 --mergeContext GRCh38.fa em.bam</pre>
+
+    <div class="pm-codehead"><h3 data-i18n="r4_h">From the Human Methylation Atlas (wgbstools .beta files)</h3></div>
+<pre class="pm-code"><span class="c"># the atlas is distributed as .beta files indexed by CpG number, not by bp</span>
+wgbstools convert -r chr1:207318058-207324558     <span class="c"># → CpG index range for the window</span>
+wgbstools beta_to_table -r chr1:207318058-207324558 *.beta &gt; roi_atlas.tsv
+
+<span class="c">check flag names against `wgbstools --help`; the CLI has changed between releases</span></pre>
+
+    <div class="pm-note blue" data-i18n="r_note">
+      Whatever the source, keep the per-CpG depth alongside the fraction. A public methylome at 5× over this window
+      gives a fraction that looks precise and is not — the same trap as reading a single nanopore molecule as if it
+      were a population average.
+    </div>
+  </section>
+
+  <!-- ===================== PLATFORMS ===================== -->
+  <section id="platforms">
+    <h2 data-i18n="s5_h">6 · What each platform actually measures</h2>
+    <p data-i18n="s5_p1">
+      These are not three ways of measuring the same thing, and the differences matter when a public track is used to
+      sanity-check our nanopore calls.
+    </p>
+    <div class="pm-tablewrap">
+      <table class="pm-table">
+        <thead>
+          <tr>
+            <th data-i18n="th_plat">Platform</th>
+            <th data-i18n="th_reads">Reads out</th>
+            <th data-i18n="th_watch">Watch for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pm-badge bs">WGBS</span></td>
+            <td data-i18n="p1_r">5mC + 5hmC, indistinguishable</td>
+            <td data-i18n="p1_w">Bisulfite fragments DNA and biases coverage; unconverted C reads as methylated. Older datasets often sit at low depth.</td>
+          </tr>
+          <tr>
+            <td><span class="pm-badge em">EM-seq</span></td>
+            <td data-i18n="p2_r">5mC + 5hmC, indistinguishable</td>
+            <td data-i18n="p2_w">Enzymatic, so less DNA damage and more even coverage than WGBS at equal depth — but the same 5mC/5hmC ambiguity unless a separate protocol is run.</td>
+          </tr>
+          <tr>
+            <td><span class="pm-badge ont">Nanopore</span></td>
+            <td data-i18n="p3_r">5mC and 5hmC separately, per molecule</td>
+            <td data-i18n="p3_w">Our own data. Per-read calls make single-molecule patterns visible, at the cost of a model-dependent call with its own error profile.</td>
+          </tr>
+          <tr>
+            <td><span class="pm-badge arr">450K / EPIC</span></td>
+            <td data-i18n="p4_r">Beta value at fixed probe positions</td>
+            <td data-i18n="p4_w">Only a few CpGs per locus, if any. Check the manifest for probes inside the window before assuming coverage.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== CAVEATS ===================== -->
+  <section id="caveats">
+    <h2 data-i18n="s6_h">7 · Before comparing any of this to our data</h2>
+    <ul class="pm-list">
+      <li data-i18n="c1"><strong>Public K562 is unsorted.</strong> ENCODE K562 methylomes are a mixed population, not the CD55-LOW / CD55-HIGH sorted fractions. They give a baseline for the locus, not a comparator for the sorted groups.</li>
+      <li data-i18n="c2"><strong>Public T cells are unedited and unstimulated (mostly).</strong> They are a reference for what the CD55 promoter looks like without an editor, which is exactly the point — but donor, subset and activation state all move methylation.</li>
+      <li data-i18n="c3"><strong>Bulk versus single-molecule.</strong> A bigWig fraction is a population average. Our nanopore data carry per-molecule patterns; collapsing ours to a fraction to compare throws away the part that is ours.</li>
+      <li data-i18n="c4"><strong>Depth is not uniform.</strong> Genome-wide assays cover this window, but not always deeply. Carry the coverage track and set a threshold before drawing anything.</li>
+      <li data-i18n="c5"><strong>Colour convention holds here too.</strong> Methylated / silenced stays orange, unmethylated / active stays blue, and no chart on this site encodes a group by colour alone.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== SOURCES ===================== -->
+  <section id="sources">
+    <h2 data-i18n="s7_h">8 · Sources</h2>
+    <ul class="pm-list pm-src">
+      <li>ENCODE portal — <a href="https://www.encodeproject.org/" target="_blank" rel="noopener">encodeproject.org</a></li>
+      <li>ENCODE K562 WGBS (HAIB / Myers) — <a href="https://www.encodeproject.org/experiments/ENCSR765JPC/" target="_blank" rel="noopener">ENCSR765JPC</a></li>
+      <li>ENCODE T-cell WGBS (Roadmap-submitted, adult CD3) — <a href="https://www.encodeproject.org/experiments/ENCSR663MXB/" target="_blank" rel="noopener">ENCSR663MXB</a></li>
+      <li>Loyfer et al. 2023, <em>Nature</em>, DNA methylation atlas of normal human cell types — <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9811898/" target="_blank" rel="noopener">PMC9811898</a></li>
+      <li>Methylation Atlas UCSC hub — <a href="https://files.cs.huji.ac.il/tommy/Meth_Atlas_hg38/hub.txt" target="_blank" rel="noopener">Meth_Atlas_hg38/hub.txt</a>; tooling: <a href="https://github.com/nloyfer/wgbs_tools" target="_blank" rel="noopener">wgbs_tools</a></li>
+      <li>Vaisvila et al. 2021, <em>Genome Research</em>, EM-seq — <a href="https://genome.cshlp.org/content/31/7/1280" target="_blank" rel="noopener">gr.266551.120</a>; pipeline: <a href="https://github.com/nebiolabs/EM-seq/" target="_blank" rel="noopener">nebiolabs/EM-seq</a></li>
+      <li>Roadmap Epigenomics processed data — <a href="https://egg2.wustl.edu/roadmap/web_portal/processed_data.html" target="_blank" rel="noopener">egg2.wustl.edu</a></li>
+      <li>BLUEPRINT sorted blood WGBS, Bioconductor wrapper — <a href="https://github.com/stephaniehicks/FlowSorted.Blood.WGBS.Blueprint" target="_blank" rel="noopener">FlowSorted.Blood.WGBS.Blueprint</a></li>
+      <li>Durek et al. 2016, <em>Immunity</em>, CD4 memory T cell epigenomes (DEEP) — <a href="https://pubmed.ncbi.nlm.nih.gov/27851915/" target="_blank" rel="noopener">PMID 27851915</a></li>
+      <li>MEXPRESS, TCGA methylation by gene — <a href="https://mexpress.ugent.be/" target="_blank" rel="noopener">mexpress.ugent.be</a></li>
+      <li>UCSC Genome Browser REST API — <a href="https://genome.ucsc.edu/goldenpath/help/api.html" target="_blank" rel="noopener">api docs</a></li>
+    </ul>
+  </section>
+
+  <footer class="pm-foot">
+    <span data-i18n="foot">epiCme · Write → Read → Learn. Catalogue compiled from primary repositories; no methylation values re-analysed on this page yet.</span>
+  </footer>
+</div>
+
+<script>
+/* ============================ data ============================ */
+var DATASETS = [
+  {
+    name: "ENCODE · K562 WGBS (HAIB / Myers)",
+    acc: "ENCSR765JPC · GEO GSE86747",
+    url: "https://www.encodeproject.org/experiments/ENCSR765JPC/",
+    cell: "k562", cellLabel: {en:"K562", ru:"K562"},
+    assay: "bs", assayLabel: "WGBS",
+    asm: "hg38 / hg19",
+    open: true,
+    note: {
+      en: "The standard public K562 methylome, used as ground truth in several nanopore benchmarking papers. Unsorted population.",
+      ru: "Стандартный публичный метилом K562, используется как ground truth в нескольких работах по бенчмаркингу нанопора. Несортированная популяция."
+    }
+  },
+  {
+    name: "ENCODE · adult CD3+ T cells, WGBS",
+    acc: "ENCSR663MXB",
+    url: "https://www.encodeproject.org/experiments/ENCSR663MXB/",
+    cell: "tcell", cellLabel: {en:"Primary T cells (CD3+)", ru:"Первичные Т-клетки (CD3+)"},
+    assay: "bs", assayLabel: "WGBS",
+    asm: "hg38 / hg19",
+    open: true,
+    note: {
+      en: "Roadmap-submitted library on adult CD3 cells, released through the ENCODE portal with uniform processing.",
+      ru: "Библиотека Roadmap по CD3-клеткам взрослого донора, выложена через портал ENCODE с единообразной обработкой."
+    }
+  },
+  {
+    name: "Human DNA Methylation Atlas (Loyfer 2023)",
+    acc: "GEO GSE186458 · EGAS00001006791",
+    url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9811898/",
+    cell: "tcell", cellLabel: {en:"CD4 T, CD8 T, naive T + 36 more", ru:"CD4 T, CD8 T, наивные T + ещё 36"},
+    assay: "bs", assayLabel: "WGBS",
+    asm: "hg38",
+    open: true,
+    note: {
+      en: "Deep WGBS on 39 sorted cell types from 205 healthy samples — the single richest T-cell resource for this window. Processed data on GEO; raw reads at EGA under controlled access. Browsable via the UCSC hub linked above.",
+      ru: "Глубокий WGBS по 39 сортированным типам клеток из 205 здоровых образцов — самый богатый источник по Т-клеткам для нашего окна. Обработанные данные в GEO; сырые риды в EGA под контролируемым доступом. Смотреть можно через UCSC-хаб выше."
+    }
+  },
+  {
+    name: "BLUEPRINT · sorted blood cell WGBS",
+    acc: "FlowSorted.Blood.WGBS.Blueprint (Bioconductor)",
+    url: "https://github.com/stephaniehicks/FlowSorted.Blood.WGBS.Blueprint",
+    cell: "tcell", cellLabel: {en:"Sorted blood incl. T subsets", ru:"Сортированная кровь, вкл. субпопуляции T"},
+    assay: "bs", assayLabel: "WGBS",
+    asm: "hg38 / hg19",
+    open: true,
+    note: {
+      en: "44 WGBS samples from venous and cord blood, packaged as a BSseq object over ~29M CpGs — the least painful way to pull a window without downloading bigWigs by hand.",
+      ru: "44 WGBS-образца из венозной и пуповинной крови, упакованы в BSseq-объект по ~29 млн CpG — самый безболезненный способ вырезать окно, не качая bigWig вручную."
+    }
+  },
+  {
+    name: "Roadmap Epigenomics · WGBS + RRBS",
+    acc: "FractionalMethylation_bigwig / ReadCoverage_bigwig",
+    url: "https://egg2.wustl.edu/roadmap/web_portal/processed_data.html",
+    cell: "blood", cellLabel: {en:"Primary blood, tissues, ESC", ru:"Первичная кровь, ткани, ESC"},
+    assay: "bs", assayLabel: "WGBS / RRBS",
+    asm: "hg19",
+    open: true,
+    note: {
+      en: "Fraction and coverage shipped as separate bigWigs per epigenome. hg19 only — liftOver the window first.",
+      ru: "Доля метилирования и покрытие лежат отдельными bigWig на каждый эпигеном. Только hg19 — сначала liftOver окна."
+    }
+  },
+  {
+    name: "DEEP / Durek 2016 · CD4 memory T cell subsets",
+    acc: "PMID 27851915 (DEEP consortium, EGA)",
+    url: "https://pubmed.ncbi.nlm.nih.gov/27851915/",
+    cell: "tcell", cellLabel: {en:"Naive, central, effector, terminal CD4 Tmem", ru:"Наивные, центральные, эффекторные, терминальные CD4 Tmem"},
+    assay: "bs", assayLabel: "WGBS / RRBS",
+    asm: "hg38 / hg19",
+    open: false,
+    note: {
+      en: "The best-resolved T cell differentiation methylome series, with matched histone, NOMe-seq and RNA. Raw data via DEEP/EGA needs a data access agreement; summary tracks are described in the paper.",
+      ru: "Лучшая по разрешению серия метиломов дифференцировки Т-клеток, с парными гистонами, NOMe-seq и RNA. Сырые данные через DEEP/EGA требуют соглашения о доступе; сводные треки описаны в статье."
+    }
+  },
+  {
+    name: "NEB EM-seq · NA12878 (Vaisvila 2021)",
+    acc: "SRA: SRR10532145, SRR10532144, SRR10532139, SRR10532138",
+    url: "https://genome.cshlp.org/content/31/7/1280",
+    cell: "other", cellLabel: {en:"NA12878 lymphoblastoid", ru:"NA12878, лимфобластоидная линия"},
+    assay: "em", assayLabel: "EM-seq",
+    asm: "hg38",
+    open: true,
+    note: {
+      en: "The reference EM-seq dataset. Its value here is the matched design — the same DNA also run as WGBS, so platform effects over our window can be measured rather than assumed.",
+      ru: "Референсный EM-seq датасет. Ценен именно парным дизайном — та же ДНК прогнана и как WGBS, так что эффект платформы на нашем окне можно измерить, а не предполагать."
+    }
+  },
+  {
+    name: "NEB WGBS · NA12878 (matched control)",
+    acc: "SRA: SRR10532136, SRR10532135, SRR10532127, SRR10532126",
+    url: "https://genome.cshlp.org/content/31/7/1280",
+    cell: "other", cellLabel: {en:"NA12878 lymphoblastoid", ru:"NA12878, лимфобластоидная линия"},
+    assay: "bs", assayLabel: "WGBS",
+    asm: "hg38",
+    open: true,
+    note: {
+      en: "The bisulfite half of the same experiment. Run both through one pipeline to get a per-CpG EM-seq minus WGBS delta across the 137 sites.",
+      ru: "Бисульфитная половина того же эксперимента. Прогнать оба через один пайплайн и получить дельту EM-seq минус WGBS по каждому из 137 сайтов."
+    }
+  },
+  {
+    name: "ENCODE · NA12878 WGBS",
+    acc: "ENCSR890UQO",
+    url: "https://www.encodeproject.org/",
+    cell: "other", cellLabel: {en:"NA12878 lymphoblastoid", ru:"NA12878, лимфобластоидная линия"},
+    assay: "bs", assayLabel: "WGBS",
+    asm: "hg38",
+    open: true,
+    note: {
+      en: "A third independent measurement of the same genome — a cheap way to see how much of any EM-seq/WGBS difference is really lab-to-lab variation.",
+      ru: "Третье независимое измерение того же генома — дешёвый способ увидеть, какая часть разницы EM-seq/WGBS на самом деле межлабораторная вариация."
+    }
+  },
+  {
+    name: "ENCODE / HAIB · K562 Infinium 450K",
+    acc: "UCSC track wgEncodeHaibMethyl450K562SitesRep1",
+    url: "https://genome.ucsc.edu/",
+    cell: "k562", cellLabel: {en:"K562", ru:"K562"},
+    assay: "arr", assayLabel: "450K",
+    asm: "hg19",
+    open: true,
+    note: {
+      en: "Array, not sequencing — a handful of probes per locus at best. Check the 450K manifest for probes inside the window before counting on it.",
+      ru: "Массив, а не секвенирование — в лучшем случае несколько зондов на локус. Прежде чем рассчитывать, проверьте в манифесте 450K, есть ли зонды внутри окна."
+    }
+  },
+  {
+    name: "TCGA methylation via MEXPRESS",
+    acc: "mexpress.ugent.be — enter CD55",
+    url: "https://mexpress.ugent.be/",
+    cell: "other", cellLabel: {en:"33 tumour types + normals", ru:"33 типа опухолей + норма"},
+    assay: "arr", assayLabel: "450K / EPIC",
+    asm: "hg19 / hg38",
+    open: true,
+    note: {
+      en: "Per-probe CD55 methylation plotted against expression across TCGA. Useful for the disease-relevance narrative, not for per-CpG comparison with our data.",
+      ru: "Метилирование CD55 по зондам в связке с экспрессией по всем TCGA. Полезно для сюжета о значимости при болезнях, но не для сравнения по отдельным CpG с нашими данными."
+    }
+  },
+  {
+    name: "IHEC Data Portal",
+    acc: "epigenomesportal.ca",
+    url: "https://epigenomesportal.ca/ihec/",
+    cell: "blood", cellLabel: {en:"Aggregated across consortia", ru:"Агрегировано по консорциумам"},
+    assay: "bs", assayLabel: "WGBS / RRBS",
+    asm: "hg38 / hg19",
+    open: true,
+    note: {
+      en: "Umbrella index over BLUEPRINT, DEEP, CEEHRC and others, with a track-hub export. The quickest way to find out whether a given cell type has a methylome at all.",
+      ru: "Зонтичный индекс поверх BLUEPRINT, DEEP, CEEHRC и других, с экспортом в track hub. Быстрее всего проверить, есть ли у нужного типа клеток метилом вообще."
+    }
+  },
+  {
+    name: "5-letter-seq · human methylome + genome",
+    acc: "GEO GSE208549",
+    url: "https://www.ncbi.nlm.nih.gov/geo/",
+    cell: "other", cellLabel: {en:"Human reference DNA", ru:"Референсная ДНК человека"},
+    assay: "em", assayLabel: {en:"Enzymatic (non-BS)", ru:"Ферментативный (без бисульфита)"},
+    asm: "hg38",
+    open: true,
+    note: {
+      en: "One of the newer bisulfite-free chemistries. Included as a third technology for the same CpGs, in the spirit of not letting one conversion chemistry define the answer.",
+      ru: "Одна из новых химий без бисульфита. Включена как третья технология по тем же CpG — чтобы одна химия конверсии не определяла ответ."
+    }
+  },
+  {
+    name: "Methyl-SNP-seq",
+    acc: "GEO GSE206253",
+    url: "https://www.ncbi.nlm.nih.gov/geo/",
+    cell: "other", cellLabel: {en:"Human reference DNA", ru:"Референсная ДНК человека"},
+    assay: "em", assayLabel: {en:"Enzymatic (non-BS)", ru:"Ферментативный (без бисульфита)"},
+    asm: "hg38",
+    open: true,
+    note: {
+      en: "Genotype and methylation from the same read. Relevant if allele-specific methylation over CD55 ever becomes a question.",
+      ru: "Генотип и метилирование с одного рида. Пригодится, если когда-нибудь встанет вопрос об аллель-специфичном метилировании CD55."
+    }
+  }
+];
+
+/* ============================ i18n ============================ */
+var I18N = {
+  en: {
+    anch_tracks:"// loaded tracks",
+    st_h:"4 · Loaded tracks",
+    st_p1:"Once <code>fetch_public_cd55_roi.py</code> has run, its output lands in <code>docs/data/public_cd55_roi.json</code> and every dataset below is drawn straight from it — one mark per CpG, positioned by base pair across the window.",
+    st_leg_low:"low methylation (blue)", st_leg_high:"high methylation (orange)",
+    st_leg_note:"— bar height repeats the value, so colour is never the only cue",
+    st_empty_h:"No data file yet.",
+    st_empty_b:"Nothing has been downloaded into this page. Run the extractor on a machine with network access and commit the JSON it writes:",
+    st_err_h:"Could not read the data file.",
+    st_err_b:"The file exists but did not parse. Check that it is the JSON written by the extractor and not a partial upload.",
+    st_meta:"generated", st_mincov:"minimum depth", st_ncpg:"CpGs", st_mean:"mean methylation",
+    st_cov:"median depth", st_nocov:"no depth track",
+    st_failed:"source(s) failed during extraction — see the failures list in the JSON.",
+    brand_sub:"epigenome · cytosine · methylation",
+    nav_home:"Home", nav_about:"About", nav_chipseq:"ChIP-seq", nav_tf:"Mechanisms",
+    nav_memory:"Methylation and memory", nav_trauma:"Methylation and trauma", nav_public:"Public data",
+    anch_coords:"// coordinates", anch_browse:"// open in a browser", anch_catalog:"// dataset catalogue",
+    anch_recipes:"// extraction recipes", anch_platforms:"// BS vs EM-seq vs ONT", anch_caveats:"// caveats",
+    anch_sources:"// sources",
+    eyebrow:"Read · public reference methylomes",
+    h1:"Public bisulfite &amp; EM-seq data over the CD55 window",
+    lede:"Where to find published CpG methylation for the same 6,500 bp / 137-CpG region we sequence with nanopore — across T cells, K562 and dozens of other sorted human cell types. Every entry links to the primary repository, with the exact coordinates and the commands to cut the window out.",
+    roi_label:"Region of interest",
+    ruler_title:"6,500 bp window around the CD55 promoter containing 137 CpGs",
+    ruler_cpg:"137 CpGs · 6,500 bp",
+    copy:"copy", copy_bed:"copy as BED",
+    honest_h:"What this page is — and is not.",
+    honest_b:"This is a verified index of where the public data live. Section 4 renders real values as soon as the extractor script has been run and its JSON committed — until then it stays empty on purpose, because nothing here is estimated or filled in from general knowledge.",
+    s1_h:"1 · Coordinates, and the assembly trap",
+    s1_p1:"The window is the same 6,500 bp / 137 CpGs used throughout this site. Most public methylomes are aligned to GRCh38 or, for anything older than about 2016, to GRCh37/hg19 — so the assembly is the first thing to get right.",
+    s1_t2t:"Our nanopore reference. UCSC calls this assembly <code>hs1</code>.",
+    s1_hg38:"The lingua franca of public methylomes — ENCODE, the methylation atlas, BLUEPRINT reprocessing.",
+    s1_hg19:"Not listed here on purpose. Roadmap Epigenomics, TCGA 450K and most pre-2016 GEO submissions are hg19; convert the hg38 window yourself rather than trusting a number typed from memory.",
+    s1_offby:"Watch the off-by-one: BED and bigWig are 0-based half-open, while the coordinates above are written in the 1-based inclusive style the genome browsers use. A CpG is two bases, so also decide up front whether you are reporting the C on the plus strand, the G on the minus strand, or the strand-collapsed pair.",
+    s2_h:"2 · Open the window in a browser",
+    s2_p1:"The fastest look before downloading anything. Each link jumps straight to the region; the first one also loads the Human Methylation Atlas track hub, which puts sorted CD4 T, CD8 T, naive T, B, NK and monocyte methylomes on screen at once.",
+    s2_c1:"39 sorted human cell types, WGBS, at our window. If the hub does not attach, add <code>hub.txt</code> manually under My Data → Track Hubs.",
+    s2_c2:"The window in our own reference — useful for checking gene models and repeats against the nanopore coordinates.",
+    s2_c3:"Filter by biosample on the left to reach K562, T cells and primary tissues. Each experiment page carries per-CpG bed and bigWig files.",
+    s2_c4:"Convert the hg38 window to hg19 before touching Roadmap or any older GEO submission.",
+    s3_h:"3 · Dataset catalogue",
+    s3_p1:"Whole-genome assays (WGBS, EM-seq) cover this window by construction; array and capture assays may not have a single probe here, so those rows are flagged. Filter by what you need.",
+    f_all:"All cell types", f_t:"T cells", f_k562:"K562", f_blood:"Other blood", f_other:"Other / reference",
+    f_aall:"All assays", f_arr:"Arrays", f_em:"EM-seq / enzymatic",
+    th_ds:"Dataset", th_cell:"Cell type", th_assay:"Assay", th_asm:"Assembly", th_access:"Access",
+    s4_h:"5 · Cutting the window out",
+    s4_p1:"All snippets use the hg38 window. Swap in the T2T coordinates only for files that were actually aligned to T2T-CHM13v2.0 — and check the contig naming in the header first (<code>chr1</code> vs <code>NC_060925.1</code>).",
+    r1_h:"From a bigWig (ENCODE, Roadmap, BLUEPRINT)",
+    r2_h:"From a per-CpG BED (ENCODE bedMethyl-style)",
+    r3_h:"From raw EM-seq / WGBS reads (SRA)",
+    r4_h:"From the Human Methylation Atlas (wgbstools .beta files)",
+    r_note:"Whatever the source, keep the per-CpG depth alongside the fraction. A public methylome at 5× over this window gives a fraction that looks precise and is not — the same trap as reading a single nanopore molecule as if it were a population average.",
+    s5_h:"6 · What each platform actually measures",
+    s5_p1:"These are not three ways of measuring the same thing, and the differences matter when a public track is used to sanity-check our nanopore calls.",
+    th_plat:"Platform", th_reads:"Reads out", th_watch:"Watch for",
+    p1_r:"5mC + 5hmC, indistinguishable",
+    p1_w:"Bisulfite fragments DNA and biases coverage; unconverted C reads as methylated. Older datasets often sit at low depth.",
+    p2_r:"5mC + 5hmC, indistinguishable",
+    p2_w:"Enzymatic, so less DNA damage and more even coverage than WGBS at equal depth — but the same 5mC/5hmC ambiguity unless a separate protocol is run.",
+    p3_r:"5mC and 5hmC separately, per molecule",
+    p3_w:"Our own data. Per-read calls make single-molecule patterns visible, at the cost of a model-dependent call with its own error profile.",
+    p4_r:"Beta value at fixed probe positions",
+    p4_w:"Only a few CpGs per locus, if any. Check the manifest for probes inside the window before assuming coverage.",
+    s6_h:"7 · Before comparing any of this to our data",
+    c1:"<strong>Public K562 is unsorted.</strong> ENCODE K562 methylomes are a mixed population, not the CD55-LOW / CD55-HIGH sorted fractions. They give a baseline for the locus, not a comparator for the sorted groups.",
+    c2:"<strong>Public T cells are unedited and unstimulated (mostly).</strong> They are a reference for what the CD55 promoter looks like without an editor, which is exactly the point — but donor, subset and activation state all move methylation.",
+    c3:"<strong>Bulk versus single-molecule.</strong> A bigWig fraction is a population average. Our nanopore data carry per-molecule patterns; collapsing ours to a fraction to compare throws away the part that is ours.",
+    c4:"<strong>Depth is not uniform.</strong> Genome-wide assays cover this window, but not always deeply. Carry the coverage track and set a threshold before drawing anything.",
+    c5:"<strong>Colour convention holds here too.</strong> Methylated / silenced stays orange, unmethylated / active stays blue, and no chart on this site encodes a group by colour alone.",
+    s7_h:"8 · Sources",
+    foot:"epiCme · Write → Read → Learn. Catalogue compiled from primary repositories; no methylation values re-analysed on this page yet.",
+    count_one:"dataset shown", count_many:"datasets shown", copied:"copied",
+    no_match:"No dataset matches both filters. Widen one of them."
+  },
+  ru: {
+    anch_tracks:"// загруженные треки",
+    st_h:"4 · Загруженные треки",
+    st_p1:"После запуска <code>fetch_public_cd55_roi.py</code> результат ложится в <code>docs/data/public_cd55_roi.json</code>, и каждый датасет ниже рисуется прямо из него — по одной отметке на CpG, с позицией по парам оснований внутри окна.",
+    st_leg_low:"низкое метилирование (синий)", st_leg_high:"высокое метилирование (оранжевый)",
+    st_leg_note:"— высота столбика дублирует значение, так что цвет никогда не единственный признак",
+    st_empty_h:"Файла с данными пока нет.",
+    st_empty_b:"В эту страницу ничего не загружено. Запустите экстрактор на машине с доступом в сеть и закоммитьте JSON, который он запишет:",
+    st_err_h:"Не удалось прочитать файл данных.",
+    st_err_b:"Файл есть, но не распарсился. Проверьте, что это именно JSON от экстрактора, а не частично загруженный файл.",
+    st_meta:"собрано", st_mincov:"минимальная глубина", st_ncpg:"CpG", st_mean:"среднее метилирование",
+    st_cov:"медианная глубина", st_nocov:"нет трека глубины",
+    st_failed:"источник(ов) не удалось обработать — смотрите список failures в JSON.",
+    brand_sub:"эпигеном · цитозин · метилирование",
+    nav_home:"Главная", nav_about:"О проекте", nav_chipseq:"ChIP-seq", nav_tf:"Механизмы",
+    nav_memory:"Метилирование и память", nav_trauma:"Метилирование и травма", nav_public:"Публичные данные",
+    anch_coords:"// координаты", anch_browse:"// открыть в браузере", anch_catalog:"// каталог данных",
+    anch_recipes:"// как вырезать окно", anch_platforms:"// BS vs EM-seq vs ONT", anch_caveats:"// оговорки",
+    anch_sources:"// источники",
+    eyebrow:"Read · публичные референсные метиломы",
+    h1:"Публичные данные bisulfite и EM-seq по окну CD55",
+    lede:"Где искать опубликованное CpG-метилирование для того же участка 6 500 п.н. со 137 CpG, который мы секвенируем нанопором — по Т-клеткам, K562 и десяткам других сортированных типов человеческих клеток. Каждая запись ведёт в первичный репозиторий, с точными координатами и командами, чтобы вырезать окно.",
+    roi_label:"Область интереса",
+    ruler_title:"Окно 6 500 п.н. вокруг промотора CD55, содержащее 137 CpG",
+    ruler_cpg:"137 CpG · 6 500 п.н.",
+    copy:"копировать", copy_bed:"копировать как BED",
+    honest_h:"Что эта страница есть — и чем она не является.",
+    honest_b:"Это выверенный указатель, где лежат публичные данные, а не их переанализ. Здесь не построено ни одного графика метилирования, потому что ни один из этих датасетов ещё не скачан и не обработан для нашего окна. Всё ниже сверено с первичным репозиторием. Раздел 4 покажет настоящие значения, как только будет запущен скрипт-экстрактор и его JSON окажется в репозитории — до тех пор он намеренно пуст.",
+    s1_h:"1 · Координаты и ловушка сборки",
+    s1_p1:"Окно — те же 6 500 п.н. и 137 CpG, что и везде на сайте. Большинство публичных метиломов выровнены на GRCh38, а всё, что старше примерно 2016 года, — на GRCh37/hg19. Так что сборка — первое, что надо не перепутать.",
+    s1_t2t:"Наш нанопоровый референс. В UCSC эта сборка называется <code>hs1</code>.",
+    s1_hg38:"Лингва франка публичных метиломов — ENCODE, атлас метилирования, переобработка BLUEPRINT.",
+    s1_hg19:"Здесь намеренно не указаны. Roadmap Epigenomics, TCGA 450K и большинство до-2016 сабмишенов в GEO — это hg19; переведите окно из hg38 сами, а не доверяйте числу, набранному по памяти.",
+    s1_offby:"Помните про off-by-one: BED и bigWig — 0-based полуоткрытые, а координаты выше записаны в 1-based включительном стиле геномных браузеров. CpG — это два основания, так что заранее решите, что вы отчитываете: C на плюс-цепи, G на минус-цепи или схлопнутую пару.",
+    s2_h:"2 · Открыть окно в браузере",
+    s2_p1:"Самый быстрый взгляд до всякого скачивания. Каждая ссылка прыгает прямо в регион; первая ещё и подгружает track hub Human Methylation Atlas, который сразу выводит на экран метиломы сортированных CD4 T, CD8 T, наивных T, B, NK и моноцитов.",
+    s2_c1:"39 сортированных типов клеток человека, WGBS, на нашем окне. Если хаб не подцепится, добавьте <code>hub.txt</code> вручную через My Data → Track Hubs.",
+    s2_c2:"Окно в нашем собственном референсе — удобно сверять модели генов и повторы с нанопоровыми координатами.",
+    s2_c3:"Отфильтруйте по biosample слева, чтобы дойти до K562, Т-клеток и первичных тканей. На странице каждого эксперимента лежат по-CpG bed и bigWig.",
+    s2_c4:"Перевести окно hg38 в hg19 прежде, чем трогать Roadmap или любой старый сабмишен в GEO.",
+    s3_h:"3 · Каталог датасетов",
+    s3_p1:"Полногеномные методы (WGBS, EM-seq) покрывают это окно по построению; массивы и капчур-панели могут не иметь здесь ни одного зонда — такие строки помечены. Фильтруйте по нужному.",
+    f_all:"Все типы клеток", f_t:"Т-клетки", f_k562:"K562", f_blood:"Другая кровь", f_other:"Прочее / референс",
+    f_aall:"Все методы", f_arr:"Массивы", f_em:"EM-seq / ферментативные",
+    th_ds:"Датасет", th_cell:"Тип клеток", th_assay:"Метод", th_asm:"Сборка", th_access:"Доступ",
+    s4_h:"5 · Как вырезать окно",
+    s4_p1:"Все сниппеты используют окно hg38. Подставляйте координаты T2T только для файлов, реально выровненных на T2T-CHM13v2.0 — и сначала проверьте именование контигов в заголовке (<code>chr1</code> или <code>NC_060925.1</code>).",
+    r1_h:"Из bigWig (ENCODE, Roadmap, BLUEPRINT)",
+    r2_h:"Из по-CpG BED (формат ENCODE bedMethyl)",
+    r3_h:"Из сырых ридов EM-seq / WGBS (SRA)",
+    r4_h:"Из Human Methylation Atlas (файлы .beta для wgbstools)",
+    r_note:"Откуда бы ни были данные, тащите вместе с долей метилирования и покрытие по каждому CpG. Публичный метилом с 5× на этом окне даёт долю, которая выглядит точной, но таковой не является — та же ловушка, что читать одну нанопоровую молекулу как среднее по популяции.",
+    s5_h:"6 · Что на самом деле меряет каждая платформа",
+    s5_p1:"Это не три способа померить одно и то же, и различия важны, когда публичный трек используется для проверки наших нанопоровых вызовов.",
+    th_plat:"Платформа", th_reads:"Что считывает", th_watch:"На что смотреть",
+    p1_r:"5mC + 5hmC, неразличимо",
+    p1_w:"Бисульфит фрагментирует ДНК и смещает покрытие; неконвертированный C читается как метилированный. Старые датасеты часто с низким покрытием.",
+    p2_r:"5mC + 5hmC, неразличимо",
+    p2_w:"Ферментативно, поэтому меньше повреждений ДНК и ровнее покрытие, чем у WGBS при той же глубине — но та же неоднозначность 5mC/5hmC, если не гнать отдельный протокол.",
+    p3_r:"5mC и 5hmC по отдельности, помолекулярно",
+    p3_w:"Наши собственные данные. Вызовы по каждому риду показывают одномолекулярные паттерны — ценой модельно-зависимого вызова со своим профилем ошибок.",
+    p4_r:"Бета-значение в фиксированных позициях зондов",
+    p4_w:"Всего несколько CpG на локус, если вообще есть. Проверьте по манифесту, есть ли зонды внутри окна, прежде чем рассчитывать на покрытие.",
+    s6_h:"7 · Прежде чем сравнивать это с нашими данными",
+    c1:"<strong>Публичный K562 несортированный.</strong> Метиломы K562 в ENCODE — смешанная популяция, а не сортированные фракции CD55-LOW / CD55-HIGH. Они дают базовую линию по локусу, но не компаратор для сортированных групп.",
+    c2:"<strong>Публичные Т-клетки не редактированы и (в основном) не стимулированы.</strong> Это референс того, как выглядит промотор CD55 без редактора — что как раз и нужно, — но донор, субпопуляция и статус активации сдвигают метилирование.",
+    c3:"<strong>Бульк против одномолекулярного.</strong> Доля в bigWig — среднее по популяции. В наших нанопоровых данных есть помолекулярные паттерны; схлопывая их до доли ради сравнения, мы выбрасываем как раз то, что есть только у нас.",
+    c4:"<strong>Покрытие неравномерно.</strong> Полногеномные методы покрывают это окно, но не всегда глубоко. Тащите трек покрытия и ставьте порог, прежде чем что-то рисовать.",
+    c5:"<strong>Цветовая конвенция действует и здесь.</strong> Метилированное / замолчанное — оранжевый, неметилированное / активное — синий, и ни один график на сайте не кодирует группу одним лишь цветом.",
+    s7_h:"8 · Источники",
+    foot:"epiCme · Write → Read → Learn. Каталог собран по первичным репозиториям; значения метилирования на этой странице пока не переанализированы.",
+    count_one:"датасет показан", count_many:"датасетов показано", copied:"скопировано",
+    no_match:"Ни один датасет не подходит под оба фильтра. Ослабьте один из них."
+  }
+};
+
+/* ============================ state ============================ */
+var ROI = {
+  hg38: { label:"GRCh38 / hg38", chrom:"chr1", start:207318058, end:207324558 },
+  t2t:  { label:"T2T-CHM13v2.0",  chrom:"chr1", start:206583354, end:206589854 }
+};
+var state = { lang:"ru", asm:"hg38", cell:"all", assay:"all" };
+
+function t(key){
+  var d = I18N[state.lang] || I18N.ru;
+  return (key in d) ? d[key] : (I18N.ru[key] || I18N.en[key] || "");
+}
+
+/* ============================ i18n apply ============================ */
+function applyLang(){
+  document.documentElement.lang = state.lang;
+  var nodes = document.querySelectorAll("[data-i18n]");
+  for (var i=0; i<nodes.length; i++){
+    var key = nodes[i].getAttribute("data-i18n");
+    var val = t(key);
+    if (val) nodes[i].innerHTML = val;
+  }
+  var btns = document.querySelectorAll("#lang-switch button");
+  for (var j=0; j<btns.length; j++){
+    var on = btns[j].getAttribute("data-lang") === state.lang;
+    btns[j].classList.toggle("active", on);
+    btns[j].setAttribute("aria-pressed", on ? "true" : "false");
+  }
+  try { localStorage.setItem("epicme_lang", state.lang); } catch(e){}
+  renderTable();
+  renderTracks();
+}
+
+/* ============================ assembly switch ============================ */
+function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+
+function applyAsm(){
+  var r = ROI[state.asm];
+  var roiStr = r.chrom + ":" + r.start + "-" + r.end;
+  document.getElementById("roiString").textContent = roiStr;
+  document.getElementById("asmName").textContent = r.label;
+  document.getElementById("rulerLeft").textContent  = fmt(r.start);
+  document.getElementById("rulerRight").textContent = fmt(r.end);
+  var btns = document.querySelectorAll(".pm-asm button");
+  for (var i=0; i<btns.length; i++){
+    btns[i].setAttribute("aria-pressed", btns[i].getAttribute("data-asm") === state.asm ? "true" : "false");
+  }
+}
+
+/* ============================ ruler ticks ============================ */
+function drawTicks(){
+  var g = document.getElementById("cpgTicks");
+  if (!g) return;
+  // 137 evenly spaced marks: a schematic of CpG density across the window,
+  // not the real per-CpG positions (those are not loaded on this page).
+  var n = 137, x0 = 12, x1 = 988;
+  var frag = "";
+  for (var i=0; i<n; i++){
+    var x = (x0 + (x1 - x0) * (i / (n - 1))).toFixed(1);
+    frag += '<line x1="'+x+'" y1="33" x2="'+x+'" y2="47"></line>';
+  }
+  g.innerHTML = frag;
+}
+
+/* ============================ table ============================ */
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function renderTable(){
+  var body = document.getElementById("dsBody");
+  if (!body) return;
+  var html = "", shown = 0;
+  for (var i=0; i<DATASETS.length; i++){
+    var d = DATASETS[i];
+    if (state.cell  !== "all" && d.cell  !== state.cell)  continue;
+    if (state.assay !== "all" && d.assay !== state.assay) continue;
+    shown++;
+    var cellLabel  = (typeof d.cellLabel  === "string") ? d.cellLabel  : (d.cellLabel[state.lang]  || d.cellLabel.en);
+    var assayLabel = (typeof d.assayLabel === "string") ? d.assayLabel : (d.assayLabel[state.lang] || d.assayLabel.en);
+    var note       = d.note[state.lang] || d.note.en;
+    var access = d.open
+      ? '<span class="pm-open">' + (state.lang === "ru" ? "● открытый" : "● open") + '</span>'
+      : '<span class="pm-closed">' + (state.lang === "ru" ? "▲ контролируемый" : "▲ controlled") + '</span>';
+
+    html += "<tr>"
+      + '<td><a href="' + d.url + '" target="_blank" rel="noopener">' + esc(d.name) + "</a>"
+      + '<span class="pm-acc">' + esc(d.acc) + "</span>"
+      + '<span class="pm-note-cell">' + esc(note) + "</span></td>"
+      + "<td>" + esc(cellLabel) + "</td>"
+      + '<td><span class="pm-badge ' + d.assay + '">' + esc(assayLabel) + "</span></td>"
+      + "<td>" + esc(d.asm) + "</td>"
+      + "<td>" + access + "</td>"
+      + "</tr>";
+  }
+  if (shown === 0){
+    html = '<tr><td colspan="5" class="pm-note-cell">' + t("no_match") + '</td></tr>';
+  }
+  body.innerHTML = html;
+  var label = shown === 1 ? t("count_one") : t("count_many");
+  document.getElementById("rowCount").textContent = shown + " " + label;
+}
+
+
+/* ============================ loaded tracks ============================ */
+var TRACKS = { state:"idle", payload:null };
+var DATA_URL = "data/public_cd55_roi.json";
+
+function esc2(s){ return esc(s); }
+
+function trackSvg(ds, roi){
+  var W = 1000, H = 74, PADX = 12, BASE = 62, MAXH = 46;
+  var span = roi.end - roi.start;
+  var parts = ['<svg viewBox="0 0 ' + W + ' ' + H + '" class="pm-track" role="img" aria-label="'
+    + esc(ds.label) + '">'];
+  parts.push('<line x1="' + PADX + '" y1="' + BASE + '" x2="' + (W - PADX) + '" y2="' + BASE
+    + '" stroke="#2a323d" stroke-width="1"/>');
+  // 50% guide
+  parts.push('<line x1="' + PADX + '" y1="' + (BASE - MAXH / 2) + '" x2="' + (W - PADX) + '" y2="'
+    + (BASE - MAXH / 2) + '" stroke="#2a323d" stroke-width="1" stroke-dasharray="3 5"/>');
+  for (var i = 0; i < ds.cpgs.length; i++){
+    var c = ds.cpgs[i];
+    if (c.meth === null || c.meth === undefined) continue;
+    var x = PADX + (W - 2 * PADX) * ((c.pos - roi.start) / span);
+    var hgt = Math.max(1.5, MAXH * c.meth);
+    var col = c.meth >= 0.5 ? "#E69F00" : "#56B4E9";
+    var title = Math.round(c.meth * 100) + "% @ " + c.pos + (c.cov ? " (" + c.cov + "x)" : "");
+    parts.push('<rect x="' + (x - 1.6).toFixed(1) + '" y="' + (BASE - hgt).toFixed(1)
+      + '" width="3.2" height="' + hgt.toFixed(1) + '" fill="' + col
+      + '"><title>' + title + '</title></rect>');
+  }
+  parts.push('</svg>');
+  return parts.join("");
+}
+
+function renderTracks(){
+  var status = document.getElementById("tracksStatus");
+  var body   = document.getElementById("tracksBody");
+  var legend = document.getElementById("tracksLegend");
+  if (!status || !body) return;
+
+  if (TRACKS.state === "empty"){
+    legend.hidden = true;
+    body.innerHTML = "";
+    status.innerHTML = '<div class="pm-note"><strong>' + t("st_empty_h") + '</strong> '
+      + t("st_empty_b")
+      + '</div><pre class="pm-code">python fetch_public_cd55_roi.py \\\n'
+      + '    --out docs/data/public_cd55_roi.json --min-cov 5 -v</pre>';
+    return;
+  }
+  if (TRACKS.state === "error"){
+    legend.hidden = true;
+    body.innerHTML = "";
+    status.innerHTML = '<div class="pm-note"><strong>' + t("st_err_h") + '</strong> '
+      + t("st_err_b") + '</div>';
+    return;
+  }
+  if (TRACKS.state !== "ready") return;
+
+  var p = TRACKS.payload, roi = p.roi;
+  legend.hidden = false;
+  status.innerHTML = '<p class="pm-count">' + t("st_meta") + ": " + esc(p.generated_utc)
+    + " · " + t("st_mincov") + ": " + esc(String(p.min_cov)) + "x · "
+    + roi.chrom + ":" + roi.start + "-" + roi.end + " (" + esc(roi.assembly) + ")</p>";
+
+  var html = "";
+  for (var i = 0; i < p.datasets.length; i++){
+    var d = p.datasets[i], s = d.summary;
+    var mean = (s.mean_meth === null || s.mean_meth === undefined)
+      ? "n/a" : (s.mean_meth * 100).toFixed(1) + "%";
+    var cov = s.median_cov ? (s.median_cov + "x") : t("st_nocov");
+    html += '<div class="pm-trackcard">'
+      + '<div class="pm-trackhead">'
+      +   '<span class="t">' + esc(d.label) + '</span>'
+      +   '<span class="pm-badge ' + (d.assay === "EM-seq" ? "em" : "bs") + '">' + esc(d.assay) + '</span>'
+      + '</div>'
+      + '<p class="pm-count">' + esc(d.cell) + ' · ' + t("st_ncpg") + ': ' + s.n_cpg
+      +   ' · ' + t("st_mean") + ': ' + mean + ' · ' + t("st_cov") + ': ' + cov + '</p>'
+      + trackSvg(d, roi)
+      + '<p class="pm-note-cell">' + esc(d.provenance)
+      + (d.note ? ' — ' + esc(d.note) : '') + '</p>'
+      + '</div>';
+  }
+  if (p.failures && p.failures.length){
+    html += '<p class="pm-count" style="color:var(--pm-orange)">' + p.failures.length + ' '
+      + t("st_failed") + '</p>';
+  }
+  body.innerHTML = html;
+}
+
+function loadTracks(){
+  if (!window.fetch){ TRACKS.state = "empty"; renderTracks(); return; }
+  fetch(DATA_URL, {cache:"no-cache"})
+    .then(function(r){ if (!r.ok) throw new Error("missing"); return r.json(); })
+    .then(function(j){
+      if (!j || !j.datasets || !j.datasets.length) throw new Error("empty");
+      TRACKS.payload = j; TRACKS.state = "ready"; renderTracks();
+    })
+    .catch(function(e){
+      TRACKS.state = (e && e.message === "missing") ? "empty" : "empty";
+      renderTracks();
+    });
+}
+
+/* ============================ copy ============================ */
+function copyText(text, btn){
+  var done = function(){
+    var old = btn.textContent;
+    btn.textContent = t("copied");
+    setTimeout(function(){ btn.textContent = old; }, 1200);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done, function(){ fallback(text, done); });
+  } else {
+    fallback(text, done);
+  }
+}
+function fallback(text, done){
+  var ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "absolute";
+  ta.style.left = "-9999px";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); done(); } catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ============================ wiring ============================ */
+function init(){
+  drawTicks();
+
+  try {
+    var saved = localStorage.getItem("epicme_lang");
+    if (saved === "ru" || saved === "en") state.lang = saved;
+  } catch(e){}
+
+  var langBtns = document.querySelectorAll("#lang-switch button");
+  for (var i=0; i<langBtns.length; i++){
+    langBtns[i].addEventListener("click", function(){
+      state.lang = this.getAttribute("data-lang");
+      applyLang();
+    });
+  }
+
+  var asmBtns = document.querySelectorAll(".pm-asm button");
+  for (var j=0; j<asmBtns.length; j++){
+    asmBtns[j].addEventListener("click", function(){
+      state.asm = this.getAttribute("data-asm");
+      applyAsm();
+    });
+  }
+
+  var filterBtns = document.querySelectorAll(".pm-filters button");
+  for (var k=0; k<filterBtns.length; k++){
+    filterBtns[k].addEventListener("click", function(){
+      var group = this.getAttribute("data-filter");
+      var value = this.getAttribute("data-value");
+      state[group] = value;
+      var peers = document.querySelectorAll('.pm-filters button[data-filter="' + group + '"]');
+      for (var m=0; m<peers.length; m++){
+        peers[m].setAttribute("aria-pressed", peers[m] === this ? "true" : "false");
+      }
+      renderTable();
+    });
+  }
+
+  var copyBtns = document.querySelectorAll(".pm-copy[data-copy]");
+  for (var p=0; p<copyBtns.length; p++){
+    copyBtns[p].addEventListener("click", function(){
+      var target = document.querySelector(this.getAttribute("data-copy"));
+      if (target) copyText(target.textContent, this);
+    });
+  }
+
+  var bedBtn = document.getElementById("copyBed");
+  if (bedBtn){
+    bedBtn.addEventListener("click", function(){
+      var r = ROI[state.asm];
+      // BED is 0-based half-open: subtract 1 from the 1-based start
+      copyText(r.chrom + "\t" + (r.start - 1) + "\t" + r.end + "\tCD55_ROI_137CpG\n", this);
+    });
+  }
+
+  applyAsm();
+  applyLang();
+  loadTracks();
+}
+
+if (document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+
+/* chips for the site-wide AI assistant, if it is present on the page */
+window.epicmeChatChips = [
+  "Which of these datasets has T cells at the CD55 promoter?",
+  "How do I lift the hg38 window over to hg19?",
+  "What is the difference between EM-seq and bisulfite sequencing?",
+  "Why can't bisulfite tell 5mC from 5hmC?"
+];
+</script>
+<script src="assets/epicme-chat.js" defer></script>
+</body>
+</html>
