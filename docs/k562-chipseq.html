@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">epicme.bio — K562: ChIP-seq транскрипционных факторов на промоторе CD55</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .page-hero{ padding:44px 0 8px; }
+  .page-hero h1{ font-size:clamp(26px,4.2vw,38px); font-weight:600; line-height:1.14; letter-spacing:-0.01em; margin:0 0 16px; }
+  .page-hero .lede{ max-width:700px; }
+  .chart-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:22px 22px 18px; margin:18px 0; }
+  table.data-table{ width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px; }
+  table.data-table th, table.data-table td{ text-align:left; padding:7px 9px; border-bottom:1px solid var(--line); }
+  table.data-table th{ color:var(--ink-faint); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.03em; }
+  table.data-table td{ color:var(--ink-dim); font-variant-numeric:tabular-nums; }
+  table.data-table td:first-child{ color:var(--ink); font-weight:600; }
+  .legend-row{ display:flex; gap:18px; flex-wrap:wrap; margin:10px 0 4px; font-size:12px; color:var(--ink-dim); }
+  .legend-row .sw{ display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px; }
+  .track-tooltip{
+    position:absolute; pointer-events:none; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:8px; padding:8px 10px; font-size:12px; color:var(--ink); box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    opacity:0; transition:opacity .1s; z-index:5; max-width:240px;
+  }
+  .absent-grid{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
+  .absent-chip{
+    border:1px dashed var(--line); border-radius:20px; padding:6px 14px; font-size:13px; color:var(--ink-faint);
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .note-list{ margin:10px 0 0; padding-left:18px; }
+  .note-list li{ font-size:14px; color:var(--ink-dim); margin-bottom:8px; line-height:1.5; }
+  .track-panel{ background:var(--surface-2); border-radius:10px; padding:8px 4px; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="day6.html">Day 6</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day6VSday35.html">Day 35 vs Day 6</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" class="active">ChIP-seq</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="page-hero">
+    <div class="kicker" data-i18n="hero-kicker">K562 · ChIP-seq · публичные данные ENCODE</div>
+    <h1 data-i18n="h1">Кто сидит на промоторе CD55 — и почему именно там метилирование различает LOW и HIGH</h1>
+    <p class="lede" data-i18n="lede">На <a href="k562.html">странице K562</a> мы нашли кластер CpG-сайтов, чьё метилирование чётче всего различает фракции CD55-LOW и CD55-HIGH — он лежит прямо на точке старта транскрипции CD55 и рядом с ней. Эта страница — попытка понять, <em>почему именно там</em>: какие транскрипционные факторы в K562, по данным ENCODE ChIP-seq, физически садятся на этот участок ДНК, и какие из них по литературе чувствительны к метилированию CpG.</p>
+  </section>
+
+  <section id="region">
+    <div class="kicker" data-i18n="region-kicker">Регион</div>
+    <h2 data-i18n="region-h2">Одно и то же окно, что и на странице K562</h2>
+    <div class="domain-strip" id="regionStrip"></div>
+    <p class="kv-note" data-i18n="region-note">Координаты и значимый кластер (LOW vs HIGH, q&lt;0,05) взяты напрямую с <a href="k562.html">страницы K562</a> — это то же самое окно chr1:207 318 092–207 324 450 (GRCh38), с точкой старта транскрипции CD55 при chr1:207 321 678.</p>
+  </section>
+
+  <section id="track">
+    <div class="kicker" data-i18n="track-kicker">Трек связывания</div>
+    <h2 data-i18n="track-h2">CpG-значимость и связывание факторов — в одном окне координат</h2>
+    <p data-i18n="track-p">Верхняя дорожка — та же статистика, что на Manhattan-графике страницы K562 (объединённая оценка значимости по каждому CpG). Ниже — реальные пики ChIP-seq транскрипционных факторов в K562 (ENCODE), выровненные по тем же геномным координатам. Оранжевая полоса — значимый кластер CpG (#20–132), жёлтая — пик сигнала (#78–83).</p>
+    <div class="chart-card">
+      <div class="track-panel" style="position:relative;">
+        <svg id="trackSvg" width="100%" viewBox="0 0 1080 520" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="track-tooltip" id="trackTooltip"></div>
+      </div>
+      <div class="legend-row" id="trackLegend"></div>
+    </div>
+  </section>
+
+  <section id="confirmed">
+    <div class="kicker" data-i18n="conf-kicker">Подтверждено в K562</div>
+    <h2 data-i18n="conf-h2">Факторы с реальным пиком ChIP-seq в K562 в этом окне</h2>
+    <p data-i18n="conf-p">Каждая строка проверена отдельным, узким запросом к API UCSC Genome Browser (не одним общим запросом на весь список — см. оговорку о методе ниже) и подтверждена как минимум одним экспериментом ENCODE именно в клетках K562.</p>
+    <table class="data-table" id="confirmedTable"></table>
+  </section>
+
+  <section id="notk562">
+    <div class="kicker" data-i18n="notk-kicker">Есть пик, но не в K562</div>
+    <h2 data-i18n="notk-h2">DNMT3B: метилтрансфераза рядом — но не подтверждена в K562</h2>
+    <p data-i18n="notk-p">В этом же окне есть пик ChIP-seq для DNMT3B — фермента, который сам устанавливает метилирование CpG — но единственный поддерживающий эксперимент ENCODE сделан в клетках HepG2, не K562. Это не значит, что DNMT3B не работает здесь в K562 — просто нет прямого ChIP-seq подтверждения именно в этой линии.</p>
+    <table class="data-table" id="notk562Table"></table>
+  </section>
+
+  <section id="absent">
+    <div class="kicker" data-i18n="absent-kicker">Открытый вопрос</div>
+    <h2 data-i18n="absent-h2">Чего нет: KLF4 и TFCP2 без ChIP-seq-подтверждения</h2>
+    <p data-i18n="absent-p">На <a href="k562.html">странице K562</a> и в литературе про CD55 главным кандидатом на роль активатора называют KLF4 (три сайта CACCC-box рядом с TSS), также упоминаются TFCP2 и NF-κB (RELA/NFKB1). Но ни для одного из них в проверенных треках ENCODE ChIP-seq (ни в K562, ни в любой другой линии) нет пика, перекрывающего это окно:</p>
+    <div class="absent-grid" id="absentGrid"></div>
+    <p class="kv-note" data-i18n="absent-note">Отсутствие ChIP-seq пика — не доказательство отсутствия связывания: возможно, эти факторы просто не профилированы ChIP-seq методом именно в K562 на этом участке, либо связывание слишком слабое/транзиентное для колл-пика. Гипотеза «KLF4 через CACCC-box» пока остаётся мотив-based и функциональной (из литературы), но не подтверждённой ChIP-seq в K562.</p>
+  </section>
+
+  <section id="hypothesis">
+    <div class="kicker" data-i18n="hyp-kicker">Механистическая гипотеза</div>
+    <h2 data-i18n="hyp-h2">CTCF и NRF1 — лучшие кандидаты на «метилирование мешает связыванию»</h2>
+    <p data-i18n="hyp-p1">Из подтверждённых в K562 факторов два — <strong>CTCF</strong> и <strong>NRF1</strong> — хорошо задокументированы в литературе именно как факторы, чьё связывание с ДНК напрямую блокируется метилированием CpG в их сайте узнавания (это не просто корреляция «активный хроматин ≈ неметилирован», а прямой, показанный в экспериментах механизм конкуренции метилирования и белка за один и тот же участок ДНК).</p>
+    <p data-i18n="hyp-p2">Оба сидят внутри значимого кластера CpG (#20–132) — CTCF на #43–86 (chr1:207 320 854–207 321 372), NRF1 на #13–43 (chr1:207 320 698–207 321 177). Правдоподобная гипотеза: рост метилирования в группе CD55-HIGH может напрямую вытеснять один или оба этих фактора с их сайтов связывания в этой области — а не просто быть побочным следствием более широкого молчания гена.</p>
+    <p data-i18n="hyp-p3">Отдельно: РНК-полимераза II (общая и инициирующая Ser5-P формы), а также коактиватор EP300/p300 и CRE-связывающий ATF1 — тоже прямо в этом окне. Это подтверждает, что участок действительно активно задействован в транскрипционной машинерии в K562 — то есть перепад метилирования происходит не в «мёртвой» зоне генома, а в реально работающем промоторном модуле.</p>
+    <p class="kv-note" data-i18n="hyp-caveat">Это гипотеза, а не доказанный механизм: у нас нет ChIP-seq CTCF/NRF1 отдельно для фракций CD55-LOW и CD55-HIGH — только общий каталог ENCODE K562 (смешанная популяция). Прямая проверка потребовала бы ChIP-seq или CUT&amp;RUN на CTCF/NRF1 в самих отсортированных LOW/HIGH фракциях.</p>
+  </section>
+
+  <section id="caveats">
+    <div class="kicker" data-i18n="caveat-kicker">Об источнике данных</div>
+    <h2 data-i18n="caveat-h2">Как получены эти данные, и что стоит перепроверить</h2>
+    <div class="disclaimer" data-i18n="caveat1">
+      <strong>Источник: UCSC Genome Browser REST API</strong> (треки ENCODE 3 «TF ChIP-seq Clusters», объединённый по клеточным линиям, и ENCODE 4 «TF Representative Peak Clusters», с разбивкой по клеточным линиям) — запрошены напрямую по координатам chr1:207 318 092–207 324 450 (hg38). Прямой доступ к ENCODE portal REST API и к сырым файлам bigBed из этой среды заблокирован сетевой политикой песочницы; данные получены через инструмент постраничного веб-фетча, который прогоняет содержимое через суммаризирующую модель, а не отдаёт сырой JSON напрямую.
+    </div>
+    <div class="disclaimer" style="margin-top:12px;" data-i18n="caveat2">
+      <strong>Из-за этого — каждый фактор в таблице выше перепроверен минимум дважды</strong> отдельными, узкими запросами («есть ли фактор X в этом окне — да/нет, с полным сырым JSON»), а не одним большим запросом на весь список сразу: при широких запросах модель иногда пропускала реально существующие записи или, наоборот, «находила» записи, которых при точечной проверке не оказывалось. Факторы, которые не подтвердились при повторной точечной проверке (в том числе изначально предполагавшиеся TFCP2, CREB1, SP1, KLF1), в итоговую таблицу не включены.
+    </div>
+    <div class="disclaimer" style="margin-top:12px;" data-i18n="caveat3">
+      <strong>Кластеры ENCODE ChIP-seq систематически показывают много факторов на любом активном промоторе</strong> («гиперэффективные» для ChIP-seq области) — само по себе присутствие десятков факторов в окне не означает, что каждый из них специфичен именно для CD55. Список на этой странице сознательно сокращён до факторов, которые (а) подтверждены именно в K562 и (б) либо перекрывают значимый кластер CpG, либо есть содержательная причина их показать (например, эритроидные факторы на краю окна).
+    </div>
+    <div class="disclaimer" style="margin-top:12px;" data-i18n="caveat4">
+      <strong>Для публикации это стоит перепроверить напрямую</strong>: скачать bigBed-файлы ENCODE ChIP-seq треков (hgdownload.soe.ucsc.edu) и распарсить <code>bigBedToBed</code>/<code>pyBigWig</code> вместо запроса через API с суммаризацией — это не было технически доступно в данной среде (сетевые ограничения песочницы), но полностью выполнимо на обычной рабочей машине.
+    </div>
+  </section>
+
+  <section id="references">
+    <div class="kicker" data-i18n="ref-kicker">Источники</div>
+    <h2 data-i18n="ref-h2">Ссылки</h2>
+    <ul class="ref-list">
+      <li class="ref-item">
+        <span class="ref-num">1</span>
+        <div class="ref-body">
+          <h4 data-i18n="ref1-h">UCSC Genome Browser REST API — документация</h4>
+          <div class="ref-meta"><a href="https://genome.ucsc.edu/goldenPath/help/api.html" target="_blank" rel="noopener">genome.ucsc.edu/goldenPath/help/api.html</a></div>
+        </div>
+      </li>
+      <li class="ref-item">
+        <span class="ref-num">2</span>
+        <div class="ref-body">
+          <h4 data-i18n="ref2-h">ENCODE Project — портал данных</h4>
+          <div class="ref-meta"><a href="https://www.encodeproject.org/" target="_blank" rel="noopener">encodeproject.org</a></div>
+        </div>
+      </li>
+      <li class="ref-item">
+        <span class="ref-num">3</span>
+        <div class="ref-body">
+          <h4 data-i18n="ref3-h">Транскрипционные факторы как «читатели» метилирования ДНК (обзор)</h4>
+          <div class="ref-meta"><a href="https://www.nature.com/articles/nrg.2016.83" target="_blank" rel="noopener">nature.com/articles/nrg.2016.83</a></div>
+        </div>
+      </li>
+      <li class="ref-item">
+        <span class="ref-num">4</span>
+        <div class="ref-body">
+          <h4 data-i18n="ref4-h">Конкуренция метилирования ДНК и связывания NRF1 (Domcke et al., Nature)</h4>
+          <div class="ref-meta"><a href="https://www.nature.com/articles/nature16462" target="_blank" rel="noopener">nature.com/articles/nature16462</a></div>
+        </div>
+      </li>
+      <li class="ref-item">
+        <span class="ref-num">5</span>
+        <div class="ref-body">
+          <h4 data-i18n="ref5-h">Асимметрия цепей ДНК при гемиметилировании CpG и связывание CTCF (Nucleic Acids Research, 2023)</h4>
+          <div class="ref-meta"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10325916/" target="_blank" rel="noopener">pmc.ncbi.nlm.nih.gov/articles/PMC10325916</a></div>
+        </div>
+      </li>
+      <li class="ref-item">
+        <span class="ref-num">6</span>
+        <div class="ref-body">
+          <h4 data-i18n="ref6-h">Роль метилирования ДНК в модуляции занятости сайтов транскрипционными факторами (Maurano et al., Cell Reports)</h4>
+          <div class="ref-meta"><a href="https://www.cell.com/cell-reports/fulltext/S2211-1247(15)00764-0" target="_blank" rel="noopener">cell.com/cell-reports · S2211-1247(15)00764-0</a></div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <footer style="margin:48px 0 24px; padding-top:24px; border-top:1px solid var(--line); font-size:13px; color:var(--ink-faint);">
+    <p data-i18n="footer">epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. Полная библиография — на страницах <a href="about.html">о проекте</a> и <a href="about-cd55.html">CD55 explorer</a>.</p>
+  </footer>
+
+</main>
+
+<script>
+const DATA = {"region": {"chrom": "chr1", "start": 207318092, "end": 207324450, "tss": 207321678, "assembly": "GRCh38/hg38"}, "cluster": {"start": 207320601, "end": 207323613}, "peak": {"start": 207321736, "end": 207321762}, "confirmed_tfs": [{"factor": "POLR2A", "start": 207321059, "end": 207322063, "score": 1000, "category": "pol2", "k562_exps": 90, "accession": "ENCSR000BMR + 89 more", "note_ru": "\u0420\u041d\u041a-\u043f\u043e\u043b\u0438\u043c\u0435\u0440\u0430\u0437\u0430 II (\u043e\u0431\u0449\u0430\u044f)", "note_en": "RNA Pol II (total)"}, {"factor": "POLR2AphosphoS5", "start": 207320968, "end": 207322248, "score": 1000, "category": "pol2", "k562_exps": 40, "accession": "ENCSR000BIA + 39 more", "note_ru": "\u0420\u041d\u041a-\u043f\u043e\u043b\u0438\u043c\u0435\u0440\u0430\u0437\u0430 II, \u0438\u043d\u0438\u0446\u0438\u0438\u0440\u0443\u044e\u0449\u0430\u044f \u0444\u043e\u0440\u043c\u0430 (Ser5-P)", "note_en": "RNA Pol II, initiating form (Ser5-P)"}, {"factor": "POLR2G", "start": 207321035, "end": 207322341, "score": 833, "category": "pol2", "k562_exps": 2, "accession": "ENCSR283ZRI, ENCSR854JES", "note_ru": "\u0441\u0443\u0431\u044a\u0435\u0434\u0438\u043d\u0438\u0446\u0430 \u0420\u041d\u041a-\u043f\u043e\u043b\u0438\u043c\u0435\u0440\u0430\u0437\u044b II", "note_en": "RNA Pol II subunit"}, {"factor": "CTCF", "start": 207320854, "end": 207321372, "score": 250, "category": "methylsens", "k562_exps": 180, "accession": "ENCSR000BPJ + 180 more", "note_ru": "\u0433\u0440\u0430\u043d\u0438\u0447\u043d\u044b\u0439/\u0438\u043d\u0441\u0443\u043b\u044f\u0442\u043e\u0440\u043d\u044b\u0439 \u0431\u0435\u043b\u043e\u043a \u2014 \u043a\u043b\u0430\u0441\u0441\u0438\u0447\u0435\u0441\u043a\u0438 \u0447\u0443\u0432\u0441\u0442\u0432\u0438\u0442\u0435\u043b\u0435\u043d \u043a \u043c\u0435\u0442\u0438\u043b\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044e CpG", "note_en": "boundary/insulator protein \u2014 a textbook CpG-methylation-sensitive factor"}, {"factor": "NRF1", "start": 207320698, "end": 207321177, "score": 98, "category": "methylsens", "k562_exps": 3, "accession": "ENCSR494TDU, ENCSR837EYC, ENCSR998AJK", "note_ru": "Nuclear Respiratory Factor 1 \u2014 \u0441\u0432\u044f\u0437\u044b\u0432\u0430\u043d\u0438\u0435 \u043d\u0430\u043f\u0440\u044f\u043c\u0443\u044e \u0431\u043b\u043e\u043a\u0438\u0440\u0443\u0435\u0442\u0441\u044f \u043c\u0435\u0442\u0438\u043b\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435\u043c \u0435\u0433\u043e \u043c\u043e\u0442\u0438\u0432\u0430", "note_en": "Nuclear Respiratory Factor 1 \u2014 binding is directly blocked by methylation of its motif"}, {"factor": "EP300", "start": 207320920, "end": 207321963, "score": 455, "category": "coact", "k562_exps": 19, "accession": "ENCSR000EGE + 18 more", "note_ru": "\u043a\u043e\u0430\u043a\u0442\u0438\u0432\u0430\u0442\u043e\u0440/\u0430\u0446\u0435\u0442\u0438\u043b\u0442\u0440\u0430\u043d\u0441\u0444\u0435\u0440\u0430\u0437\u0430 p300 \u2014 \u043c\u0430\u0440\u043a\u0435\u0440 \u0430\u043a\u0442\u0438\u0432\u043d\u043e\u0433\u043e \u044d\u043d\u0445\u0430\u043d\u0441\u0435\u0440\u0430/\u043f\u0440\u043e\u043c\u043e\u0442\u043e\u0440\u0430", "note_en": "p300 coactivator/acetyltransferase \u2014 marks active enhancer/promoter chromatin"}, {"factor": "ATF1", "start": 207320899, "end": 207321979, "score": 1000, "category": "coact", "k562_exps": 2, "accession": "ENCSR000DNZ, ENCSR091GVJ", "note_ru": "CRE-\u0441\u0432\u044f\u0437\u044b\u0432\u0430\u044e\u0449\u0438\u0439 \u0444\u0430\u043a\u0442\u043e\u0440 \u0441\u0435\u043c\u0435\u0439\u0441\u0442\u0432\u0430 ATF/CREB", "note_en": "CRE-binding factor, ATF/CREB family"}, {"factor": "NR2C2", "start": 207320852, "end": 207321762, "score": 168, "category": "coact", "k562_exps": 2, "accession": "ENCSR559ZKI, ENCSR750LYM", "note_ru": "\u044f\u0434\u0435\u0440\u043d\u044b\u0439 \u0440\u0435\u0446\u0435\u043f\u0442\u043e\u0440 TR4", "note_en": "nuclear receptor TR4"}, {"factor": "MAZ", "start": 207318061, "end": 207318431, "score": 27, "category": "edge", "k562_exps": 1, "accession": "ENCSR000EFX", "note_ru": "\u0432\u043d\u0435 \u0437\u043d\u0430\u0447\u0438\u043c\u043e\u0433\u043e \u043a\u043b\u0430\u0441\u0442\u0435\u0440\u0430 (5\u2032-\u043a\u0440\u0430\u0439 \u043e\u043a\u043d\u0430)", "note_en": "outside the significant cluster (5\u2032 edge of window)"}, {"factor": "GATA1", "start": 207318095, "end": 207318345, "score": 21, "category": "edge", "k562_exps": 1, "accession": "ENCSR000EFT", "note_ru": "\u044d\u0440\u0438\u0442\u0440\u043e\u0438\u0434\u043d\u044b\u0439 \u043c\u0430\u0441\u0442\u0435\u0440-\u0440\u0435\u0433\u0443\u043b\u044f\u0442\u043e\u0440; \u0432\u043d\u0435 \u043a\u043b\u0430\u0441\u0442\u0435\u0440\u0430", "note_en": "erythroid master regulator; outside the cluster"}, {"factor": "NFE2", "start": 207318152, "end": 207318356, "score": 176, "category": "edge", "k562_exps": 2, "accession": "ENCSR000FCC, ENCSR552YGL", "note_ru": "\u044d\u0440\u0438\u0442\u0440\u043e\u0438\u0434\u043d\u044b\u0439 \u0444\u0430\u043a\u0442\u043e\u0440; \u0432\u043d\u0435 \u043a\u043b\u0430\u0441\u0442\u0435\u0440\u0430", "note_en": "erythroid factor; outside the cluster"}], "not_k562_tfs": [{"factor": "DNMT3B", "start": 207321048, "end": 207321528, "score": 43, "cell_line": "HepG2", "accession": "ENCSR156CWW", "note_ru": "de novo \u0414\u041d\u041a-\u043c\u0435\u0442\u0438\u043b\u0442\u0440\u0430\u043d\u0441\u0444\u0435\u0440\u0430\u0437\u0430; \u0432 \u044d\u0442\u043e\u043c \u043e\u043a\u043d\u0435 \u0435\u0441\u0442\u044c \u043f\u0438\u043a \u0442\u043e\u043b\u044c\u043a\u043e \u0432 HepG2, \u043d\u0435 \u0432 K562", "note_en": "de novo DNA methyltransferase; a peak exists here only in HepG2, not K562"}], "absent_tfs": ["KLF4", "TFCP2", "RELA", "NFKB1", "SP1", "CREB1", "KLF1"], "coords_positions": [{"position": 1, "start": 207318092, "end": 207318093, "dist_to_tss": -3586}, {"position": 2, "start": 207318412, "end": 207318413, "dist_to_tss": -3266}, {"position": 3, "start": 207318471, "end": 207318472, "dist_to_tss": -3207}, {"position": 4, "start": 207318809, "end": 207318810, "dist_to_tss": -2869}, {"position": 5, "start": 207318842, "end": 207318843, "dist_to_tss": -2836}, {"position": 6, "start": 207318856, "end": 207318857, "dist_to_tss": -2822}, {"position": 7, "start": 207318881, "end": 207318882, "dist_to_tss": -2797}, {"position": 8, "start": 207318883, "end": 207318884, "dist_to_tss": -2795}, {"position": 9, "start": 207318906, "end": 207318907, "dist_to_tss": -2772}, {"position": 10, "start": 207318932, "end": 207318933, "dist_to_tss": -2746}, {"position": 11, "start": 207318977, "end": 207318978, "dist_to_tss": -2701}, {"position": 12, "start": 207319009, "end": 207319010, "dist_to_tss": -2669}, {"position": 13, "start": 207319100, "end": 207319101, "dist_to_tss": -2578}, {"position": 14, "start": 207319112, "end": 207319113, "dist_to_tss": -2566}, {"position": 15, "start": 207319116, "end": 207319117, "dist_to_tss": -2562}, {"position": 16, "start": 207319651, "end": 207319652, "dist_to_tss": -2027}, {"position": 17, "start": 207319939, "end": 207319940, "dist_to_tss": -1739}, {"position": 18, "start": 207320084, "end": 207320085, "dist_to_tss": -1594}, {"position": 19, "start": 207320502, "end": 207320503, "dist_to_tss": -1176}, {"position": 20, "start": 207320601, "end": 207320602, "dist_to_tss": -1077}, {"position": 21, "start": 207320725, "end": 207320726, "dist_to_tss": -953}, {"position": 22, "start": 207320825, "end": 207320826, "dist_to_tss": -853}, {"position": 23, "start": 207320868, "end": 207320869, "dist_to_tss": -810}, {"position": 24, "start": 207320873, "end": 207320874, "dist_to_tss": -805}, {"position": 25, "start": 207320878, "end": 207320879, "dist_to_tss": -800}, {"position": 26, "start": 207320880, "end": 207320881, "dist_to_tss": -798}, {"position": 27, "start": 207320882, "end": 207320883, "dist_to_tss": -796}, {"position": 28, "start": 207320884, "end": 207320885, "dist_to_tss": -794}, {"position": 29, "start": 207320886, "end": 207320887, "dist_to_tss": -792}, {"position": 30, "start": 207320888, "end": 207320889, "dist_to_tss": -790}, {"position": 31, "start": 207320890, "end": 207320891, "dist_to_tss": -788}, {"position": 32, "start": 207320892, "end": 207320893, "dist_to_tss": -786}, {"position": 33, "start": 207320932, "end": 207320933, "dist_to_tss": -746}, {"position": 34, "start": 207320991, "end": 207320992, "dist_to_tss": -687}, {"position": 35, "start": 207321008, "end": 207321009, "dist_to_tss": -670}, {"position": 36, "start": 207321032, "end": 207321033, "dist_to_tss": -646}, {"position": 37, "start": 207321127, "end": 207321128, "dist_to_tss": -551}, {"position": 38, "start": 207321158, "end": 207321159, "dist_to_tss": -520}, {"position": 39, "start": 207321199, "end": 207321200, "dist_to_tss": -479}, {"position": 40, "start": 207321201, "end": 207321202, "dist_to_tss": -477}, {"position": 41, "start": 207321213, "end": 207321214, "dist_to_tss": -465}, {"position": 42, "start": 207321215, "end": 207321216, "dist_to_tss": -463}, {"position": 43, "start": 207321223, "end": 207321224, "dist_to_tss": -455}, {"position": 44, "start": 207321241, "end": 207321242, "dist_to_tss": -437}, {"position": 45, "start": 207321251, "end": 207321252, "dist_to_tss": -427}, {"position": 46, "start": 207321283, "end": 207321284, "dist_to_tss": -395}, {"position": 47, "start": 207321285, "end": 207321286, "dist_to_tss": -393}, {"position": 48, "start": 207321296, "end": 207321297, "dist_to_tss": -382}, {"position": 49, "start": 207321304, "end": 207321305, "dist_to_tss": -374}, {"position": 50, "start": 207321312, "end": 207321313, "dist_to_tss": -366}, {"position": 51, "start": 207321316, "end": 207321317, "dist_to_tss": -362}, {"position": 52, "start": 207321332, "end": 207321333, "dist_to_tss": -346}, {"position": 53, "start": 207321360, "end": 207321361, "dist_to_tss": -318}, {"position": 54, "start": 207321371, "end": 207321372, "dist_to_tss": -307}, {"position": 55, "start": 207321383, "end": 207321384, "dist_to_tss": -295}, {"position": 56, "start": 207321388, "end": 207321389, "dist_to_tss": -290}, {"position": 57, "start": 207321423, "end": 207321424, "dist_to_tss": -255}, {"position": 58, "start": 207321474, "end": 207321475, "dist_to_tss": -204}, {"position": 59, "start": 207321507, "end": 207321508, "dist_to_tss": -171}, {"position": 60, "start": 207321522, "end": 207321523, "dist_to_tss": -156}, {"position": 61, "start": 207321527, "end": 207321528, "dist_to_tss": -151}, {"position": 62, "start": 207321534, "end": 207321535, "dist_to_tss": -144}, {"position": 63, "start": 207321537, "end": 207321538, "dist_to_tss": -141}, {"position": 64, "start": 207321551, "end": 207321552, "dist_to_tss": -127}, {"position": 65, "start": 207321585, "end": 207321586, "dist_to_tss": -93}, {"position": 66, "start": 207321611, "end": 207321612, "dist_to_tss": -67}, {"position": 67, "start": 207321633, "end": 207321634, "dist_to_tss": -45}, {"position": 68, "start": 207321662, "end": 207321663, "dist_to_tss": -16}, {"position": 69, "start": 207321670, "end": 207321671, "dist_to_tss": -8}, {"position": 70, "start": 207321693, "end": 207321694, "dist_to_tss": 15}, {"position": 71, "start": 207321698, "end": 207321699, "dist_to_tss": 20}, {"position": 72, "start": 207321702, "end": 207321703, "dist_to_tss": 24}, {"position": 73, "start": 207321709, "end": 207321710, "dist_to_tss": 31}, {"position": 74, "start": 207321717, "end": 207321718, "dist_to_tss": 39}, {"position": 75, "start": 207321722, "end": 207321723, "dist_to_tss": 44}, {"position": 76, "start": 207321725, "end": 207321726, "dist_to_tss": 47}, {"position": 77, "start": 207321733, "end": 207321734, "dist_to_tss": 55}, {"position": 78, "start": 207321736, "end": 207321737, "dist_to_tss": 58}, {"position": 79, "start": 207321739, "end": 207321740, "dist_to_tss": 61}, {"position": 80, "start": 207321741, "end": 207321742, "dist_to_tss": 63}, {"position": 81, "start": 207321757, "end": 207321758, "dist_to_tss": 79}, {"position": 82, "start": 207321760, "end": 207321761, "dist_to_tss": 82}, {"position": 83, "start": 207321762, "end": 207321763, "dist_to_tss": 84}, {"position": 84, "start": 207321771, "end": 207321772, "dist_to_tss": 93}, {"position": 85, "start": 207321774, "end": 207321775, "dist_to_tss": 96}, {"position": 86, "start": 207321776, "end": 207321777, "dist_to_tss": 98}, {"position": 87, "start": 207321778, "end": 207321779, "dist_to_tss": 100}, {"position": 88, "start": 207321782, "end": 207321783, "dist_to_tss": 104}, {"position": 89, "start": 207321786, "end": 207321787, "dist_to_tss": 108}, {"position": 90, "start": 207321792, "end": 207321793, "dist_to_tss": 114}, {"position": 91, "start": 207321794, "end": 207321795, "dist_to_tss": 116}, {"position": 92, "start": 207321797, "end": 207321798, "dist_to_tss": 119}, {"position": 93, "start": 207321810, "end": 207321811, "dist_to_tss": 132}, {"position": 94, "start": 207321823, "end": 207321824, "dist_to_tss": 145}, {"position": 95, "start": 207321854, "end": 207321855, "dist_to_tss": 176}, {"position": 96, "start": 207321858, "end": 207321859, "dist_to_tss": 180}, {"position": 97, "start": 207321879, "end": 207321880, "dist_to_tss": 201}, {"position": 98, "start": 207321882, "end": 207321883, "dist_to_tss": 204}, {"position": 99, "start": 207321886, "end": 207321887, "dist_to_tss": 208}, {"position": 100, "start": 207321921, "end": 207321922, "dist_to_tss": 243}, {"position": 101, "start": 207321935, "end": 207321936, "dist_to_tss": 257}, {"position": 102, "start": 207321946, "end": 207321947, "dist_to_tss": 268}, {"position": 103, "start": 207321949, "end": 207321950, "dist_to_tss": 271}, {"position": 104, "start": 207321975, "end": 207321976, "dist_to_tss": 297}, {"position": 105, "start": 207321977, "end": 207321978, "dist_to_tss": 299}, {"position": 106, "start": 207321981, "end": 207321982, "dist_to_tss": 303}, {"position": 107, "start": 207321990, "end": 207321991, "dist_to_tss": 312}, {"position": 108, "start": 207321993, "end": 207321994, "dist_to_tss": 315}, {"position": 109, "start": 207322015, "end": 207322016, "dist_to_tss": 337}, {"position": 110, "start": 207322018, "end": 207322019, "dist_to_tss": 340}, {"position": 111, "start": 207322049, "end": 207322050, "dist_to_tss": 371}, {"position": 112, "start": 207322078, "end": 207322079, "dist_to_tss": 400}, {"position": 113, "start": 207322081, "end": 207322082, "dist_to_tss": 403}, {"position": 114, "start": 207322102, "end": 207322103, "dist_to_tss": 424}, {"position": 115, "start": 207322114, "end": 207322115, "dist_to_tss": 436}, {"position": 116, "start": 207322138, "end": 207322139, "dist_to_tss": 460}, {"position": 117, "start": 207322210, "end": 207322211, "dist_to_tss": 532}, {"position": 118, "start": 207322217, "end": 207322218, "dist_to_tss": 539}, {"position": 119, "start": 207322230, "end": 207322231, "dist_to_tss": 552}, {"position": 120, "start": 207322244, "end": 207322245, "dist_to_tss": 566}, {"position": 121, "start": 207322257, "end": 207322258, "dist_to_tss": 579}, {"position": 122, "start": 207322435, "end": 207322436, "dist_to_tss": 757}, {"position": 123, "start": 207322449, "end": 207322450, "dist_to_tss": 771}, {"position": 124, "start": 207322466, "end": 207322467, "dist_to_tss": 788}, {"position": 125, "start": 207322503, "end": 207322504, "dist_to_tss": 825}, {"position": 126, "start": 207322567, "end": 207322568, "dist_to_tss": 889}, {"position": 127, "start": 207322667, "end": 207322668, "dist_to_tss": 989}, {"position": 128, "start": 207322700, "end": 207322701, "dist_to_tss": 1022}, {"position": 129, "start": 207322793, "end": 207322794, "dist_to_tss": 1115}, {"position": 130, "start": 207322878, "end": 207322879, "dist_to_tss": 1200}, {"position": 131, "start": 207323409, "end": 207323410, "dist_to_tss": 1731}, {"position": 132, "start": 207323613, "end": 207323614, "dist_to_tss": 1935}, {"position": 133, "start": 207323695, "end": 207323696, "dist_to_tss": 2017}, {"position": 134, "start": 207323863, "end": 207323864, "dist_to_tss": 2185}, {"position": 135, "start": 207323917, "end": 207323918, "dist_to_tss": 2239}, {"position": 136, "start": 207324141, "end": 207324142, "dist_to_tss": 2463}, {"position": 137, "start": 207324450, "end": 207324451, "dist_to_tss": 2772}], "combined_score": [-0.47849542141820817, -0.8278918748864704, -0.7642304690206659, -0.47875075734615297, -0.5922398392105093, -0.8011409522861644, -0.32345878973605136, -0.2770709058791531, -0.34601014646948197, -0.6621805653757441, -0.05693942309212326, -0.6581699251880213, -0.4919120093476013, -0.4894602621853162, -0.6762924069696439, -0.6794418942409196, -0.5863467534635443, -0.6376173829227832, -0.01698014805927121, -0.38471657834818446, -0.8153348090870564, -0.5321355739295438, -0.18990449629840356, -0.7677921569639642, 0.030020523086814393, -0.2878096531663428, -0.575124995567779, -0.4488512404841227, 0.40646853533086896, -0.5108036552586634, 0.3411380165096844, -0.6882040601028675, -0.5156399705800228, 0.41830584477395444, -0.7403182213981384, 0.41443238111630465, 0.10984338415417845, -0.5421921924558749, -0.3004315208932176, -0.2092045696039034, -0.46457067382012074, 0.11021387767074688, -0.48408565934869974, 0.44662623444489125, -0.43364692328998883, -0.0943375392839003, -0.2800217320676106, -0.2081138498371172, -0.21445434497968766, 1.5976615485663554, 0.6506840102351281, 0.003982889806048458, -0.4873774658060319, 0.3921515316973605, 1.4899507579998617, 0.9947647621646363, -0.5879919229452434, 0.6690794788777396, 0.452533282583144, -0.5732237652196929, 1.2386444892813453, 0.15826002015361537, -0.1952518891490432, 0.014335302253816887, -0.5141786882897881, 0.05423129714726682, 0.326917676939381, -0.12670036456407727, 0.4152749190409039, 1.572331203450302, 0.2741549286314515, -0.05356227773620292, 1.5684825983028787, -0.3468075718373058, -0.46807423916241997, -0.5748993667778723, 0.11344229348906006, 2.9971747697667612, 2.2529027912513673, 2.739911588302522, 1.1951246721928095, 3.3768759736221834, 2.944369807982335, 0.8480765701081125, 0.5002318895579877, 0.7467376142529631, 0.520465294199616, 0.9993082831470316, 0.3770852428680409, -0.33004814797688836, -0.4340399568105446, 0.8261009387330854, -0.6996848472863918, -0.37625728422833893, 0.05148499814865406, -0.27487569452725485, -0.3423856885994645, 0.17654606777888823, -0.12280126354363136, -0.09031414111207207, 1.4544664723685894, -0.4196189561686927, 0.546407159627786, -0.6522889089796509, -0.5506311787801234, -0.39620390769665753, -0.008016088173348646, -0.31813874055818103, 0.11601282491134735, 1.56502928159853, -0.3317587888796634, -0.5570717046458983, -0.32322341696058354, -0.3502305177894562, -0.1465761944461135, -0.7388089672854061, -0.46239345729979825, -0.41161606988379495, -0.1726370586111845, -0.373508287419236, -0.5627522358339311, 0.7108596864835084, -0.7811722031908541, -0.3195331259431079, -0.03940250967336243, -0.18817559902881761, -0.6511775852613034, -0.3416722087413108, -0.7532756283666086, -0.5749469615859005, -0.821908883677065, -0.8209707297661, -0.14456054694656895, -0.4360764275495543, -0.3078897056386883, -0.4061642758606619, 0.28409607546707166], "delta": [0.8478570799453735, 2.1545506663969527, 2.64300409829851, -4.931540702785767, 0.38092269950209356, -2.2840843869441585, -0.7027083355513781, 0.1678292439069935, 0.5595921252531397, -3.0683199234476675, -2.5441197014175145, -1.2268440326896055, -1.9561366237156719, -2.08615428095235, -0.8759899328263643, -2.6600386697677365, 0.3547901182709019, -1.1666100460739983, -0.34123989096583784, 8.638915155896974, 4.3867247777843374, 7.636069285538455, 14.901410804499578, 4.773196617992315, 13.433340463333892, 12.318543905478776, 15.456195825304016, 19.881345176231996, 22.37000573303665, 19.20531788349321, 12.827096841216179, 10.783303151815133, 22.738087979044895, 34.00555365744832, 5.888864261888469, 20.641125778694462, 32.58284431530863, 15.871413504866306, 18.82675034254652, 15.450969309057777, 16.778601222940278, 16.057212931175492, 19.504519807367387, 12.984118165725087, 15.661191406962043, 25.90367917707534, 20.24684642656309, 26.83441848070335, 23.52842111783568, 42.818363397093606, 35.908037833525135, 28.39233973387999, 18.385367819307074, 12.733761585041064, 53.36440852128628, 40.027016572250616, 13.124556593008277, 32.27754478914717, 21.59367449579443, 13.752609628597948, 44.54114574914851, 37.30893776219286, 26.64861905439416, 32.37262221740436, 16.616353382185128, 35.65419690867696, 39.913614074685626, 31.628553426126583, 32.81661799876693, 46.986187479009246, 25.503302222656693, 26.459335283920815, 47.70670468473299, 16.75504963738624, 14.429508007377777, 14.476611178485852, 30.32360201175708, 58.64354481689288, 59.133772683322476, 53.73339411578153, 44.61180050581063, 59.76182571891215, 54.946752446058, 32.85849465362876, 41.77596376798268, 41.238632730445005, 41.49682908549838, 41.63291208257638, 38.352208477344824, 16.896359150710467, 20.641996864735503, 25.155254955592355, 8.169915978911975, 19.06052402600482, 17.335999501867832, 27.228697832834715, 17.944856382108668, 27.73986402669524, 24.667640347285875, 25.438745068281854, 44.942393789608204, 22.4598566450476, 29.064882682454616, 8.913113684148717, 13.032963508915243, 23.227477021879423, 27.85675086842439, 24.716485690476027, 33.258871608047414, 44.98601261655212, 25.860931436172464, 15.220679969763635, 21.620710425512623, 13.33652086299462, 19.87873191810888, 6.4724273844931846, 19.10936936919498, 19.666767648122534, 14.474869006403772, 23.458637447214606, 14.614436347645922, 21.68962301009266, 3.3513583618936638, 21.483756342393598, 21.855355195011967, 25.39338406925586, 12.27318290645278, 29.249778760276797, 5.35414648247391, 21.145258759334737, 5.162120404093589, 4.818460829680417, 0.7576835434747693, -1.4474223757484488, 1.4973001172094627, 2.280535517888076, -4.27119295878569]};
+
+const I18N = {
+  ru: {
+    'brand-sub': 'эпигеном · цитозин · метилирование',
+    'nav-home': 'Главная', 'nav-about': 'О проекте', 'nav-k562': 'K562',
+    'title': 'epicme.bio — K562: ChIP-seq транскрипционных факторов на промоторе CD55',
+    'hero-kicker': 'K562 · ChIP-seq · публичные данные ENCODE',
+    'h1': 'Кто сидит на промоторе CD55 — и почему именно там метилирование различает LOW и HIGH',
+    'lede': 'На <a href="k562.html">странице K562</a> мы нашли кластер CpG-сайтов, чьё метилирование чётче всего различает фракции CD55-LOW и CD55-HIGH — он лежит прямо на точке старта транскрипции CD55 и рядом с ней. Эта страница — попытка понять, <em>почему именно там</em>: какие транскрипционные факторы в K562, по данным ENCODE ChIP-seq, физически садятся на этот участок ДНК, и какие из них по литературе чувствительны к метилированию CpG.',
+    'region-kicker': 'Регион', 'region-h2': 'Одно и то же окно, что и на странице K562',
+    'region-note': 'Координаты и значимый кластер (LOW vs HIGH, q&lt;0,05) взяты напрямую с <a href="k562.html">страницы K562</a> — это то же самое окно chr1:207 318 092–207 324 450 (GRCh38), с точкой старта транскрипции CD55 при chr1:207 321 678.',
+    'track-kicker': 'Трек связывания', 'track-h2': 'CpG-значимость и связывание факторов — в одном окне координат',
+    'track-p': 'Верхняя дорожка — та же статистика, что на Manhattan-графике страницы K562 (объединённая оценка значимости по каждому CpG). Ниже — реальные пики ChIP-seq транскрипционных факторов в K562 (ENCODE), выровненные по тем же геномным координатам. Оранжевая полоса — значимый кластер CpG (#20–132), жёлтая — пик сигнала (#78–83).',
+    'conf-kicker': 'Подтверждено в K562', 'conf-h2': 'Факторы с реальным пиком ChIP-seq в K562 в этом окне',
+    'conf-p': 'Каждая строка проверена отдельным, узким запросом к API UCSC Genome Browser (не одним общим запросом на весь список — см. оговорку о методе ниже) и подтверждена как минимум одним экспериментом ENCODE именно в клетках K562.',
+    'notk-kicker': 'Есть пик, но не в K562', 'notk-h2': 'DNMT3B: метилтрансфераза рядом — но не подтверждена в K562',
+    'notk-p': 'В этом же окне есть пик ChIP-seq для DNMT3B — фермента, который сам устанавливает метилирование CpG — но единственный поддерживающий эксперимент ENCODE сделан в клетках HepG2, не K562. Это не значит, что DNMT3B не работает здесь в K562 — просто нет прямого ChIP-seq подтверждения именно в этой линии.',
+    'absent-kicker': 'Открытый вопрос', 'absent-h2': 'Чего нет: KLF4 и TFCP2 без ChIP-seq-подтверждения',
+    'absent-p': 'На <a href="k562.html">странице K562</a> и в литературе про CD55 главным кандидатом на роль активатора называют KLF4 (три сайта CACCC-box рядом с TSS), также упоминаются TFCP2 и NF-κB (RELA/NFKB1). Но ни для одного из них в проверенных треках ENCODE ChIP-seq (ни в K562, ни в любой другой линии) нет пика, перекрывающего это окно:',
+    'absent-note': 'Отсутствие ChIP-seq пика — не доказательство отсутствия связывания: возможно, эти факторы просто не профилированы ChIP-seq методом именно в K562 на этом участке, либо связывание слишком слабое/транзиентное для колл-пика. Гипотеза «KLF4 через CACCC-box» пока остаётся мотив-based и функциональной (из литературы), но не подтверждённой ChIP-seq в K562.',
+    'hyp-kicker': 'Механистическая гипотеза', 'hyp-h2': 'CTCF и NRF1 — лучшие кандидаты на «метилирование мешает связыванию»',
+    'hyp-p1': 'Из подтверждённых в K562 факторов два — <strong>CTCF</strong> и <strong>NRF1</strong> — хорошо задокументированы в литературе именно как факторы, чьё связывание с ДНК напрямую блокируется метилированием CpG в их сайте узнавания (это не просто корреляция «активный хроматин ≈ неметилирован», а прямой, показанный в экспериментах механизм конкуренции метилирования и белка за один и тот же участок ДНК).',
+    'hyp-p2': 'Оба сидят внутри значимого кластера CpG (#20–132) — CTCF на #43–86 (chr1:207 320 854–207 321 372), NRF1 на #13–43 (chr1:207 320 698–207 321 177). Правдоподобная гипотеза: рост метилирования в группе CD55-HIGH может напрямую вытеснять один или оба этих фактора с их сайтов связывания в этой области — а не просто быть побочным следствием более широкого молчания гена.',
+    'hyp-p3': 'Отдельно: РНК-полимераза II (общая и инициирующая Ser5-P формы), а также коактиватор EP300/p300 и CRE-связывающий ATF1 — тоже прямо в этом окне. Это подтверждает, что участок действительно активно задействован в транскрипционной машинерии в K562 — то есть перепад метилирования происходит не в «мёртвой» зоне генома, а в реально работающем промоторном модуле.',
+    'hyp-caveat': 'Это гипотеза, а не доказанный механизм: у нас нет ChIP-seq CTCF/NRF1 отдельно для фракций CD55-LOW и CD55-HIGH — только общий каталог ENCODE K562 (смешанная популяция). Прямая проверка потребовала бы ChIP-seq или CUT&amp;RUN на CTCF/NRF1 в самих отсортированных LOW/HIGH фракциях.',
+    'caveat-kicker': 'Об источнике данных', 'caveat-h2': 'Как получены эти данные, и что стоит перепроверить',
+    'caveat1': '<strong>Источник: UCSC Genome Browser REST API</strong> (треки ENCODE 3 «TF ChIP-seq Clusters», объединённый по клеточным линиям, и ENCODE 4 «TF Representative Peak Clusters», с разбивкой по клеточным линиям) — запрошены напрямую по координатам chr1:207 318 092–207 324 450 (hg38). Прямой доступ к ENCODE portal REST API и к сырым файлам bigBed из этой среды заблокирован сетевой политикой песочницы; данные получены через инструмент постраничного веб-фетча, который прогоняет содержимое через суммаризирующую модель, а не отдаёт сырой JSON напрямую.',
+    'caveat2': '<strong>Из-за этого — каждый фактор в таблице выше перепроверен минимум дважды</strong> отдельными, узкими запросами («есть ли фактор X в этом окне — да/нет, с полным сырым JSON»), а не одним большим запросом на весь список сразу: при широких запросах модель иногда пропускала реально существующие записи или, наоборот, «находила» записи, которых при точечной проверке не оказывалось. Факторы, которые не подтвердились при повторной точечной проверке (в том числе изначально предполагавшиеся TFCP2, CREB1, SP1, KLF1), в итоговую таблицу не включены.',
+    'caveat3': '<strong>Кластеры ENCODE ChIP-seq систематически показывают много факторов на любом активном промоторе</strong> («гиперэффективные» для ChIP-seq области) — само по себе присутствие десятков факторов в окне не означает, что каждый из них специфичен именно для CD55. Список на этой странице сознательно сокращён до факторов, которые (а) подтверждены именно в K562 и (б) либо перекрывают значимый кластер CpG, либо есть содержательная причина их показать (например, эритроидные факторы на краю окна).',
+    'caveat4': '<strong>Для публикации это стоит перепроверить напрямую</strong>: скачать bigBed-файлы ENCODE ChIP-seq треков (hgdownload.soe.ucsc.edu) и распарсить <code>bigBedToBed</code>/<code>pyBigWig</code> вместо запроса через API с суммаризацией — это не было технически доступно в данной среде (сетевые ограничения песочницы), но полностью выполнимо на обычной рабочей машине.',
+    'ref-kicker': 'Источники', 'ref-h2': 'Ссылки',
+    'ref1-h': 'UCSC Genome Browser REST API — документация',
+    'ref2-h': 'ENCODE Project — портал данных',
+    'ref3-h': 'Транскрипционные факторы как «читатели» метилирования ДНК (обзор)',
+    'ref4-h': 'Конкуренция метилирования ДНК и связывания NRF1 (Domcke et al., Nature)',
+    'ref5-h': 'Асимметрия цепей ДНК при гемиметилировании CpG и связывание CTCF (Nucleic Acids Research, 2023)',
+    'ref6-h': 'Роль метилирования ДНК в модуляции занятости сайтов транскрипционными факторами (Maurano et al., Cell Reports)',
+    'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. Полная библиография — на страницах <a href="about.html">о проекте</a> и <a href="about-cd55.html">CD55 explorer</a>.',
+    'stat-bp': 'п.н.', 'stat-window': 'окно', 'stat-cluster': 'значимый кластер', 'stat-peak': 'пик сигнала', 'stat-tss': 'TSS',
+    'th-factor': 'Фактор', 'th-coord': 'chr1', 'th-vstss': 'от TSS', 'th-score': 'score', 'th-exps': 'K562-экспериментов ENCODE', 'th-note': 'Роль',
+    'th-cellline': 'Клеточная линия', 'cat-pol2': 'Полимераза II', 'cat-methylsens': 'Метил-чувствительные', 'cat-coact': 'Коактиваторы / CRE', 'cat-edge': 'Вне кластера',
+  },
+  en: {
+    'brand-sub': 'epigenome · cytosine · methylation',
+    'nav-home': 'Home', 'nav-about': 'About', 'nav-k562': 'K562',
+    'title': 'epicme.bio — K562: transcription factor ChIP-seq at the CD55 promoter',
+    'hero-kicker': 'K562 · ChIP-seq · public ENCODE data',
+    'h1': 'Who sits on the CD55 promoter — and why methylation there splits LOW from HIGH',
+    'lede': 'On the <a href="k562.html">K562 page</a> we found a cluster of CpG sites whose methylation most sharply separates the CD55-LOW and CD55-HIGH fractions — sitting right on and around the CD55 transcription start site. This page tries to understand <em>why there specifically</em>: which transcription factors, according to public K562 ENCODE ChIP-seq data, physically sit on this stretch of DNA, and which of them are known from the literature to be sensitive to CpG methylation.',
+    'region-kicker': 'Region', 'region-h2': 'The same window as the K562 page',
+    'region-note': 'Coordinates and the significant cluster (LOW vs HIGH, q&lt;0.05) are taken directly from the <a href="k562.html">K562 page</a> — the same window, chr1:207,318,092–207,324,450 (GRCh38), with the CD55 transcription start site at chr1:207,321,678.',
+    'track-kicker': 'Binding track', 'track-h2': 'CpG significance and factor binding — in the same coordinate window',
+    'track-p': 'The top track is the same statistic as the K562 page\'s Manhattan plot (a combined significance score per CpG). Below it are real K562 ChIP-seq peaks (ENCODE), aligned to the same genomic coordinates. The orange band is the significant CpG cluster (#20–132); the yellow band is the peak signal (#78–83).',
+    'conf-kicker': 'Confirmed in K562', 'conf-h2': 'Factors with a real K562 ChIP-seq peak in this window',
+    'conf-p': 'Every row was checked with a separate, narrow query to the UCSC Genome Browser API (not one broad query for the whole list at once — see the methodology caveat below), and confirmed by at least one ENCODE experiment specifically in K562 cells.',
+    'notk-kicker': 'Peak exists, but not in K562', 'notk-h2': 'DNMT3B: a methyltransferase nearby — but not confirmed in K562',
+    'notk-p': 'This same window has a ChIP-seq peak for DNMT3B — the enzyme that lays down CpG methylation itself — but the only supporting ENCODE experiment is in HepG2 cells, not K562. That doesn\'t mean DNMT3B isn\'t active here in K562 — just that there\'s no direct ChIP-seq confirmation in this specific line.',
+    'absent-kicker': 'Open question', 'absent-h2': 'What\'s missing: KLF4 and TFCP2 without ChIP-seq support',
+    'absent-p': 'On the <a href="k562.html">K562 page</a> and in the CD55 literature, KLF4 is named as the main activator candidate (three CACCC-box sites near the TSS), with TFCP2 and NF-κB (RELA/NFKB1) also mentioned. But none of them have a peak overlapping this window in the ENCODE ChIP-seq tracks checked here (in K562 or any other cell line):',
+    'absent-note': 'No ChIP-seq peak isn\'t proof of no binding: these factors may simply not have been ChIP-seq-profiled in K562 at this specific site, or the binding may be too weak/transient to call a peak. The "KLF4 via CACCC-box" hypothesis remains motif-based and functional (from the literature), not ChIP-seq-confirmed in K562.',
+    'hyp-kicker': 'Mechanistic hypothesis', 'hyp-h2': 'CTCF and NRF1 — the strongest candidates for "methylation blocks binding"',
+    'hyp-p1': 'Of the K562-confirmed factors, two — <strong>CTCF</strong> and <strong>NRF1</strong> — are well documented in the literature specifically as factors whose DNA binding is directly blocked by CpG methylation at their recognition site (not just the general correlation "active chromatin ≈ unmethylated," but a direct, experimentally shown competition between methylation and the protein for the same DNA site).',
+    'hyp-p2': 'Both sit inside the significant CpG cluster (#20–132) — CTCF at #43–86 (chr1:207,320,854–207,321,372), NRF1 at #13–43 (chr1:207,320,698–207,321,177). A plausible hypothesis: increased methylation in the CD55-HIGH group could directly displace one or both of these factors from their binding sites here — rather than simply being a downstream consequence of broader gene silencing.',
+    'hyp-p3': 'Separately: RNA Pol II (both total and the initiating Ser5-P form), plus the coactivator EP300/p300 and the CRE-binding factor ATF1, are also right in this window. This confirms the region is genuinely engaged by the transcriptional machinery in K562 — the methylation difference isn\'t happening in a "dead" part of the genome, but in an actively working promoter module.',
+    'hyp-caveat': 'This is a hypothesis, not a proven mechanism: we don\'t have CTCF/NRF1 ChIP-seq done separately on the CD55-LOW and CD55-HIGH fractions — only the general ENCODE K562 catalog (a mixed population). Directly testing this would need ChIP-seq or CUT&amp;RUN for CTCF/NRF1 on the sorted LOW/HIGH fractions themselves.',
+    'caveat-kicker': 'About the data source', 'caveat-h2': 'How this data was obtained, and what to double-check',
+    'caveat1': '<strong>Source: the UCSC Genome Browser REST API</strong> (the ENCODE 3 "TF ChIP-seq Clusters" track, pooled across cell types, and the ENCODE 4 "TF Representative Peak Clusters" track, resolved by cell type) — queried directly at chr1:207,318,092–207,324,450 (hg38). Direct access to the ENCODE portal REST API and to raw bigBed files was blocked by this sandbox\'s network policy; data was instead retrieved through a page-fetching tool that runs content through a summarizing model rather than returning raw JSON directly.',
+    'caveat2': '<strong>Because of that, every factor in the table above was independently re-checked at least twice</strong> with separate, narrow queries ("is factor X present in this window — yes/no, with the full raw JSON"), rather than one broad query for the entire list at once: broad queries sometimes missed real entries, or conversely "found" entries that a focused re-check couldn\'t reproduce. Factors that didn\'t survive a focused re-check (including initially-suggested TFCP2, CREB1, SP1, KLF1) were excluded from the final table.',
+    'caveat3': '<strong>ENCODE ChIP-seq cluster tracks systematically show many factors at any active promoter</strong> ("hyper-ChIPable" regions) — the mere presence of dozens of factors in a window doesn\'t mean each one is CD55-specific. The list on this page is deliberately trimmed to factors that (a) are K562-confirmed and (b) either overlap the significant CpG cluster or have a substantive reason to be shown (e.g., erythroid factors at the window\'s edge).',
+    'caveat4': '<strong>For publication-grade work this should be independently re-verified</strong>: download the ENCODE ChIP-seq track bigBed files directly (hgdownload.soe.ucsc.edu) and parse them with <code>bigBedToBed</code>/<code>pyBigWig</code> instead of querying through a summarizing API fetch — this wasn\'t technically possible in this environment (sandbox network restrictions), but is fully doable on a regular machine.',
+    'ref-kicker': 'Sources', 'ref-h2': 'References',
+    'ref1-h': 'UCSC Genome Browser REST API — documentation',
+    'ref2-h': 'ENCODE Project — data portal',
+    'ref3-h': 'Transcription factors as readers and effectors of DNA methylation (review)',
+    'ref4-h': 'Competition between DNA methylation and NRF1 binding (Domcke et al., Nature)',
+    'ref5-h': 'DNA strand asymmetry from CpG hemimethylation and CTCF binding (Nucleic Acids Research, 2023)',
+    'ref6-h': 'Role of DNA methylation in modulating transcription factor occupancy (Maurano et al., Cell Reports)',
+    'footer': 'epicme.bio — an open science project and PhD work by Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. The full bibliography lives on the <a href="about.html">about</a> and <a href="about-cd55.html">CD55 explorer</a> pages.',
+    'stat-bp': 'bp', 'stat-window': 'window', 'stat-cluster': 'significant cluster', 'stat-peak': 'peak signal', 'stat-tss': 'TSS',
+    'th-factor': 'Factor', 'th-coord': 'chr1', 'th-vstss': 'from TSS', 'th-score': 'score', 'th-exps': 'K562 ENCODE experiments', 'th-note': 'Role',
+    'th-cellline': 'Cell line', 'cat-pol2': 'Pol II machinery', 'cat-methylsens': 'Methylation-sensitive', 'cat-coact': 'Coactivators / CRE', 'cat-edge': 'Outside cluster',
+  }
+};
+
+const CATCOLOR = { pol2: '#56B4E9', methylsens: '#E69F00', coact: '#F0E442', edge: '#6E8079' };
+const CAT_ORDER = ['pol2', 'methylsens', 'coact', 'edge'];
+
+function fmtInt(v){ return v.toLocaleString('en-US'); }
+function svgEl(tag, attrs){ const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const dict = I18N[lang];
+    if(!dict || !(key in dict)) return;
+    if(el.tagName === 'TITLE'){ document.title = dict[key]; }
+    else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('#lang-switch button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){}
+  renderDynamic(lang);
+}
+
+document.querySelectorAll('#lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+
+function renderDynamic(lang){
+  const t = I18N[lang];
+  renderRegionStrip(t);
+  renderTrack(t);
+  renderConfirmedTable(t);
+  renderNotK562Table(t);
+  renderAbsentGrid(t);
+}
+
+function renderRegionStrip(t){
+  const el = document.getElementById('regionStrip');
+  el.innerHTML = '';
+  const r = DATA.region, c = DATA.cluster, p = DATA.peak;
+  const items = [
+    { n: fmtInt(r.end - r.start), lbl: t['stat-window'] + ' (' + t['stat-bp'] + ')' },
+    { n: fmtInt(c.end - c.start), lbl: t['stat-cluster'] + ' (' + t['stat-bp'] + ')' },
+    { n: fmtInt(p.end - p.start), lbl: t['stat-peak'] + ' (' + t['stat-bp'] + ')' },
+    { n: 'chr1:' + fmtInt(r.tss), lbl: t['stat-tss'] },
+  ];
+  items.forEach(it => {
+    const div = document.createElement('div');
+    div.className = 'domain';
+    div.innerHTML = '<div class="n">' + it.n + '</div><div class="t">' + it.lbl + '</div>';
+    el.appendChild(div);
+  });
+}
+
+function renderConfirmedTable(t){
+  const el = document.getElementById('confirmedTable');
+  let html = '<thead><tr><th>' + t['th-factor'] + '</th><th>' + t['th-coord'] + '</th><th>' + t['th-vstss'] + '</th><th>' + t['th-score'] + '</th><th>' + t['th-exps'] + '</th><th>' + t['th-note'] + '</th></tr></thead><tbody>';
+  DATA.confirmed_tfs.forEach(f => {
+    const mid = Math.round((f.start + f.end) / 2);
+    const dist = mid - DATA.region.tss;
+    const distStr = (dist >= 0 ? '+' : '') + fmtInt(dist);
+    const note = lang_note(f, t);
+    const swatch = '<span class="sw" style="background:' + CATCOLOR[f.category] + '"></span>';
+    html += '<tr><td>' + swatch + f.factor + '</td><td>' + fmtInt(f.start) + '–' + fmtInt(f.end) + '</td><td>' + distStr + '</td><td>' + f.score + '</td><td>' + f.k562_exps + '</td><td>' + note + '</td></tr>';
+  });
+  html += '</tbody>';
+  el.innerHTML = html;
+}
+
+function lang_note(f, t){
+  const lang = document.documentElement.getAttribute('lang') || 'ru';
+  return lang === 'ru' ? f.note_ru : f.note_en;
+}
+
+function renderNotK562Table(t){
+  const el = document.getElementById('notk562Table');
+  let html = '<thead><tr><th>' + t['th-factor'] + '</th><th>' + t['th-coord'] + '</th><th>' + t['th-score'] + '</th><th>' + t['th-cellline'] + '</th><th>' + t['th-note'] + '</th></tr></thead><tbody>';
+  DATA.not_k562_tfs.forEach(f => {
+    const note = lang_note(f, t);
+    html += '<tr><td>' + f.factor + '</td><td>' + fmtInt(f.start) + '–' + fmtInt(f.end) + '</td><td>' + f.score + '</td><td>' + f.cell_line + '</td><td>' + note + '</td></tr>';
+  });
+  html += '</tbody>';
+  el.innerHTML = html;
+}
+
+function renderAbsentGrid(t){
+  const el = document.getElementById('absentGrid');
+  el.innerHTML = '';
+  DATA.absent_tfs.forEach(name => {
+    const chip = document.createElement('span');
+    chip.className = 'absent-chip';
+    chip.textContent = name;
+    el.appendChild(chip);
+  });
+}
+
+function renderTrack(t){
+  const el = document.getElementById('trackSvg');
+  const tip = document.getElementById('trackTooltip');
+  el.innerHTML = '';
+  const r = DATA.region, c = DATA.cluster, p = DATA.peak;
+  const W = 1080, H = 520;
+  const M = { top: 30, right: 30, bottom: 24, left: 128 };
+  const plotW = W - M.left - M.right;
+  const x = pos => M.left + ((pos - r.start) / (r.end - r.start)) * plotW;
+
+  // cluster + peak highlight bands (full height)
+  el.appendChild(svgEl('rect', { x: x(c.start).toFixed(1), y: M.top, width: (x(c.end)-x(c.start)).toFixed(1), height: H-M.top-M.bottom, fill: '#E69F00', opacity: 0.10 }));
+  el.appendChild(svgEl('rect', { x: x(p.start).toFixed(1), y: M.top, width: Math.max(x(p.end)-x(p.start),2).toFixed(1), height: H-M.top-M.bottom, fill: '#F0E442', opacity: 0.20 }));
+
+  // TSS line
+  const tssX = x(r.tss);
+  el.appendChild(svgEl('line', { x1: tssX.toFixed(1), x2: tssX.toFixed(1), y1: M.top, y2: H-M.bottom, stroke: 'var(--ink-faint)', 'stroke-width': 1, 'stroke-dasharray': '3,3' }));
+  const tssLbl = svgEl('text', { x: tssX+4, y: M.top-10, fill: 'var(--ink-faint)', 'font-size': '10px' }); tssLbl.textContent = 'TSS'; el.appendChild(tssLbl);
+
+  // ruler ticks every 1000bp from region start (rounded)
+  let tickStart = Math.ceil(r.start/1000)*1000;
+  for (let gp = tickStart; gp <= r.end; gp += 1000){
+    const tx = x(gp);
+    el.appendChild(svgEl('line', { x1: tx.toFixed(1), x2: tx.toFixed(1), y1: H-M.bottom, y2: H-M.bottom+4, stroke: 'var(--ink-faint)', 'stroke-width': 1 }));
+    const relBp = gp - r.tss;
+    const lbl = svgEl('text', { x: tx.toFixed(1), y: H-M.bottom+15, 'text-anchor':'middle', fill: 'var(--ink-faint)', 'font-size': '9px' });
+    lbl.textContent = (relBp>=0?'+':'') + relBp;
+    el.appendChild(lbl);
+  }
+  el.appendChild(svgEl('line', { x1: M.left, x2: W-M.right, y1: H-M.bottom, y2: H-M.bottom, stroke: 'var(--line)', 'stroke-width': 1 }));
+
+  // CpG significance mini-track (top band, ~70px tall)
+  const sigTop = M.top, sigH = 60;
+  const maxScore = Math.max(...DATA.combined_score, 0.1);
+  DATA.coords_positions.forEach((cp, i) => {
+    const score = DATA.combined_score[i];
+    const h = Math.max((score/maxScore) * sigH, score>0 ? 1.5 : 0);
+    const cx = x(cp.start);
+    const bar = svgEl('rect', { x: (cx-0.9).toFixed(1), y: (sigTop+sigH-h).toFixed(1), width: 1.8, height: h.toFixed(1), fill: '#F0E442' });
+    el.appendChild(bar);
+  });
+  const sigLbl = svgEl('text', { x: M.left, y: sigTop-10, fill: 'var(--ink-dim)', 'font-size': '10.5px', 'font-weight':600 });
+  sigLbl.textContent = lang_track_label('sig');
+  el.appendChild(sigLbl);
+
+  // TF lanes
+  const laneTop = sigTop + sigH + 26;
+  const laneH = 24, laneGap = 8;
+  DATA.confirmed_tfs.forEach((f, i) => {
+    const y = laneTop + i*(laneH+laneGap);
+    const lx1 = x(f.start), lx2 = x(f.end);
+    const bar = svgEl('rect', { x: lx1.toFixed(1), y: (y+4).toFixed(1), width: Math.max(lx2-lx1,2).toFixed(1), height: 12, rx: 3, fill: CATCOLOR[f.category] });
+    bar.style.cursor = 'pointer';
+    bar.addEventListener('mousemove', (ev) => showTip(ev, f));
+    bar.addEventListener('mouseleave', hideTip);
+    el.appendChild(bar);
+    const lbl = svgEl('text', { x: M.left-4, y: (y+13).toFixed(1), 'text-anchor':'end', fill: 'var(--ink-dim)', 'font-size':'10px', 'font-family':"'IBM Plex Mono',monospace" });
+    lbl.textContent = f.factor;
+    el.appendChild(lbl);
+  });
+
+  // not-in-K562 lane (dashed outline)
+  const nkY = laneTop + DATA.confirmed_tfs.length*(laneH+laneGap) + 6;
+  DATA.not_k562_tfs.forEach((f, i) => {
+    const y = nkY + i*(laneH+laneGap);
+    const lx1 = x(f.start), lx2 = x(f.end);
+    const bar = svgEl('rect', { x: lx1.toFixed(1), y: (y+4).toFixed(1), width: Math.max(lx2-lx1,2).toFixed(1), height: 12, rx: 3, fill: 'none', stroke: 'var(--ink-faint)', 'stroke-width':1.5, 'stroke-dasharray':'3,2' });
+    bar.style.cursor = 'pointer';
+    bar.addEventListener('mousemove', (ev) => showTip(ev, f));
+    bar.addEventListener('mouseleave', hideTip);
+    el.appendChild(bar);
+    const lbl = svgEl('text', { x: M.left-4, y: (y+13).toFixed(1), 'text-anchor':'end', fill: 'var(--ink-faint)', 'font-size':'10px', 'font-family':"'IBM Plex Mono',monospace" });
+    lbl.textContent = f.factor + ' †';
+    el.appendChild(lbl);
+  });
+
+  function showTip(ev, f){
+    const lang = document.documentElement.getAttribute('lang') || 'ru';
+    const dict = I18N[lang];
+    const note = lang_note(f, dict);
+    const exps = f.k562_exps !== undefined ? (f.k562_exps + ' ' + dict['th-exps']) : (f.cell_line || '');
+    tip.innerHTML = '<strong>' + f.factor + '</strong><br>' + fmtInt(f.start) + '–' + fmtInt(f.end) + ' · score ' + f.score + '<br>' + exps + '<br><span style="color:var(--ink-faint)">' + note + '</span>';
+    const box = el.getBoundingClientRect();
+    const px = (ev.clientX - box.left) / box.width * el.viewBox.baseVal.width;
+    const py = (ev.clientY - box.top) / box.height * el.viewBox.baseVal.height;
+    tip.style.left = Math.min(px+10, box.width-250) + 'px';
+    tip.style.top = Math.max(py-10, 0) + 'px';
+    tip.style.opacity = '1';
+  }
+  function hideTip(){ tip.style.opacity = '0'; }
+
+  // legend
+  const legendEl = document.getElementById('trackLegend');
+  legendEl.innerHTML = '';
+  CAT_ORDER.forEach(cat => {
+    const span = document.createElement('span');
+    span.innerHTML = '<span class="sw" style="background:' + CATCOLOR[cat] + '"></span>' + t['cat-'+cat];
+    legendEl.appendChild(span);
+  });
+  const dnmt = document.createElement('span');
+  dnmt.innerHTML = '<span class="sw" style="border:1.5px dashed var(--ink-faint); background:transparent;"></span>' + t['th-cellline'] + ' ≠ K562';
+  legendEl.appendChild(dnmt);
+}
+
+function lang_track_label(key){
+  const lang = document.documentElement.getAttribute('lang') || 'ru';
+  return lang === 'ru' ? 'Значимость CpG (LOW vs HIGH)' : 'CpG significance (LOW vs HIGH)';
+}
+
+const savedLang = (function(){ try{ return localStorage.getItem('epicme_lang'); }catch(e){ return null; } })();
+applyLang(savedLang === 'en' ? 'en' : 'ru');
+</script>
+
+<script src="assets/epicme-chat.js" defer></script>
+</body>
+</html>
