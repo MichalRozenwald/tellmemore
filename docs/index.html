@@ -129,6 +129,24 @@
 
   .draft-note{ font-size:12.5px; color:var(--ink-faint); margin-top:8px; }
 
+  /* Comparison cards in #beyond are links too — same affordance as
+     .page-card so it is obvious they lead somewhere, not just describe. */
+  .diff-card{
+    display:flex; flex-direction:column; text-decoration:none;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .diff-card h3{ color:var(--ink); }
+  .diff-card ul{ flex:1; }
+  .diff-card:hover, .diff-card:focus-visible{
+    border-color:var(--blue); transform:translateY(-2px);
+  }
+  .diff-card .go{
+    margin-top:14px; font-size:14px; color:var(--blue); font-weight:700;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .diff-card .go .arrow{ transition:transform .15s ease; }
+  .diff-card:hover .go .arrow{ transform:translateX(3px); }
+
   /* ---------- Factors / mechanisms section ----------
      No new hues: only --blue / --orange / --yellow from the shared
      palette, and every colored element is also distinguished by
@@ -340,7 +358,7 @@
   </section>
 
   <section id="beyond">
-    <div class="kicker-shaped learn"><span class="shape"></span><span class="lbl" data-i18n="beyond-kicker">Learn — за пределами CD55</span></div>
+    <div class="kicker-shaped learn"><span class="shape"></span><span class="lbl" data-i18n="beyond-kicker">Additionally, about methylation — за пределами CD55</span></div>
     <h2 data-i18n="beyond-h2">Две заметки: одна про память, одна про поколения</h2>
     <p class="lede" data-i18n="beyond-lede">Всё выше — про один ген в донорских T-клетках. Эти две страницы берут ту же метку, CpG-метилирование, и спрашивают, что она делает за пределами моей темы. Обе — обзоры чужой литературы с оригинальными статьями и оговорками, а не мои данные.</p>
 
@@ -361,22 +379,24 @@
 
     <h3 class="sub-h" data-i18n="beyond-diff-h3">В чём разница между ними</h3>
     <div class="compare">
-      <div class="card">
+      <a class="card diff-card" href="methylation-and-memory.html">
         <h3 data-i18n="beyond-c1-h">Память — ось «одна жизнь»</h3>
         <ul>
           <li data-i18n="beyond-c1-a">Соматические клетки: нейрон, T-клетка, клетки HPA-оси.</li>
           <li data-i18n="beyond-c1-b">Вопрос: сколько держится метка и почему одни стираются, а другие запираются.</li>
           <li data-i18n="beyond-c1-c">Связь с моей работой прямая: донорские T-клетки уже несут этот метилом до редактирования.</li>
         </ul>
-      </div>
-      <div class="card">
+        <span class="go"><span data-i18n="beyond-c1-go">Открыть «One Mark, Three Memories»</span> <span class="arrow">→</span></span>
+      </a>
+      <a class="card diff-card" href="methylation-generational-trauma.html">
         <h3 data-i18n="beyond-c2-h">Травма — ось «поколения»</h3>
         <ul>
           <li data-i18n="beyond-c2-a">Зародышевая линия: сперматозоид, ооцит, F0 → F1 → F2 → F3.</li>
           <li data-i18n="beyond-c2-b">Вопрос: считается ли найденное наследованием или это просто прямое воздействие на ещё одно поколение.</li>
           <li data-i18n="beyond-c2-c">Связь с моей работой косвенная: вся эта литература корреляционна, а редактирование эпигенома — недостающий инструмент записи.</li>
         </ul>
-      </div>
+        <span class="go"><span data-i18n="beyond-c2-go">Открыть «Inherited Marks»</span> <span class="arrow">→</span></span>
+      </a>
     </div>
 
     <div class="disclaimer" data-i18n="beyond-overlap"><strong>Где они пересекаются:</strong> FKBP5 и NR3C1 встречаются на обеих страницах, но отвечают на разные вопросы. На странице про память — осталась ли метка у самого человека, пережившего стресс. На странице про травму — появилась ли она у его ребёнка. Это единственное место, где темы соприкасаются, и оно помечено на обеих страницах перекрёстными ссылками.</div>
@@ -405,7 +425,7 @@ const I18N = {
     'title': 'epicme.bio — эпигеном · цитозин · метилирование',
     'brand-sub': 'эпигеном · цитозин · метилирование',
     'nav-home': 'Главная',
-    'beyond-kicker': 'Learn — за пределами CD55',
+    'beyond-kicker': 'Additionally, about methylation — за пределами CD55',
     'beyond-h2': 'Две заметки: одна про память, одна про поколения',
     'beyond-lede': 'Всё выше — про один ген в донорских T-клетках. Эти две страницы берут ту же метку, CpG-метилирование, и спрашивают, что она делает за пределами моей темы. Обе — обзоры чужой литературы с оригинальными статьями и оговорками, а не мои данные.',
     'beyond-tag1': 'Заметки · внутри одной жизни',
@@ -416,10 +436,12 @@ const I18N = {
     'beyond-go2': 'Читать',
     'beyond-diff-h3': 'В чём разница между ними',
     'beyond-c1-h': 'Память — ось «одна жизнь»',
+    'beyond-c1-go': 'Открыть «One Mark, Three Memories»',
     'beyond-c1-a': 'Соматические клетки: нейрон, T-клетка, клетки HPA-оси.',
     'beyond-c1-b': 'Вопрос: сколько держится метка и почему одни стираются, а другие запираются.',
     'beyond-c1-c': 'Связь с моей работой прямая: донорские T-клетки уже несут этот метилом до редактирования.',
     'beyond-c2-h': 'Травма — ось «поколения»',
+    'beyond-c2-go': 'Открыть «Inherited Marks»',
     'beyond-c2-a': 'Зародышевая линия: сперматозоид, ооцит, F0 → F1 → F2 → F3.',
     'beyond-c2-b': 'Вопрос: считается ли найденное наследованием или это просто прямое воздействие на ещё одно поколение.',
     'beyond-c2-c': 'Связь с моей работой косвенная: вся эта литература корреляционна, а редактирование эпигенома — недостающий инструмент записи.',
@@ -490,7 +512,7 @@ const I18N = {
     'title': 'epicme.bio — epigenome · cytosine · methylation',
     'brand-sub': 'epigenome · cytosine · methylation',
     'nav-home': 'Home',
-    'beyond-kicker': 'Learn — beyond CD55',
+    'beyond-kicker': 'Additionally, about methylation — beyond CD55',
     'beyond-h2': 'Two notes: one on memory, one on generations',
     'beyond-lede': 'Everything above is about one gene in donor T cells. These two pages take the same mark, CpG methylation, and ask what it does outside my own topic. Both are reviews of other people\u2019s literature, with the original papers and the caveats — not my data.',
     'beyond-tag1': 'Notes · within one lifetime',
@@ -501,10 +523,12 @@ const I18N = {
     'beyond-go2': 'Read',
     'beyond-diff-h3': 'How they differ',
     'beyond-c1-h': 'Memory — the one-lifetime axis',
+    'beyond-c1-go': 'Open \u201cOne Mark, Three Memories\u201d',
     'beyond-c1-a': 'Somatic cells: neuron, T cell, cells of the HPA axis.',
     'beyond-c1-b': 'The question: how long a mark lasts, and why some are erased while others lock.',
     'beyond-c1-c': 'Directly connected to my work: donor T cells already carry this methylome before I edit anything.',
     'beyond-c2-h': 'Trauma — the across-generations axis',
+    'beyond-c2-go': 'Open \u201cInherited Marks\u201d',
     'beyond-c2-a': 'The germline: sperm, oocyte, F0 → F1 → F2 → F3.',
     'beyond-c2-b': 'The question: whether a finding counts as inheritance, or is simply direct exposure reaching one more generation.',
     'beyond-c2-c': 'Indirectly connected: that whole literature is correlational, and epigenome editing is the missing writing tool.',
