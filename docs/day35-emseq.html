@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">epicme.bio — EM-seq, Day 35 (ортогональная проверка)</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific styles only — palette, typography, nav, footer, cards,
+     tags, buttons and disclaimers all come from assets/theme.css. */
+
+  .hero{ padding:56px 0 28px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--blue); font-weight:600; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--blue-deep); }
+  h1.display{
+    font-size:clamp(30px, 5vw, 44px);
+    font-weight:600; line-height:1.14; letter-spacing:-0.01em;
+    margin:0 0 18px;
+  }
+  h1.display em{ font-style:normal; color:var(--blue); }
+  .hero-sub{ font-size:17px; color:var(--ink-dim); max-width:680px; margin:0 0 20px; }
+
+  .lang-switch{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+  }
+  .lang-switch button{
+    border:none; background:transparent; color:var(--ink-dim);
+    font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+  }
+  .lang-switch button.active{ background:var(--blue); color:#06182A; }
+  .nav-inner{ flex-wrap:wrap; row-gap:10px; }
+  .nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+  .nav-links a{
+    display:inline-flex; align-items:center; padding:10px 18px; border-radius:999px;
+    border:1.5px solid var(--line); background:var(--surface-2); color:var(--ink-dim);
+    font-size:14.5px; font-weight:600; text-decoration:none;
+    transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{
+    border-color:var(--blue); color:var(--ink); background:var(--surface); transform:translateY(-1px);
+  }
+  .nav-links a.active{ background:var(--blue); border-color:var(--blue); color:#06182A; }
+
+  /* ---------- donor banner — this page's one job is to say "same donor,
+     same day, different chemistry", so it earns a standing strip up top ---------- */
+  .donor-banner{
+    display:flex; gap:12px; align-items:flex-start;
+    background:var(--blue-dim); border:1px solid var(--blue-deep);
+    border-radius:var(--radius); padding:14px 18px; font-size:13.8px; color:var(--ink-dim);
+    margin-bottom:8px;
+  }
+  .donor-banner strong{ color:var(--blue); }
+
+  .sub-h{ font-size:17px; margin:32px 0 10px; color:var(--ink); }
+
+  /* ---------- design grid: three conditions, two replicates each ---------- */
+  .design-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin:14px 0; }
+  @media (max-width:760px){ .design-grid{ grid-template-columns:1fr; } }
+  .design-card{
+    background:var(--surface-2); border:2px solid var(--line); border-radius:var(--radius);
+    padding:18px 18px 16px;
+  }
+  .design-card.nt{ border-color:var(--blue-deep); }
+  .design-card.coff{ border-color:var(--orange); }
+  .design-card.zfp{ border-color:var(--yellow); }
+  .design-card h3{ font-size:15.5px; margin:0 0 6px; }
+  .design-card .barcodes{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint); margin-top:8px; }
+
+  /* ---------- results table ---------- */
+  .res-tablewrap{
+    overflow-x:auto; border:1px solid var(--line);
+    border-radius:var(--radius); background:var(--surface); margin:14px 0;
+  }
+  .res-tablewrap table{ border-collapse:collapse; width:100%; min-width:520px; }
+  .res-tablewrap th, .res-tablewrap td{
+    text-align:left; padding:10px 14px; border-bottom:1px solid var(--line);
+    font-size:13.8px; color:var(--ink-dim); vertical-align:top;
+  }
+  .res-tablewrap th{
+    font-family:'Space Grotesk',sans-serif; font-size:12.5px; font-weight:600;
+    color:var(--ink); background:var(--surface-2);
+  }
+  .res-tablewrap tr:last-child td{ border-bottom:none; }
+  .res-tablewrap td strong{ color:var(--ink); font-weight:600; }
+  .res-tablewrap .num{ font-family:'IBM Plex Mono',monospace; }
+
+  /* ---------- charts (plain inline SVG, no external lib — matches the
+     rest of the site's day35/day6VSday35 chart pattern) ---------- */
+  .chart-panel{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 18px 10px; margin:14px 0;
+  }
+  .chart-title{ font-family:'Space Grotesk',sans-serif; font-size:13px; color:var(--ink-dim); margin-bottom:8px; }
+  .chart-panel svg{ width:100%; height:auto; display:block; }
+  .legend{ display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-dim); margin-top:10px; }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend .sw{ width:16px; height:3px; display:inline-block; border-radius:2px; }
+  .legend .sw.dash{ background-image:linear-gradient(90deg, currentColor 60%, transparent 60%); background-size:6px 3px; background-color:transparent !important; }
+  .legend .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+
+  .caveat-inline{ font-size:12.5px; color:var(--ink-faint); margin-top:6px; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="day6.html">Day 6</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day35-emseq.html" class="active" data-i18n="nav-emseq">EM-seq · Day 35</a>
+      <a href="day6VSday35.html">Day 35 vs Day 6</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="upload-user-input.html" data-i18n="nav-upload" class="upload-nav-link">Загрузка данных</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow" data-i18n="eyebrow">Read · ортогональная проверка</div>
+    <h1 class="display" data-i18n="h1">EM-seq на Day 35 — <em>другая химия, тот же донор</em></h1>
+    <p class="hero-sub" data-i18n="hero-sub">Nanopore-данные Day 35 (страница «Day 35») — прямые одномолекульные вызовы метилирования. Эта страница — независимая проверка того же донора и той же временной точки другим методом: EM-seq (ферментативная, не-бисульфитная конвертация + короткое прочтение), без вызова с одной молекулы, зато с очень глубоким покрытием на ампликон.</p>
+
+    <div class="donor-banner">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" style="margin-top:1px; flex-shrink:0;"><circle cx="8" cy="8" r="6.5" stroke="#56B4E9" stroke-width="1.3"/><path d="M8 5V8.3L10 10" stroke="#56B4E9" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span data-i18n="donor-banner"><strong>Тот же донор, тот же день.</strong> Оба набора данных — Nanopore на странице «Day 35» и EM-seq здесь — сделаны на одном и том же доноре, 35 дней после электропорации. Разница между ними — это метод измерения, а не биология.</span>
+    </div>
+  </section>
+
+  <section id="design" style="padding-top:0;">
+    <h2 data-i18n="design-h2">Дизайн эксперимента</h2>
+    <p class="lede" data-i18n="design-lede">Три условия, по два независимых прогона (реплики/баркода) на условие — видно на IGV-скриншоте с покрытием по каждому баркоду.</p>
+
+    <div class="design-grid">
+      <div class="design-card nt">
+        <span class="tag blue" data-i18n="nt-tag">Unedited</span>
+        <h3 data-i18n="nt-h3">NT — нетаргетный контроль</h3>
+        <p data-i18n="nt-p" style="font-size:13.5px;">Донор 1B и донор 3B, по 2 прогона каждый.</p>
+        <div class="barcodes">NT_1B.1 / NT_1B.2 / NT_3B.1 / NT_3B.2</div>
+      </div>
+      <div class="design-card coff">
+        <span class="tag amber" data-i18n="coff-tag">CRISPRoff</span>
+        <h3 data-i18n="coff-h3">CRISPRoff — редактированные</h3>
+        <p data-i18n="coff-p" style="font-size:13.5px;">Тот же донор, что и на странице «Day 35», 2 прогона.</p>
+        <div class="barcodes">Coff_1.1 / Coff_1.2</div>
+      </div>
+      <div class="design-card zfp">
+        <span class="tag amber" data-i18n="zfp-tag">ZFPoff</span>
+        <h3 data-i18n="zfp-h3">ZFPoff — вторая система редактирования</h3>
+        <p data-i18n="zfp-p" style="font-size:13.5px;">Донор 1A и донор 3A, по 2 прогона каждый — независимая проверка вторым молчащим инструментом.</p>
+        <div class="barcodes">ZFP_1A.1 / ZFP_1A.2 / ZFP_3A.1 / ZFP_3A.2</div>
+      </div>
+    </div>
+    <p class="caveat-inline" data-i18n="design-note">91 CpG-позиции на ампликоне (33–1450 п.н. внутри прочтения) — подмножество полного окна анализа Nanopore-страниц (137 CpG), не 1:1 совпадающая нумерация. Покрытие на позицию: Coff ≈ 800–840×, ZFPoff ≈ 1800–3300×, NT неравномерно (39–48× у пары 1B против 800–1400× у 3B — см. оговорку ниже).</p>
+  </section>
+
+  <section id="global">
+    <h2 data-i18n="global-h2">Глобальный % метилирования CpG (EM-seq, объединены реплики)</h2>
+    <p class="lede" data-i18n="global-lede">Взвешенное среднее по всем 91 CpG-позициям: сумма метилированных прочтений делённая на сумму метилированных+неметилированных — честная доля, не «наивная» floor-оценка.</p>
+
+    <div class="res-tablewrap">
+      <table>
+        <thead><tr>
+          <th data-i18n="th-cond">Условие</th>
+          <th data-i18n="th-pct">% метилирования CpG</th>
+          <th data-i18n="th-cov">Покрытие/позицию</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="tag blue">NT</span></td><td class="num"><strong>4.9%</strong></td><td class="num">39–1400×</td></tr>
+          <tr><td><span class="tag amber">CRISPRoff</span></td><td class="num"><strong>62.7%</strong></td><td class="num">≈800–840×</td></tr>
+          <tr><td><span class="tag amber">ZFPoff</span></td><td class="num"><strong>66.0%</strong></td><td class="num">≈1800–3300×</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-h" data-i18n="stats-h3">Статистика по каждому CpG (Fisher's exact + BH-коррекция)</h3>
+    <div class="res-tablewrap">
+      <table>
+        <thead><tr><th data-i18n="th-comp">Сравнение</th><th data-i18n="th-sig">Значимо (q&lt;0.05)</th></tr></thead>
+        <tbody>
+          <tr><td>CRISPRoff vs NT</td><td class="num"><strong>91 / 91</strong></td></tr>
+          <tr><td>ZFPoff vs NT</td><td class="num"><strong>90 / 91</strong></td></tr>
+          <tr><td>CRISPRoff vs ZFPoff</td><td class="num">79 / 91</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caveat-inline" data-i18n="stats-note">CpH-метилирование во всех образцах 0.02–0.22% — конверсия чистая, фонового шума нет.</p>
+
+    <div class="chart-panel">
+      <div class="chart-title" data-i18n="chart1-title">% метилирования по позиции CpG на ампликоне (EM-seq, п.н.)</div>
+      <svg id="emseqChart" viewBox="0 0 720 300" preserveAspectRatio="none"></svg>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--orange)"></i>CRISPRoff</span>
+        <span><i class="sw" style="background:var(--yellow)"></i>ZFPoff</span>
+        <span><i class="sw dash" style="color:var(--blue)"></i>NT</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="crossvalidation">
+    <div class="kicker-shaped" style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
+      <span style="width:12px;height:12px;background:var(--blue);border-radius:50%;flex-shrink:0;"></span>
+      <span style="font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;color:var(--blue);" data-i18n="cross-kicker">Read — сверка методов</span>
+    </div>
+    <h2 data-i18n="cross-h2">Сходится ли EM-seq с Nanopore на этом же доноре?</h2>
+    <p class="lede" data-i18n="cross-lede">Данные Day 35 ONT (Unedited/NT и CRISPRoff, порог вызова 0.7) взяты напрямую из <code>epiCode/epiEditData/T_cells/Day_35</code> — тот же донор, тот же день, что и EM-seq выше.</p>
+
+    <div class="res-tablewrap">
+      <table>
+        <thead><tr>
+          <th data-i18n="th-cond">Условие</th>
+          <th data-i18n="th-emseq">EM-seq (честная доля)</th>
+          <th data-i18n="th-ont">ONT Day 35 (наивная floor-оценка)</th>
+          <th data-i18n="th-nmol">N молекул (ONT)</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="tag blue">NT / Unedited</span></td><td class="num"><strong>4.9%</strong></td><td class="num">19.7%</td><td class="num">202 (87 FWD + 115 RVS)</td></tr>
+          <tr><td><span class="tag amber">CRISPRoff</span></td><td class="num"><strong>62.7%</strong></td><td class="num">58.7%</td><td class="num">326 (104 FWD + 222 RVS)</td></tr>
+          <tr><td><span class="tag blue">Δ (CRISPRoff − NT)</span></td><td class="num"><strong>+57.8 п.п.</strong></td><td class="num">+39.0 п.п.</td><td class="num">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-h" data-i18n="cross-read-h3">Как читать это расхождение</h3>
+    <p data-i18n="cross-read-p1"><strong>CRISPRoff сходится хорошо:</strong> 62.7% (EM-seq, честная доля метилированных среди всех прочтений) против 58.7% (ONT, наивная оценка) — две независимые химии (ферментативная конверсия + короткое прочтение против прямого одномолекульного вызова Nanopore) в пределах ~4 процентных пунктов друг от друга. Это сильная ортогональная проверка того, что CRISPRoff действительно откладывает метилирование на этом окне у этого донора на 35-й день.</p>
+    <p data-i18n="cross-read-p2"><strong>NT/Unedited расходится сильно:</strong> 4.9% (EM-seq) против 19.7% (ONT) — на первый взгляд похоже на проблему. Но у ONT-массива в имени файла стоит <code>filterMode10_NoFullyUnmeth</code> — из него уже <strong>исключены полностью-неметилированные молекулы</strong> ещё до подсчёта наивной доли (<code>nansum(a)/a.size</code>). Для NT-условия, где истинное метилирование действительно низкое, этот фильтр выбрасывает подавляющее большинство молекул и оставляет смещённый вверх остаток — именно поэтому и разница CRISPRoff−NT в ONT (+39.0) меньше, чем в EM-seq (+57.8): не потому что эффект CRISPRoff слабее, а потому что база NT в ONT завышена фильтром.</p>
+    <div class="disclaimer" data-i18n="cross-disclaimer"><strong>Открытый вопрос:</strong> чтобы получить настоящее прямое сравнение, нужен либо ONT-массив без фильтра <code>NoFullyUnmeth</code> для NT, либо явный пересчёт «доли среди вызванных» вместо floor-оценки. Пока это не сделано — сравнивайте CRISPRoff-к-CRISPRoff между методами, а не абсолютные NT-числа.</div>
+
+    <div class="chart-panel">
+      <div class="chart-title" data-i18n="chart2-title">ONT Day 35, наивная % метилирования по индексу CpG (0.7, с фильтром NoFullyUnmeth)</div>
+      <svg id="ontChart" viewBox="0 0 720 300" preserveAspectRatio="none"></svg>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--orange)"></i>CRISPRoff</span>
+        <span><i class="sw dash" style="color:var(--blue)"></i>NT</span>
+      </div>
+    </div>
+    <p class="caveat-inline" data-i18n="chart2-note">Обе кривые растут на первых ~20 и последних ~15 CpG-индексах независимо от условия — похоже на фон вне зоны прямого действия CRISPRoff/ZFPoff, тот же паттерн виден и в EM-seq-профиле (первая позиция ампликона тоже почти всегда метилирована). Индексация CpG в ONT-окне (137, T2T-CHM13v2.0) и локальная нумерация позиций в EM-seq-ампликоне (91) не выровнены геномными координатами напрямую — сопоставление 1:1 не сделано, это качественное наблюдение, а не количественная проверка позиции.</p>
+  </section>
+
+  <section id="deeper">
+    <h2 data-i18n="deeper-h2">Ещё четыре сравнения EM-seq и ONT</h2>
+    <p class="lede" data-i18n="deeper-lede">Помимо глобального итога, ниже — то же самое NT/CRISPRoff сравнение под другими углами: своя статистика значимости для ONT, форма распределения эффекта, грубая проверка формы профиля без привязки к координатам, и честный отчёт о попытке выровнять профили по позиции.</p>
+
+    <h3 class="sub-h" data-i18n="ont-sig-h3">1. Своя статистика значимости для ONT (наивная)</h3>
+    <p data-i18n="ont-sig-p">Тот же тест — Fisher's exact + BH — применённый к ONT-массивам напрямую: «метилировано» = число 1 в позиции, «не метилировано» = всё остальное (включая NaN — то есть неопределённые и отфильтрованные молекулы, не только честные 0). Это тот же наивный floor-подход, что и в глобальном итоге, только по каждому CpG отдельно.</p>
+    <div class="res-tablewrap">
+      <table>
+        <thead><tr><th data-i18n="th-method">Метод</th><th data-i18n="th-comp">Сравнение</th><th data-i18n="th-sig">Значимо (q&lt;0.05)</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag amber">EM-seq</span></td><td>CRISPRoff vs NT</td><td class="num"><strong>91 / 91</strong></td></tr>
+          <tr><td><span class="tag blue">ONT (наивно)</span></td><td>CRISPRoff vs NT</td><td class="num"><strong>118 / 137</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caveat-inline" data-i18n="ont-sig-note">Числа не строго сопоставимы: разное общее число CpG (91 против 137) и разное определение «не метилировано» — у EM-seq это честный явный 0, у ONT это NaN, куда попадают и неопределённые вызовы, и отфильтрованные NoFullyUnmeth-молекулы. Но оба метода сходятся в главном: у подавляющего большинства CpG на этом окне CRISPRoff статистически отличим от NT.</p>
+
+    <h3 class="sub-h" data-i18n="delta-dist-h3">2. Форма распределения эффекта Δ(CRISPRoff − NT)</h3>
+    <p data-i18n="delta-dist-p">Не только средний эффект, а его разброс по 91/137 позициям — совпадает ли форма распределения, а не только итоговое число.</p>
+    <div class="res-tablewrap">
+      <table>
+        <thead><tr><th data-i18n="th-method">Метод</th><th data-i18n="th-mean">Среднее</th><th data-i18n="th-median">Медиана</th><th data-i18n="th-iqr">IQR (25–75%)</th><th data-i18n="th-range">Мин…Макс</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag amber">EM-seq</span></td><td class="num"><strong>+58.3 п.п.</strong></td><td class="num">+58.5</td><td class="num">+41.9…+82.8</td><td class="num">−3.6…+96.6</td></tr>
+          <tr><td><span class="tag blue">ONT (наивно)</span></td><td class="num"><strong>+39.0 п.п.</strong></td><td class="num">+42.7</td><td class="num">+18.7…+57.8</td><td class="num">−9.9…+85.4</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caveat-inline" data-i18n="delta-dist-note">Оба распределения сдвинуты далеко вправо от нуля и имеют похожий размах (~90–100 п.п. от минимума до максимума) — качественно одна и та же картина: почти на каждом CpG CRISPRoff поднимает метилирование, с широким разбросом по величине эффекта. Абсолютный сдвиг у ONT ниже во всём распределении — той же самой инфляции NT-базы фильтром NoFullyUnmeth, что и в глобальном итоге.</p>
+
+    <h3 class="sub-h" data-i18n="tercile-h3">3. Грубая проверка формы профиля — по третям, без привязки к координатам</h3>
+    <p data-i18n="tercile-p">Раз точное сопоставление CpG-позиций между методами не сделано, можно сравнить хотя бы форму: разбить каждый профиль на три равные по числу CpG части (первая/средняя/последняя треть по порядку) и посмотреть среднее метилирование в каждой.</p>
+    <div class="res-tablewrap">
+      <table>
+        <thead><tr><th data-i18n="th-cond">Условие</th><th data-i18n="th-t1">1-я треть</th><th data-i18n="th-t2">средняя треть</th><th data-i18n="th-t3">3-я треть</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag blue">EM-seq · NT</span></td><td class="num">12.9%</td><td class="num">0.3%</td><td class="num">0.2%</td></tr>
+          <tr><td><span class="tag amber">EM-seq · CRISPRoff</span></td><td class="num">61.5%</td><td class="num">67.3%</td><td class="num">59.4%</td></tr>
+          <tr><td><span class="tag amber">EM-seq · ZFPoff</span></td><td class="num">55.0%</td><td class="num">73.0%</td><td class="num">72.5%</td></tr>
+          <tr><td><span class="tag blue">ONT · NT</span></td><td class="num">44.2%</td><td class="num">2.0%</td><td class="num">13.4%</td></tr>
+          <tr><td><span class="tag amber">ONT · CRISPRoff</span></td><td class="num">66.1%</td><td class="num">61.3%</td><td class="num">48.9%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p data-i18n="tercile-p2"><strong>Совпадает:</strong> у NT в обоих методах середина профиля — почти пустая (0.3% и 2.0%), а первая треть заметно выше (12.9% и 44.2%) — то же качественное «высокий край, пустая середина», что видно и на графиках выше.</p>
+    <p data-i18n="tercile-p3"><strong>Не совпадает:</strong> последняя треть NT — у EM-seq почти ноль (0.2%), у ONT заметно выше (13.4%). У CRISPRoff EM-seq держится ровно по всем третям (61–67%), а ONT спадает к концу (66%→49%). Это ожидаемо: без сопоставления координат «первая треть» в 91-позиционном ампликоне EM-seq и «первая треть» в 137-позиционном окне ONT — не обязательно один и тот же участок промотора.</p>
+
+    <h3 class="sub-h" data-i18n="align-h3">4. Попытка выровнять профили по относительной позиции — и почему она не сработала</h3>
+    <p data-i18n="align-p1">Самый прямой способ проверить совпадение формы — интерполировать оба профиля Δ(CRISPRoff−NT) на общую ось «относительная позиция в ампликоне, 0–100%» (позиция EM-seq делённая на длину ампликона, индекс ONT делённый на 137) и посчитать корреляцию.</p>
+    <div class="res-tablewrap">
+      <table>
+        <thead><tr><th data-i18n="th-metric">Метрика</th><th data-i18n="th-value">Значение</th></tr></thead>
+        <tbody>
+          <tr><td>Pearson r</td><td class="num">−0.008 (p = 0.94)</td></tr>
+          <tr><td>Spearman ρ</td><td class="num">−0.123 (p = 0.24)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="disclaimer" data-i18n="align-disclaimer"><strong>Честный отрицательный результат:</strong> корреляция практически нулевая и статистически не значима. Это не значит, что методы не совпадают — это значит, что «относительная позиция в окне» — плохая замена настоящим геномным координатам. EM-seq-ампликон и 137-CpG окно ONT почти наверняка покрывают промотор CD55 неодинаково (разные границы, возможно разная ориентация нумерации), так что деление на длину не выравнивает одни и те же CpG. Вывод: без явного геномного координатного сопоставления (T2T-CHM13v2.0 позиции для обоих наборов) per-CpG корреляцию доверять нельзя — это остаётся открытой задачей, а не выполненной проверкой.</div>
+
+    <div class="chart-panel">
+      <div class="chart-title" data-i18n="chart3-title">Δ(CRISPRoff−NT) по относительной позиции — EM-seq (интерполировано на позиции ONT) vs ONT наивный</div>
+      <svg id="scatterChart" viewBox="0 0 720 320" preserveAspectRatio="none"></svg>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--orange)"></span><span data-i18n="scatter-legend">каждая точка — одна CpG-позиция ONT (ось X) против интерполированного EM-seq (ось Y)</span></span>
+      </div>
+    </div>
+    <p class="caveat-inline" data-i18n="chart3-note">Облако точек без выраженного тренда — визуальное подтверждение того же нулевого результата: точки не выстраиваются по диагонали, как было бы при настоящем совпадении позиций.</p>
+  </section>
+
+  <section id="conclusion">
+    <h2 data-i18n="concl-h2">Что это добавляет к общей картине</h2>
+    <p data-i18n="concl-p1">Основной результат Day 35 — что CRISPRoff молчит CD55 через метилирование промотора — теперь подтверждён вторым, полностью независимым способом измерения (EM-seq, без Nanopore) на том же самом доноре и дне. Это не просто ещё один прогон того же пайплайна — другая химия конверсии, другая платформа секвенирования, другой вызов метилирования.</p>
+    <p data-i18n="concl-p2">Как бонус — тот же эксперимент включает ZFPoff (66.0%), вторую систему молчания без сайт-специфичной sgRNA, которая на этом ампликоне выглядит не слабее CRISPRoff, а местами сильнее.</p>
+    <div class="disclaimer" data-i18n="concl-disclaimer"><strong>Честно про статус:</strong> per-CpG сопоставление EM-seq и ONT по геномным координатам ещё не сделано — обе позиции пока сравниваются только по глобальному итогу и общей форме профиля, не по конкретной паре координат. Это следующий шаг, если понадобится точная проверка «тот же ли это CpG».</div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap" data-i18n="footer">
+    epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="day35.html">← Nanopore Day 35</a> · <a href="index.html">← на главную</a>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   Bilingual RU/EN toggle — same pattern as the rest of the site.
+   ============================================================ */
+const I18N = {
+  ru: {
+    'title': 'epicme.bio — EM-seq, Day 35 (ортогональная проверка)',
+    'brand-sub': 'эпигеном · цитозин · метилирование',
+    'nav-home': 'Главная', 'nav-about': 'О проекте', 'nav-k562': 'K562', 'nav-chipseq': 'ChIP-seq',
+    'nav-emseq': 'EM-seq · Day 35', 'nav-upload': 'Загрузка данных',
+    'eyebrow': 'Read · ортогональная проверка',
+    'h1': 'EM-seq на Day 35 — <em>другая химия, тот же донор</em>',
+    'hero-sub': 'Nanopore-данные Day 35 (страница «Day 35») — прямые одномолекульные вызовы метилирования. Эта страница — независимая проверка того же донора и той же временной точки другим методом: EM-seq (ферментативная, не-бисульфитная конвертация + короткое прочтение), без вызова с одной молекулы, зато с очень глубоким покрытием на ампликон.',
+    'donor-banner': '<strong>Тот же донор, тот же день.</strong> Оба набора данных — Nanopore на странице «Day 35» и EM-seq здесь — сделаны на одном и том же доноре, 35 дней после электропорации. Разница между ними — это метод измерения, а не биология.',
+    'design-h2': 'Дизайн эксперимента',
+    'design-lede': 'Три условия, по два независимых прогона (реплики/баркода) на условие — видно на IGV-скриншоте с покрытием по каждому баркоду.',
+    'nt-tag': 'Unedited', 'nt-h3': 'NT — нетаргетный контроль', 'nt-p': 'Донор 1B и донор 3B, по 2 прогона каждый.',
+    'coff-tag': 'CRISPRoff', 'coff-h3': 'CRISPRoff — редактированные', 'coff-p': 'Тот же донор, что и на странице «Day 35», 2 прогона.',
+    'zfp-tag': 'ZFPoff', 'zfp-h3': 'ZFPoff — вторая система редактирования', 'zfp-p': 'Донор 1A и донор 3A, по 2 прогона каждый — независимая проверка вторым молчащим инструментом.',
+    'design-note': '91 CpG-позиции на ампликоне (33–1450 п.н. внутри прочтения) — подмножество полного окна анализа Nanopore-страниц (137 CpG), не 1:1 совпадающая нумерация. Покрытие на позицию: Coff ≈ 800–840×, ZFPoff ≈ 1800–3300×, NT неравномерно (39–48× у пары 1B против 800–1400× у 3B — см. оговорку ниже).',
+    'global-h2': 'Глобальный % метилирования CpG (EM-seq, объединены реплики)',
+    'global-lede': 'Взвешенное среднее по всем 91 CpG-позициям: сумма метилированных прочтений делённая на сумму метилированных+неметилированных — честная доля, не «наивная» floor-оценка.',
+    'th-cond': 'Условие', 'th-pct': '% метилирования CpG', 'th-cov': 'Покрытие/позицию',
+    'stats-h3': 'Статистика по каждому CpG (Fisher\u2019s exact + BH-коррекция)',
+    'th-comp': 'Сравнение', 'th-sig': 'Значимо (q&lt;0.05)',
+    'stats-note': 'CpH-метилирование во всех образцах 0.02–0.22% — конверсия чистая, фонового шума нет.',
+    'chart1-title': '% метилирования по позиции CpG на ампликоне (EM-seq, п.н.)',
+    'cross-kicker': 'Read — сверка методов',
+    'cross-h2': 'Сходится ли EM-seq с Nanopore на этом же доноре?',
+    'cross-lede': 'Данные Day 35 ONT (Unedited/NT и CRISPRoff, порог вызова 0.7) взяты напрямую из <code>epiCode/epiEditData/T_cells/Day_35</code> — тот же донор, тот же день, что и EM-seq выше.',
+    'th-emseq': 'EM-seq (честная доля)', 'th-ont': 'ONT Day 35 (наивная floor-оценка)', 'th-nmol': 'N молекул (ONT)',
+    'cross-read-h3': 'Как читать это расхождение',
+    'cross-read-p1': '<strong>CRISPRoff сходится хорошо:</strong> 62.7% (EM-seq, честная доля метилированных среди всех прочтений) против 58.7% (ONT, наивная оценка) — две независимые химии (ферментативная конверсия + короткое прочтение против прямого одномолекульного вызова Nanopore) в пределах ~4 процентных пунктов друг от друга. Это сильная ортогональная проверка того, что CRISPRoff действительно откладывает метилирование на этом окне у этого донора на 35-й день.',
+    'cross-read-p2': '<strong>NT/Unedited расходится сильно:</strong> 4.9% (EM-seq) против 19.7% (ONT) — на первый взгляд похоже на проблему. Но у ONT-массива в имени файла стоит <code>filterMode10_NoFullyUnmeth</code> — из него уже <strong>исключены полностью-неметилированные молекулы</strong> ещё до подсчёта наивной доли (<code>nansum(a)/a.size</code>). Для NT-условия, где истинное метилирование действительно низкое, этот фильтр выбрасывает подавляющее большинство молекул и оставляет смещённый вверх остаток — именно поэтому и разница CRISPRoff−NT в ONT (+39.0) меньше, чем в EM-seq (+57.8): не потому что эффект CRISPRoff слабее, а потому что база NT в ONT завышена фильтром.',
+    'cross-disclaimer': '<strong>Открытый вопрос:</strong> чтобы получить настоящее прямое сравнение, нужен либо ONT-массив без фильтра <code>NoFullyUnmeth</code> для NT, либо явный пересчёт «доли среди вызванных» вместо floor-оценки. Пока это не сделано — сравнивайте CRISPRoff-к-CRISPRoff между методами, а не абсолютные NT-числа.',
+    'chart2-title': 'ONT Day 35, наивная % метилирования по индексу CpG (0.7, с фильтром NoFullyUnmeth)',
+    'chart2-note': 'Обе кривые растут на первых ~20 и последних ~15 CpG-индексах независимо от условия — похоже на фон вне зоны прямого действия CRISPRoff/ZFPoff, тот же паттерн виден и в EM-seq-профиле (первая позиция ампликона тоже почти всегда метилирована). Индексация CpG в ONT-окне (137, T2T-CHM13v2.0) и локальная нумерация позиций в EM-seq-ампликоне (91) не выровнены геномными координатами напрямую — сопоставление 1:1 не сделано, это качественное наблюдение, а не количественная проверка позиции.',
+    'deeper-h2': 'Ещё четыре сравнения EM-seq и ONT',
+    'deeper-lede': 'Помимо глобального итога, ниже — то же самое NT/CRISPRoff сравнение под другими углами: своя статистика значимости для ONT, форма распределения эффекта, грубая проверка формы профиля без привязки к координатам, и честный отчёт о попытке выровнять профили по позиции.',
+    'ont-sig-h3': '1. Своя статистика значимости для ONT (наивная)',
+    'ont-sig-p': 'Тот же тест — Fisher\u2019s exact + BH — применённый к ONT-массивам напрямую: «метилировано» = число 1 в позиции, «не метилировано» = всё остальное (включая NaN — то есть неопределённые и отфильтрованные молекулы, не только честные 0). Это тот же наивный floor-подход, что и в глобальном итоге, только по каждому CpG отдельно.',
+    'th-method': 'Метод',
+    'ont-sig-note': 'Числа не строго сопоставимы: разное общее число CpG (91 против 137) и разное определение «не метилировано» — у EM-seq это честный явный 0, у ONT это NaN, куда попадают и неопределённые вызовы, и отфильтрованные NoFullyUnmeth-молекулы. Но оба метода сходятся в главном: у подавляющего большинства CpG на этом окне CRISPRoff статистически отличим от NT.',
+    'delta-dist-h3': '2. Форма распределения эффекта Δ(CRISPRoff − NT)',
+    'delta-dist-p': 'Не только средний эффект, а его разброс по 91/137 позициям — совпадает ли форма распределения, а не только итоговое число.',
+    'th-mean': 'Среднее', 'th-median': 'Медиана', 'th-iqr': 'IQR (25–75%)', 'th-range': 'Мин…Макс',
+    'delta-dist-note': 'Оба распределения сдвинуты далеко вправо от нуля и имеют похожий размах (~90–100 п.п. от минимума до максимума) — качественно одна и та же картина: почти на каждом CpG CRISPRoff поднимает метилирование, с широким разбросом по величине эффекта. Абсолютный сдвиг у ONT ниже во всём распределении — той же самой инфляции NT-базы фильтром NoFullyUnmeth, что и в глобальном итоге.',
+    'tercile-h3': '3. Грубая проверка формы профиля — по третям, без привязки к координатам',
+    'tercile-p': 'Раз точное сопоставление CpG-позиций между методами не сделано, можно сравнить хотя бы форму: разбить каждый профиль на три равные по числу CpG части (первая/средняя/последняя треть по порядку) и посмотреть среднее метилирование в каждой.',
+    'th-t1': '1-я треть', 'th-t2': 'средняя треть', 'th-t3': '3-я треть',
+    'tercile-p2': '<strong>Совпадает:</strong> у NT в обоих методах середина профиля — почти пустая (0.3% и 2.0%), а первая треть заметно выше (12.9% и 44.2%) — то же качественное «высокий край, пустая середина», что видно и на графиках выше.',
+    'tercile-p3': '<strong>Не совпадает:</strong> последняя треть NT — у EM-seq почти ноль (0.2%), у ONT заметно выше (13.4%). У CRISPRoff EM-seq держится ровно по всем третям (61–67%), а ONT спадает к концу (66%→49%). Это ожидаемо: без сопоставления координат «первая треть» в 91-позиционном ампликоне EM-seq и «первая треть» в 137-позиционном окне ONT — не обязательно один и тот же участок промотора.',
+    'align-h3': '4. Попытка выровнять профили по относительной позиции — и почему она не сработала',
+    'align-p1': 'Самый прямой способ проверить совпадение формы — интерполировать оба профиля Δ(CRISPRoff−NT) на общую ось «относительная позиция в ампликоне, 0–100%» (позиция EM-seq делённая на длину ампликона, индекс ONT делённый на 137) и посчитать корреляцию.',
+    'th-metric': 'Метрика', 'th-value': 'Значение',
+    'align-disclaimer': '<strong>Честный отрицательный результат:</strong> корреляция практически нулевая и статистически не значима. Это не значит, что методы не совпадают — это значит, что «относительная позиция в окне» — плохая замена настоящим геномным координатам. EM-seq-ампликон и 137-CpG окно ONT почти наверняка покрывают промотор CD55 неодинаково (разные границы, возможно разная ориентация нумерации), так что деление на длину не выравнивает одни и те же CpG. Вывод: без явного геномного координатного сопоставления (T2T-CHM13v2.0 позиции для обоих наборов) per-CpG корреляцию доверять нельзя — это остаётся открытой задачей, а не выполненной проверкой.',
+    'chart3-title': 'Δ(CRISPRoff−NT) по относительной позиции — EM-seq (интерполировано на позиции ONT) vs ONT наивный',
+    'scatter-legend': 'каждая точка — одна CpG-позиция ONT (ось X) против интерполированного EM-seq (ось Y)',
+    'chart3-note': 'Облако точек без выраженного тренда — визуальное подтверждение того же нулевого результата: точки не выстраиваются по диагонали, как было бы при настоящем совпадении позиций.',
+    'concl-h2': 'Что это добавляет к общей картине',
+    'concl-p1': 'Основной результат Day 35 — что CRISPRoff молчит CD55 через метилирование промотора — теперь подтверждён вторым, полностью независимым способом измерения (EM-seq, без Nanopore) на том же самом доноре и дне. Это не просто ещё один прогон того же пайплайна — другая химия конверсии, другая платформа секвенирования, другой вызов метилирования.',
+    'concl-p2': 'Как бонус — тот же эксперимент включает ZFPoff (66.0%), вторую систему молчания без сайт-специфичной sgRNA, которая на этом ампликоне выглядит не слабее CRISPRoff, а местами сильнее.',
+    'concl-disclaimer': '<strong>Честно про статус:</strong> per-CpG сопоставление EM-seq и ONT по геномным координатам ещё не сделано — обе позиции пока сравниваются только по глобальному итогу и общей форме профиля, не по конкретной паре координат. Это следующий шаг, если понадобится точная проверка «тот же ли это CpG».',
+    'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="day35.html">← Nanopore Day 35</a> · <a href="index.html">← на главную</a>'
+  },
+  en: {
+    'title': 'epicme.bio — EM-seq, Day 35 (orthogonal validation)',
+    'brand-sub': 'epigenome · cytosine · methylation',
+    'nav-home': 'Home', 'nav-about': 'About', 'nav-k562': 'K562', 'nav-chipseq': 'ChIP-seq',
+    'nav-emseq': 'EM-seq · Day 35', 'nav-upload': 'Upload data',
+    'eyebrow': 'Read · orthogonal validation',
+    'h1': 'EM-seq at Day 35 — <em>different chemistry, same donor</em>',
+    'hero-sub': 'The Day 35 Nanopore data (the "Day 35" page) are direct single-molecule methylation calls. This page is an independent check of the same donor and timepoint with a different method: EM-seq (enzymatic, non-bisulfite conversion + short-read sequencing) — no single-molecule calling, but very deep per-amplicon coverage.',
+    'donor-banner': '<strong>Same donor, same day.</strong> Both datasets — the Nanopore "Day 35" page and the EM-seq data here — come from the same donor, 35 days after electroporation. The difference between them is the measurement method, not the biology.',
+    'design-h2': 'Experimental design',
+    'design-lede': 'Three conditions, two independent runs (replicates/barcodes) per condition — visible in the IGV screenshot with per-barcode coverage.',
+    'nt-tag': 'Unedited', 'nt-h3': 'NT — non-targeting control', 'nt-p': 'Donor 1B and donor 3B, 2 runs each.',
+    'coff-tag': 'CRISPRoff', 'coff-h3': 'CRISPRoff — edited', 'coff-p': 'Same donor as the "Day 35" page, 2 runs.',
+    'zfp-tag': 'ZFPoff', 'zfp-h3': 'ZFPoff — second editing system', 'zfp-p': 'Donor 1A and donor 3A, 2 runs each — an independent check with a second silencing tool.',
+    'design-note': '91 CpG positions on the amplicon (33–1450 bp within the read) — a subset of the full analysis window used on the Nanopore pages (137 CpG), not a 1:1 matching numbering. Coverage per position: Coff ≈ 800–840×, ZFPoff ≈ 1800–3300×, NT uneven (39–48× for the 1B pair vs 800–1400× for 3B — see the caveat below).',
+    'global-h2': 'Global % CpG methylation (EM-seq, replicates pooled)',
+    'global-lede': 'Weighted average across all 91 CpG positions: methylated reads summed, divided by methylated+unmethylated summed — an honest fraction, not a "naive" floor estimate.',
+    'th-cond': 'Condition', 'th-pct': '% CpG methylation', 'th-cov': 'Coverage/position',
+    'stats-h3': 'Per-CpG statistics (Fisher\u2019s exact + BH correction)',
+    'th-comp': 'Comparison', 'th-sig': 'Significant (q&lt;0.05)',
+    'stats-note': 'CpH methylation in every sample is 0.02–0.22% — clean conversion, no background signal.',
+    'chart1-title': '% methylation by CpG position on the amplicon (EM-seq, bp)',
+    'cross-kicker': 'Read — cross-method check',
+    'cross-h2': 'Does EM-seq agree with Nanopore on the same donor?',
+    'cross-lede': 'Day 35 ONT data (Unedited/NT and CRISPRoff, 0.7 calling threshold) come directly from <code>epiCode/epiEditData/T_cells/Day_35</code> — the same donor, the same day, as the EM-seq data above.',
+    'th-emseq': 'EM-seq (honest fraction)', 'th-ont': 'ONT Day 35 (naive floor estimate)', 'th-nmol': 'N molecules (ONT)',
+    'cross-read-h3': 'How to read this gap',
+    'cross-read-p1': '<strong>CRISPRoff agrees well:</strong> 62.7% (EM-seq, an honest fraction of methylated among all reads) vs 58.7% (ONT, a naive estimate) — two independent chemistries (enzymatic conversion + short reads vs direct single-molecule Nanopore calling) within ~4 percentage points of each other. That is a strong orthogonal confirmation that CRISPRoff is genuinely depositing methylation on this window, in this donor, at day 35.',
+    'cross-read-p2': '<strong>NT/Unedited disagrees a lot:</strong> 4.9% (EM-seq) vs 19.7% (ONT) — at first glance this looks like a problem. But the ONT array\u2019s filename carries <code>filterMode10_NoFullyUnmeth</code> — <strong>fully-unmethylated molecules have already been excluded</strong> before this naive fraction (<code>nansum(a)/a.size</code>) is computed. For the NT condition, where true methylation really is low, this filter throws out the vast majority of molecules and leaves a biased-high remainder — which is also why the CRISPRoff−NT gap looks smaller in ONT (+39.0) than in EM-seq (+57.8): not because CRISPRoff\u2019s effect is weaker, but because the ONT NT baseline is inflated by the filter.',
+    'cross-disclaimer': '<strong>Open question:</strong> a true head-to-head comparison needs either an ONT array without the <code>NoFullyUnmeth</code> filter for NT, or an explicit recomputation of "fraction among called sites" instead of the floor estimate. Until then, compare CRISPRoff-to-CRISPRoff across methods, not the absolute NT numbers.',
+    'chart2-title': 'ONT Day 35, naive % methylation by CpG index (0.7, NoFullyUnmeth filter applied)',
+    'chart2-note': 'Both curves rise at the first ~20 and last ~15 CpG indices regardless of condition — this looks like background outside the direct CRISPRoff/ZFPoff footprint, and the same pattern shows up in the EM-seq profile (the amplicon\u2019s first position is also almost always methylated). CpG indexing in the ONT window (137, T2T-CHM13v2.0) and the local position numbering in the EM-seq amplicon (91) are not aligned by genomic coordinate — no 1:1 mapping has been done, so this is a qualitative observation, not a positional check.',
+    'deeper-h2': 'Four more EM-seq vs ONT comparisons',
+    'deeper-lede': 'Beyond the global total, here is the same NT/CRISPRoff comparison from a few more angles: significance testing done directly on the ONT data, the shape of the effect\u2019s distribution, a coordinate-agnostic shape check, and an honest report of an attempt to align the profiles by position.',
+    'ont-sig-h3': '1. Significance testing on the ONT data itself (naive)',
+    'ont-sig-p': 'The same test — Fisher\u2019s exact + BH — applied directly to the ONT arrays: "methylated" = a 1 at that position, "not methylated" = everything else (including NaN — i.e. uncalled and filtered-out molecules, not just honest 0s). This is the same naive floor approach as the global total, just per CpG.',
+    'th-method': 'Method',
+    'ont-sig-note': 'These numbers aren\u2019t strictly comparable: different total CpG counts (91 vs 137), and a different definition of "not methylated" — for EM-seq that\u2019s an honest explicit 0, for ONT it\u2019s NaN, which lumps together uncalled molecules and ones filtered out by NoFullyUnmeth. But both methods agree on the headline: at the overwhelming majority of CpGs on this window, CRISPRoff is statistically distinguishable from NT.',
+    'delta-dist-h3': '2. Shape of the Δ(CRISPRoff − NT) effect distribution',
+    'delta-dist-p': 'Not just the average effect but its spread across the 91/137 positions — does the shape of the distribution match, not just the headline number.',
+    'th-mean': 'Mean', 'th-median': 'Median', 'th-iqr': 'IQR (25–75%)', 'th-range': 'Min…Max',
+    'delta-dist-note': 'Both distributions sit far to the right of zero and cover a similar range (~90–100 points from minimum to maximum) — qualitatively the same picture: CRISPRoff raises methylation at nearly every CpG, with a wide spread in effect size. The absolute shift is lower across the whole ONT distribution — the same NT-baseline inflation from the NoFullyUnmeth filter as in the global total.',
+    'tercile-h3': '3. A rough shape check by thirds, with no coordinate alignment',
+    'tercile-p': 'Since an exact CpG-position match between methods hasn\u2019t been done, we can at least compare shape: split each profile into three equal-count ordinal thirds (first / middle / last, in order) and look at the average methylation in each.',
+    'th-t1': '1st third', 'th-t2': 'middle third', 'th-t3': '3rd third',
+    'tercile-p2': '<strong>Agrees:</strong> in both methods, NT\u2019s middle is nearly empty (0.3% and 2.0%), and the first third is noticeably higher (12.9% and 44.2%) — the same qualitative "high edge, empty middle" pattern visible on the charts above.',
+    'tercile-p3': '<strong>Disagrees:</strong> NT\u2019s last third — near zero in EM-seq (0.2%), noticeably higher in ONT (13.4%). CRISPRoff stays flat across thirds in EM-seq (61–67%), but tapers off toward the end in ONT (66%→49%). That\u2019s expected: without a coordinate match, the "first third" of EM-seq\u2019s 91-position amplicon and the "first third" of ONT\u2019s 137-position window aren\u2019t necessarily the same stretch of promoter.',
+    'align-h3': '4. Trying to align the profiles by relative position — and why it didn\u2019t work',
+    'align-p1': 'The most direct way to check shape agreement is to interpolate both Δ(CRISPRoff−NT) profiles onto a shared "relative position in the amplicon, 0–100%" axis (EM-seq position divided by amplicon length, ONT index divided by 137) and compute a correlation.',
+    'th-metric': 'Metric', 'th-value': 'Value',
+    'align-disclaimer': '<strong>An honest null result:</strong> the correlation is essentially zero and not statistically significant. That doesn\u2019t mean the methods disagree — it means "relative position within the window" is a poor stand-in for real genomic coordinates. The EM-seq amplicon and the 137-CpG ONT window almost certainly don\u2019t cover the CD55 promoter identically (different boundaries, possibly different numbering direction), so dividing by length doesn\u2019t line up the same CpGs. Bottom line: without an explicit genomic coordinate match (T2T-CHM13v2.0 positions for both datasets), the per-CpG correlation shouldn\u2019t be trusted — this stays an open task, not a completed check.',
+    'chart3-title': 'Δ(CRISPRoff−NT) by relative position — EM-seq (interpolated onto ONT positions) vs ONT naive',
+    'scatter-legend': 'each point is one ONT CpG position (x-axis) against interpolated EM-seq (y-axis)',
+    'chart3-note': 'A cloud with no visible trend — a visual confirmation of the same null result: the points don\u2019t line up along a diagonal the way they would under a genuine positional match.',
+    'concl-h2': 'What this adds to the picture',
+    'concl-p1': 'The core Day 35 finding — that CRISPRoff silences CD55 via promoter methylation — is now confirmed by a second, fully independent measurement method (EM-seq, no Nanopore involved) on the same donor and day. This isn\u2019t just another run of the same pipeline — different conversion chemistry, different sequencing platform, different methylation calling.',
+    'concl-p2': 'As a bonus, the same experiment includes ZFPoff (66.0%), a second silencing system with no site-specific sgRNA, which on this amplicon looks no weaker than CRISPRoff — and in places stronger.',
+    'concl-disclaimer': '<strong>Honest status:</strong> a per-CpG match between EM-seq and ONT by genomic coordinate has not been done yet — both are compared here only by global total and overall profile shape, not by a specific coordinate pair. That is the next step if a precise "is this the same CpG" check is needed.',
+    'footer': 'epicme.bio — an open science project and PhD work by Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. <a href="day35.html">← Nanopore Day 35</a> · <a href="index.html">← back home</a>'
+  }
+};
+
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const dict = I18N[lang];
+    if(!dict || !(key in dict)) return;
+    if(el.tagName === 'TITLE'){ document.title = dict[key]; }
+    else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('#lang-switch button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){ /* ignore */ }
+}
+document.querySelectorAll('#lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+(function(){
+  let saved = 'ru';
+  try{ saved = localStorage.getItem('epicme_lang') || 'ru'; }catch(e){ /* ignore */ }
+  if(saved === 'en') applyLang('en');
+})();
+
+/* ============================================================
+   Data — computed from the uploaded CD55_MISHA_RESULTS_05_13_26.xlsx
+   (EM-seq) and the Day_35 T-cell .npy arrays (ONT, mC 0.7 threshold).
+   No values below are placeholders.
+   ============================================================ */
+const EMSEQ = {"pos": [33, 157, 257, 300, 305, 310, 312, 314, 316, 318, 320, 322, 324, 364, 423, 440, 464, 559, 590, 631, 633, 645, 647, 655, 673, 683, 715, 717, 728, 736, 744, 748, 764, 792, 803, 815, 820, 855, 906, 939, 954, 959, 966, 969, 983, 1017, 1043, 1065, 1094, 1102, 1125, 1130, 1134, 1141, 1149, 1154, 1157, 1165, 1168, 1171, 1173, 1189, 1192, 1194, 1203, 1206, 1208, 1210, 1214, 1218, 1224, 1226, 1229, 1242, 1255, 1286, 1290, 1311, 1314, 1318, 1353, 1367, 1378, 1381, 1407, 1409, 1413, 1422, 1425, 1447, 1450], "coff": [87.08, 57.04, 26.83, 73.7, 67.89, 82.67, 62.0, 72.95, 75.61, 77.93, 80.81, 66.32, 43.54, 82.7, 87.86, 27.57, 67.59, 28.73, 17.41, 60.06, 63.07, 62.13, 74.39, 71.45, 53.78, 46.14, 53.18, 43.68, 84.89, 46.82, 73.56, 51.68, 44.5, 73.81, 66.41, 96.81, 95.6, 53.92, 54.25, 58.68, 82.69, 90.86, 88.16, 84.59, 89.78, 88.99, 62.87, 61.9, 96.1, 83.27, 95.49, 94.33, 94.35, 95.68, 17.2, 17.24, 43.21, 14.61, 21.83, 27.53, 94.71, 95.18, 96.85, 96.92, 85.94, 83.18, 65.29, 91.16, 69.62, 95.46, 34.46, 27.27, 47.96, 14.29, 38.59, 19.47, 35.39, 25.35, 20.21, 51.72, 73.58, 94.17, 70.69, 82.58, 20.99, 38.88, 45.99, 54.75, 41.05, 57.95, 71.41], "nt": [90.65, 29.65, 18.32, 25.26, 20.53, 27.13, 18.71, 20.4, 15.57, 17.96, 21.72, 13.0, 9.12, 24.62, 23.92, 2.14, 4.16, 1.0, 0.12, 0.21, 0.22, 0.21, 0.25, 0.25, 0.21, 0.9, 0.21, 0.13, 0.21, 0.09, 0.17, 0.22, 0.27, 0.09, 0.13, 0.17, 0.18, 0.09, 0.41, 0.14, 0.23, 0.37, 0.09, 0.23, 0.28, 0.13, 0.09, 0.14, 0.27, 0.19, 0.46, 0.14, 0.41, 0.37, 0.09, 0.19, 0.27, 0.37, 1.25, 0.82, 0.14, 0.68, 0.36, 0.36, 0.09, 0.09, 0.32, 0.32, 0.14, 0.19, 0.23, 0.05, 0.09, 0.33, 0.49, 0.09, 0.13, 0.18, 0.13, 0.54, 0.15, 0.14, 0.22, 0.13, 0.13, 0.0, 0.09, 0.35, 0.18, 0.13, 0.18], "zfp": [73.96, 29.79, 23.83, 68.73, 71.62, 62.68, 46.6, 61.32, 65.61, 69.57, 65.49, 54.5, 32.33, 78.98, 64.79, 31.68, 60.71, 23.64, 8.53, 58.96, 49.96, 57.29, 71.22, 67.78, 36.58, 45.68, 58.54, 75.82, 83.17, 51.59, 75.62, 88.26, 61.88, 26.61, 25.68, 90.94, 91.21, 23.25, 61.3, 48.52, 80.68, 92.34, 85.53, 90.48, 80.4, 77.66, 73.25, 79.52, 97.23, 89.59, 92.73, 95.02, 60.87, 54.89, 40.0, 63.69, 52.07, 96.44, 97.92, 97.64, 97.43, 95.27, 98.11, 97.38, 93.87, 96.09, 93.95, 96.78, 89.27, 94.7, 67.51, 32.85, 45.01, 25.31, 71.68, 32.66, 58.87, 53.0, 72.38, 82.24, 90.03, 87.1, 74.31, 68.4, 31.57, 38.45, 46.1, 78.4, 71.69, 83.1, 83.04]};
+
+const ONT = {"idx": Array.from({length:137}, (_,i)=>i+1), "nt": [62.38, 81.19, 78.71, 84.65, 82.18, 90.59, 96.04, 89.6, 81.19, 92.08, 89.6, 89.11, 94.06, 91.58, 83.66, 77.72, 77.72, 83.17, 52.97, 84.16, 33.17, 19.31, 24.75, 7.43, 13.86, 19.8, 24.75, 26.73, 27.72, 23.27, 14.85, 7.92, 22.77, 22.77, 5.94, 6.44, 0.99, 0.0, 1.98, 6.44, 3.96, 1.49, 4.46, 4.95, 0.5, 3.47, 4.95, 3.47, 0.99, 0.99, 0.99, 0.0, 3.47, 2.97, 0.0, 1.98, 1.98, 4.46, 2.48, 4.46, 0.0, 1.49, 3.96, 0.5, 0.99, 2.97, 2.48, 0.0, 3.47, 1.49, 3.47, 2.97, 1.98, 0.5, 2.48, 1.49, 1.49, 0.99, 0.99, 0.5, 3.96, 1.98, 2.97, 0.5, 2.48, 1.49, 0.5, 1.49, 2.48, 0.99, 1.49, 1.98, 3.96, 4.95, 0.99, 0.99, 1.98, 0.99, 2.97, 1.98, 0.99, 1.98, 2.48, 2.97, 1.98, 1.98, 2.48, 1.49, 1.49, 1.49, 5.45, 2.48, 0.5, 5.94, 2.48, 2.97, 3.47, 0.99, 3.47, 1.98, 0.0, 0.5, 3.96, 1.98, 6.44, 3.47, 11.88, 14.36, 4.95, 60.4, 42.08, 51.98, 65.35, 61.88, 61.39, 82.18, 74.75], "coff": [63.19, 84.97, 73.01, 79.75, 84.97, 88.96, 90.18, 87.73, 85.58, 86.2, 81.9, 88.34, 91.41, 89.26, 83.74, 70.55, 67.79, 74.85, 62.27, 80.98, 57.06, 26.99, 67.48, 25.46, 57.98, 58.28, 67.48, 73.93, 79.14, 75.46, 49.39, 31.29, 76.69, 63.19, 26.69, 57.06, 57.98, 18.71, 52.76, 51.23, 60.43, 64.72, 69.63, 44.17, 44.17, 51.84, 44.17, 66.56, 41.1, 66.56, 49.39, 51.53, 58.9, 60.74, 81.29, 79.14, 49.08, 50.61, 50.61, 53.99, 80.67, 77.3, 73.31, 73.31, 73.01, 53.68, 57.98, 77.91, 68.71, 79.75, 70.55, 79.75, 84.66, 22.39, 17.79, 24.85, 27.61, 36.5, 58.59, 70.25, 83.74, 87.42, 86.5, 68.1, 70.55, 70.55, 75.46, 66.56, 74.54, 37.12, 35.28, 46.63, 16.87, 40.8, 16.87, 33.13, 30.37, 23.93, 33.13, 55.83, 71.78, 59.82, 69.63, 29.75, 39.57, 40.49, 45.71, 39.88, 51.84, 59.82, 56.44, 36.81, 30.67, 43.25, 65.03, 18.71, 42.02, 46.93, 38.04, 47.55, 30.06, 46.63, 27.3, 58.59, 53.68, 73.31, 50.61, 72.39, 31.29, 77.91, 60.43, 69.94, 74.23, 66.87, 73.62, 80.67, 71.17]};
+
+/* ---------- minimal vanilla-SVG line chart (no external lib) ---------- */
+function drawLineChart(svgEl, series, xVals, opts){
+  opts = opts || {};
+  const W = 720, H = 300, padL = 40, padR = 14, padT = 14, padB = 30;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const xMin = Math.min(...xVals), xMax = Math.max(...xVals);
+  const x = v => padL + (v - xMin) / (xMax - xMin || 1) * plotW;
+  const y = v => padT + (100 - v) / 100 * plotH;
+
+  let svg = '';
+  // gridlines + y labels
+  [0,25,50,75,100].forEach(v=>{
+    svg += `<line x1="${padL}" y1="${y(v)}" x2="${W-padR}" y2="${y(v)}" stroke="#24352E" stroke-width="1"/>`;
+    svg += `<text x="${padL-8}" y="${y(v)+4}" font-size="10.5" fill="#6E8079" text-anchor="end" font-family="IBM Plex Mono, monospace">${v}%</text>`;
+  });
+  // x labels (min/max only, to avoid clutter)
+  svg += `<text x="${padL}" y="${H-8}" font-size="10.5" fill="#6E8079" text-anchor="start" font-family="IBM Plex Mono, monospace">${xVals[0]}</text>`;
+  svg += `<text x="${W-padR}" y="${H-8}" font-size="10.5" fill="#6E8079" text-anchor="end" font-family="IBM Plex Mono, monospace">${xVals[xVals.length-1]}</text>`;
+
+  series.forEach(s=>{
+    const pts = s.values.map((v,i)=> `${x(xVals[i]).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    const dash = s.dashed ? ' stroke-dasharray="5,4"' : '';
+    svg += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2"${dash} opacity="0.95"/>`;
+  });
+
+  svgEl.innerHTML = svg;
+}
+
+drawLineChart(document.getElementById('emseqChart'), [
+  {values: EMSEQ.nt, color:'#56B4E9', dashed:true},
+  {values: EMSEQ.coff, color:'#E69F00'},
+  {values: EMSEQ.zfp, color:'#F0E442'},
+], EMSEQ.pos);
+
+drawLineChart(document.getElementById('ontChart'), [
+  {values: ONT.nt, color:'#56B4E9', dashed:true},
+  {values: ONT.coff, color:'#E69F00'},
+], ONT.idx);
+
+/* ---------- extra comparison #4: relative-position scatter ----------
+   ont_delta / emseq_delta are Coff-NT deltas; emseq_relpos/ont_relpos
+   are each profile's own position axis rescaled to 0-100. EM-seq delta
+   is linearly interpolated onto each ONT relative position so the two
+   can share one x-axis point-for-point, purely to visualize the
+   correlation reported in the text above (Pearson r=-0.008) — this is
+   NOT a genomic coordinate crosswalk, see the disclaimer on the page. */
+const EXTRA = {
+  ont_delta: [0.81, 3.78, -5.71, -4.9, 2.79, -1.64, -5.86, -1.87, 4.39, -5.88, -7.7, -0.77, -2.65, -2.32, 0.08, -7.17, -9.93, -8.32, 9.3, -3.18, 23.89, 7.69, 42.73, 18.03, 44.11, 38.48, 42.73, 47.19, 51.42, 52.19, 34.54, 23.37, 53.91, 40.42, 20.75, 50.62, 56.99, 18.71, 50.78, 44.79, 56.47, 63.24, 65.18, 39.22, 43.68, 48.38, 39.22, 63.1, 40.11, 65.57, 48.4, 51.53, 55.43, 57.77, 81.29, 77.16, 47.1, 46.16, 48.14, 49.53, 80.67, 75.82, 69.35, 72.82, 72.02, 50.71, 55.5, 77.91, 65.25, 78.27, 67.09, 76.78, 82.68, 21.9, 15.32, 23.36, 26.12, 35.51, 57.6, 69.75, 79.78, 85.44, 83.53, 67.6, 68.08, 69.07, 74.97, 65.08, 72.06, 36.13, 33.79, 44.65, 12.91, 35.85, 15.88, 32.14, 28.39, 22.94, 30.16, 53.85, 70.79, 57.84, 67.16, 26.78, 37.59, 38.51, 43.23, 38.39, 50.36, 58.33, 51.0, 34.33, 30.18, 37.31, 62.56, 15.74, 38.56, 45.94, 34.57, 45.57, 30.06, 46.13, 23.34, 56.61, 47.25, 69.85, 38.73, 58.04, 26.34, 17.52, 18.35, 17.96, 8.89, 4.99, 12.23, -1.5, -3.59],
+  emseq_delta: [-3.57, 27.39, 8.51, 48.44, 47.36, 55.54, 43.29, 52.55, 60.04, 59.97, 59.09, 53.32, 34.42, 58.08, 63.94, 25.43, 63.43, 27.73, 17.29, 59.85, 62.85, 61.92, 74.14, 71.2, 53.57, 45.24, 52.97, 43.55, 84.68, 46.73, 73.39, 51.46, 44.23, 73.72, 66.28, 96.64, 95.42, 53.83, 53.84, 58.54, 82.46, 90.49, 88.07, 84.36, 89.5, 88.86, 62.78, 61.76, 95.83, 83.08, 95.03, 94.19, 93.94, 95.31, 17.11, 17.05, 42.94, 14.24, 20.58, 26.71, 94.57, 94.5, 96.49, 96.56, 85.85, 83.09, 64.97, 90.84, 69.48, 95.27, 34.23, 27.22, 47.87, 13.96, 38.1, 19.38, 35.26, 25.17, 20.08, 51.18, 73.43, 94.03, 70.47, 82.45, 20.86, 38.88, 45.9, 54.4, 40.87, 57.82, 71.23],
+  ont_relpos: Array.from({length:137}, (_,i)=> i/136*100),
+  emseq_relpos: EMSEQ.pos.map(p => (p - EMSEQ.pos[0]) / (EMSEQ.pos[EMSEQ.pos.length-1] - EMSEQ.pos[0]) * 100),
+};
+
+function drawScatter(svgEl, xVals, yVals, color){
+  const W = 720, H = 320, pad = 42;
+  const plotW = W - pad*2, plotH = H - pad*2;
+  const xMin = -10, xMax = 100, yMin = -10, yMax = 100;
+  const x = v => pad + (v - xMin) / (xMax - xMin) * plotW;
+  const y = v => H - pad - (v - yMin) / (yMax - yMin) * plotH;
+  let svg = '';
+  [0,25,50,75,100].forEach(v=>{
+    svg += `<line x1="${x(v)}" y1="${pad}" x2="${x(v)}" y2="${H-pad}" stroke="#24352E" stroke-width="1"/>`;
+    svg += `<line x1="${pad}" y1="${y(v)}" x2="${W-pad}" y2="${y(v)}" stroke="#24352E" stroke-width="1"/>`;
+    svg += `<text x="${x(v)}" y="${H-pad+16}" font-size="10" fill="#6E8079" text-anchor="middle" font-family="IBM Plex Mono, monospace">${v}</text>`;
+    svg += `<text x="${pad-8}" y="${y(v)+3}" font-size="10" fill="#6E8079" text-anchor="end" font-family="IBM Plex Mono, monospace">${v}</text>`;
+  });
+  svg += `<text x="${W/2}" y="${H-6}" font-size="11" fill="#A9B8B0" text-anchor="middle" font-family="Space Grotesk, sans-serif">ONT &#916; (naive), %</text>`;
+  svg += `<text x="14" y="${H/2}" font-size="11" fill="#A9B8B0" text-anchor="middle" font-family="Space Grotesk, sans-serif" transform="rotate(-90 14 ${H/2})">EM-seq &#916; (interp.), %</text>`;
+  for(let i=0;i<xVals.length;i++){
+    svg += `<circle cx="${x(xVals[i]).toFixed(1)}" cy="${y(yVals[i]).toFixed(1)}" r="4" fill="${color}" opacity="0.75"/>`;
+  }
+  svgEl.innerHTML = svg;
+}
+
+// interpolate EM-seq delta onto ONT's relative-position grid for the scatter
+function interp1d(xq, x, y){
+  return xq.map(xv=>{
+    if(xv <= x[0]) return y[0];
+    if(xv >= x[x.length-1]) return y[y.length-1];
+    for(let i=0;i<x.length-1;i++){
+      if(xv>=x[i] && xv<=x[i+1]){
+        const t = (xv - x[i]) / (x[i+1]-x[i]);
+        return y[i] + t*(y[i+1]-y[i]);
+      }
+    }
+    return y[y.length-1];
+  });
+}
+const emseqDeltaInterp = interp1d(EXTRA.ont_relpos, EXTRA.emseq_relpos, EXTRA.emseq_delta);
+drawScatter(document.getElementById('scatterChart'), EXTRA.ont_delta, emseqDeltaInterp, '#E69F00');
+</script>
+<script src="assets/epicme-chat.js" defer></script>
+
+</body>
+</html>
