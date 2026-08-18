@@ -105,6 +105,15 @@
   .legend .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
 
   .caveat-inline{ font-size:12.5px; color:var(--ink-faint); margin-top:6px; }
+
+  /* ---------- IGV screenshot figure ---------- */
+  .igv-figure{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px 14px 12px; margin:18px 0 8px;
+  }
+  .igv-figure img{ width:100%; height:auto; display:block; border-radius:8px; border:1px solid var(--line); }
+  .igv-figure figcaption{ font-size:12.5px; color:var(--ink-faint); margin-top:10px; line-height:1.5; }
+  .igv-figure figcaption strong{ color:var(--ink-dim); font-weight:600; }
 </style>
 </head>
 <body>
@@ -149,29 +158,70 @@
 
   <section id="design" style="padding-top:0;">
     <h2 data-i18n="design-h2">Дизайн эксперимента</h2>
-    <p class="lede" data-i18n="design-lede">Три условия, по два независимых прогона (реплики/баркода) на условие — видно на IGV-скриншоте с покрытием по каждому баркоду.</p>
+    <p class="lede" data-i18n="design-lede">Один донор на все 10 образцов. Три условия, у каждого — биологические и технические реплики (расшифровка ниже) — видно на IGV-скриншоте с покрытием по каждому баркоду.</p>
 
     <div class="design-grid">
       <div class="design-card nt">
         <span class="tag blue" data-i18n="nt-tag">Unedited</span>
         <h3 data-i18n="nt-h3">NT — нетаргетный контроль</h3>
-        <p data-i18n="nt-p" style="font-size:13.5px;">Донор 1B и донор 3B, по 2 прогона каждый.</p>
+        <p data-i18n="nt-p" style="font-size:13.5px;">Биологические реплики 1 и 3, тот же донор — по 2 технических EM-seq прогона на каждую.</p>
         <div class="barcodes">NT_1B.1 / NT_1B.2 / NT_3B.1 / NT_3B.2</div>
       </div>
       <div class="design-card coff">
         <span class="tag amber" data-i18n="coff-tag">CRISPRoff</span>
         <h3 data-i18n="coff-h3">CRISPRoff — редактированные</h3>
-        <p data-i18n="coff-p" style="font-size:13.5px;">Тот же донор, что и на странице «Day 35», 2 прогона.</p>
+        <p data-i18n="coff-p" style="font-size:13.5px;">Биологическая реплика 1, тот же донор, что и на странице «Day 35» — 2 технических прогона.</p>
         <div class="barcodes">Coff_1.1 / Coff_1.2</div>
       </div>
       <div class="design-card zfp">
         <span class="tag amber" data-i18n="zfp-tag">ZFPoff</span>
         <h3 data-i18n="zfp-h3">ZFPoff — вторая система редактирования</h3>
-        <p data-i18n="zfp-p" style="font-size:13.5px;">Донор 1A и донор 3A, по 2 прогона каждый — независимая проверка вторым молчащим инструментом.</p>
+        <p data-i18n="zfp-p" style="font-size:13.5px;">Биологические реплики 1 и 3, тот же донор — по 2 технических прогона на каждую, независимая проверка вторым молчащим инструментом.</p>
         <div class="barcodes">ZFP_1A.1 / ZFP_1A.2 / ZFP_3A.1 / ZFP_3A.2</div>
       </div>
     </div>
     <p class="caveat-inline" data-i18n="design-note">91 CpG-позиции на ампликоне (33–1450 п.н. внутри прочтения) — подмножество полного окна анализа Nanopore-страниц (137 CpG), не 1:1 совпадающая нумерация. Покрытие на позицию: Coff ≈ 800–840×, ZFPoff ≈ 1800–3300×, NT неравномерно (39–48× у пары 1B против 800–1400× у 3B — см. оговорку ниже).</p>
+
+    <figure class="igv-figure">
+      <img src="assets/img/igv-day35-emseq.png" alt="IGV coverage tracks for all 10 EM-seq barcodes over the 1,341 bp CD55 amplicon" loading="lazy">
+      <figcaption data-i18n="igv-caption">IGV, покрытие по всем 10 баркодам вдоль 1,341 п.н. ампликона CD55. Сверху вниз: Coff_1.1/1.2, NT_1B.1/1B.2, NT_3B.1/3B.2, ZFP_1A.1/1A.2, ZFP_3A.1/3A.2 — те же баркоды и та же группировка, что и в карточках выше. Заметен провал покрытия у пары NT_1B (шкала [0–65] и [0–51] против тысяч у остальных) — это тот же перекос покрытия, что отмечен в оговорке выше.</figcaption>
+    </figure>
+
+    <h3 class="sub-h" data-i18n="naming-h3">Что означают цифры и буквы в именах образцов</h3>
+    <div class="donor-banner">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" style="margin-top:1px; flex-shrink:0;"><circle cx="8" cy="8" r="6.5" stroke="#56B4E9" stroke-width="1.3"/><path d="M8 5V8.3L10 10" stroke="#56B4E9" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span data-i18n="naming-donor-note"><strong>Все 10 образцов на этой странице — один и тот же донор.</strong> Ни цифры, ни буквы в именах образцов ниже не обозначают разных доноров — это исключительно биологические и технические реплики внутри одного и того же донора, Day 35.</span>
+    </div>
+    <p data-i18n="naming-p1">Имя образца устроено как <code>ТИП_N[Буква].M</code> — три независимых уровня, каждый со своим смыслом:</p>
+    <ul style="color:var(--ink-dim); font-size:15px; padding-left:20px; margin:0 0 16px;">
+      <li data-i18n="naming-li1"><strong>N (цифра после «_»)</strong> — биологическая реплика. У этого донора на Day 0 клетки разделили на параллельные культуры (биологические реплики 1, 2, 3), и каждую параллельную культуру растили под все три типа воздействия сразу: (i) NT = нетаргетный контроль, фейковая электропорация без действующих реагентов редактирования, (ii) CRISPRoff = KRAB+dCas9+DNMT, (iii) ZFPoff = KRAB+ZFP+DNMT — те же домены молчания, но другой способ прицеливания на ДНК (dCas9+sgRNA против ZFP). В этом EM-seq-прогоне есть данные по репликам 1 и 3 (не по всем трём — реплика 2 в этот раунд не попала).</li>
+      <li data-i18n="naming-li2"><strong>Буква (A или B) после N</strong> — разделение на пробирки. Клетки, извлечённые из одной биологической реплики, развели по двум максимально совпадающим пробиркам. У NT это пробирка «B», у ZFPoff — пробирка «A»; у CRISPRoff в этом наборе буква не проставлена (одна пробирка на реплику).</li>
+      <li data-i18n="naming-li3"><strong>M (цифра после «.»)</strong> — технический EM-seq повтор. Один и тот же биологический материал прогнали через EM-seq-пайплайн дважды (.1 и .2), независимо, чтобы проверить техническую воспроизводимость самого измерения — а не биологии.</li>
+    </ul>
+
+    <div class="res-tablewrap">
+      <table>
+        <thead><tr>
+          <th data-i18n="th-sample">Образец</th>
+          <th data-i18n="th-biorep">Биол. реплика</th>
+          <th data-i18n="th-tube">Пробирка</th>
+          <th data-i18n="th-techrep">Технич. повтор</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="num">Coff_1.1</td><td class="num">1</td><td class="num">—</td><td class="num">1</td></tr>
+          <tr><td class="num">Coff_1.2</td><td class="num">1</td><td class="num">—</td><td class="num">2</td></tr>
+          <tr><td class="num">NT_1B.1</td><td class="num">1</td><td class="num">B</td><td class="num">1</td></tr>
+          <tr><td class="num">NT_1B.2</td><td class="num">1</td><td class="num">B</td><td class="num">2</td></tr>
+          <tr><td class="num">NT_3B.1</td><td class="num">3</td><td class="num">B</td><td class="num">1</td></tr>
+          <tr><td class="num">NT_3B.2</td><td class="num">3</td><td class="num">B</td><td class="num">2</td></tr>
+          <tr><td class="num">ZFP_1A.1</td><td class="num">1</td><td class="num">A</td><td class="num">1</td></tr>
+          <tr><td class="num">ZFP_1A.2</td><td class="num">1</td><td class="num">A</td><td class="num">2</td></tr>
+          <tr><td class="num">ZFP_3A.1</td><td class="num">3</td><td class="num">A</td><td class="num">1</td></tr>
+          <tr><td class="num">ZFP_3A.2</td><td class="num">3</td><td class="num">A</td><td class="num">2</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caveat-inline" data-i18n="naming-note">Асимметрия в таблице честная, не ошибка оформления: у CRISPRoff нет буквы пробирки в этом наборе, а биологическая реплика 2 не представлена ни в одном условии — так решили в лаборатории при подготовке именно этого EM-seq-прогона.</p>
   </section>
 
   <section id="global">
@@ -387,11 +437,20 @@ const I18N = {
     'hero-sub': 'Nanopore-данные Day 35 (страница «Day 35») — прямые одномолекульные вызовы метилирования. Эта страница — независимая проверка того же донора и той же временной точки другим методом: EM-seq (ферментативная, не-бисульфитная конвертация + короткое прочтение), без вызова с одной молекулы, зато с очень глубоким покрытием на ампликон.',
     'donor-banner': '<strong>Тот же донор, тот же день.</strong> Оба набора данных — Nanopore на странице «Day 35» и EM-seq здесь — сделаны на одном и том же доноре, 35 дней после электропорации. Разница между ними — это метод измерения, а не биология.',
     'design-h2': 'Дизайн эксперимента',
-    'design-lede': 'Три условия, по два независимых прогона (реплики/баркода) на условие — видно на IGV-скриншоте с покрытием по каждому баркоду.',
-    'nt-tag': 'Unedited', 'nt-h3': 'NT — нетаргетный контроль', 'nt-p': 'Донор 1B и донор 3B, по 2 прогона каждый.',
-    'coff-tag': 'CRISPRoff', 'coff-h3': 'CRISPRoff — редактированные', 'coff-p': 'Тот же донор, что и на странице «Day 35», 2 прогона.',
-    'zfp-tag': 'ZFPoff', 'zfp-h3': 'ZFPoff — вторая система редактирования', 'zfp-p': 'Донор 1A и донор 3A, по 2 прогона каждый — независимая проверка вторым молчащим инструментом.',
+    'design-lede': 'Один донор на все 10 образцов. Три условия, у каждого — биологические и технические реплики (расшифровка ниже) — видно на IGV-скриншоте с покрытием по каждому баркоду.',
+    'nt-tag': 'Unedited', 'nt-h3': 'NT — нетаргетный контроль', 'nt-p': 'Биологические реплики 1 и 3, тот же донор — по 2 технических EM-seq прогона на каждую.',
+    'coff-tag': 'CRISPRoff', 'coff-h3': 'CRISPRoff — редактированные', 'coff-p': 'Биологическая реплика 1, тот же донор, что и на странице «Day 35» — 2 технических прогона.',
+    'zfp-tag': 'ZFPoff', 'zfp-h3': 'ZFPoff — вторая система редактирования', 'zfp-p': 'Биологические реплики 1 и 3, тот же донор — по 2 технических прогона на каждую, независимая проверка вторым молчащим инструментом.',
     'design-note': '91 CpG-позиции на ампликоне (33–1450 п.н. внутри прочтения) — подмножество полного окна анализа Nanopore-страниц (137 CpG), не 1:1 совпадающая нумерация. Покрытие на позицию: Coff ≈ 800–840×, ZFPoff ≈ 1800–3300×, NT неравномерно (39–48× у пары 1B против 800–1400× у 3B — см. оговорку ниже).',
+    'igv-caption': 'IGV, покрытие по всем 10 баркодам вдоль 1,341 п.н. ампликона CD55. Сверху вниз: Coff_1.1/1.2, NT_1B.1/1B.2, NT_3B.1/3B.2, ZFP_1A.1/1A.2, ZFP_3A.1/3A.2 — те же баркоды и та же группировка, что и в карточках выше. Заметен провал покрытия у пары NT_1B (шкала [0–65] и [0–51] против тысяч у остальных) — это тот же перекос покрытия, что отмечен в оговорке выше.',
+    'naming-h3': 'Что означают цифры и буквы в именах образцов',
+    'naming-donor-note': '<strong>Все 10 образцов на этой странице — один и тот же донор.</strong> Ни цифры, ни буквы в именах образцов ниже не обозначают разных доноров — это исключительно биологические и технические реплики внутри одного и того же донора, Day 35.',
+    'naming-p1': 'Имя образца устроено как <code>ТИП_N[Буква].M</code> — три независимых уровня, каждый со своим смыслом:',
+    'naming-li1': '<strong>N (цифра после «_»)</strong> — биологическая реплика. У этого донора на Day 0 клетки разделили на параллельные культуры (биологические реплики 1, 2, 3), и каждую параллельную культуру растили под все три типа воздействия сразу: (i) NT = нетаргетный контроль, фейковая электропорация без действующих реагентов редактирования, (ii) CRISPRoff = KRAB+dCas9+DNMT, (iii) ZFPoff = KRAB+ZFP+DNMT — те же домены молчания, но другой способ прицеливания на ДНК (dCas9+sgRNA против ZFP). В этом EM-seq-прогоне есть данные по репликам 1 и 3 (не по всем трём — реплика 2 в этот раунд не попала).',
+    'naming-li2': '<strong>Буква (A или B) после N</strong> — разделение на пробирки. Клетки, извлечённые из одной биологической реплики, развели по двум максимально совпадающим пробиркам. У NT это пробирка «B», у ZFPoff — пробирка «A»; у CRISPRoff в этом наборе буква не проставлена (одна пробирка на реплику).',
+    'naming-li3': '<strong>M (цифра после «.»)</strong> — технический EM-seq повтор. Один и тот же биологический материал прогнали через EM-seq-пайплайн дважды (.1 и .2), независимо, чтобы проверить техническую воспроизводимость самого измерения — а не биологии.',
+    'th-sample': 'Образец', 'th-biorep': 'Биол. реплика', 'th-tube': 'Пробирка', 'th-techrep': 'Технич. повтор',
+    'naming-note': 'Асимметрия в таблице честная, не ошибка оформления: у CRISPRoff нет буквы пробирки в этом наборе, а биологическая реплика 2 не представлена ни в одном условии — так решили в лаборатории при подготовке именно этого EM-seq-прогона.',
     'global-h2': 'Глобальный % метилирования CpG (EM-seq, объединены реплики)',
     'global-lede': 'Взвешенное среднее по всем 91 CpG-позициям: сумма метилированных прочтений делённая на сумму метилированных+неметилированных — честная доля, не «наивная» floor-оценка.',
     'th-cond': 'Условие', 'th-pct': '% метилирования CpG', 'th-cov': 'Покрытие/позицию',
@@ -455,11 +514,20 @@ const I18N = {
     'hero-sub': 'The Day 35 Nanopore data (the "Day 35" page) are direct single-molecule methylation calls. This page is an independent check of the same donor and timepoint with a different method: EM-seq (enzymatic, non-bisulfite conversion + short-read sequencing) — no single-molecule calling, but very deep per-amplicon coverage.',
     'donor-banner': '<strong>Same donor, same day.</strong> Both datasets — the Nanopore "Day 35" page and the EM-seq data here — come from the same donor, 35 days after electroporation. The difference between them is the measurement method, not the biology.',
     'design-h2': 'Experimental design',
-    'design-lede': 'Three conditions, two independent runs (replicates/barcodes) per condition — visible in the IGV screenshot with per-barcode coverage.',
-    'nt-tag': 'Unedited', 'nt-h3': 'NT — non-targeting control', 'nt-p': 'Donor 1B and donor 3B, 2 runs each.',
-    'coff-tag': 'CRISPRoff', 'coff-h3': 'CRISPRoff — edited', 'coff-p': 'Same donor as the "Day 35" page, 2 runs.',
-    'zfp-tag': 'ZFPoff', 'zfp-h3': 'ZFPoff — second editing system', 'zfp-p': 'Donor 1A and donor 3A, 2 runs each — an independent check with a second silencing tool.',
+    'design-lede': 'One donor for all 10 samples. Three conditions, each with biological and technical replicates (decoded below) — visible in the IGV screenshot with per-barcode coverage.',
+    'nt-tag': 'Unedited', 'nt-h3': 'NT — non-targeting control', 'nt-p': 'Biological replicates 1 and 3, same donor — 2 technical EM-seq runs each.',
+    'coff-tag': 'CRISPRoff', 'coff-h3': 'CRISPRoff — edited', 'coff-p': 'Biological replicate 1, same donor as the "Day 35" page — 2 technical runs.',
+    'zfp-tag': 'ZFPoff', 'zfp-h3': 'ZFPoff — second editing system', 'zfp-p': 'Biological replicates 1 and 3, same donor — 2 technical runs each, an independent check with a second silencing tool.',
     'design-note': '91 CpG positions on the amplicon (33–1450 bp within the read) — a subset of the full analysis window used on the Nanopore pages (137 CpG), not a 1:1 matching numbering. Coverage per position: Coff ≈ 800–840×, ZFPoff ≈ 1800–3300×, NT uneven (39–48× for the 1B pair vs 800–1400× for 3B — see the caveat below).',
+    'igv-caption': 'IGV, coverage across all 10 EM-seq barcodes along the 1,341 bp CD55 amplicon. Top to bottom: Coff_1.1/1.2, NT_1B.1/1B.2, NT_3B.1/3B.2, ZFP_1A.1/1A.2, ZFP_3A.1/3A.2 — the same barcodes and grouping as the cards above. Notice the coverage gap for the NT_1B pair (scale [0–65] and [0–51] vs thousands for the rest) — the same coverage skew flagged in the caveat above.',
+    'naming-h3': 'What the numbers and letters in the sample names mean',
+    'naming-donor-note': '<strong>All 10 samples on this page are the same donor.</strong> Neither the numbers nor the letters in the sample names below mark different donors — they are purely biological and technical replicates within one and the same donor, Day 35.',
+    'naming-p1': 'A sample name is built as <code>TYPE_N[Letter].M</code> — three independent levels, each with its own meaning:',
+    'naming-li1': '<strong>N (the number after "_")</strong> — biological replicate. At Day 0, this donor\u2019s cells were split into parallel cultures (biological replicates 1, 2, 3), and each parallel culture was grown under all three treatments in parallel: (i) NT = non-targeting control, a mock electroporation with no active editing reagents, (ii) CRISPRoff = KRAB+dCas9+DNMT, (iii) ZFPoff = KRAB+ZFP+DNMT — the same silencing domains, but a different way of targeting the DNA (dCas9+sgRNA vs. ZFP). This EM-seq run has data for replicates 1 and 3 (not all three — replicate 2 wasn\u2019t part of this round).',
+    'naming-li2': '<strong>The letter (A or B) after N</strong> — a tube split. Cells extracted from one biological replicate were divided into two closely matched tubes. For NT that\u2019s tube "B", for ZFPoff it\u2019s tube "A"; for CRISPRoff in this batch no letter was recorded (one tube per replicate).',
+    'naming-li3': '<strong>M (the number after ".")</strong> — technical EM-seq replicate. The same biological material was run through the EM-seq pipeline twice (.1 and .2), independently, to check the technical reproducibility of the measurement itself — not the biology.',
+    'th-sample': 'Sample', 'th-biorep': 'Bio. replicate', 'th-tube': 'Tube', 'th-techrep': 'Technical rep.',
+    'naming-note': 'The asymmetry in the table is honest, not a formatting mistake: CRISPRoff has no tube letter in this batch, and biological replicate 2 isn\u2019t represented in any condition — that\u2019s simply what the lab chose to prepare for this particular EM-seq run.',
     'global-h2': 'Global % CpG methylation (EM-seq, replicates pooled)',
     'global-lede': 'Weighted average across all 91 CpG positions: methylated reads summed, divided by methylated+unmethylated summed — an honest fraction, not a "naive" floor estimate.',
     'th-cond': 'Condition', 'th-pct': '% CpG methylation', 'th-cov': 'Coverage/position',
