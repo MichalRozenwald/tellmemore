@@ -79,11 +79,12 @@
   /* Ella's 4 pages get their own subtle accent so they read as a distinct
      group in the nav, without changing the pill shape/size — same pattern
      as .upload-nav-link above, just a different hue from the shared palette. */
-  .nav-links a.ella-link{
-    border-color:#cbbf3e; color:#cbbf3e;
-  }
+  /* Ella's 4 pages look exactly like every other nav pill at rest — the
+     only difference is the hover/focus outline color (gold instead of
+     the default blue), so the group is discoverable without standing
+     out from the rest of the nav. */
   .nav-links a.ella-link:hover, .nav-links a.ella-link:focus-visible{
-    background:#cbbf3e; border-color:#cbbf3e; color:#2B2600;
+    border-color:#cbbf3e; color:var(--ink); background:var(--surface);
   }
 
   /* ---------- collapsing nav on scroll ----------
