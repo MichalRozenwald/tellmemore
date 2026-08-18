@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">epicme.bio — Research Ideas/Todos</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific styles only — palette, type, nav, footer, .tag, .btn
+     all come from assets/theme.css, reused exactly as on other pages. */
+
+  .hero{ padding:56px 0 20px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--orange); font-weight:600; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--orange); }
+  h1.display{
+    font-size:clamp(30px, 5vw, 44px);
+    font-weight:600; line-height:1.12; letter-spacing:-0.01em;
+    margin:0 0 18px;
+  }
+  h1.display em{ font-style:normal; color:var(--orange); }
+  .hero-sub{ font-size:17px; color:var(--ink-dim); max-width:720px; margin:0 0 20px; }
+
+  .lang-switch{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+  }
+  .lang-switch button{
+    border:none; background:transparent; color:var(--ink-dim);
+    font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+  }
+  .lang-switch button.active{ background:var(--blue); color:#06182A; }
+  .nav-inner{ flex-wrap:wrap; row-gap:10px; }
+  .nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+  .nav-links a{
+    display:inline-flex; align-items:center; padding:10px 18px; border-radius:999px;
+    border:1.5px solid var(--line); background:var(--surface-2); color:var(--ink-dim);
+    font-size:14.5px; font-weight:600; text-decoration:none;
+    transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{
+    border-color:var(--blue); color:var(--ink); background:var(--surface); transform:translateY(-1px);
+  }
+  .nav-links a.active{ background:var(--orange); border-color:var(--orange); color:#2B1900; }
+
+  /* ---- table of contents ---- */
+  .toc{
+    display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 6px;
+  }
+  .toc a{
+    font-size:13.3px; font-weight:600; color:var(--ink-dim);
+    border:1px solid var(--line); background:var(--surface-2); border-radius:999px;
+    padding:7px 14px; text-decoration:none;
+  }
+  .toc a:hover{ color:var(--ink); border-color:var(--blue); }
+
+  /* ---- section framing ---- */
+  .section-head{ margin:0 0 6px; }
+  .section-head h2{ margin:0 0 8px; }
+  .section-sub{ font-size:14.5px; color:var(--ink-dim); max-width:760px; margin:0 0 22px; }
+
+  .recap{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 18px; font-size:13.8px; color:var(--ink-dim); margin:0 0 24px;
+  }
+  .recap strong{ color:var(--ink); }
+  .recap code{
+    background:var(--surface); border:1px solid var(--line); padding:1px 6px; border-radius:5px;
+    font-family:'IBM Plex Mono',monospace; color:var(--blue); font-size:12.6px;
+  }
+
+  /* ---- flagship callout ---- */
+  .flagship{
+    position:relative; background:var(--blue-dim); border:1.5px solid var(--blue-deep);
+    border-radius:var(--radius); padding:22px 24px; margin:0 0 28px;
+  }
+  .flagship .tag{ margin-bottom:10px; }
+  .flagship h3{ margin:0 0 10px; font-size:18px; color:var(--ink); }
+  .flagship p{ margin:0 0 10px; font-size:14.3px; color:var(--ink-dim); }
+  .flagship p:last-child{ margin-bottom:0; }
+
+  /* ---- idea cards ---- */
+  .idea-grid{ display:grid; grid-template-columns:1fr; gap:14px; margin:0 0 30px; }
+  .idea-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px 22px;
+  }
+  .idea-card-top{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:8px;
+  }
+  .idea-card h3{ margin:0; font-size:16.5px; color:var(--ink); }
+  .idea-card .tier-tag{ flex:0 0 auto; }
+  .idea-card .field-label{
+    font-family:'Space Grotesk',sans-serif; font-size:11.5px; font-weight:700;
+    letter-spacing:0.04em; text-transform:uppercase; color:var(--orange); margin:14px 0 4px;
+  }
+  .idea-card .field-label:first-of-type{ margin-top:14px; }
+  .idea-card p{ margin:0; font-size:13.8px; color:var(--ink-dim); line-height:1.55; }
+
+  .tier-legend{
+    display:flex; flex-wrap:wrap; gap:16px; font-size:12.6px; color:var(--ink-faint);
+    margin:0 0 22px; padding:12px 16px; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:9px;
+  }
+  .tier-legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .tier-legend .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .dot-1{ background:var(--blue); }
+  .dot-2{ background:var(--orange); }
+  .dot-3{ background:var(--yellow); }
+
+  .stub-section{
+    border:1.5px dashed var(--line); border-radius:var(--radius); padding:22px 24px;
+    color:var(--ink-faint); font-size:14px; margin:0 0 30px;
+  }
+  .stub-section h2{ color:var(--ink-dim); margin:0 0 8px; }
+  .stub-section ul{ margin:10px 0 0; padding-left:20px; }
+  .stub-section li{ margin-bottom:6px; }
+
+  .back-link{ display:inline-block; margin-top:6px; font-size:13.5px; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="upload-user-input.html" data-i18n="nav-upload">Загрузка данных</a>
+      <a href="research-ideas-todos.html" data-i18n="nav-todos" class="active">Research Ideas/Todos</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow" data-i18n="eyebrow">Working notes · epicme.bio</div>
+    <h1 class="display" data-i18n="h1">Карта <em>Research Ideas/Todos</em></h1>
+    <p class="hero-sub" data-i18n="hero-sub">Живой список направлений, экспериментов и открытых вопросов epiCme — не окончательный план, а рабочая доска, которая растёт по мере прогресса. Первый раздел ниже фокусируется на самом насущном: как экспериментально провалидировать гипотезы о транскрипционных факторах, вышедшие из ChIP-seq анализа K562.</p>
+
+    <nav class="toc" aria-label="Table of contents">
+      <a href="#tf-validation" data-i18n="toc-tf">TF-валидация (ChIP-seq → причинность)</a>
+      <a href="#later" data-i18n="toc-later">Другие направления</a>
+    </nav>
+  </section>
+
+  <section id="tf-validation" style="padding-top:6px;">
+    <div class="section-head">
+      <h2 data-i18n="tf-h2">Валидация TF-гипотез: от корреляции ChIP-seq к причинности</h2>
+      <p class="section-sub" data-i18n="tf-sub">Публичные ENCODE ChIP-seq треки для K562 показали, что CTCF и NRF1 — единственные из подтверждённых в локусе факторов с прямой литературной поддержкой метилчувствительного связывания — сидят прямо внутри значимого дифференциального CpG-кластера (CTCF: CpG #43–86, NRF1: CpG #13–43). Но это данные из несортированной, немодифицированной K562-популяции ENCODE — не из наших CD55-LOW/HIGH фракций. Ниже — конкретные эксперименты, которые превратили бы эту гипотезу в проверяемый, а затем и в доказанный механизм.</p>
+    </div>
+
+    <div class="recap">
+      <strong data-i18n="recap-label">Гипотеза, которую проверяем:</strong>
+      <span data-i18n="recap-text">рост метилирования в CD55-HIGH (ZFPoff/CRISPRoff-индуцированный) физически вытесняет CTCF и/или NRF1 из их сайтов связывания в промоторе <code>chr1:207,318,092–207,324,450</code>, что и приводит к молчанию гена — а не просто коррелирует с ним.</span>
+    </div>
+
+    <div class="tier-legend">
+      <span><span class="dot dot-1"></span><span data-i18n="tier1-label">Tier 1 — можно начать уже сейчас, текущими средствами лаборатории</span></span>
+      <span><span class="dot dot-2"></span><span data-i18n="tier2-label">Tier 2 — нужна новая, но посильная итерация протокола</span></span>
+      <span><span class="dot dot-3"></span><span data-i18n="tier3-label">Tier 3 — амбициозно, но самый большой концептуальный выигрыш</span></span>
+    </div>
+
+    <div class="flagship">
+      <span class="tag blue tier-tag" data-i18n="flag-tag">Флагманский эксперимент · Tier 2</span>
+      <h3 data-i18n="flag-h3">Совместное считывание метилирования и занятости TF на одной молекуле (single-molecule joint readout)</h3>
+      <p data-i18n="flag-p1">Обработать хроматин GpC-метилтрансферазой (M.CviPI) перед пробоподготовкой Nanopore — она метит только доступные, не занятые белком GC-мотивы, оставляя нетронутыми занятые/закрытые участки. В сочетании с уже читаемым нативным CpG-метилированием это даёт на <strong>каждой отдельной молекуле</strong> сразу два ответа: метилирован ли CTCF/NRF1-мотив, и занят ли он белком прямо здесь и сейчас (это техника из семейства dSMF / Fiber-seq, адаптированная под long-read).</p>
+      <p data-i18n="flag-p2">Это единственный из перечисленных экспериментов, который проверяет гипотезу ровно на том уровне, на котором уже устроен весь пайплайн epiCme (per-molecule токенизация вместо усреднённого bulk-сигнала) — и не требует сортировки LOW/HIGH фракций отдельно: гетерогенность видна прямо внутри одной популяции, молекула за молекулой.</p>
+      <p data-i18n="flag-p3">Стоимость входа: один новый ферментативный шаг перед библиотечной подготовкой, протокол уже опубликован для long-read платформ — умеренный, но не тривиальный wet-lab lift.</p>
+    </div>
+
+    <div class="idea-grid">
+
+      <div class="idea-card">
+        <div class="idea-card-top">
+          <h3 data-i18n="i1-h3">CUT&amp;RUN на CTCF и NRF1 в отсортированных CD55-LOW / CD55-HIGH фракциях</h3>
+          <span class="tag blue tier-tag" data-i18n="i1-tier">Tier 1</span>
+        </div>
+        <p class="field-label" data-i18n="fl-tests">Что проверяет</p>
+        <p data-i18n="i1-tests">Прямую версию гипотезы «вытеснения» — но уже в тех самых клетках, где мы видим сигнал метилирования, а не в смешанной ENCODE-популяции. Это главный концептуальный разрыв текущего ChIP-seq анализа, и его закрытие — самый очевидный следующий шаг.</p>
+        <p class="field-label" data-i18n="fl-why">Почему это сильно продвигает</p>
+        <p data-i18n="i1-why">Даёт первую прямую (не выведенную из литературы) причинно-следственную привязку: конкретный CpG-кластер → occupancy конкретного TF → фенотип молчания — на одном и том же локусе, в одном эксперименте.</p>
+        <p class="field-label" data-i18n="fl-feas">Реализуемость</p>
+        <p data-i18n="i1-feas">CUT&amp;RUN работает на low input (~100–500 тыс. клеток) — совместим с уже FACS-отсортированными фракциями без дополнительного культивирования; антитела к CTCF и NRF1 широко валидированы (ENCODE-grade), риск по реагентам низкий.</p>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card-top">
+          <h3 data-i18n="i2-h3">In vitro биохимия: EMSA / biolayer interferometry на метилированных vs неметилированных олигодуплексах CD55-мотивов</h3>
+          <span class="tag blue tier-tag" data-i18n="i2-tier">Tier 1</span>
+        </div>
+        <p class="field-label" data-i18n="fl-tests">Что проверяет</p>
+        <p data-i18n="i2-tests">Чисто биофизический вопрос: падает ли аффинность связывания рекомбинантного CTCF/NRF1 (или их ДНК-связывающих доменов) при CpG-метилировании именно того мотива, который реально присутствует в CD55-промоторе — не обобщённого consensus-мотива из литературы.</p>
+        <p class="field-label" data-i18n="fl-why">Почему это сильно продвигает</p>
+        <p data-i18n="i2-why">Убирает все клеточные confounders (хроматин-контекст, другие факторы, кинетика ремоделинга) — чистый да/нет ответ, чувствителен ли именно этот мотив в этом локусе, без всех остальных слоёв клеточной сложности.</p>
+        <p class="field-label" data-i18n="fl-feas">Реализуемость</p>
+        <p data-i18n="i2-feas">Рекомбинантные белки/домены доступны коммерчески или через сотрудничество; синтез коротких мет./немет. дуплексов — рутинная услуга; можно делать полностью без клеточной культуры, параллельно с остальными экспериментами.</p>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card-top">
+          <h3 data-i18n="i3-h3">ATAC-seq в отсортированных фракциях как быстрый corroborating readout</h3>
+          <span class="tag blue tier-tag" data-i18n="i3-tier">Tier 1</span>
+        </div>
+        <p class="field-label" data-i18n="fl-tests">Что проверяет</p>
+        <p data-i18n="i3-tests">Падает ли доступность хроматина в CpG-кластере #20–132 синхронно с ростом метилирования в CD55-HIGH — независимая от антител линия доказательств, что этот регион теряет функциональную открытость, а не только несёт метку метилирования.</p>
+        <p class="field-label" data-i18n="fl-why">Почему это сильно продвигает</p>
+        <p data-i18n="i3-why">Быстрый и дешёвый способ отличить «метилирование как побочный маркер» от «метилирование как часть реального закрытия хроматина» — минимальный риск, максимальная скорость получения ответа.</p>
+        <p class="field-label" data-i18n="fl-feas">Реализуемость</p>
+        <p data-i18n="i3-feas">Не требует антител или оптимизации; можно делать на тех же отсортированных клетках параллельно с CUT&amp;RUN, используя уже существующий FACS-протокол.</p>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card-top">
+          <h3 data-i18n="i4-h3">Генетическая эпистазия: degron/нокдаун CTCF и NRF1 в K562 перед CRISPRoff/ZFPoff</h3>
+          <span class="tag amber tier-tag" data-i18n="i4-tier">Tier 2</span>
+        </div>
+        <p class="field-label" data-i18n="fl-tests">Что проверяет</p>
+        <p data-i18n="i4-tests">Причинную необходимость: если CTCF/NRF1 — реальные downstream-эффекторы метилирования на пути к молчанию CD55, их острая потеря до редактирования должна изменить фенотип. Полный нокаут CTCF часто летален/плейотропен — предпочтителен обратимый degron (auxin-inducible degron, dTAG) для острого истощения без компенсаторных эффектов.</p>
+        <p class="field-label" data-i18n="fl-why">Почему это сильно продвигает</p>
+        <p data-i18n="i4-why">Генетика — золотой стандарт причинности в биологии; дополняет корреляционный ChIP-seq и ацеллюлярную биохимию третьей, ортогональной линией доказательств.</p>
+        <p class="field-label" data-i18n="fl-feas">Реализуемость</p>
+        <p data-i18n="i4-feas">Degron-линии K562 для CTCF описаны в литературе и потенциально доступны через сотрудничество; требует более длительной настройки клеточной модели, чем Tier 1 эксперименты.</p>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card-top">
+          <h3 data-i18n="i5-h3">Кинетика: ранние временные точки (Day 1–2–4) с параллельным метилированием + CUT&amp;RUN + экспрессией</h3>
+          <span class="tag amber tier-tag" data-i18n="i5-tier">Tier 2</span>
+        </div>
+        <p class="field-label" data-i18n="fl-tests">Что проверяет</p>
+        <p data-i18n="i5-tests">Временной порядок событий: метилирование растёт раньше потери occupancy TF, или наоборот? Обе модели механистически осмысленны — TF-потеря может открывать доступ для de novo DNMT так же легко, как метилирование может вытеснять TF. Разделить их можно только кинетикой.</p>
+        <p class="field-label" data-i18n="fl-why">Почему это сильно продвигает</p>
+        <p data-i18n="i5-why">Сейчас у нас есть только отдельные снимки (Day 16 K562, Day 35 T-клетки) — без временного ряда причинная стрелка в принципе не определима, какие бы корреляции мы ни находили.</p>
+        <p class="field-label" data-i18n="fl-feas">Реализуемость</p>
+        <p data-i18n="i5-feas">Требует повторения тайм-курса редактирования с более частым забором точек — логистически посильно с существующим ZFPoff/CRISPRoff протоколом, но добавляет объём работы кратно числу точек.</p>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card-top">
+          <h3 data-i18n="i6-h3">Motif-resolution эпигенетическое редактирование: таргетировать не весь промотор, а именно CTCF- или NRF1-кластер</h3>
+          <span class="tag amber tier-tag" data-i18n="i6-tier">Tier 3</span>
+        </div>
+        <p class="field-label" data-i18n="fl-tests">Что проверяет</p>
+        <p data-i18n="i6-tests">Достаточность/необходимость именно этого узкого CpG-кластера (а не всего промотора целиком) для молчания CD55 — направить CRISPRoff/ZFPoff/dCas9-TET1 узко, на CpG #43–86 (CTCF) или #13–43 (NRF1) по отдельности, вместо широкого покрытия всего промотора.</p>
+        <p class="field-label" data-i18n="fl-why">Почему это сильно продвигает</p>
+        <p data-i18n="i6-why">Переход от «промотор в целом метилирован → ген молчит» к «именно этот CpG-кластер, связанный с занятостью конкретного TF, функциональный драйвер» — уровень механистической детализации, редко достижимый в epigenome editing литературе, и прямой мост к общему вопросу «как устроена регуляция клеток», не только к CD55.</p>
+        <p class="field-label" data-i18n="fl-feas">Реализуемость</p>
+        <p data-i18n="i6-feas">Требует дизайна нового, более короткого guide/ZFP, нацеленного именно на подрегион — технически посильно на существующей платформе, но это новая итерация дизайна, а не переиспользование текущих реагентов.</p>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card-top">
+          <h3 data-i18n="i7-h3">Парное single-cell считывание: поверхностная экспрессия CD55 + метилирование + (в перспективе) TF occupancy</h3>
+          <span class="tag amber tier-tag" data-i18n="i7-tier">Tier 3</span>
+        </div>
+        <p class="field-label" data-i18n="fl-tests">Что проверяет</p>
+        <p data-i18n="i7-tests">Расширяет уже существующий open todo (прямое парное измерение CD55 surface expression + метилирования, вместо вывода направления из модели сортировки) — добавляя третье измерение: occupancy TF на тех же клетках, если методика из пункта 1 или флагманского эксперимента станет рутинной.</p>
+        <p class="field-label" data-i18n="fl-why">Почему это сильно продвигает</p>
+        <p data-i18n="i7-why">Закрывает последний остающийся разрыв между «мы выводим направление эффекта из модели» и «мы видим все три переменные одновременно на одной клетке» — самый строгий из возможных здесь стандартов доказательства.</p>
+        <p class="field-label" data-i18n="fl-feas">Реализуемость</p>
+        <p data-i18n="i7-feas">Наиболее амбициозный пункт списка — зависит от созревания методик из Tier 1–2 выше; разумно вернуться к нему после первых результатов CUT&amp;RUN и/или флагманского эксперимента.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="later" style="padding-top:0;">
+    <div class="stub-section">
+      <h2 data-i18n="later-h2">Другие направления (заготовки — будут расширены отдельно)</h2>
+      <p data-i18n="later-p">Этот раздел — просто список названий, чтобы ничего не потерялось. Разворачивать их в полноценные подразделы будем по одному, когда до них дойдёт очередь — не пытаемся продумать всё сразу.</p>
+      <ul>
+        <li data-i18n="later-li1">Добавление ZFPoff как третьей модальности редактирования на сайте (нужен three-way group selector в UI)</li>
+        <li data-i18n="later-li2">Мультитаймпоинт / мультидонорный анализ (Day 6, Day 28, Day 35) — честная документация confound между donor и timepoint</li>
+        <li data-i18n="later-li3">Off-target профилирование метилирования по уже существующим глубоким ONT-прогонам</li>
+        <li data-i18n="later-li4">Data upload &amp; analysis service — вопросы к научрукам про аудиторию, реальный бэкенд и приоритизацию</li>
+      </ul>
+    </div>
+    <a class="back-link" href="index.html" data-i18n="back-home">← Вернуться на главную</a>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap" data-i18n="footer">epicme.bio — рабочая доска идей и TODO проекта CD55 multi-omics. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="index.html">← Назад на главную</a></div>
+</footer>
+
+<script>
+const I18N = {
+  ru: {
+    'title':'epicme.bio — Research Ideas/Todos',
+    'brand-sub':'эпигеном · цитозин · метилирование',
+    'nav-home':'Главная','nav-about':'О проекте','nav-k562':'K562','nav-chipseq':'ChIP-seq','nav-upload':'Загрузка данных','nav-todos':'Research Ideas/Todos',
+    'eyebrow':'Working notes · epicme.bio',
+    'h1':'Карта <em>Research Ideas/Todos</em>',
+    'hero-sub':'Живой список направлений, экспериментов и открытых вопросов epiCme — не окончательный план, а рабочая доска, которая растёт по мере прогресса. Первый раздел ниже фокусируется на самом насущном: как экспериментально провалидировать гипотезы о транскрипционных факторах, вышедшие из ChIP-seq анализа K562.',
+    'toc-tf':'TF-валидация (ChIP-seq → причинность)','toc-later':'Другие направления',
+    'tf-h2':'Валидация TF-гипотез: от корреляции ChIP-seq к причинности',
+    'tf-sub':'Публичные ENCODE ChIP-seq треки для K562 показали, что CTCF и NRF1 — единственные из подтверждённых в локусе факторов с прямой литературной поддержкой метилчувствительного связывания — сидят прямо внутри значимого дифференциального CpG-кластера (CTCF: CpG #43–86, NRF1: CpG #13–43). Но это данные из несортированной, немодифицированной K562-популяции ENCODE — не из наших CD55-LOW/HIGH фракций. Ниже — конкретные эксперименты, которые превратили бы эту гипотезу в проверяемый, а затем и в доказанный механизм.',
+    'recap-label':'Гипотеза, которую проверяем:',
+    'recap-text':'рост метилирования в CD55-HIGH (ZFPoff/CRISPRoff-индуцированный) физически вытесняет CTCF и/или NRF1 из их сайтов связывания в промоторе <code>chr1:207,318,092–207,324,450</code>, что и приводит к молчанию гена — а не просто коррелирует с ним.',
+    'tier1-label':'Tier 1 — можно начать уже сейчас, текущими средствами лаборатории',
+    'tier2-label':'Tier 2 — нужна новая, но посильная итерация протокола',
+    'tier3-label':'Tier 3 — амбициозно, но самый большой концептуальный выигрыш',
+    'flag-tag':'Флагманский эксперимент · Tier 2',
+    'flag-h3':'Совместное считывание метилирования и занятости TF на одной молекуле (single-molecule joint readout)',
+    'flag-p1':'Обработать хроматин GpC-метилтрансферазой (M.CviPI) перед пробоподготовкой Nanopore — она метит только доступные, не занятые белком GC-мотивы, оставляя нетронутыми занятые/закрытые участки. В сочетании с уже читаемым нативным CpG-метилированием это даёт на <strong>каждой отдельной молекуле</strong> сразу два ответа: метилирован ли CTCF/NRF1-мотив, и занят ли он белком прямо здесь и сейчас (это техника из семейства dSMF / Fiber-seq, адаптированная под long-read).',
+    'flag-p2':'Это единственный из перечисленных экспериментов, который проверяет гипотезу ровно на том уровне, на котором уже устроен весь пайплайн epiCme (per-molecule токенизация вместо усреднённого bulk-сигнала) — и не требует сортировки LOW/HIGH фракций отдельно: гетерогенность видна прямо внутри одной популяции, молекула за молекулой.',
+    'flag-p3':'Стоимость входа: один новый ферментативный шаг перед библиотечной подготовкой, протокол уже опубликован для long-read платформ — умеренный, но не тривиальный wet-lab lift.',
+    'fl-tests':'Что проверяет','fl-why':'Почему это сильно продвигает','fl-feas':'Реализуемость',
+    'i1-h3':'CUT&RUN на CTCF и NRF1 в отсортированных CD55-LOW / CD55-HIGH фракциях','i1-tier':'Tier 1',
+    'i1-tests':'Прямую версию гипотезы «вытеснения» — но уже в тех самых клетках, где мы видим сигнал метилирования, а не в смешанной ENCODE-популяции. Это главный концептуальный разрыв текущего ChIP-seq анализа, и его закрытие — самый очевидный следующий шаг.',
+    'i1-why':'Даёт первую прямую (не выведенную из литературы) причинно-следственную привязку: конкретный CpG-кластер → occupancy конкретного TF → фенотип молчания — на одном и том же локусе, в одном эксперименте.',
+    'i1-feas':'CUT&RUN работает на low input (~100–500 тыс. клеток) — совместим с уже FACS-отсортированными фракциями без дополнительного культивирования; антитела к CTCF и NRF1 широко валидированы (ENCODE-grade), риск по реагентам низкий.',
+    'i2-h3':'In vitro биохимия: EMSA / biolayer interferometry на метилированных vs неметилированных олигодуплексах CD55-мотивов','i2-tier':'Tier 1',
+    'i2-tests':'Чисто биофизический вопрос: падает ли аффинность связывания рекомбинантного CTCF/NRF1 (или их ДНК-связывающих доменов) при CpG-метилировании именно того мотива, который реально присутствует в CD55-промоторе — не обобщённого consensus-мотива из литературы.',
+    'i2-why':'Убирает все клеточные confounders (хроматин-контекст, другие факторы, кинетика ремоделинга) — чистый да/нет ответ, чувствителен ли именно этот мотив в этом локусе, без всех остальных слоёв клеточной сложности.',
+    'i2-feas':'Рекомбинантные белки/домены доступны коммерчески или через сотрудничество; синтез коротких мет./немет. дуплексов — рутинная услуга; можно делать полностью без клеточной культуры, параллельно с остальными экспериментами.',
+    'i3-h3':'ATAC-seq в отсортированных фракциях как быстрый corroborating readout','i3-tier':'Tier 1',
+    'i3-tests':'Падает ли доступность хроматина в CpG-кластере #20–132 синхронно с ростом метилирования в CD55-HIGH — независимая от антител линия доказательств, что этот регион теряет функциональную открытость, а не только несёт метку метилирования.',
+    'i3-why':'Быстрый и дешёвый способ отличить «метилирование как побочный маркер» от «метилирование как часть реального закрытия хроматина» — минимальный риск, максимальная скорость получения ответа.',
+    'i3-feas':'Не требует антител или оптимизации; можно делать на тех же отсортированных клетках параллельно с CUT&RUN, используя уже существующий FACS-протокол.',
+    'i4-h3':'Генетическая эпистазия: degron/нокдаун CTCF и NRF1 в K562 перед CRISPRoff/ZFPoff','i4-tier':'Tier 2',
+    'i4-tests':'Причинную необходимость: если CTCF/NRF1 — реальные downstream-эффекторы метилирования на пути к молчанию CD55, их острая потеря до редактирования должна изменить фенотип. Полный нокаут CTCF часто летален/плейотропен — предпочтителен обратимый degron (auxin-inducible degron, dTAG) для острого истощения без компенсаторных эффектов.',
+    'i4-why':'Генетика — золотой стандарт причинности в биологии; дополняет корреляционный ChIP-seq и ацеллюлярную биохимию третьей, ортогональной линией доказательств.',
+    'i4-feas':'Degron-линии K562 для CTCF описаны в литературе и потенциально доступны через сотрудничество; требует более длительной настройки клеточной модели, чем Tier 1 эксперименты.',
+    'i5-h3':'Кинетика: ранние временные точки (Day 1–2–4) с параллельным метилированием + CUT&RUN + экспрессией','i5-tier':'Tier 2',
+    'i5-tests':'Временной порядок событий: метилирование растёт раньше потери occupancy TF, или наоборот? Обе модели механистически осмысленны — TF-потеря может открывать доступ для de novo DNMT так же легко, как метилирование может вытеснять TF. Разделить их можно только кинетикой.',
+    'i5-why':'Сейчас у нас есть только отдельные снимки (Day 16 K562, Day 35 T-клетки) — без временного ряда причинная стрелка в принципе не определима, какие бы корреляции мы ни находили.',
+    'i5-feas':'Требует повторения тайм-курса редактирования с более частым забором точек — логистически посильно с существующим ZFPoff/CRISPRoff протоколом, но добавляет объём работы кратно числу точек.',
+    'i6-h3':'Motif-resolution эпигенетическое редактирование: таргетировать не весь промотор, а именно CTCF- или NRF1-кластер','i6-tier':'Tier 3',
+    'i6-tests':'Достаточность/необходимость именно этого узкого CpG-кластера (а не всего промотора целиком) для молчания CD55 — направить CRISPRoff/ZFPoff/dCas9-TET1 узко, на CpG #43–86 (CTCF) или #13–43 (NRF1) по отдельности, вместо широкого покрытия всего промотора.',
+    'i6-why':'Переход от «промотор в целом метилирован → ген молчит» к «именно этот CpG-кластер, связанный с занятостью конкретного TF, функциональный драйвер» — уровень механистической детализации, редко достижимый в epigenome editing литературе, и прямой мост к общему вопросу «как устроена регуляция клеток», не только к CD55.',
+    'i6-feas':'Требует дизайна нового, более короткого guide/ZFP, нацеленного именно на подрегион — технически посильно на существующей платформе, но это новая итерация дизайна, а не переиспользование текущих реагентов.',
+    'i7-h3':'Парное single-cell считывание: поверхностная экспрессия CD55 + метилирование + (в перспективе) TF occupancy','i7-tier':'Tier 3',
+    'i7-tests':'Расширяет уже существующий open todo (прямое парное измерение CD55 surface expression + метилирования, вместо вывода направления из модели сортировки) — добавляя третье измерение: occupancy TF на тех же клетках, если методика из пункта 1 или флагманского эксперимента станет рутинной.',
+    'i7-why':'Закрывает последний остающийся разрыв между «мы выводим направление эффекта из модели» и «мы видим все три переменные одновременно на одной клетке» — самый строгий из возможных здесь стандартов доказательства.',
+    'i7-feas':'Наиболее амбициозный пункт списка — зависит от созревания методик из Tier 1–2 выше; разумно вернуться к нему после первых результатов CUT&RUN и/или флагманского эксперимента.',
+    'later-h2':'Другие направления (заготовки — будут расширены отдельно)',
+    'later-p':'Этот раздел — просто список названий, чтобы ничего не потерялось. Разворачивать их в полноценные подразделы будем по одному, когда до них дойдёт очередь — не пытаемся продумать всё сразу.',
+    'later-li1':'Добавление ZFPoff как третьей модальности редактирования на сайте (нужен three-way group selector в UI)',
+    'later-li2':'Мультитаймпоинт / мультидонорный анализ (Day 6, Day 28, Day 35) — честная документация confound между donor и timepoint',
+    'later-li3':'Off-target профилирование метилирования по уже существующим глубоким ONT-прогонам',
+    'later-li4':'Data upload & analysis service — вопросы к научрукам про аудиторию, реальный бэкенд и приоритизацию',
+    'back-home':'← Вернуться на главную',
+    'footer':'epicme.bio — рабочая доска идей и TODO проекта CD55 multi-omics. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="index.html">← Назад на главную</a>'
+  },
+  en: {
+    'title':'epicme.bio — Research Ideas/Todos',
+    'brand-sub':'epigenome · cytosine · methylation',
+    'nav-home':'Home','nav-about':'About','nav-k562':'K562','nav-chipseq':'ChIP-seq','nav-upload':'Upload data','nav-todos':'Research Ideas/Todos',
+    'eyebrow':'Working notes · epicme.bio',
+    'h1':'<em>Research Ideas/Todos</em> map',
+    'hero-sub':'A living list of epiCme directions, experiments, and open questions — not a final plan, a working board that grows as we go. The first section below tackles the most pressing thing right now: how to experimentally validate the transcription-factor hypotheses that came out of the K562 ChIP-seq analysis.',
+    'toc-tf':'TF validation (ChIP-seq → causality)','toc-later':'Other directions',
+    'tf-h2':'Validating the TF hypotheses: from ChIP-seq correlation to causality',
+    'tf-sub':'Public ENCODE ChIP-seq tracks for K562 showed that CTCF and NRF1 — the only confirmed factors in the locus with direct literature support for methylation-sensitive binding — sit right inside the significant differential CpG cluster (CTCF: CpG #43–86, NRF1: CpG #13–43). But that data comes from an unsorted, unedited ENCODE K562 population — not from our own CD55-LOW/HIGH fractions. Below are concrete experiments that would turn this hypothesis into something testable, and then proven, as a mechanism.',
+    'recap-label':'The hypothesis we\'re testing:',
+    'recap-text':'rising methylation in CD55-HIGH (ZFPoff/CRISPRoff-induced) physically displaces CTCF and/or NRF1 from their binding sites in the promoter <code>chr1:207,318,092–207,324,450</code>, and that this is what drives gene silencing — not just something that correlates with it.',
+    'tier1-label':'Tier 1 — can start right now with the lab\'s current toolkit',
+    'tier2-label':'Tier 2 — needs a new but manageable protocol iteration',
+    'tier3-label':'Tier 3 — ambitious, but the biggest conceptual payoff',
+    'flag-tag':'Flagship experiment · Tier 2',
+    'flag-h3':'Single-molecule joint readout of methylation and TF occupancy',
+    'flag-p1':'Treat chromatin with a GpC methyltransferase (M.CviPI) before Nanopore library prep — it only methylates accessible, unbound GC motifs, leaving occupied/closed stretches untouched. Combined with the native CpG methylation already being read, this gives, on <strong>every single molecule</strong>, two answers at once: is the CTCF/NRF1 motif methylated, and is it occupied by protein right there and then (this is the dSMF / Fiber-seq family of techniques, adapted for long-read).',
+    'flag-p2':'This is the only experiment on this list that tests the hypothesis at exactly the level the whole epiCme pipeline is already built on (per-molecule tokenization instead of averaged bulk signal) — and it doesn\'t require sorting LOW/HIGH fractions separately: heterogeneity is visible right inside one population, molecule by molecule.',
+    'flag-p3':'Cost of entry: one new enzymatic step before library prep, protocol already published for long-read platforms — a moderate but non-trivial wet-lab lift.',
+    'fl-tests':'What it tests','fl-why':'Why it moves the needle','fl-feas':'Feasibility',
+    'i1-h3':'CUT&RUN for CTCF and NRF1 in sorted CD55-LOW / CD55-HIGH fractions','i1-tier':'Tier 1',
+    'i1-tests':'The direct version of the "displacement" hypothesis — but in the actual cells where we see the methylation signal, not in a mixed ENCODE population. This is the main conceptual gap in the current ChIP-seq analysis, and closing it is the most obvious next step.',
+    'i1-why':'Gives the first direct (not literature-inferred) causal link: a specific CpG cluster → occupancy of a specific TF → the silencing phenotype — at the same locus, in one experiment.',
+    'i1-feas':'CUT&RUN works on low input (~100–500k cells) — compatible with already FACS-sorted fractions without additional culturing; CTCF and NRF1 antibodies are widely validated (ENCODE-grade), so reagent risk is low.',
+    'i2-h3':'In vitro biochemistry: EMSA / biolayer interferometry on methylated vs unmethylated CD55-motif oligo duplexes','i2-tier':'Tier 1',
+    'i2-tests':'A purely biophysical question: does recombinant CTCF/NRF1 (or their DNA-binding domains) bind more weakly once the exact motif present in the CD55 promoter is CpG-methylated — not a generalized consensus motif from the literature.',
+    'i2-why':'Removes every cellular confounder (chromatin context, other factors, remodeling kinetics) — a clean yes/no on whether this specific motif in this specific locus is methylation-sensitive, with none of the other layers of cellular complexity.',
+    'i2-feas':'Recombinant proteins/domains are available commercially or through collaboration; synthesizing short methylated/unmethylated duplexes is a routine service; can be done entirely without cell culture, in parallel with the other experiments.',
+    'i3-h3':'ATAC-seq in sorted fractions as a fast corroborating readout','i3-tier':'Tier 1',
+    'i3-tests':'Whether chromatin accessibility drops across the #20–132 CpG cluster in step with rising methylation in CD55-HIGH — an antibody-independent line of evidence that this region actually loses functional openness, not just gains a methylation mark.',
+    'i3-why':'A fast, cheap way to tell "methylation as a side-marker" apart from "methylation as part of real chromatin closing" — minimal risk, fastest turnaround of anything on this list.',
+    'i3-feas':'No antibodies or optimization needed; can be run on the same sorted cells in parallel with CUT&RUN, using the existing FACS protocol.',
+    'i4-h3':'Genetic epistasis: CTCF and NRF1 degron/knockdown in K562 before CRISPRoff/ZFPoff','i4-tier':'Tier 2',
+    'i4-tests':'Causal necessity: if CTCF/NRF1 are genuine downstream effectors of methylation on the path to CD55 silencing, acutely removing them before editing should change the phenotype. Full CTCF knockout is often lethal/pleiotropic — an inducible, reversible degron (auxin-inducible degron, dTAG) is preferable for acute depletion without compensatory effects.',
+    'i4-why':'Genetics is the gold standard for causality in biology; complements correlational ChIP-seq and cell-free biochemistry with a third, orthogonal line of evidence.',
+    'i4-feas':'CTCF degron K562 lines are described in the literature and potentially accessible through collaboration; requires longer cell-model setup than the Tier 1 experiments.',
+    'i5-h3':'Kinetics: early timepoints (Day 1–2–4) with methylation + CUT&RUN + expression read in parallel','i5-tier':'Tier 2',
+    'i5-tests':'The temporal order of events: does methylation rise before TF occupancy is lost, or the reverse? Both directions are mechanistically plausible — TF loss can open the door to de novo DNMT recruitment just as easily as methylation can displace a TF. Only kinetics can tell them apart.',
+    'i5-why':'Right now we only have single snapshots (Day 16 K562, Day 35 T cells) — without a time series the causal arrow simply isn\'t determinable, no matter what correlations we find.',
+    'i5-feas':'Requires repeating the editing time-course with more frequent sampling points — logistically doable with the existing ZFPoff/CRISPRoff protocol, but scales the workload with the number of timepoints.',
+    'i6-h3':'Motif-resolution epigenetic editing: target not the whole promoter, but specifically the CTCF or NRF1 cluster','i6-tier':'Tier 3',
+    'i6-tests':'Sufficiency/necessity of this narrow CpG cluster specifically (not the whole promoter) for CD55 silencing — direct CRISPRoff/ZFPoff/dCas9-TET1 narrowly at CpG #43–86 (CTCF) or #13–43 (NRF1) individually, instead of broad promoter-wide coverage.',
+    'i6-why':'Moves from "the promoter as a whole is methylated → the gene is silent" to "this specific CpG cluster, tied to a specific TF\'s occupancy, is the functional driver" — a level of mechanistic detail rarely reached in the epigenome-editing literature, and a direct bridge to the bigger question of how cell regulation works in general, not just for CD55.',
+    'i6-feas':'Requires designing a new, shorter guide/ZFP targeted specifically at the sub-region — technically feasible on the existing platform, but a new design iteration rather than reuse of current reagents.',
+    'i7-h3':'Paired single-cell readout: CD55 surface expression + methylation + (eventually) TF occupancy','i7-tier':'Tier 3',
+    'i7-tests':'Extends the existing open todo (a direct paired measurement of CD55 surface expression and methylation, instead of inferring direction from the sorting model) by adding a third dimension — TF occupancy on the same cells, once the technique from item 1 or the flagship experiment becomes routine.',
+    'i7-why':'Closes the last remaining gap between "we infer the direction of effect from the model" and "we see all three variables at once on one cell" — the strictest standard of evidence available here.',
+    'i7-feas':'The most ambitious item on the list — depends on the Tier 1–2 techniques above maturing first; reasonable to return to once first CUT&RUN and/or flagship-experiment results are in.',
+    'later-h2':'Other directions (stubs — to be expanded separately)',
+    'later-p':'This section is just a list of names so nothing gets lost. We\'ll expand each into a full subsection one at a time, as its turn comes up — not trying to think everything through at once.',
+    'later-li1':'Adding ZFPoff as a third editing modality on the site (needs a three-way group selector in the UI)',
+    'later-li2':'Multi-timepoint / multi-donor analysis (Day 6, Day 28, Day 35) — honest documentation of the donor/timepoint confound',
+    'later-li3':'Off-target methylation profiling from existing deep ONT sequencing runs',
+    'later-li4':'Data upload & analysis service — questions for advisors on audience, real backend timeline, and prioritization',
+    'back-home':'← Back to home',
+    'footer':'epicme.bio — the ideas & TODO working board for the CD55 multi-omics project. Part of the PhD project of Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. <a href="index.html">← Back to home</a>'
+  }
+};
+
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const dict = I18N[lang];
+    if(!dict || !(key in dict)) return;
+    if(el.tagName === 'TITLE'){ document.title = dict[key]; }
+    else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('#lang-switch button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){}
+}
+document.querySelectorAll('#lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+(function(){
+  let saved = 'ru';
+  try{ saved = localStorage.getItem('epicme_lang') || 'ru'; }catch(e){}
+  if(saved === 'en') applyLang('en');
+})();
+</script>
+
+</body>
+</html>
