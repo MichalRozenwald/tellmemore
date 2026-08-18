@@ -300,6 +300,7 @@
       <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
       <a href="public-methylation.html" data-i18n="nav-public">Публичные данные</a>
       <a href="cd55-tf-tcells.html" data-i18n="nav-tf">Механизмы</a>
+      <a href="cd55-dna-structures.html" data-i18n="nav-struct">Структуры ДНК</a>
       <a href="methylation-and-memory.html" data-i18n="nav-memory">Метилирование и память</a>
       <a href="methylation-generational-trauma.html" data-i18n="nav-trauma">Метилирование и травма</a>
       <a href="upload-user-input.html" data-i18n="nav-upload" class="upload-nav-link">Загрузка данных</a>
@@ -449,6 +450,13 @@
 
     <div class="disclaimer" data-i18n="tf-note"><strong>Важно:</strong> вся механистика по KLF4, CREB и CBP получена на эндотелиальных клетках и репортёрных конструкциях, а не на первичных человеческих T-клетках. Перенос на нашу систему — допущение, пока T-клеточный ChIP не скажет обратного. На странице механизмов это помечено отдельно, и ни одно число там не измерено заново — это гипотезы с прописанными способами проверки.</div>
 
+    <a class="page-card" href="cd55-dna-structures.html" style="margin-top:16px; max-width:560px;">
+      <span class="tag amber" data-i18n="struct-tag">Гипотезы · структура ДНК</span>
+      <h3 data-i18n="struct-h3">Форма ДНК на том же окне</h3>
+      <p data-i18n="struct-p">Тот же вопрос, что и выше, но не «кто сидит на промоторе», а «во что складывается сама ДНК»: G-квадруплексы, i-мотивы, Z-форма, R-петли, нуклеосомы и петли хроматина. Ни одна структура ещё не посчитана — страница честно держит пустые слоты и список того, что считается на уже имеющихся данных.</p>
+      <span class="go"><span data-i18n="struct-go">Смотреть структуры ДНК</span> <span class="arrow">→</span></span>
+    </a>
+
     <a class="page-card" href="research-ideas-todos.html" style="margin-top:16px; max-width:560px;">
       <span class="tag amber" data-i18n="research-tag">Рабочие заметки</span>
       <h3 data-i18n="research-h3">Как это провалидировать дальше</h3>
@@ -593,6 +601,10 @@
 const I18N = {
   ru: {
     'nav-research': 'Research Ideas/Todos',
+    'struct-tag': 'Гипотезы · структура ДНК',
+    'struct-h3': 'Форма ДНК на том же окне',
+    'struct-p': 'Тот же вопрос, что и выше, но не «кто сидит на промоторе», а «во что складывается сама ДНК»: G-квадруплексы, i-мотивы, Z-форма, R-петли, нуклеосомы и петли хроматина. Ни одна структура ещё не посчитана — страница честно держит пустые слоты и список того, что считается на уже имеющихся данных.',
+    'struct-go': 'Смотреть структуры ДНК',
     'research-tag': 'Рабочие заметки',
     'research-h3': 'Как это провалидировать дальше',
     'research-p': 'Растущий список конкретных экспериментов — CUT&amp;RUN на CTCF/NRF1 в отсортированных фракциях, in vitro биохимия на метилированных олигодуплексах, single-molecule совместное считывание метилирования и занятости фактора, — которые превратили бы гипотезы этого раздела в доказанный механизм.',
@@ -684,6 +696,7 @@ const I18N = {
     'chipseq-p': 'Публичные данные ENCODE ChIP-seq по K562 транскрипционным факторам поверх значимого CpG-кластера со страницы K562 — CTCF и NRF1 как кандидаты на «метилирование мешает связыванию».',
     'chipseq-go': 'Смотреть ChIP-seq',
     'nav-tf': 'Механизмы',
+    'nav-struct': 'Структуры ДНК',
     'nav-memory': 'Метилирование и память',
     'nav-trauma': 'Метилирование и травма',
     'tf-kicker': 'Learn — как устроен CD55',
@@ -729,6 +742,10 @@ const I18N = {
   },
   en: {
     'nav-research': 'Research Ideas/Todos',
+    'struct-tag': 'Hypotheses · DNA structure',
+    'struct-h3': 'The shape of the DNA across the same window',
+    'struct-p': 'The same question as above, but not “who sits on the promoter” — “what does the DNA itself fold into”: G-quadruplexes, i-motifs, Z-form, R-loops, nucleosomes and chromatin loops. No structure has been computed yet — the page honestly keeps empty slots plus a list of what is computable on data already in hand.',
+    'struct-go': 'View DNA structures',
     'research-tag': 'Working notes',
     'research-h3': 'Validating this further',
     'research-p': 'A growing list of concrete experiments — CUT&amp;RUN for CTCF/NRF1 in sorted fractions, in vitro biochemistry on methylated oligo duplexes, a single-molecule joint readout of methylation and factor occupancy — that would turn this section\'s hypotheses into a proven mechanism.',
@@ -820,6 +837,7 @@ const I18N = {
     'chipseq-p': 'Public ENCODE ChIP-seq data for K562 transcription factors, overlaid on the significant CpG cluster from the K562 page — CTCF and NRF1 as candidates for "methylation blocks binding."',
     'chipseq-go': 'View ChIP-seq',
     'nav-tf': 'Mechanisms',
+    'nav-struct': 'DNA structures',
     'nav-memory': 'Methylation &amp; memory',
     'nav-trauma': 'Methylation &amp; trauma',
     'tf-kicker': 'Learn — how CD55 is put together',

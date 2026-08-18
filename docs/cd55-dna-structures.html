@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">epicme.bio — 2D и 3D структуры ДНК CD55</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific styles only. Palette, type, nav, footer, cards, tags,
+     .disclaimer and the reference list all come from assets/theme.css —
+     no new hues are introduced here, per the palette note in that file.
+     Seven structure classes are separated on two axes instead:
+       hue   = mechanism family (blue = G-strand folding, orange =
+               transcription-coupled, yellow = repeat-driven, neutral =
+               packaging rather than DNA structure)
+       edge  = variant within the family (solid vs dashed left border)
+     plus a distinct icon and the category name in text on every card,
+     so hue is never the only cue. */
+
+  .hero{ padding:56px 0 24px; }
+  /* shape vocabulary shared with index.html: hexagon/yellow = Learn */
+  .kicker-shaped{ display:flex; align-items:center; gap:9px; margin-bottom:12px; }
+  .kicker-shaped .shape{ width:12px; height:12px; flex-shrink:0; }
+  .kicker-shaped.learn .shape{ background:var(--yellow); clip-path:polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+  .kicker-shaped.learn span.lbl{ color:var(--yellow); }
+  .kicker-shaped span.lbl{ font-size:12px; letter-spacing:0.12em; text-transform:uppercase; font-weight:600; }
+  h1.display{
+    font-size:clamp(30px, 5vw, 44px);
+    font-weight:600; line-height:1.12; letter-spacing:-0.01em; margin:0 0 18px;
+  }
+  h1.display em{ font-style:normal; color:var(--orange); }
+  .hero-sub{ font-size:17px; color:var(--ink-dim); max-width:680px; margin:0 0 20px; }
+
+  .lang-switch{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+  }
+  .lang-switch button{
+    border:none; background:transparent; color:var(--ink-dim);
+    font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+  }
+  .lang-switch button.active{ background:var(--blue); color:#06182A; }
+  .nav-inner{ flex-wrap:wrap; row-gap:10px; }
+
+  /* ---------- primary cross-page navigation — big, easy-to-hit pill
+     buttons so switching between pages is obvious from anywhere on
+     the site, not a row of small text links. ---------- */
+  .nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+  .nav-links a{
+    display:inline-flex; align-items:center;
+    padding:10px 18px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:var(--surface-2);
+    color:var(--ink-dim);
+    font-size:14.5px; font-weight:600;
+    text-decoration:none;
+    transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{
+    border-color:var(--blue);
+    color:var(--ink);
+    background:var(--surface);
+    transform:translateY(-1px);
+  }
+  .nav-links a.active{
+    background:var(--blue);
+    border-color:var(--blue);
+    color:#06182A;
+  }
+  /* the upload link is an action, not just a destination — it earns a
+     standing accent border instead of waiting for hover like its siblings */
+  .nav-links a.upload-nav-link{
+    border-color:var(--orange); color:var(--orange);
+  }
+  .nav-links a.upload-nav-link:hover, .nav-links a.upload-nav-link:focus-visible{
+    background:var(--orange); border-color:var(--orange); color:#2B1900;
+  }
+  /* Ella's 4 pages get their own subtle accent so they read as a distinct
+     group in the nav, without changing the pill shape/size — same pattern
+     as .upload-nav-link above, just a different hue from the shared palette. */
+  /* Ella's 4 pages look exactly like every other nav pill at rest — the
+     only difference is the hover/focus outline color (gold instead of
+     the default blue), so the group is discoverable without standing
+     out from the rest of the nav. */
+  .nav-links a.ella-link:hover, .nav-links a.ella-link:focus-visible{
+    border-color:#cbbf3e; color:var(--ink); background:var(--surface);
+  }
+
+  /* ---------- collapsing nav on scroll ----------
+     On load / at the top of the page all links stay statically visible,
+     exactly as before. Past a small scroll threshold #site-nav gets
+     .nav-collapsed (added/removed by JS below) and the pill row hides
+     behind a single "Menu" toggle; clicking it reveals the same links
+     as a dropdown panel, so nothing about the link list itself changes —
+     only how much space it takes up while reading the page. ---------- */
+  .nav-inner{ position:relative; }
+  /* Pin the header while scrolling so the "Menu" toggle stays reachable —
+     without this the whole bar would scroll off-screen and the collapsed
+     menu would be unreachable exactly when it's needed. If assets/theme.css
+     already makes .nav sticky/fixed site-wide, this is redundant and safe;
+     if not, this is what makes the collapse behavior actually usable. */
+  #site-nav{ position:sticky; top:0; z-index:100; }
+  .nav-toggle{
+    display:none; align-items:center; gap:7px;
+    background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink);
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px;
+    padding:10px 18px; border-radius:999px; cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, color .15s ease;
+  }
+  .nav-toggle:hover, .nav-toggle:focus-visible{
+    border-color:var(--blue); color:var(--ink); background:var(--surface);
+  }
+  .nav-toggle-icon{ font-size:11px; transition:transform .15s ease; }
+  #site-nav.nav-open .nav-toggle-icon{ transform:rotate(180deg); }
+
+  #site-nav.nav-collapsed .nav-toggle{ display:inline-flex; }
+  #site-nav.nav-collapsed .nav-links{ display:none; }
+  #site-nav.nav-collapsed.nav-open .nav-links{
+    display:flex; flex-direction:column; align-items:stretch; flex-wrap:nowrap;
+    position:absolute; top:100%; left:0; right:0; margin-top:10px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:10px; gap:4px; max-height:min(70vh, 520px); overflow-y:auto;
+    box-shadow:0 18px 44px rgba(0,0,0,0.30); z-index:90;
+  }
+  #site-nav.nav-collapsed.nav-open .nav-links a{ width:100%; text-align:left; }
+
+
+
+  /* ---------- tables ---------- */
+  .tbl{ width:100%; border-collapse:collapse; font-size:13.4px; margin:6px 0 4px; }
+  .tbl th, .tbl td{
+    text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top;
+  }
+  .tbl th{
+    font-family:'Space Grotesk',sans-serif; font-size:11.8px; font-weight:600;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint);
+  }
+  .tbl td.num{ font-family:'IBM Plex Mono',monospace; color:var(--ink); white-space:nowrap; }
+  .tbl td.derived{ font-family:'IBM Plex Mono',monospace; color:var(--blue); white-space:nowrap; }
+  .tbl tr:last-child td{ border-bottom:none; }
+  .tbl-wrap{ overflow-x:auto; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:8px 10px; }
+  .empty-slot{ font-family:'IBM Plex Mono',monospace; color:var(--ink-faint); }
+
+  /* ---------- figures ---------- */
+  figure{ margin:20px 0 8px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px 18px 14px; }
+  figure svg{ width:100%; height:auto; display:block; }
+  figcaption{ font-size:12.6px; color:var(--ink-faint); margin-top:12px; line-height:1.6; }
+  .legend{ display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:14px; }
+  .legend-item{ display:flex; align-items:center; gap:7px; font-size:12.4px; color:var(--ink-dim); }
+  .legend-key{ width:22px; height:11px; border-radius:2px; flex:0 0 auto; }
+
+  /* ---------- structure cards ---------- */
+  .struct-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px; }
+  @media (max-width:820px){ .struct-grid{ grid-template-columns:1fr; } }
+  .struct-card{
+    background:var(--surface); border:1px solid var(--line); border-left-width:4px;
+    border-radius:var(--radius); padding:18px 20px 16px;
+  }
+  .struct-card h3{ margin:0 0 3px; font-size:16.5px; color:var(--ink); }
+  .struct-card .alias{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint); margin:0 0 12px; }
+  .struct-card dl{ margin:0; }
+  .struct-card dt{
+    font-family:'Space Grotesk',sans-serif; font-size:11.3px; font-weight:600;
+    letter-spacing:0.07em; text-transform:uppercase; color:var(--ink-faint); margin-top:11px;
+  }
+  .struct-card dd{ margin:3px 0 0; font-size:13.6px; color:var(--ink-dim); line-height:1.62; }
+  .sc-g4{ border-left-color:var(--blue); }
+  .sc-im{ border-left-color:var(--blue); border-left-style:dashed; }
+  .sc-z{ border-left-color:var(--orange); }
+  .sc-r{ border-left-color:var(--orange); border-left-style:dashed; }
+  .sc-cr{ border-left-color:var(--yellow); }
+  .sc-h{ border-left-color:var(--yellow); border-left-style:dashed; }
+  .sc-nu{ border-left-color:var(--ink-faint); }
+
+  /* ---------- hypotheses ---------- */
+  .hyp{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 20px 14px; margin-bottom:12px;
+  }
+  .hyp-head{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .hyp-id{
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:700;
+    color:var(--blue); flex:0 0 auto;
+  }
+  .hyp-head h3{ margin:0; font-size:15.6px; color:var(--ink); }
+  .hyp p{ margin:9px 0 0; font-size:13.6px; color:var(--ink-dim); line-height:1.65; }
+  .hyp .test{
+    margin-top:11px; padding-top:10px; border-top:1px dashed var(--line);
+    font-size:13.2px; color:var(--ink-dim);
+  }
+  .hyp .test strong{ color:var(--ink); font-family:'Space Grotesk',sans-serif; font-size:11.8px; letter-spacing:0.06em; text-transform:uppercase; }
+  .hyp.null-hyp{ border-color:var(--orange); }
+  .hyp.null-hyp .hyp-id{ color:var(--orange); }
+
+  /* ---------- code ---------- */
+  pre.code{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:9px;
+    padding:15px 17px; overflow-x:auto; font-family:'IBM Plex Mono',monospace;
+    font-size:12.6px; line-height:1.75; color:var(--ink-dim); margin:12px 0;
+  }
+  pre.code .cmt{ color:var(--ink-faint); }
+  pre.code b{ color:var(--blue); font-weight:400; }
+
+  .callout{
+    background:var(--yellow-dim); border:1px solid var(--yellow); border-radius:var(--radius);
+    padding:16px 20px; font-size:13.7px; color:var(--ink-dim); line-height:1.65; margin:16px 0;
+  }
+  .callout strong{ color:var(--yellow); }
+  .callout-blue{ background:var(--blue-dim); border-color:var(--blue-deep); }
+  .callout-blue strong{ color:var(--blue); }
+
+  ul.plain{ font-size:13.8px; color:var(--ink-dim); line-height:1.7; padding-left:20px; }
+  ul.plain li{ margin-bottom:8px; }
+</style>
+</head>
+<body>
+
+<header class="nav" id="site-nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav-links">
+      <span data-i18n="nav-toggle-label">Меню</span>
+      <span class="nav-toggle-icon" aria-hidden="true">▾</span>
+    </button>
+    <nav class="nav-links" id="site-nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="day6.html">Day 6</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day35-emseq.html" data-i18n="nav-emseq">EM-seq · Day 35</a>
+      <a href="day6VSday35.html">Day 35 vs Day 6</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="public-methylation.html" data-i18n="nav-public">Публичные данные</a>
+      <a href="cd55-tf-tcells.html" data-i18n="nav-tf">Механизмы</a>
+      <a href="cd55-dna-structures.html" data-i18n="nav-struct" class="active">Структуры ДНК</a>
+      <a href="methylation-and-memory.html" data-i18n="nav-memory">Метилирование и память</a>
+      <a href="methylation-generational-trauma.html" data-i18n="nav-trauma">Метилирование и травма</a>
+      <a href="upload-user-input.html" data-i18n="nav-upload" class="upload-nav-link">Загрузка данных</a>
+      <a href="research-ideas-todos.html" data-i18n="nav-research">Research Ideas/Todos</a>
+      <a href="CHAPLEedited.htm" data-i18n="nav-chaple" class="ella-link">CHAPLE-синдром</a>
+      <a href="cd55HGSOCedited.htm" data-i18n="nav-hgsoc" class="ella-link">CD55 и рак яичников</a>
+      <a href="mesites_plot_wNucNEW.html" data-i18n="nav-mesites-nuc" class="ella-link">Mesites: delMC + нуклеосомы</a>
+      <a href="mesites_plotEDITED.htm" data-i18n="nav-mesites" class="ella-link">Mesites: delMC</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="kicker-shaped learn"><span class="shape"></span><span class="lbl" data-i18n="eyebrow">Learn — форма ДНК на нашем окне</span></div>
+    <h1 class="display" data-i18n="h1">Что ДНК <em>делает со своей формой</em><br>в области TSS CD55</h1>
+    <p class="hero-sub" data-i18n="hero-sub">Наши профили метилирования — одномерные: 137 CpG вдоль 6,4 kb. Но ДНК в этом окне не прямая линия. Она может складываться в G-квадруплексы, i-мотивы, Z-форму, R-петли, крестообразные структуры — и всё это укладывается в петли и домены хроматина. Эта страница — карта того, где такие структуры искать и как связать их с тем, что мы уже измерили.</p>
+
+    <div class="disclaimer">
+      <span data-i18n="status-banner"><strong>Ни одна структура на этой странице ещё не предсказана.</strong> Здесь нет ни одного вычисленного G4-скора, ни одной координаты Z-ДНК, ни одного Hi-C контакта. Все такие поля стоят пустыми и помечены «не вычислено». Реальные числа на странице — только те, что уже получены в проекте: координаты, позиции CpG, позиции ChIP-seq пиков. Чтобы заполнить пустые слоты, нужна последовательность окна — команды приведены в разделе 6.</span>
+    </div>
+  </section>
+
+  <!-- ============ 1. COORDINATES ============ -->
+  <section>
+    <h2 data-i18n="s1-h2">1. Система координат</h2>
+    <p class="lede" data-i18n="s1-lede">Всё на этой странице привязано к одному окну. Прежде чем накладывать структуру на метилирование, координаты должны совпадать до пары оснований — иначе «перекрытие» ничего не значит.</p>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th data-i18n="s1-th1">Величина</th>
+          <th data-i18n="s1-th2">Значение</th>
+          <th data-i18n="s1-th3">Откуда</th>
+        </tr></thead>
+        <tbody>
+          <tr><td data-i18n="s1-r1a">Окно анализа (GRCh38)</td><td class="num">chr1:207,318,092–207,324,450</td><td data-i18n="s1-r1c">Файл координат проекта</td></tr>
+          <tr><td data-i18n="s1-r2a">Длина окна</td><td class="derived">6,358 bp</td><td data-i18n="s1-r2c">Вычислено: конец − начало</td></tr>
+          <tr><td data-i18n="s1-r3a">TSS (выведен, требует подтверждения)</td><td class="derived">≈ chr1:207,321,620</td><td data-i18n="s1-r3c">Вычислено из якоря: пик CpG #78–83 = chr1:207,321,678 = +58 bp</td></tr>
+          <tr><td data-i18n="s1-r4a">Окно относительно TSS</td><td class="derived">−3,528 … +2,830</td><td data-i18n="s1-r4c">Вычислено. Сходится: MAZ/GATA1/NFE2 на ≈−3,4 kb попадают внутрь левого края</td></tr>
+          <tr><td data-i18n="s1-r5a">Число CpG</td><td class="num">137</td><td data-i18n="s1-r5c">Файл координат проекта</td></tr>
+          <tr><td data-i18n="s1-r6a">Плотность CpG, всё окно</td><td class="derived">2,15 / 100 bp</td><td data-i18n="s1-r6c">Вычислено: 137 / 6 358</td></tr>
+          <tr><td data-i18n="s1-r7a">Значимый блок #20–132 (LOW vs HIGH)</td><td class="num">−1,077 … +1,935</td><td data-i18n="s1-r7c">Анализ K562 Day 16</td></tr>
+          <tr><td data-i18n="s1-r8a">Плотность CpG в блоке</td><td class="derived">3,75 / 100 bp (113 CpG / 3 012 bp)</td><td data-i18n="s1-r8c">Вычислено</td></tr>
+          <tr><td data-i18n="s1-r9a">Пик дифференциала #78–83</td><td class="num">+58 … +84</td><td data-i18n="s1-r9c">Анализ K562 Day 16</td></tr>
+          <tr><td data-i18n="s1-r10a">Плотность CpG в пике</td><td class="derived">22,2 / 100 bp (6 CpG / 27 bp)</td><td data-i18n="s1-r10c">Вычислено — один CpG каждые 4,5 bp</td></tr>
+          <tr><td data-i18n="s1-r11a">Протоспейсер CRISPRoff (T-клетки)</td><td class="num">+93 … +112</td><td data-i18n="s1-r11c">Датасет T-клеток; пик заканчивается за 9 bp до него</td></tr>
+          <tr><td data-i18n="s1-r12a">Сайт связывания ZFP (K562 ZFPoff)</td><td class="empty-slot" data-i18n="s1-r12v">не задан</td><td data-i18n="s1-r12c">Нужен от нас — без него нельзя отделить структуру от следа эффектора</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-blue">
+      <span data-i18n="s1-callout"><strong>Плотность — это уже подсказка.</strong> 22 CpG на 100 bp в пике #78–83 — это не просто «CpG-остров», это очень G/C-насыщенный микроучасток. Именно такая композиция необходима (хотя и недостаточна) для G-квадруплекса на G-цепи и i-мотива на C-цепи. Это не предсказание структуры — это наблюдение, что композиционное условие выполнено и предсказание имеет смысл считать.</span>
+    </div>
+  </section>
+
+  <!-- ============ 2. WHAT WE ALREADY KNOW ============ -->
+  <section>
+    <h2 data-i18n="s2-h2">2. Что уже нанесено на этот локус</h2>
+    <p class="lede" data-i18n="s2-lede">Ниже — только измеренное: блок значимых CpG, пик дифференциала, ChIP-seq пики K562 и три литературных CACCC-сайта KLF4. Структурные треки лягут поверх этой же оси.</p>
+
+    <figure>
+      <svg viewBox="0 0 900 470" role="img" aria-labelledby="track-title">
+        <title id="track-title" data-i18n="fig1-alt">Карта окна CD55: обзор всего окна и увеличенный вид коровой области промотора</title>
+
+        <!-- ============ OVERVIEW PANEL ============ -->
+        <text x="60" y="26" font-family="'Space Grotesk',sans-serif" font-size="12" font-weight="600" fill="#6E8079" letter-spacing="0.08em" data-i18n="fig1-p1">ВСЁ ОКНО · 6 358 bp</text>
+
+        <!-- significant block -->
+        <rect x="368.4" y="52" width="379.0" height="16" fill="#56B4E9" fill-opacity="0.28" stroke="#56B4E9" stroke-width="1.2"/>
+        <text x="557.9" y="64.5" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10.5" fill="#56B4E9">#20–132</text>
+
+        <!-- peak -->
+        <rect x="510.2" y="76" width="5" height="14" fill="#E69F00"/>
+        <path d="M512.7 72 l4 -6 h-8 z" fill="#E69F00"/>
+        <text x="524" y="70" font-family="'IBM Plex Mono',monospace" font-size="10.5" fill="#E69F00">#78–83</text>
+
+        <!-- axis -->
+        <line x1="60" y1="104" x2="860" y2="104" stroke="#24352E" stroke-width="1.4"/>
+        <g stroke="#24352E" stroke-width="1">
+          <line x1="126.4" y1="104" x2="126.4" y2="110"/><line x1="252.3" y1="104" x2="252.3" y2="110"/>
+          <line x1="378.1" y1="104" x2="378.1" y2="110"/><line x1="503.9" y1="104" x2="503.9" y2="110"/>
+          <line x1="629.7" y1="104" x2="629.7" y2="110"/><line x1="755.5" y1="104" x2="755.5" y2="110"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#6E8079" text-anchor="middle">
+          <text x="126.4" y="122">−3000</text><text x="252.3" y="122">−2000</text><text x="378.1" y="122">−1000</text>
+          <text x="503.9" y="122">0</text><text x="629.7" y="122">+1000</text><text x="755.5" y="122">+2000</text>
+        </g>
+
+        <!-- distal TF cluster -->
+        <line x1="71" y1="90" x2="71" y2="104" stroke="#6E8079" stroke-width="1.2"/>
+        <text x="76" y="88" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#6E8079">MAZ/GATA1/NFE2</text>
+
+        <!-- TSS -->
+        <line x1="503.9" y1="44" x2="503.9" y2="104" stroke="#E9EEEA" stroke-width="1" stroke-dasharray="3 3"/>
+        <text x="503.9" y="40" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="#E9EEEA">TSS</text>
+
+        <!-- zoom connector -->
+        <path d="M403.3 132 L529.1 132 L860 196 L60 196 Z" fill="#56B4E9" fill-opacity="0.07" stroke="#56B4E9" stroke-width="0.8" stroke-dasharray="4 3"/>
+
+        <!-- ============ ZOOM PANEL ============ -->
+        <text x="60" y="214" font-family="'Space Grotesk',sans-serif" font-size="12" font-weight="600" fill="#6E8079" letter-spacing="0.08em" data-i18n="fig1-p2">КОРОВАЯ ОБЛАСТЬ · −800 … +200 bp</text>
+
+        <!-- significant block continues across whole zoom -->
+        <rect x="60" y="226" width="800" height="14" fill="#56B4E9" fill-opacity="0.28" stroke="#56B4E9" stroke-width="1.2"/>
+        <text x="70" y="236.5" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#56B4E9" data-i18n="fig1-blockcont">← блок #20–132 продолжается за оба края</text>
+
+        <!-- peak + protospacer -->
+        <rect x="746.4" y="250" width="20.8" height="14" fill="#E69F00"/>
+        <rect x="774.4" y="250" width="15.2" height="14" fill="none" stroke="#F0E442" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <text x="746.4" y="246" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#E69F00">#78–83</text>
+        <text x="795" y="261" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#F0E442" data-i18n="fig1-proto">протоспейсер</text>
+        <line x1="767.2" y1="257" x2="774.4" y2="257" stroke="#6E8079" stroke-width="1"/>
+        <text x="720" y="278" font-family="'IBM Plex Mono',monospace" font-size="9" fill="#6E8079">9 bp</text>
+
+        <!-- KLF4 CACCC sites -->
+        <g fill="#F0E442">
+          <rect x="166.4" y="286" width="12" height="10"/>
+          <rect x="452.0" y="286" width="6.4" height="10"/>
+          <rect x="615.2" y="286" width="8.8" height="10"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#F0E442" text-anchor="middle">
+          <text x="172.4" y="308">C</text><text x="455.2" y="308">B</text><text x="619.6" y="308">A</text>
+        </g>
+        <text x="60" y="294" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#F0E442" data-i18n="fig1-klf">KLF4 CACCC</text>
+
+        <!-- TSS line -->
+        <line x1="700" y1="222" x2="700" y2="400" stroke="#E9EEEA" stroke-width="1" stroke-dasharray="3 3"/>
+
+        <!-- TF ticks -->
+        <g stroke="#6E8079" stroke-width="1.1">
+          <line x1="108" y1="344" x2="108" y2="400"/>
+          <line x1="248" y1="344" x2="248" y2="400"/>
+          <line x1="403.2" y1="344" x2="403.2" y2="400"/>
+          <line x1="510" y1="344" x2="510" y2="400"/>
+          <line x1="606.4" y1="344" x2="606.4" y2="400"/>
+          <line x1="644" y1="344" x2="644" y2="400"/>
+          <line x1="708" y1="344" x2="708" y2="400"/>
+        </g>
+        <g fill="#E9EEEA">
+          <circle cx="248" cy="344" r="4.5"/><circle cx="108" cy="344" r="4.5"/>
+        </g>
+        <g fill="#6E8079">
+          <circle cx="403.2" cy="344" r="3"/><circle cx="510" cy="344" r="3"/>
+          <circle cx="606.4" cy="344" r="3"/><circle cx="644" cy="344" r="3"/><circle cx="708" cy="344" r="3"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="9.8">
+          <text x="112" y="338" transform="rotate(-55,112,338)" fill="#E9EEEA">NRF1 −740</text>
+          <text x="252" y="338" transform="rotate(-55,252,338)" fill="#E9EEEA">CTCF −565</text>
+          <text x="407.2" y="338" transform="rotate(-55,407.2,338)" fill="#6E8079">NR2C2 −371</text>
+          <text x="514" y="338" transform="rotate(-55,514,338)" fill="#6E8079">EP300/ATF1 −236</text>
+          <text x="610.4" y="338" transform="rotate(-55,610.4,338)" fill="#6E8079">POLR2A −117</text>
+          <text x="648" y="338" transform="rotate(-55,648,338)" fill="#6E8079">Pol II pS5 −70</text>
+          <text x="712" y="338" transform="rotate(-55,712,338)" fill="#6E8079">POLR2G +10</text>
+        </g>
+
+        <!-- zoom axis -->
+        <line x1="60" y1="400" x2="860" y2="400" stroke="#24352E" stroke-width="1.4"/>
+        <g stroke="#24352E" stroke-width="1">
+          <line x1="60" y1="400" x2="60" y2="406"/><line x1="220" y1="400" x2="220" y2="406"/>
+          <line x1="380" y1="400" x2="380" y2="406"/><line x1="540" y1="400" x2="540" y2="406"/>
+          <line x1="700" y1="400" x2="700" y2="406"/><line x1="860" y1="400" x2="860" y2="406"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#6E8079" text-anchor="middle">
+          <text x="60" y="418">−800</text><text x="220" y="418">−600</text><text x="380" y="418">−400</text>
+          <text x="540" y="418">−200</text><text x="700" y="418">0</text><text x="860" y="418">+200</text>
+        </g>
+        <text x="460" y="444" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="11.5" fill="#6E8079" data-i18n="fig1-xlab">позиция, bp относительно TSS</text>
+
+        <!-- reserved lane note -->
+        <rect x="60" y="452" width="800" height="0.8" fill="#24352E"/>
+      </svg>
+
+      <div class="legend">
+        <span class="legend-item"><span class="legend-key" style="background:#56B4E9;opacity:0.45;border:1px solid #56B4E9;"></span><span data-i18n="lg1">Значимые CpG, LOW vs HIGH (q&lt;0,05)</span></span>
+        <span class="legend-item"><span class="legend-key" style="background:#E69F00;"></span><span data-i18n="lg2">Пик дифференциала #78–83</span></span>
+        <span class="legend-item"><span class="legend-key" style="border:1.6px dashed #F0E442;"></span><span data-i18n="lg3">Протоспейсер CRISPRoff (T-клетки)</span></span>
+        <span class="legend-item"><span class="legend-key" style="background:#F0E442;"></span><span data-i18n="lg4">CACCC-сайты KLF4 (литература)</span></span>
+        <span class="legend-item"><span class="legend-key" style="background:#E9EEEA;border-radius:50%;width:11px;"></span><span data-i18n="lg5">ChIP-seq K562, метилирование-чувствительный ТФ</span></span>
+        <span class="legend-item"><span class="legend-key" style="background:#6E8079;border-radius:50%;width:11px;"></span><span data-i18n="lg6">ChIP-seq K562, прочие факторы</span></span>
+      </div>
+
+      <figcaption data-i18n="fig1-cap">Позиции ТФ — центры ChIP-seq пиков K562 (ENCODE через UCSC API), проверенные вручную. CACCC-сайты KLF4 — из литературы, не ChIP-seq: прямого ChIP-подтверждения KLF4 в этом окне нет ни в одной клеточной линии. Ось — выведенный TSS, см. раздел 1. Структурные дорожки (G4, Z-ДНК, R-петли) лягут между блоком CpG и осью — сейчас эта полоса пуста, потому что ничего не посчитано.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ 3. 2D STRUCTURES ============ -->
+  <section>
+    <h2 data-i18n="s3-h2">3. 2D: небиформная ДНК</h2>
+    <p class="lede" data-i18n="s3-lede">Семь классов структур, которые могут возникать в промоторной области. Для каждого — последовательностная подпись, документированная связь с 5mC, чем считать и что это предсказывает для наших групп LOW / HIGH / BASE.</p>
+
+    <figure>
+      <svg viewBox="0 0 900 280" role="img" aria-labelledby="icons-title">
+        <title id="icons-title" data-i18n="fig2-alt">Схематические изображения шести классов небиформных структур ДНК</title>
+
+        <!-- G4 -->
+        <g transform="translate(20,20)">
+          <rect x="30" y="62" width="66" height="13" fill="#56B4E9" fill-opacity="0.9"/>
+          <rect x="34" y="44" width="66" height="13" fill="#56B4E9" fill-opacity="0.65"/>
+          <rect x="38" y="26" width="66" height="13" fill="#56B4E9" fill-opacity="0.4"/>
+          <path d="M30 68 C10 60 10 46 34 50" stroke="#56B4E9" stroke-width="1.8" fill="none"/>
+          <path d="M100 50 C122 44 122 32 104 32" stroke="#56B4E9" stroke-width="1.8" fill="none"/>
+          <path d="M96 68 C118 74 118 60 100 57" stroke="#56B4E9" stroke-width="1.8" fill="none"/>
+          <text x="67" y="100" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="12.5" fill="#56B4E9" font-weight="600">G4</text>
+          <text x="67" y="116" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#6E8079" data-i18n="ic1">G-цепь</text>
+        </g>
+
+        <!-- i-motif -->
+        <g transform="translate(320,20)">
+          <line x1="20" y1="34" x2="110" y2="34" stroke="#E69F00" stroke-width="1.8"/>
+          <line x1="20" y1="48" x2="110" y2="48" stroke="#E69F00" stroke-width="1.8"/>
+          <line x1="20" y1="62" x2="110" y2="62" stroke="#E69F00" stroke-width="1.8"/>
+          <line x1="20" y1="76" x2="110" y2="76" stroke="#E69F00" stroke-width="1.8"/>
+          <g stroke="#E69F00" stroke-width="1.4" stroke-opacity="0.75">
+            <line x1="34" y1="34" x2="34" y2="62"/><line x1="50" y1="48" x2="50" y2="76"/>
+            <line x1="66" y1="34" x2="66" y2="62"/><line x1="82" y1="48" x2="82" y2="76"/>
+            <line x1="98" y1="34" x2="98" y2="62"/>
+          </g>
+          <text x="65" y="100" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="12.5" fill="#E69F00" font-weight="600">i-motif</text>
+          <text x="65" y="116" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#6E8079" data-i18n="ic2">C-цепь</text>
+        </g>
+
+        <!-- Z-DNA -->
+        <g transform="translate(620,20)">
+          <path d="M10 52 q14 -20 28 0 q14 20 28 0" stroke="#E69F00" stroke-width="1.8" fill="none" stroke-opacity="0.35"/>
+          <path d="M10 52 q14 20 28 0 q14 -20 28 0" stroke="#E69F00" stroke-width="1.8" fill="none" stroke-opacity="0.35"/>
+          <path d="M70 40 l14 12 l-14 12 l14 12 l-14 12" stroke="#E69F00" stroke-width="2.2" fill="none"/>
+          <path d="M98 40 l-14 12 l14 12 l-14 12 l14 12" stroke="#E69F00" stroke-width="2.2" fill="none"/>
+          <line x1="68" y1="28" x2="68" y2="82" stroke="#6E8079" stroke-width="0.9" stroke-dasharray="3 3"/>
+          <text x="38" y="96" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#6E8079">B</text>
+          <text x="84" y="96" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#E69F00">Z</text>
+          <text x="60" y="116" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="12.5" fill="#E69F00" font-weight="600">Z-DNA</text>
+        </g>
+
+        <!-- R-loop -->
+        <g transform="translate(20,160)">
+          <path d="M20 60 L48 60 C60 60 60 30 78 30 C96 30 96 60 108 60 L136 60" stroke="#E69F00" stroke-width="1.8" fill="none"/>
+          <line x1="20" y1="76" x2="136" y2="76" stroke="#E69F00" stroke-width="1.8"/>
+          <line x1="50" y1="72" x2="106" y2="72" stroke="#E69F00" stroke-width="2.6" stroke-dasharray="5 3"/>
+          <text x="78" y="96" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="12.5" fill="#E69F00" font-weight="600">R-loop</text>
+          <text x="78" y="110" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#6E8079" data-i18n="ic4">РНК:ДНК гибрид</text>
+        </g>
+
+        <!-- Cruciform -->
+        <g transform="translate(320,160)">
+          <path d="M10 60 L52 60 M104 60 L146 60" stroke="#F0E442" stroke-width="1.8"/>
+          <path d="M10 68 L52 68 M104 68 L146 68" stroke="#F0E442" stroke-width="1.8"/>
+          <path d="M52 60 C56 36 74 32 78 30 C82 32 100 36 104 60" stroke="#F0E442" stroke-width="1.8" fill="none"/>
+          <path d="M52 68 C56 92 74 96 78 98 C82 96 100 92 104 68" stroke="#F0E442" stroke-width="1.8" fill="none"/>
+          <text x="78" y="118" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="12.5" fill="#F0E442" font-weight="600" data-i18n="ic5">Крестообразная</text>
+        </g>
+
+        <!-- Nucleosome -->
+        <g transform="translate(620,160)">
+          <ellipse cx="70" cy="62" rx="30" ry="24" fill="#6E8079" fill-opacity="0.28" stroke="#6E8079" stroke-width="1.4"/>
+          <path d="M14 54 C34 34 106 34 126 54" stroke="#6E8079" stroke-width="2" fill="none"/>
+          <path d="M18 70 C38 92 102 92 122 70" stroke="#6E8079" stroke-width="2" fill="none"/>
+          <path d="M126 54 C132 60 132 64 122 70" stroke="#6E8079" stroke-width="2" fill="none"/>
+          <text x="70" y="112" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="12.5" fill="#6E8079" font-weight="600" data-i18n="ic6">Нуклеосома</text>
+        </g>
+      </svg>
+      <figcaption data-i18n="fig2-cap">Схемы, не масштаб и не структурные модели. H-ДНК (триплекс) не показана — см. карточку ниже.</figcaption>
+    </figure>
+
+    <div class="struct-grid">
+
+      <div class="struct-card sc-g4">
+        <h3 data-i18n="c-g4-h">G-квадруплекс</h3>
+        <p class="alias" data-i18n="al-g4">G4 · G-quadruplex</p>
+        <dl>
+          <dt data-i18n="lbl-sig">Подпись</dt>
+          <dd data-i18n="c-g4-sig">Четыре трека по ≥3 гуанинов с петлями 1–7 нт. Формируется на G-цепи; комплементарная C-цепь при этом остаётся одноцепочечной или сама сворачивается в i-мотив.</dd>
+          <dt data-i18n="lbl-me">Связь с 5mC</dt>
+          <dd data-i18n="c-g4-me">Документированная и направленная: G4 ингибируют DNMT1 и локально удерживают гипометилирование; G4 обогащены в неметилированных CGI-промоторах (Mao et al. 2018).</dd>
+          <dt data-i18n="lbl-tool">Чем считать</dt>
+          <dd data-i18n="c-g4-tool">G4Hunter (окно 25, порог 1,2), pqsfinder. Экспериментально: G4-seq и G4 ChIP-seq в K562 (Hänsel-Hertsch et al. 2016) — для нас это правильная клеточная линия.</dd>
+          <dt data-i18n="lbl-pred">Что предсказывает у нас</dt>
+          <dd data-i18n="c-g4-pred">Если G4 перекрывает плотное ядро CpG, он может быть причиной, по которой BASE и LOW держатся на 7,4 % и 9,2 %. Тогда ZFPoff/CRISPRoff — это «продавливание» структурного барьера, а HIGH (29,4 %) — состояние, где барьер снят.</dd>
+        </dl>
+      </div>
+
+      <div class="struct-card sc-im">
+        <h3 data-i18n="c-im-h">i-мотив</h3>
+        <p class="alias" data-i18n="al-im">i-motif · C-rich counterpart</p>
+        <dl>
+          <dt data-i18n="lbl-sig">Подпись</dt>
+          <dd data-i18n="c-im-sig">C-богатая цепь, комплементарная G4-мотиву. Зависит от pH и отрицательной суперспирализации; в клетке существует, показан антителом iMab (Zeraati et al. 2018).</dd>
+          <dt data-i18n="lbl-me">Связь с 5mC</dt>
+          <dd data-i18n="c-im-me">Существует, но направление контекст-зависимо: 5mC сдвигает переходный pH и термостабильность i-мотива, и в литературе описаны сдвиги в обе стороны. Не принимать знак эффекта на веру — проверять для конкретной последовательности.</dd>
+          <dt data-i18n="lbl-tool">Чем считать</dt>
+          <dd data-i18n="c-im-tool">G4Hunter по обратно-комплементарной цепи (C-богатая сторона), затем сопоставить с G4-предсказаниями — они должны быть на одних координатах, на разных цепях.</dd>
+          <dt data-i18n="lbl-pred">Что предсказывает у нас</dt>
+          <dd data-i18n="c-im-pred">Асимметрию между цепями. Это самое ценное здесь: ONT читает каждую цепь отдельно, поэтому мы можем измерить метилирование по цепям прямо на имеющихся данных — новых экспериментов не нужно.</dd>
+        </dl>
+      </div>
+
+      <div class="struct-card sc-z">
+        <h3 data-i18n="c-z-h">Z-ДНК</h3>
+        <p class="alias" data-i18n="al-z">Z-DNA · левозакрученная форма</p>
+        <dl>
+          <dt data-i18n="lbl-sig">Подпись</dt>
+          <dd data-i18n="c-z-sig">Чередование пурин/пиримидин, прежде всего повторы (CG)n и (CA)n. Требует отрицательной суперспирализации — то есть возникает позади движущейся РНК-полимеразы.</dd>
+          <dt data-i18n="lbl-me">Связь с 5mC</dt>
+          <dd data-i18n="c-z-me">Самая сильная и самая старая из всех перечисленных: 5-метилцитозин резко стабилизирует Z-форму, снижая необходимую ионную силу на порядки (Behe &amp; Felsenfeld 1981).</dd>
+          <dt data-i18n="lbl-tool">Чем считать</dt>
+          <dd data-i18n="c-z-tool">Z-Hunt (zhunt3), готовые треки Z-ДНК в Non-B DB для hg38.</dd>
+          <dt data-i18n="lbl-pred">Что предсказывает у нас</dt>
+          <dd data-i18n="c-z-pred">Единственный класс, где наше вмешательство — причина структуры, а не следствие. Если рядом со следом эффектора есть (CG)n, то HIGH может быть Z-склонным, а LOW — нет, и это следствие редактирования, а не исходное свойство локуса.</dd>
+        </dl>
+      </div>
+
+      <div class="struct-card sc-r">
+        <h3 data-i18n="c-r-h">R-петля</h3>
+        <p class="alias" data-i18n="al-r">R-loop · РНК:ДНК гибрид + вытесненная цепь</p>
+        <dl>
+          <dt data-i18n="lbl-sig">Подпись</dt>
+          <dd data-i18n="c-r-sig">GC-skew: избыток G на нематричной цепи ниже TSS. Ко-транскрипционная структура — без транскрипции не образуется.</dd>
+          <dt data-i18n="lbl-me">Связь с 5mC</dt>
+          <dd data-i18n="c-r-me">R-петли характерны именно для неметилированных CGI-промоторов и защищают их от de novo метилирования DNMT3B1 (Ginno et al. 2012).</dd>
+          <dt data-i18n="lbl-tool">Чем считать</dt>
+          <dd data-i18n="c-r-tool">QmRLFS-finder плюс GC-skew в скользящем окне 100 bp. Экспериментально — DRIP-seq / qDRIP.</dd>
+          <dt data-i18n="lbl-pred">Что предсказывает у нас</dt>
+          <dd data-i18n="c-r-pred">Обратную связь и, главное, порядок событий: замолкание → падение транскрипции → потеря R-петли → снятие защиты → распространение метилирования на фланги. Это предсказывает временную задержку — ядро метилируется раньше флангов. Проверяемо на серии Day 2 → 16 → 35.</dd>
+        </dl>
+      </div>
+
+      <div class="struct-card sc-cr">
+        <h3 data-i18n="c-cr-h">Крестообразная структура</h3>
+        <p class="alias" data-i18n="al-cr">cruciform · инвертированные повторы</p>
+        <dl>
+          <dt data-i18n="lbl-sig">Подпись</dt>
+          <dd data-i18n="c-cr-sig">Инвертированные повторы длиной ≥6 bp с коротким спейсером. Экструзия зависит от суперспирализации.</dd>
+          <dt data-i18n="lbl-me">Связь с 5mC</dt>
+          <dd data-i18n="c-cr-me">Прямая связь документирована слабо. Есть общее соображение, что шпилечная ДНК — плохой субстрат для DNMT, но для этого локуса это гипотеза, а не установленный факт.</dd>
+          <dt data-i18n="lbl-tool">Чем считать</dt>
+          <dd data-i18n="c-cr-tool">EMBOSS einverted; треки cruciform в Non-B DB.</dd>
+          <dt data-i18n="lbl-pred">Что предсказывает у нас</dt>
+          <dd data-i18n="c-cr-pred">Кандидат на объяснение резких границ значимого блока. Почему сигнал начинается на CpG #20 и обрывается на #132, а не размывается плавно? Границы структурного элемента — одно из немногих объяснений резкого края.</dd>
+        </dl>
+      </div>
+
+      <div class="struct-card sc-h">
+        <h3 data-i18n="c-h-h">H-ДНК / триплекс</h3>
+        <p class="alias" data-i18n="al-h">H-DNA · внутримолекулярный триплекс</p>
+        <dl>
+          <dt data-i18n="lbl-sig">Подпись</dt>
+          <dd data-i18n="c-h-sig">Зеркальные пурин-богатые повторы (полипурин/полипиримидин).</dd>
+          <dt data-i18n="lbl-me">Связь с 5mC</dt>
+          <dd data-i18n="c-h-me">Слабая и плохо документированная. Основной эффект триплексов — блок элонгации Pol II, а не изменение метилирования.</dd>
+          <dt data-i18n="lbl-tool">Чем считать</dt>
+          <dd data-i18n="c-h-tool">Triplexator; треки H-DNA в Non-B DB.</dd>
+          <dt data-i18n="lbl-pred">Что предсказывает у нас</dt>
+          <dd data-i18n="c-h-pred">Низкий приоритет для механизма. Но проверить стоит по технической причине: триплексы и другие структуры дают обрывы ONT-ридов и ошибки картирования, а это уже влияло бы на наши покрытия и на фильтр NoFullyUnmeth.</dd>
+        </dl>
+      </div>
+
+      <div class="struct-card sc-nu" style="grid-column:1 / -1;">
+        <h3 data-i18n="c-nu-h">Нуклеосомное позиционирование</h3>
+        <p class="alias" data-i18n="al-nu">nucleosome positioning · не структура ДНК, а её упаковка</p>
+        <dl>
+          <dt data-i18n="lbl-sig">Подпись</dt>
+          <dd data-i18n="c-nu-sig">Не строго последовательность-специфична, но GC-состав и изгибная жёсткость сильно влияют на то, где нуклеосома сядет.</dd>
+          <dt data-i18n="lbl-me">Связь с 5mC</dt>
+          <dd data-i18n="c-nu-me">DNMT3A/3B предпочитают нуклеосомную ДНК, а метилирование обогащено на нуклеосоме с периодичностью около 10 bp — периода витка спирали (Chodavarapu et al. 2010).</dd>
+          <dt data-i18n="lbl-tool">Чем считать</dt>
+          <dd data-i18n="c-nu-tool">Автокорреляция per-CpG дельты HIGH−LOW по расстоянию в bp; MNase-seq K562; nanoNOMe / SMAC-seq — GpC-футпринтинг на той же ONT-молекуле, что и CpG-метилирование.</dd>
+          <dt data-i18n="lbl-pred">Что предсказывает у нас</dt>
+          <dd data-i18n="c-nu-pred">Самое дешёвое из всех предсказаний на этой странице: если в дельте HIGH−LOW есть периодичность ~10 bp, то форму профиля задаёт нуклеосома, а не последовательность. Считается на уже имеющихся данных, сегодня, без новых экспериментов.</dd>
+        </dl>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ 4. EMPTY SLOTS ============ -->
+  <section>
+    <h2 data-i18n="s4-h2">4. Слоты аннотации — пока пустые</h2>
+    <p class="lede" data-i18n="s4-lede">Эта таблица — форма, которую нужно заполнить. Ни одно поле не заполнено выдуманным значением. Когда команды из раздела 6 будут прогнаны на Skynet, значения встанут сюда, а структурные дорожки — на рисунок в разделе 2.</p>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th data-i18n="s4-th1">Элемент</th>
+          <th data-i18n="s4-th2">Метод</th>
+          <th data-i18n="s4-th3">Координаты</th>
+          <th data-i18n="s4-th4">Скор</th>
+          <th data-i18n="s4-th5">Перекрытие с CpG</th>
+          <th data-i18n="s4-th6">Статус</th>
+        </tr></thead>
+        <tbody>
+          <tr><td data-i18n="s4-r1">G-квадруплекс</td><td class="num">G4Hunter / pqsfinder</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag" data-i18n="notcomputed">не вычислено</span></td></tr>
+          <tr><td data-i18n="s4-r2">i-мотив</td><td class="num">G4Hunter (rev-comp)</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag" data-i18n="notcomputed">не вычислено</span></td></tr>
+          <tr><td data-i18n="s4-r3">Z-ДНК</td><td class="num">Z-Hunt / Non-B DB</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag" data-i18n="notcomputed">не вычислено</span></td></tr>
+          <tr><td data-i18n="s4-r4">R-петля (RLFS)</td><td class="num">QmRLFS-finder</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag" data-i18n="notcomputed">не вычислено</span></td></tr>
+          <tr><td data-i18n="s4-r5">GC-skew</td><td class="num" data-i18n="s4-m5">окно 100 bp</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag" data-i18n="notcomputed">не вычислено</span></td></tr>
+          <tr><td data-i18n="s4-r6">Инвертированные повторы</td><td class="num">EMBOSS einverted</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag" data-i18n="notcomputed">не вычислено</span></td></tr>
+          <tr><td data-i18n="s4-r7">H-ДНК / триплекс</td><td class="num">Triplexator</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag" data-i18n="notcomputed">не вычислено</span></td></tr>
+          <tr><td data-i18n="s4-r8">Периодичность ~10 bp в дельте</td><td class="num" data-i18n="s4-m8">автокорреляция</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag blue" data-i18n="datainhand">данные уже есть</span></td></tr>
+          <tr><td data-i18n="s4-r9">Асимметрия метилирования по цепям</td><td class="num" data-i18n="s4-m9">ONT, разбивка по цепи</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag blue" data-i18n="datainhand">данные уже есть</span></td></tr>
+          <tr><td data-i18n="s4-r10">TAD и границы доменов</td><td class="num">Hi-C K562 / 4DN</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag" data-i18n="notcomputed">не вычислено</span></td></tr>
+          <tr><td data-i18n="s4-r11">Петли CTCF, ориентация мотива</td><td class="num">JASPAR MA0139 + Hi-C</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td class="empty-slot">—</td><td><span class="tag" data-i18n="notcomputed">не вычислено</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 5. 3D ============ -->
+  <section>
+    <h2 data-i18n="s5-h2">5. 3D: локус в объёме</h2>
+    <p class="lede" data-i18n="s5-lede">Выше масштаба вторичных структур начинается уровень, на котором CD55 уже не изолированный промотор, а часть плотного кластера генов с общей регуляторной архитектурой.</p>
+
+    <ul class="plain">
+      <li data-i18n="s5-l1"><strong>Соседство.</strong> CD55 лежит на 1q32.2 внутри кластера RCA — регуляторов активации комплемента, где рядом стоят C4BPA/C4BPB, CR2, CR1, CR1L, CD46. Вопрос, который стоит задать данным: остаётся ли эффект ZFPoff/CRISPRoff строго на CD55, или соседние промоторы кластера тоже сдвигаются? У нас уже есть глубокие ONT-прогоны — off-target профилирование по этому кластеру возможно без новых экспериментов.</li>
+      <li data-i18n="s5-l2"><strong>Границы TAD.</strong> Первое, что нужно узнать: лежит ли окно −3,5…+2,8 kb внутри одного домена или на его границе. Это меняет интерпретацию — на границе преобладают CTCF-зависимые эффекты, внутри домена важнее локальные энхансеры.</li>
+      <li data-i18n="s5-l3"><strong>CTCF на −565 — самое интересное место всей страницы.</strong> Это единственный элемент, где 2D и 3D сходятся: 180 экспериментов ChIP-seq в K562 подтверждают связывание, связывание CTCF чувствительно к метилированию мотива, и CTCF — якорь хроматиновых петель. Если метилирование в HIGH вытесняет CTCF, то следствие — не только локальное, но и потеря петли, то есть изменение 3D.</li>
+      <li data-i18n="s5-l4"><strong>Ориентация мотива CTCF.</strong> Петли формируются между конвергентно ориентированными сайтами CTCF. Пока мы не просканируем окно на MA0139 и не узнаем ориентацию, мы не можем сказать, участвует ли этот сайт в петле вообще. Это скан по последовательности — быстро.</li>
+      <li data-i18n="s5-l5"><strong>Компартмент A/B.</strong> Статус локуса в K562 и в первичных T-клетках может различаться, и это одно из объяснений, почему кросс-типовая корреляция r = 0,784, а не выше.</li>
+      <li data-i18n="s5-l6"><strong>Одномолекулярный прокси на уже имеющихся данных.</strong> ONT даёт длинные риды: скоординированность метилирования вдоль одной молекулы на масштабе килобаз — это доступный нам суррогат доменной организации, который не требует Hi-C.</li>
+    </ul>
+
+    <div class="callout callout-blue">
+      <span data-i18n="s5-callout"><strong>Где брать 3D-данные.</strong> Портал 4D Nucleome и ENCODE — Hi-C и Micro-C для K562; Rao et al. 2014 — карты петель высокого разрешения, включая K562; Javierre et al. 2016 — promoter capture Hi-C для клеток крови, в том числе T-клеток, что даёт нам вторую клеточную систему на том же локусе.</span>
+    </div>
+  </section>
+
+  <!-- ============ 6. HYPOTHESES ============ -->
+  <section>
+    <h2 data-i18n="s6-h2">6. Механистические гипотезы</h2>
+    <p class="lede" data-i18n="s6-lede">Каждая с явным тестом. H0 идёт первой намеренно: это объяснение, которое любая структурная гипотеза обязана победить, прежде чем её стоит рассматривать всерьёз.</p>
+
+    <div class="hyp null-hyp">
+      <div class="hyp-head"><span class="hyp-id">H0</span><h3 data-i18n="h0-h">Пик — это след эффектора, а не структура</h3></div>
+      <p data-i18n="h0-p">Пик дифференциала #78–83 заканчивается ровно за 9 bp до протоспейсера CRISPRoff (+93…+112). Это в точности то, что даёт футпринт dCas9: метилирование ложится вплотную к месту посадки и обрывается там, где белок закрывает ДНК. Никакой вторичной структуры для объяснения положения пика не требуется. Пока эта версия не отвергнута, любое структурное объяснение положения пика — избыточная сущность.</p>
+      <p class="test"><strong data-i18n="lbl-test">Тест</strong><span data-i18n="h0-t"> — решающий и уже возможный: у ZFPoff нет sgRNA, ZFP садится в другое место. Нужен сайт связывания ZFP (сейчас он не задан, см. раздел 1). Если сайт ZFP отличается от протоспейсера, а пик в K562 ZFPoff всё равно приходится на #78–83, то положение пика задаётся локусом, а не эффектором — и структурные гипотезы получают право на жизнь. Если пик сдвигается вслед за сайтом ZFP, вся эта страница относится к флангам, но не к пику.</span></p>
+    </div>
+
+    <div class="hyp">
+      <div class="hyp-head"><span class="hyp-id">H1</span><h3 data-i18n="h1-h">G4 держит ядро промотора неметилированным</h3></div>
+      <p data-i18n="h1-p">Плотное CpG-ядро складывается в G4, G4 ингибирует DNMT1, и поэтому BASE (7,4 %) и LOW (9,2 %) остаются низкими. HIGH (29,4 %) — состояние, в котором барьер продавлен принудительным рекрутингом DNMT.</p>
+      <p class="test"><strong data-i18n="lbl-test">Тест</strong><span data-i18n="h1-t"> — G4Hunter плюс проверка по G4 ChIP-seq K562. Функционально: стабилизатор G4 (пиридостатин) на фоне ZFPoff должен замедлить набор метилирования, если гипотеза верна.</span></p>
+    </div>
+
+    <div class="hyp">
+      <div class="hyp-head"><span class="hyp-id">H2</span><h3 data-i18n="h2-h">Метилирование само переводит участок в Z-форму</h3></div>
+      <p data-i18n="h2-p">Здесь причинность обратная всем остальным гипотезам: не структура управляет метилированием, а метилирование создаёт структуру. 5mC резко стабилизирует Z-ДНК, поэтому в HIGH могли появиться Z-склонные участки, которых нет в LOW. Это давало бы вторичный, самоподдерживающийся слой репрессии.</p>
+      <p class="test"><strong data-i18n="lbl-test">Тест</strong><span data-i18n="h2-t"> — Z-Hunt по окну; если (CG)n есть, то анти-Z-ДНК антитело или Zα-based CUT&amp;RUN на отсортированных фракциях HIGH и LOW.</span></p>
+    </div>
+
+    <div class="hyp">
+      <div class="hyp-head"><span class="hyp-id">H3</span><h3 data-i18n="h3-h">Потеря R-петли предшествует распространению метилирования</h3></div>
+      <p data-i18n="h3-p">R-петля защищает неметилированный CGI-промотор от de novo метилирования. Замолкание убирает транскрипцию, транскрипция уносит с собой R-петлю, защита снимается — и метилирование расползается с ядра на фланги. Это объясняет, почему значимый блок такой широкий (#20–132, 3 kb), хотя эффектор садится в одну точку.</p>
+      <p class="test"><strong data-i18n="lbl-test">Тест</strong><span data-i18n="h3-t"> — временной ряд, который у нас уже частично есть: если гипотеза верна, ядро метилируется раньше флангов. Сравнить форму профиля Day 6 / Day 28 / Day 35 — ширина блока должна расти со временем. Экспериментально: DRIP-seq на HIGH vs LOW.</span></p>
+    </div>
+
+    <div class="hyp">
+      <div class="hyp-head"><span class="hyp-id">H4</span><h3 data-i18n="h4-h">Форму профиля задаёт нуклеосома</h3></div>
+      <p data-i18n="h4-p">Тонкая структура дельты HIGH−LOW отражает не последовательность, а доступность: DNMT достаёт до CpG, обращённых наружу от октамера, и не достаёт до обращённых внутрь. Подпись — периодичность около 10 bp.</p>
+      <p class="test"><strong data-i18n="lbl-test">Тест</strong><span data-i18n="h4-t"> — считается сегодня на имеющихся данных: автокорреляция per-CpG дельты по расстоянию в bp, пик на ~10 bp. Дальше — nanoNOMe / SMAC-seq, где футпринт хроматина и CpG-метилирование читаются с одной и той же молекулы.</span></p>
+    </div>
+
+    <div class="hyp">
+      <div class="hyp-head"><span class="hyp-id">H5</span><h3 data-i18n="h5-h">Метилирование вытесняет CTCF и рвёт петлю</h3></div>
+      <p data-i18n="h5-p">Мостик от 2D к 3D. CTCF на −565 лежит внутри значимого блока, его связывание чувствительно к метилированию мотива, и он служит якорем петли. Тогда следствие метилирования — не только локальное молчание, но и перестройка контактов всего участка.</p>
+      <p class="test"><strong data-i18n="lbl-test">Тест</strong><span data-i18n="h5-t"> — сначала скан MA0139 на ориентацию мотива (по последовательности, быстро). Затем CTCF CUT&amp;RUN на отсортированных HIGH и LOW; затем 4C или Capture-C с точкой обзора на промоторе CD55.</span></p>
+    </div>
+
+    <div class="hyp">
+      <div class="hyp-head"><span class="hyp-id">H6</span><h3 data-i18n="h6-h">Границы блока — это границы структурного элемента</h3></div>
+      <p data-i18n="h6-p">Сигнал не размывается плавно, он начинается на CpG #20 и обрывается на #132. Резкий край требует резкой причины: край структуры, край нуклеосомного массива, граница повтора или сайт CTCF.</p>
+      <p class="test"><strong data-i18n="lbl-test">Тест</strong><span data-i18n="h6-t"> — пересечь координаты #20 и #132 с краями предсказанных элементов, с RepeatMasker и с сайтами CTCF. Совпадение в пределах десятков bp было бы сильной уликой; отсутствие совпадения гипотезу закрывает.</span></p>
+    </div>
+
+    <div class="hyp">
+      <div class="hyp-head"><span class="hyp-id">H7</span><h3 data-i18n="h7-h">Структура формируется не на всех молекулах сразу</h3></div>
+      <p data-i18n="h7-p">Структурные переходы — событие на уровне отдельной молекулы: на одной G4 сложился, на соседней нет. Усреднённый профиль это скрывает, а одномолекулярные данные — нет. Если элемент переключается по принципу «всё или ничего», молекулы должны распадаться на две моды по метилированию внутри элемента, а CpG внутри элемента — коррелировать между собой сильнее, чем просто соседние CpG на том же расстоянии.</p>
+      <p class="test"><strong data-i18n="lbl-test">Тест</strong><span data-i18n="h7-t"> — полностью на имеющихся ONT-данных. Для каждого предсказанного элемента, покрывающего CpG i…j: (1) тест на бимодальность доли метилирования по молекулам, (2) попарная корреляция внутри элемента против фона, подобранного по расстоянию между CpG. Это, пожалуй, самое сильное применение одномолекулярного разрешения во всём проекте.</span></p>
+    </div>
+  </section>
+
+  <!-- ============ 7. HOW TO COMPUTE ============ -->
+  <section>
+    <h2 data-i18n="s7-h2">7. Как заполнить пустые слоты</h2>
+    <p class="lede" data-i18n="s7-lede">Всё, что нужно для 2D-предсказаний — последовательность окна. Дальше — пересечение с координатами наших CpG.</p>
+
+    <pre class="code" data-i18n="code-block"><span class="cmt"># 1. Достать окно из референса (GRCh38)</span>
+<b>samtools</b> faidx GRCh38.fa chr1:207318092-207324450 &gt; cd55_window.fa
+
+<span class="cmt"># 2. G-квадруплексы на G-цепи</span>
+<b>python</b> G4Hunter.py -i cd55_window.fa -o g4_out -w 25 -s 1.2
+
+<span class="cmt"># 2b. То же через pqsfinder (обе цепи сразу)</span>
+<b>Rscript</b> -e 'library(pqsfinder); library(Biostrings);
+  s &lt;- readDNAStringSet("cd55_window.fa")[[1]];
+  write.csv(as.data.frame(pqsfinder(s, strand="*")), "pqs.csv")'
+
+<span class="cmt"># 3. i-мотив = G4Hunter по обратно-комплементарной цепи</span>
+<b>seqkit</b> seq -r -p cd55_window.fa &gt; cd55_window_rc.fa
+<b>python</b> G4Hunter.py -i cd55_window_rc.fa -o imotif_out -w 25 -s 1.2
+
+<span class="cmt"># 4. Z-ДНК (проверить порядок аргументов в своей сборке zhunt3)</span>
+<b>zhunt3</b> &lt;window&gt; &lt;minsize&gt; &lt;maxsize&gt; cd55_window.fa
+
+<span class="cmt"># 5. R-петли и GC-skew</span>
+<b>python</b> QmRLFS-finder.py -i cd55_window.fa -o rlfs_out
+
+<span class="cmt"># 6. Инвертированные повторы -&gt; крестообразные структуры</span>
+<b>einverted</b> -sequence cd55_window.fa -gap 12 -threshold 50 \
+  -match 3 -mismatch -4 -outfile inv.out -outseq inv.fa
+
+<span class="cmt"># 7. Свободная энергия укладки, параметры ДНК (не РНК!)</span>
+<b>RNAfold</b> --paramFile=dna_mathews2004.par &lt; cd55_window.fa
+
+<span class="cmt"># 8. Мотив CTCF и его ориентация (JASPAR MA0139)</span>
+<b>fimo</b> --thresh 1e-4 MA0139.meme cd55_window.fa
+
+<span class="cmt"># 9. Пересечь всё с нашими CpG</span>
+<span class="cmt">#    cd55_cpg_137.bed  — 137 CpG из файла координат проекта</span>
+<span class="cmt">#    cd55_sig.bed      — подмножество значимых (q &lt; 0.05)</span>
+<b>bedtools</b> intersect -a cd55_sig.bed -b structures.bed -wa -wb &gt; overlap.tsv</pre>
+
+    <div class="callout">
+      <span data-i18n="s7-callout"><strong>Две проверки перед тем, как чему-то верить.</strong> Первая: координаты выхода этих программ — относительно начала окна, а не хромосомы. Прибавить 207 318 091 (или 207 318 092, в зависимости от того, 0- или 1-based выход) и проверить на известной точке — координата CpG-пика должна лечь на chr1:207,321,678. Вторая: у всех этих предсказателей высокая доля ложных срабатываний. Предсказание G4 — это не G4. Ценность имеет только совпадение предсказания с независимым экспериментальным треком (G4-seq, DRIP-seq, Non-B DB) или с нашим собственным сигналом метилирования.</span>
+    </div>
+
+    <div class="callout callout-blue">
+      <span data-i18n="s7-callout2"><strong>Что можно посчитать до всякой последовательности.</strong> Три анализа из этой страницы не требуют ни референса, ни новых экспериментов — только уже лежащие на Skynet <code>.npy</code> матрицы: периодичность ~10 bp в дельте HIGH−LOW (H4), асимметрия метилирования между цепями (i-мотив), бимодальность и внутриэлементная корреляция по молекулам (H7). С них и стоит начать.</span>
+    </div>
+  </section>
+
+  <!-- ============ 8. CAVEATS ============ -->
+  <section>
+    <h2 data-i18n="s8-h2">8. Оговорки</h2>
+    <ul class="plain">
+      <li data-i18n="s8-l1">Ни одно структурное предсказание на этой странице не сделано. Все соответствующие поля помечены «не вычислено» намеренно — пустой слот лучше правдоподобного числа.</li>
+      <li data-i18n="s8-l2">TSS выведен арифметически из одного якоря (пик = +58 = chr1:207,321,678), а не взят из аннотации. Сходимость с положением дистальных ТФ обнадёживает, но это следует подтвердить по файлу координат.</li>
+      <li data-i18n="s8-l3">H0 не отвергнута. Пока сайт связывания ZFP не задан, положение пика полностью объясняется футпринтом эффектора, и структурные объяснения избыточны.</li>
+      <li data-i18n="s8-l4">Небиформные структуры динамичны и зависят от суперспирализации, а значит — от транскрипции. Они не свойство последовательности, а свойство состояния. Предсказание по последовательности даёт лишь список мест, где такое возможно.</li>
+      <li data-i18n="s8-l5">Все ChIP-seq данные ENCODE — с несортированной популяции K562, а не с фракций LOW и HIGH. Это тот же ограничитель, что и на странице ChIP-seq: мы сравниваем наш отсортированный сигнал с чужим усреднённым.</li>
+      <li data-i18n="s8-l6">Baseline (Day 2, mock) отличается от LOW/HIGH (Day 16) и по времени, и по процедуре. Любое структурное сравнение с baseline наследует этот конфаундер.</li>
+      <li data-i18n="s8-l7">Совпадение координат — не механизм. Даже идеальное перекрытие предсказанного G4 с пиком метилирования остаётся корреляцией, пока нет функционального возмущения.</li>
+    </ul>
+  </section>
+
+  <!-- ============ SOURCES ============ -->
+  <section>
+    <h2 data-i18n="s9-h2">Источники</h2>
+    <p class="lede" data-i18n="s9-lede">Ссылки на статьи даны как поиск по PubMed, а не как прямые DOI — прямые адреса не проверялись из этой среды, а непроверенная ссылка хуже, чем поиск, который точно откроется.</p>
+    <ol class="ref-list" id="references">
+      <li class="ref-item" id="ref-1">
+        <span class="ref-num">1</span>
+        <div class="ref-body" data-i18n="src1"></div>
+      </li>
+      <li class="ref-item" id="ref-2">
+        <span class="ref-num">2</span>
+        <div class="ref-body" data-i18n="src2"></div>
+      </li>
+      <li class="ref-item" id="ref-3">
+        <span class="ref-num">3</span>
+        <div class="ref-body" data-i18n="src3"></div>
+      </li>
+      <li class="ref-item" id="ref-4">
+        <span class="ref-num">4</span>
+        <div class="ref-body" data-i18n="src4"></div>
+      </li>
+      <li class="ref-item" id="ref-5">
+        <span class="ref-num">5</span>
+        <div class="ref-body" data-i18n="src5"></div>
+      </li>
+      <li class="ref-item" id="ref-6">
+        <span class="ref-num">6</span>
+        <div class="ref-body" data-i18n="src6"></div>
+      </li>
+      <li class="ref-item" id="ref-7">
+        <span class="ref-num">7</span>
+        <div class="ref-body" data-i18n="src7"></div>
+      </li>
+      <li class="ref-item" id="ref-8">
+        <span class="ref-num">8</span>
+        <div class="ref-body" data-i18n="src8"></div>
+      </li>
+      <li class="ref-item" id="ref-9">
+        <span class="ref-num">9</span>
+        <div class="ref-body" data-i18n="src9"></div>
+      </li>
+      <li class="ref-item" id="ref-10">
+        <span class="ref-num">10</span>
+        <div class="ref-body" data-i18n="src10"></div>
+      </li>
+      <li class="ref-item" id="ref-11">
+        <span class="ref-num">11</span>
+        <div class="ref-body" data-i18n="src11"></div>
+      </li>
+      <li class="ref-item" id="ref-12">
+        <span class="ref-num">12</span>
+        <div class="ref-body" data-i18n="src12"></div>
+      </li>
+      <li class="ref-item" id="ref-13">
+        <span class="ref-num">13</span>
+        <div class="ref-body" data-i18n="src13"></div>
+      </li>
+      <li class="ref-item" id="ref-14">
+        <span class="ref-num">14</span>
+        <div class="ref-body" data-i18n="src14"></div>
+      </li>
+      <li class="ref-item" id="ref-15">
+        <span class="ref-num">15</span>
+        <div class="ref-body" data-i18n="src15"></div>
+      </li>
+      <li class="ref-item" id="ref-16">
+        <span class="ref-num">16</span>
+        <div class="ref-body" data-i18n="src16"></div>
+      </li>
+      <li class="ref-item" id="ref-17">
+        <span class="ref-num">17</span>
+        <div class="ref-body" data-i18n="src17"></div>
+      </li>
+    </ol>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap" data-i18n="footer">epicme.bio — карта вторичных и третичных структур ДНК в области TSS CD55. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="index.html">← Назад на главную</a></div>
+</footer>
+
+<script>
+const I18N = {
+  ru: {
+    'nav-research':'Research Ideas/Todos',
+    'nav-public':'Публичные данные',
+    'brand-sub':'эпигеном · цитозин · метилирование',
+    'nav-home':'Главная',
+    'nav-about':'О проекте',
+    'nav-emseq':'EM-seq · Day 35',
+    'nav-k562':'K562',
+    'nav-chipseq':'ChIP-seq',
+    'nav-tf':'Механизмы',
+    'nav-struct':'Структуры ДНК',
+    'nav-memory':'Метилирование и память',
+    'nav-trauma':'Метилирование и травма',
+    'nav-toggle-label':'Меню',
+    'nav-chaple':'CHAPLE-синдром',
+    'nav-hgsoc':'CD55 и рак яичников',
+    'nav-mesites-nuc':'Mesites: delMC + нуклеосомы',
+    'nav-mesites':'Mesites: delMC',
+    'nav-upload':'Загрузка данных',
+    'al-g4':'G4 · G-quadruplex',
+    'al-im':'i-motif · C-rich counterpart',
+    'al-z':'Z-DNA · левозакрученная форма',
+    'al-r':'R-loop · РНК:ДНК гибрид + вытесненная цепь',
+    'al-cr':'cruciform · инвертированные повторы',
+    'al-h':'H-DNA · внутримолекулярный триплекс',
+    'al-nu':'nucleosome positioning · не структура ДНК, а её упаковка',
+    's1-r12v':'не задан',
+    's4-m5':'окно 100 bp',
+    'code-block':`<span class="cmt"># 1. Достать окно из референса (GRCh38)</span>
+<b>samtools</b> faidx GRCh38.fa chr1:207318092-207324450 &gt; cd55_window.fa
+
+<span class="cmt"># 2. G-квадруплексы на G-цепи</span>
+<b>python</b> G4Hunter.py -i cd55_window.fa -o g4_out -w 25 -s 1.2
+
+<span class="cmt"># 2b. То же через pqsfinder (обе цепи сразу)</span>
+<b>Rscript</b> -e 'library(pqsfinder); library(Biostrings);
+  s &lt;- readDNAStringSet("cd55_window.fa")[[1]];
+  write.csv(as.data.frame(pqsfinder(s, strand="*")), "pqs.csv")'
+
+<span class="cmt"># 3. i-мотив = G4Hunter по обратно-комплементарной цепи</span>
+<b>seqkit</b> seq -r -p cd55_window.fa &gt; cd55_window_rc.fa
+<b>python</b> G4Hunter.py -i cd55_window_rc.fa -o imotif_out -w 25 -s 1.2
+
+<span class="cmt"># 4. Z-ДНК (проверить порядок аргументов в своей сборке zhunt3)</span>
+<b>zhunt3</b> &lt;window&gt; &lt;minsize&gt; &lt;maxsize&gt; cd55_window.fa
+
+<span class="cmt"># 5. R-петли и GC-skew</span>
+<b>python</b> QmRLFS-finder.py -i cd55_window.fa -o rlfs_out
+
+<span class="cmt"># 6. Инвертированные повторы -&gt; крестообразные структуры</span>
+<b>einverted</b> -sequence cd55_window.fa -gap 12 -threshold 50 \
+  -match 3 -mismatch -4 -outfile inv.out -outseq inv.fa
+
+<span class="cmt"># 7. Свободная энергия укладки, параметры ДНК (не РНК!)</span>
+<b>RNAfold</b> --paramFile=dna_mathews2004.par &lt; cd55_window.fa
+
+<span class="cmt"># 8. Мотив CTCF и его ориентация (JASPAR MA0139)</span>
+<b>fimo</b> --thresh 1e-4 MA0139.meme cd55_window.fa
+
+<span class="cmt"># 9. Пересечь всё с нашими CpG</span>
+<span class="cmt">#    cd55_cpg_137.bed  — 137 CpG из файла координат проекта</span>
+<span class="cmt">#    cd55_sig.bed      — подмножество значимых (q &lt; 0.05)</span>
+<b>bedtools</b> intersect -a cd55_sig.bed -b structures.bed -wa -wb &gt; overlap.tsv`,
+    'title':'epicme.bio — 2D и 3D структуры ДНК CD55',
+    'eyebrow':'Learn — форма ДНК на нашем окне',
+    'h1':'Что ДНК <em>делает со своей формой</em><br>в области TSS CD55',
+    'hero-sub':'Наши профили метилирования — одномерные: 137 CpG вдоль 6,4 kb. Но ДНК в этом окне не прямая линия. Она может складываться в G-квадруплексы, i-мотивы, Z-форму, R-петли, крестообразные структуры — и всё это укладывается в петли и домены хроматина. Эта страница — карта того, где такие структуры искать и как связать их с тем, что мы уже измерили.',
+    'status-banner':'<strong>Ни одна структура на этой странице ещё не предсказана.</strong> Здесь нет ни одного вычисленного G4-скора, ни одной координаты Z-ДНК, ни одного Hi-C контакта. Все такие поля стоят пустыми и помечены «не вычислено». Реальные числа на странице — только те, что уже получены в проекте: координаты, позиции CpG, позиции ChIP-seq пиков. Чтобы заполнить пустые слоты, нужна последовательность окна — команды приведены в разделе 6.',
+
+    's1-h2':'1. Система координат',
+    's1-lede':'Всё на этой странице привязано к одному окну. Прежде чем накладывать структуру на метилирование, координаты должны совпадать до пары оснований — иначе «перекрытие» ничего не значит.',
+    's1-th1':'Величина','s1-th2':'Значение','s1-th3':'Откуда',
+    's1-r1a':'Окно анализа (GRCh38)','s1-r1c':'Файл координат проекта',
+    's1-r2a':'Длина окна','s1-r2c':'Вычислено: конец − начало',
+    's1-r3a':'TSS (выведен, требует подтверждения)','s1-r3c':'Вычислено из якоря: пик CpG #78–83 = chr1:207,321,678 = +58 bp',
+    's1-r4a':'Окно относительно TSS','s1-r4c':'Вычислено. Сходится: MAZ/GATA1/NFE2 на ≈−3,4 kb попадают внутрь левого края',
+    's1-r5a':'Число CpG','s1-r5c':'Файл координат проекта',
+    's1-r6a':'Плотность CpG, всё окно','s1-r6c':'Вычислено: 137 / 6 358',
+    's1-r7a':'Значимый блок #20–132 (LOW vs HIGH)','s1-r7c':'Анализ K562 Day 16',
+    's1-r8a':'Плотность CpG в блоке','s1-r8c':'Вычислено',
+    's1-r9a':'Пик дифференциала #78–83','s1-r9c':'Анализ K562 Day 16',
+    's1-r10a':'Плотность CpG в пике','s1-r10c':'Вычислено — один CpG каждые 4,5 bp',
+    's1-r11a':'Протоспейсер CRISPRoff (T-клетки)','s1-r11c':'Датасет T-клеток; пик заканчивается за 9 bp до него',
+    's1-r12a':'Сайт связывания ZFP (K562 ZFPoff)','s1-r12c':'Нужен от нас — без него нельзя отделить структуру от следа эффектора',
+    's1-callout':'<strong>Плотность — это уже подсказка.</strong> 22 CpG на 100 bp в пике #78–83 — это не просто «CpG-остров», это очень G/C-насыщенный микроучасток. Именно такая композиция необходима (хотя и недостаточна) для G-квадруплекса на G-цепи и i-мотива на C-цепи. Это не предсказание структуры — это наблюдение, что композиционное условие выполнено и предсказание имеет смысл считать.',
+
+    's2-h2':'2. Что уже нанесено на этот локус',
+    's2-lede':'Ниже — только измеренное: блок значимых CpG, пик дифференциала, ChIP-seq пики K562 и три литературных CACCC-сайта KLF4. Структурные треки лягут поверх этой же оси.',
+    'fig1-alt':'Карта окна CD55: обзор всего окна и увеличенный вид коровой области промотора',
+    'fig1-p1':'ВСЁ ОКНО · 6 358 bp','fig1-p2':'КОРОВАЯ ОБЛАСТЬ · −800 … +200 bp',
+    'fig1-blockcont':'← блок #20–132 продолжается за оба края',
+    'fig1-proto':'протоспейсер','fig1-klf':'KLF4 CACCC',
+    'fig1-xlab':'позиция, bp относительно TSS',
+    'lg1':'Значимые CpG, LOW vs HIGH (q&lt;0,05)','lg2':'Пик дифференциала #78–83',
+    'lg3':'Протоспейсер CRISPRoff (T-клетки)','lg4':'CACCC-сайты KLF4 (литература)',
+    'lg5':'ChIP-seq K562, метилирование-чувствительный ТФ','lg6':'ChIP-seq K562, прочие факторы',
+    'fig1-cap':'Позиции ТФ — центры ChIP-seq пиков K562 (ENCODE через UCSC API), проверенные вручную. CACCC-сайты KLF4 — из литературы, не ChIP-seq: прямого ChIP-подтверждения KLF4 в этом окне нет ни в одной клеточной линии. Ось — выведенный TSS, см. раздел 1. Структурные дорожки (G4, Z-ДНК, R-петли) лягут между блоком CpG и осью — сейчас эта полоса пуста, потому что ничего не посчитано.',
+
+    's3-h2':'3. 2D: небиформная ДНК',
+    's3-lede':'Семь классов структур, которые могут возникать в промоторной области. Для каждого — последовательностная подпись, документированная связь с 5mC, чем считать и что это предсказывает для наших групп LOW / HIGH / BASE.',
+    'fig2-alt':'Схематические изображения шести классов небиформных структур ДНК',
+    'ic1':'G-цепь','ic2':'C-цепь','ic4':'РНК:ДНК гибрид','ic5':'Крестообразная','ic6':'Нуклеосома',
+    'fig2-cap':'Схемы, не масштаб и не структурные модели. H-ДНК (триплекс) не показана — см. карточку ниже.',
+    'lbl-sig':'Подпись','lbl-me':'Связь с 5mC','lbl-tool':'Чем считать','lbl-pred':'Что предсказывает у нас',
+
+    'c-g4-h':'G-квадруплекс',
+    'c-g4-sig':'Четыре трека по ≥3 гуанинов с петлями 1–7 нт. Формируется на G-цепи; комплементарная C-цепь при этом остаётся одноцепочечной или сама сворачивается в i-мотив.',
+    'c-g4-me':'Документированная и направленная: G4 ингибируют DNMT1 и локально удерживают гипометилирование; G4 обогащены в неметилированных CGI-промоторах (Mao et al. 2018).',
+    'c-g4-tool':'G4Hunter (окно 25, порог 1,2), pqsfinder. Экспериментально: G4-seq и G4 ChIP-seq в K562 (Hänsel-Hertsch et al. 2016) — для нас это правильная клеточная линия.',
+    'c-g4-pred':'Если G4 перекрывает плотное ядро CpG, он может быть причиной, по которой BASE и LOW держатся на 7,4 % и 9,2 %. Тогда ZFPoff/CRISPRoff — это «продавливание» структурного барьера, а HIGH (29,4 %) — состояние, где барьер снят.',
+
+    'c-im-h':'i-мотив',
+    'c-im-sig':'C-богатая цепь, комплементарная G4-мотиву. Зависит от pH и отрицательной суперспирализации; в клетке существует, показан антителом iMab (Zeraati et al. 2018).',
+    'c-im-me':'Существует, но направление контекст-зависимо: 5mC сдвигает переходный pH и термостабильность i-мотива, и в литературе описаны сдвиги в обе стороны. Не принимать знак эффекта на веру — проверять для конкретной последовательности.',
+    'c-im-tool':'G4Hunter по обратно-комплементарной цепи (C-богатая сторона), затем сопоставить с G4-предсказаниями — они должны быть на одних координатах, на разных цепях.',
+    'c-im-pred':'Асимметрию между цепями. Это самое ценное здесь: ONT читает каждую цепь отдельно, поэтому мы можем измерить метилирование по цепям прямо на имеющихся данных — новых экспериментов не нужно.',
+
+    'c-z-h':'Z-ДНК',
+    'c-z-sig':'Чередование пурин/пиримидин, прежде всего повторы (CG)n и (CA)n. Требует отрицательной суперспирализации — то есть возникает позади движущейся РНК-полимеразы.',
+    'c-z-me':'Самая сильная и самая старая из всех перечисленных: 5-метилцитозин резко стабилизирует Z-форму, снижая необходимую ионную силу на порядки (Behe &amp; Felsenfeld 1981).',
+    'c-z-tool':'Z-Hunt (zhunt3), готовые треки Z-ДНК в Non-B DB для hg38.',
+    'c-z-pred':'Единственный класс, где наше вмешательство — причина структуры, а не следствие. Если рядом со следом эффектора есть (CG)n, то HIGH может быть Z-склонным, а LOW — нет, и это следствие редактирования, а не исходное свойство локуса.',
+
+    'c-r-h':'R-петля',
+    'c-r-sig':'GC-skew: избыток G на нематричной цепи ниже TSS. Ко-транскрипционная структура — без транскрипции не образуется.',
+    'c-r-me':'R-петли характерны именно для неметилированных CGI-промоторов и защищают их от de novo метилирования DNMT3B1 (Ginno et al. 2012).',
+    'c-r-tool':'QmRLFS-finder плюс GC-skew в скользящем окне 100 bp. Экспериментально — DRIP-seq / qDRIP.',
+    'c-r-pred':'Обратную связь и, главное, порядок событий: замолкание → падение транскрипции → потеря R-петли → снятие защиты → распространение метилирования на фланги. Это предсказывает временную задержку — ядро метилируется раньше флангов. Проверяемо на серии Day 2 → 16 → 35.',
+
+    'c-cr-h':'Крестообразная структура',
+    'c-cr-sig':'Инвертированные повторы длиной ≥6 bp с коротким спейсером. Экструзия зависит от суперспирализации.',
+    'c-cr-me':'Прямая связь документирована слабо. Есть общее соображение, что шпилечная ДНК — плохой субстрат для DNMT, но для этого локуса это гипотеза, а не установленный факт.',
+    'c-cr-tool':'EMBOSS einverted; треки cruciform в Non-B DB.',
+    'c-cr-pred':'Кандидат на объяснение резких границ значимого блока. Почему сигнал начинается на CpG #20 и обрывается на #132, а не размывается плавно? Границы структурного элемента — одно из немногих объяснений резкого края.',
+
+    'c-h-h':'H-ДНК / триплекс',
+    'c-h-sig':'Зеркальные пурин-богатые повторы (полипурин/полипиримидин).',
+    'c-h-me':'Слабая и плохо документированная. Основной эффект триплексов — блок элонгации Pol II, а не изменение метилирования.',
+    'c-h-tool':'Triplexator; треки H-DNA в Non-B DB.',
+    'c-h-pred':'Низкий приоритет для механизма. Но проверить стоит по технической причине: триплексы и другие структуры дают обрывы ONT-ридов и ошибки картирования, а это уже влияло бы на наши покрытия и на фильтр NoFullyUnmeth.',
+
+    'c-nu-h':'Нуклеосомное позиционирование',
+    'c-nu-sig':'Не строго последовательность-специфична, но GC-состав и изгибная жёсткость сильно влияют на то, где нуклеосома сядет.',
+    'c-nu-me':'DNMT3A/3B предпочитают нуклеосомную ДНК, а метилирование обогащено на нуклеосоме с периодичностью около 10 bp — периода витка спирали (Chodavarapu et al. 2010).',
+    'c-nu-tool':'Автокорреляция per-CpG дельты HIGH−LOW по расстоянию в bp; MNase-seq K562; nanoNOMe / SMAC-seq — GpC-футпринтинг на той же ONT-молекуле, что и CpG-метилирование.',
+    'c-nu-pred':'Самое дешёвое из всех предсказаний на этой странице: если в дельте HIGH−LOW есть периодичность ~10 bp, то форму профиля задаёт нуклеосома, а не последовательность. Считается на уже имеющихся данных, сегодня, без новых экспериментов.',
+
+    's4-h2':'4. Слоты аннотации — пока пустые',
+    's4-lede':'Эта таблица — форма, которую нужно заполнить. Ни одно поле не заполнено выдуманным значением. Когда команды из раздела 6 будут прогнаны на Skynet, значения встанут сюда, а структурные дорожки — на рисунок в разделе 2.',
+    's4-th1':'Элемент','s4-th2':'Метод','s4-th3':'Координаты','s4-th4':'Скор','s4-th5':'Перекрытие с CpG','s4-th6':'Статус',
+    's4-r1':'G-квадруплекс','s4-r2':'i-мотив','s4-r3':'Z-ДНК','s4-r4':'R-петля (RLFS)','s4-r5':'GC-skew',
+    's4-r6':'Инвертированные повторы','s4-r7':'H-ДНК / триплекс',
+    's4-r8':'Периодичность ~10 bp в дельте','s4-m8':'автокорреляция',
+    's4-r9':'Асимметрия метилирования по цепям','s4-m9':'ONT, разбивка по цепи',
+    's4-r10':'TAD и границы доменов','s4-r11':'Петли CTCF, ориентация мотива',
+    'notcomputed':'не вычислено','datainhand':'данные уже есть',
+
+    's5-h2':'5. 3D: локус в объёме',
+    's5-lede':'Выше масштаба вторичных структур начинается уровень, на котором CD55 уже не изолированный промотор, а часть плотного кластера генов с общей регуляторной архитектурой.',
+    's5-l1':'<strong>Соседство.</strong> CD55 лежит на 1q32.2 внутри кластера RCA — регуляторов активации комплемента, где рядом стоят C4BPA/C4BPB, CR2, CR1, CR1L, CD46. Вопрос, который стоит задать данным: остаётся ли эффект ZFPoff/CRISPRoff строго на CD55, или соседние промоторы кластера тоже сдвигаются? У нас уже есть глубокие ONT-прогоны — off-target профилирование по этому кластеру возможно без новых экспериментов.',
+    's5-l2':'<strong>Границы TAD.</strong> Первое, что нужно узнать: лежит ли окно −3,5…+2,8 kb внутри одного домена или на его границе. Это меняет интерпретацию — на границе преобладают CTCF-зависимые эффекты, внутри домена важнее локальные энхансеры.',
+    's5-l3':'<strong>CTCF на −565 — самое интересное место всей страницы.</strong> Это единственный элемент, где 2D и 3D сходятся: 180 экспериментов ChIP-seq в K562 подтверждают связывание, связывание CTCF чувствительно к метилированию мотива, и CTCF — якорь хроматиновых петель. Если метилирование в HIGH вытесняет CTCF, то следствие — не только локальное, но и потеря петли, то есть изменение 3D.',
+    's5-l4':'<strong>Ориентация мотива CTCF.</strong> Петли формируются между конвергентно ориентированными сайтами CTCF. Пока мы не просканируем окно на MA0139 и не узнаем ориентацию, мы не можем сказать, участвует ли этот сайт в петле вообще. Это скан по последовательности — быстро.',
+    's5-l5':'<strong>Компартмент A/B.</strong> Статус локуса в K562 и в первичных T-клетках может различаться, и это одно из объяснений, почему кросс-типовая корреляция r = 0,784, а не выше.',
+    's5-l6':'<strong>Одномолекулярный прокси на уже имеющихся данных.</strong> ONT даёт длинные риды: скоординированность метилирования вдоль одной молекулы на масштабе килобаз — это доступный нам суррогат доменной организации, который не требует Hi-C.',
+    's5-callout':'<strong>Где брать 3D-данные.</strong> Портал 4D Nucleome и ENCODE — Hi-C и Micro-C для K562; Rao et al. 2014 — карты петель высокого разрешения, включая K562; Javierre et al. 2016 — promoter capture Hi-C для клеток крови, в том числе T-клеток, что даёт нам вторую клеточную систему на том же локусе.',
+
+    's6-h2':'6. Механистические гипотезы',
+    's6-lede':'Каждая с явным тестом. H0 идёт первой намеренно: это объяснение, которое любая структурная гипотеза обязана победить, прежде чем её стоит рассматривать всерьёз.',
+    'lbl-test':'Тест',
+    'h0-h':'Пик — это след эффектора, а не структура',
+    'h0-p':'Пик дифференциала #78–83 заканчивается ровно за 9 bp до протоспейсера CRISPRoff (+93…+112). Это в точности то, что даёт футпринт dCas9: метилирование ложится вплотную к месту посадки и обрывается там, где белок закрывает ДНК. Никакой вторичной структуры для объяснения положения пика не требуется. Пока эта версия не отвергнута, любое структурное объяснение положения пика — избыточная сущность.',
+    'h0-t':' — решающий и уже возможный: у ZFPoff нет sgRNA, ZFP садится в другое место. Нужен сайт связывания ZFP (сейчас он не задан, см. раздел 1). Если сайт ZFP отличается от протоспейсера, а пик в K562 ZFPoff всё равно приходится на #78–83, то положение пика задаётся локусом, а не эффектором — и структурные гипотезы получают право на жизнь. Если пик сдвигается вслед за сайтом ZFP, вся эта страница относится к флангам, но не к пику.',
+    'h1-h':'G4 держит ядро промотора неметилированным',
+    'h1-p':'Плотное CpG-ядро складывается в G4, G4 ингибирует DNMT1, и поэтому BASE (7,4 %) и LOW (9,2 %) остаются низкими. HIGH (29,4 %) — состояние, в котором барьер продавлен принудительным рекрутингом DNMT.',
+    'h1-t':' — G4Hunter плюс проверка по G4 ChIP-seq K562. Функционально: стабилизатор G4 (пиридостатин) на фоне ZFPoff должен замедлить набор метилирования, если гипотеза верна.',
+    'h2-h':'Метилирование само переводит участок в Z-форму',
+    'h2-p':'Здесь причинность обратная всем остальным гипотезам: не структура управляет метилированием, а метилирование создаёт структуру. 5mC резко стабилизирует Z-ДНК, поэтому в HIGH могли появиться Z-склонные участки, которых нет в LOW. Это давало бы вторичный, самоподдерживающийся слой репрессии.',
+    'h2-t':' — Z-Hunt по окну; если (CG)n есть, то анти-Z-ДНК антитело или Zα-based CUT&amp;RUN на отсортированных фракциях HIGH и LOW.',
+    'h3-h':'Потеря R-петли предшествует распространению метилирования',
+    'h3-p':'R-петля защищает неметилированный CGI-промотор от de novo метилирования. Замолкание убирает транскрипцию, транскрипция уносит с собой R-петлю, защита снимается — и метилирование расползается с ядра на фланги. Это объясняет, почему значимый блок такой широкий (#20–132, 3 kb), хотя эффектор садится в одну точку.',
+    'h3-t':' — временной ряд, который у нас уже частично есть: если гипотеза верна, ядро метилируется раньше флангов. Сравнить форму профиля Day 6 / Day 28 / Day 35 — ширина блока должна расти со временем. Экспериментально: DRIP-seq на HIGH vs LOW.',
+    'h4-h':'Форму профиля задаёт нуклеосома',
+    'h4-p':'Тонкая структура дельты HIGH−LOW отражает не последовательность, а доступность: DNMT достаёт до CpG, обращённых наружу от октамера, и не достаёт до обращённых внутрь. Подпись — периодичность около 10 bp.',
+    'h4-t':' — считается сегодня на имеющихся данных: автокорреляция per-CpG дельты по расстоянию в bp, пик на ~10 bp. Дальше — nanoNOMe / SMAC-seq, где футпринт хроматина и CpG-метилирование читаются с одной и той же молекулы.',
+    'h5-h':'Метилирование вытесняет CTCF и рвёт петлю',
+    'h5-p':'Мостик от 2D к 3D. CTCF на −565 лежит внутри значимого блока, его связывание чувствительно к метилированию мотива, и он служит якорем петли. Тогда следствие метилирования — не только локальное молчание, но и перестройка контактов всего участка.',
+    'h5-t':' — сначала скан MA0139 на ориентацию мотива (по последовательности, быстро). Затем CTCF CUT&amp;RUN на отсортированных HIGH и LOW; затем 4C или Capture-C с точкой обзора на промоторе CD55.',
+    'h6-h':'Границы блока — это границы структурного элемента',
+    'h6-p':'Сигнал не размывается плавно, он начинается на CpG #20 и обрывается на #132. Резкий край требует резкой причины: край структуры, край нуклеосомного массива, граница повтора или сайт CTCF.',
+    'h6-t':' — пересечь координаты #20 и #132 с краями предсказанных элементов, с RepeatMasker и с сайтами CTCF. Совпадение в пределах десятков bp было бы сильной уликой; отсутствие совпадения гипотезу закрывает.',
+    'h7-h':'Структура формируется не на всех молекулах сразу',
+    'h7-p':'Структурные переходы — событие на уровне отдельной молекулы: на одной G4 сложился, на соседней нет. Усреднённый профиль это скрывает, а одномолекулярные данные — нет. Если элемент переключается по принципу «всё или ничего», молекулы должны распадаться на две моды по метилированию внутри элемента, а CpG внутри элемента — коррелировать между собой сильнее, чем просто соседние CpG на том же расстоянии.',
+    'h7-t':' — полностью на имеющихся ONT-данных. Для каждого предсказанного элемента, покрывающего CpG i…j: (1) тест на бимодальность доли метилирования по молекулам, (2) попарная корреляция внутри элемента против фона, подобранного по расстоянию между CpG. Это, пожалуй, самое сильное применение одномолекулярного разрешения во всём проекте.',
+
+    's7-h2':'7. Как заполнить пустые слоты',
+    's7-lede':'Всё, что нужно для 2D-предсказаний — последовательность окна. Дальше — пересечение с координатами наших CpG.',
+    's7-callout':'<strong>Две проверки перед тем, как чему-то верить.</strong> Первая: координаты выхода этих программ — относительно начала окна, а не хромосомы. Прибавить 207 318 091 (или 207 318 092, в зависимости от того, 0- или 1-based выход) и проверить на известной точке — координата CpG-пика должна лечь на chr1:207,321,678. Вторая: у всех этих предсказателей высокая доля ложных срабатываний. Предсказание G4 — это не G4. Ценность имеет только совпадение предсказания с независимым экспериментальным треком (G4-seq, DRIP-seq, Non-B DB) или с нашим собственным сигналом метилирования.',
+    's7-callout2':'<strong>Что можно посчитать до всякой последовательности.</strong> Три анализа из этой страницы не требуют ни референса, ни новых экспериментов — только уже лежащие на Skynet <code>.npy</code> матрицы: периодичность ~10 bp в дельте HIGH−LOW (H4), асимметрия метилирования между цепями (i-мотив), бимодальность и внутриэлементная корреляция по молекулам (H7). С них и стоит начать.',
+
+    's8-h2':'8. Оговорки',
+    's8-l1':'Ни одно структурное предсказание на этой странице не сделано. Все соответствующие поля помечены «не вычислено» намеренно — пустой слот лучше правдоподобного числа.',
+    's8-l2':'TSS выведен арифметически из одного якоря (пик = +58 = chr1:207,321,678), а не взят из аннотации. Сходимость с положением дистальных ТФ обнадёживает, но это следует подтвердить по файлу координат.',
+    's8-l3':'H0 не отвергнута. Пока сайт связывания ZFP не задан, положение пика полностью объясняется футпринтом эффектора, и структурные объяснения избыточны.',
+    's8-l4':'Небиформные структуры динамичны и зависят от суперспирализации, а значит — от транскрипции. Они не свойство последовательности, а свойство состояния. Предсказание по последовательности даёт лишь список мест, где такое возможно.',
+    's8-l5':'Все ChIP-seq данные ENCODE — с несортированной популяции K562, а не с фракций LOW и HIGH. Это тот же ограничитель, что и на странице ChIP-seq: мы сравниваем наш отсортированный сигнал с чужим усреднённым.',
+    's8-l6':'Baseline (Day 2, mock) отличается от LOW/HIGH (Day 16) и по времени, и по процедуре. Любое структурное сравнение с baseline наследует этот конфаундер.',
+    's8-l7':'Совпадение координат — не механизм. Даже идеальное перекрытие предсказанного G4 с пиком метилирования остаётся корреляцией, пока нет функционального возмущения.',
+
+    's9-h2':'Источники',
+    's9-lede':'Ссылки на статьи даны как поиск по PubMed, а не как прямые DOI — прямые адреса не проверялись из этой среды, а непроверенная ссылка хуже, чем поиск, который точно откроется.',
+    'src1':'<h4>Mao S.-Q. и др. Структуры G-квадруплексов формируют метилом ДНК. <em>Nat Struct Mol Biol</em>, 2018.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=G-quadruplex+structures+mold+the+DNA+methylome">поиск в PubMed</a></div>',
+    'src2':'<h4>Hänsel-Hertsch R. и др. Ландшафт G-квадруплексов в хроматине человека. <em>Nat Genet</em>, 2016.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=G-quadruplex+structures+mark+human+regulatory+chromatin">поиск в PubMed</a></div>',
+    'src3':'<h4>Bedrat A., Lacroix L., Mergny J.-L. Переоценка склонности к образованию G-квадруплексов: алгоритм G4Hunter. <em>Nucleic Acids Res</em>, 2016.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=G4Hunter+re-evaluation+G-quadruplex+propensity">поиск в PubMed</a></div>',
+    'src4':'<h4>Zeraati M. и др. i-мотивы ДНК существуют в ядрах живых клеток человека. <em>Nat Chem</em>, 2018.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=i-motif+DNA+structures+nuclei+human+cells">поиск в PubMed</a></div>',
+    'src5':'<h4>Behe M., Felsenfeld G. Влияние метилирования на левозакрученную форму ДНК: поведение поли(dG-m5dC). <em>PNAS</em>, 1981.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=Effects+of+methylation+on+a+synthetic+polynucleotide+poly+dG-m5dC">поиск в PubMed</a></div>',
+    'src6':'<h4>Ginno P. A. и др. Образование R-петель — отличительная черта неметилированных CpG-островковых промоторов человека. <em>Mol Cell</em>, 2012.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=R-loop+formation+unmethylated+human+CpG+island+promoters">поиск в PubMed</a></div>',
+    'src7':'<h4>Chodavarapu R. K. и др. Позиционирование нуклеосом связано с метилированием ДНК. <em>Nature</em>, 2010.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=Relationship+between+nucleosome+positioning+and+DNA+methylation">поиск в PubMed</a></div>',
+    'src8':'<h4>Domcke S. и др. Конкуренция между метилированием ДНК и фактором NRF1. <em>Nature</em>, 2016.</h4><div class=\'ref-meta\'><a href="https://www.nature.com/articles/nature16462">nature.com/articles/nature16462</a></div>',
+    'src9':'<h4>Rao S. S. P. и др. Трёхмерная карта генома человека с разрешением до петель. <em>Cell</em>, 2014.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=A+3D+map+of+the+human+genome+at+kilobase+resolution+loops">поиск в PubMed</a></div>',
+    'src10':'<h4>Javierre B. M. и др. Promoter capture Hi-C для 17 типов первичных клеток крови. <em>Cell</em>, 2016.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=Lineage-specific+genome+architecture+links+enhancers+noncoding+disease+variants">поиск в PubMed</a></div>',
+    'src11':'<h4>Jenjaroenpun P. и др. QmRLFS-finder: предсказание последовательностей, образующих R-петли. <em>Nucleic Acids Res</em>, 2015.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=QmRLFS-finder+R-loop+forming+sequences">поиск в PubMed</a></div>',
+    'src12':'<h4>База данных небиформной ДНК (Non-B DB), треки hg38.</h4><div class=\'ref-meta\'><a href="https://nonb-abcc.ncifcrf.gov/">nonb-abcc.ncifcrf.gov</a></div>',
+    'src13':'<h4>pqsfinder, Bioconductor.</h4><div class=\'ref-meta\'><a href="https://bioconductor.org/packages/pqsfinder/">bioconductor.org/packages/pqsfinder</a></div>',
+    'src14':'<h4>ViennaRNA (укладка с параметрами ДНК).</h4><div class=\'ref-meta\'><a href="https://www.tbi.univie.ac.at/RNA/">tbi.univie.ac.at/RNA</a></div>',
+    'src15':'<h4>JASPAR, матрица CTCF MA0139.</h4><div class=\'ref-meta\'><a href="https://jaspar.elixir.no/">jaspar.elixir.no</a></div>',
+    'src16':'<h4>Портал 4D Nucleome (Hi-C, Micro-C).</h4><div class=\'ref-meta\'><a href="https://data.4dnucleome.org/">data.4dnucleome.org</a></div>',
+    'src17':'<h4>EMBOSS (einverted).</h4><div class=\'ref-meta\'><a href="http://emboss.open-bio.org/">emboss.open-bio.org</a></div>',
+
+    'footer':'epicme.bio — карта вторичных и третичных структур ДНК в области TSS CD55. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="index.html">← Назад на главную</a>'
+  },
+
+  en: {
+    'nav-research':'Research Ideas/Todos',
+    'nav-public':'Public data',
+    'brand-sub':'epigenome · cytosine · methylation',
+    'nav-home':'Home',
+    'nav-about':'About',
+    'nav-emseq':'EM-seq · Day 35',
+    'nav-k562':'K562',
+    'nav-chipseq':'ChIP-seq',
+    'nav-tf':'Mechanisms',
+    'nav-struct':'DNA structures',
+    'nav-memory':'Methylation &amp; memory',
+    'nav-trauma':'Methylation &amp; trauma',
+    'nav-toggle-label':'Menu',
+    'nav-chaple':'CHAPLE syndrome',
+    'nav-hgsoc':'CD55 in ovarian cancer',
+    'nav-mesites-nuc':'Mesites: delMC + nucleosomes',
+    'nav-mesites':'Mesites: delMC',
+    'nav-upload':'Upload data',
+    'al-g4':'G4 · G-quadruplex',
+    'al-im':'i-motif · C-rich counterpart',
+    'al-z':'Z-DNA · left-handed form',
+    'al-r':'R-loop · RNA:DNA hybrid + displaced strand',
+    'al-cr':'cruciform · inverted repeats',
+    'al-h':'H-DNA · intramolecular triplex',
+    'al-nu':'nucleosome positioning · not DNA structure but its packaging',
+    's1-r12v':'not specified',
+    's4-m5':'100 bp window',
+    'code-block':`<span class="cmt"># 1. Pull the window out of the reference (GRCh38)</span>
+<b>samtools</b> faidx GRCh38.fa chr1:207318092-207324450 &gt; cd55_window.fa
+
+<span class="cmt"># 2. G-quadruplexes on the G strand</span>
+<b>python</b> G4Hunter.py -i cd55_window.fa -o g4_out -w 25 -s 1.2
+
+<span class="cmt"># 2b. Same via pqsfinder (both strands at once)</span>
+<b>Rscript</b> -e 'library(pqsfinder); library(Biostrings);
+  s &lt;- readDNAStringSet("cd55_window.fa")[[1]];
+  write.csv(as.data.frame(pqsfinder(s, strand="*")), "pqs.csv")'
+
+<span class="cmt"># 3. i-motif = G4Hunter on the reverse complement</span>
+<b>seqkit</b> seq -r -p cd55_window.fa &gt; cd55_window_rc.fa
+<b>python</b> G4Hunter.py -i cd55_window_rc.fa -o imotif_out -w 25 -s 1.2
+
+<span class="cmt"># 4. Z-DNA (check the argument order in your zhunt3 build)</span>
+<b>zhunt3</b> &lt;window&gt; &lt;minsize&gt; &lt;maxsize&gt; cd55_window.fa
+
+<span class="cmt"># 5. R-loops and GC skew</span>
+<b>python</b> QmRLFS-finder.py -i cd55_window.fa -o rlfs_out
+
+<span class="cmt"># 6. Inverted repeats -&gt; cruciforms</span>
+<b>einverted</b> -sequence cd55_window.fa -gap 12 -threshold 50 \
+  -match 3 -mismatch -4 -outfile inv.out -outseq inv.fa
+
+<span class="cmt"># 7. Folding free energy, DNA parameters (not RNA!)</span>
+<b>RNAfold</b> --paramFile=dna_mathews2004.par &lt; cd55_window.fa
+
+<span class="cmt"># 8. CTCF motif and its orientation (JASPAR MA0139)</span>
+<b>fimo</b> --thresh 1e-4 MA0139.meme cd55_window.fa
+
+<span class="cmt"># 9. Intersect everything with our CpGs</span>
+<span class="cmt">#    cd55_cpg_137.bed  — 137 CpGs from the project coordinates file</span>
+<span class="cmt">#    cd55_sig.bed      — the significant subset (q &lt; 0.05)</span>
+<b>bedtools</b> intersect -a cd55_sig.bed -b structures.bed -wa -wb &gt; overlap.tsv`,
+    'title':'epicme.bio — CD55 2D and 3D DNA structures',
+    'eyebrow':'Learn — the shape of the DNA across our window',
+    'h1':'What the DNA <em>does with its shape</em><br>across the CD55 TSS',
+    'hero-sub':'Our methylation profiles are one-dimensional: 137 CpGs along 6.4 kb. But the DNA in that window is not a straight line. It can fold into G-quadruplexes, i-motifs, Z-form, R-loops, cruciforms — and all of it is packed into chromatin loops and domains. This page maps where to look for those structures and how to tie them to what we have already measured.',
+    'status-banner':'<strong>No structure on this page has been predicted yet.</strong> There is not a single computed G4 score here, not one Z-DNA coordinate, not one Hi-C contact. Every such field is left empty and marked “not computed”. The real numbers on this page are only the ones the project already produced: coordinates, CpG positions, ChIP-seq peak positions. Filling the empty slots needs the window sequence — the commands are in section 6.',
+
+    's1-h2':'1. Coordinate system',
+    's1-lede':'Everything on this page hangs off one window. Before structure can be laid over methylation, the coordinates have to line up to the base pair — otherwise “overlap” means nothing.',
+    's1-th1':'Quantity','s1-th2':'Value','s1-th3':'Source',
+    's1-r1a':'Analysis window (GRCh38)','s1-r1c':'Project coordinates file',
+    's1-r2a':'Window length','s1-r2c':'Computed: end − start',
+    's1-r3a':'TSS (derived, needs confirming)','s1-r3c':'Computed from one anchor: CpG peak #78–83 = chr1:207,321,678 = +58 bp',
+    's1-r4a':'Window relative to TSS','s1-r4c':'Computed. Consistent: MAZ/GATA1/NFE2 at ≈−3.4 kb fall inside the left edge',
+    's1-r5a':'Number of CpGs','s1-r5c':'Project coordinates file',
+    's1-r6a':'CpG density, whole window','s1-r6c':'Computed: 137 / 6,358',
+    's1-r7a':'Significant block #20–132 (LOW vs HIGH)','s1-r7c':'K562 Day 16 analysis',
+    's1-r8a':'CpG density in the block','s1-r8c':'Computed',
+    's1-r9a':'Differential peak #78–83','s1-r9c':'K562 Day 16 analysis',
+    's1-r10a':'CpG density in the peak','s1-r10c':'Computed — one CpG every 4.5 bp',
+    's1-r11a':'CRISPRoff protospacer (T cells)','s1-r11c':'T-cell dataset; the peak stops 9 bp short of it',
+    's1-r12a':'ZFP binding site (K562 ZFPoff)','s1-r12c':'Needed from us — without it, structure cannot be separated from the effector footprint',
+    's1-callout':'<strong>The density is already a hint.</strong> 22 CpGs per 100 bp across peak #78–83 is not just “a CpG island”, it is a very G/C-loaded micro-stretch. That composition is exactly what a G-quadruplex on the G strand and an i-motif on the C strand require — necessary, though not sufficient. This is not a structure prediction; it is the observation that the compositional precondition is met, so the prediction is worth computing.',
+
+    's2-h2':'2. What is already mapped onto this locus',
+    's2-lede':'Below is measured material only: the significant CpG block, the differential peak, K562 ChIP-seq peaks and the three CACCC sites for KLF4 from the literature. Structure tracks will go onto this same axis.',
+    'fig1-alt':'CD55 window map: overview of the whole window and a zoom on the core promoter region',
+    'fig1-p1':'WHOLE WINDOW · 6,358 bp','fig1-p2':'CORE REGION · −800 … +200 bp',
+    'fig1-blockcont':'← block #20–132 continues past both edges',
+    'fig1-proto':'protospacer','fig1-klf':'KLF4 CACCC',
+    'fig1-xlab':'position, bp relative to TSS',
+    'lg1':'Significant CpGs, LOW vs HIGH (q&lt;0.05)','lg2':'Differential peak #78–83',
+    'lg3':'CRISPRoff protospacer (T cells)','lg4':'KLF4 CACCC sites (literature)',
+    'lg5':'K562 ChIP-seq, methylation-sensitive TF','lg6':'K562 ChIP-seq, other factors',
+    'fig1-cap':'TF positions are K562 ChIP-seq peak centres (ENCODE via the UCSC API), verified by hand. The KLF4 CACCC sites come from the literature, not ChIP-seq: there is no direct ChIP confirmation of KLF4 in this window in any cell line. The axis uses the derived TSS, see section 1. Structure tracks (G4, Z-DNA, R-loops) will sit between the CpG block and the axis — that lane is empty right now because nothing has been computed.',
+
+    's3-h2':'3. 2D: non-B DNA',
+    's3-lede':'Seven classes of structure that can arise in a promoter region. For each: the sequence signature, the documented relationship with 5mC, what to compute it with, and what it would predict for our LOW / HIGH / BASE groups.',
+    'fig2-alt':'Schematic drawings of six classes of non-B DNA structure',
+    'ic1':'G strand','ic2':'C strand','ic4':'RNA:DNA hybrid','ic5':'Cruciform','ic6':'Nucleosome',
+    'fig2-cap':'Schematics — not to scale and not structural models. H-DNA (triplex) is not drawn; see its card below.',
+    'lbl-sig':'Signature','lbl-me':'Relationship with 5mC','lbl-tool':'What computes it','lbl-pred':'What it predicts here',
+
+    'c-g4-h':'G-quadruplex',
+    'c-g4-sig':'Four tracts of ≥3 guanines with 1–7 nt loops. Forms on the G strand; the complementary C strand is left single-stranded or folds into an i-motif itself.',
+    'c-g4-me':'Documented and directional: G4s inhibit DNMT1 and hold local hypomethylation in place; G4s are enriched at unmethylated CGI promoters (Mao et al. 2018).',
+    'c-g4-tool':'G4Hunter (window 25, threshold 1.2), pqsfinder. Experimentally: G4-seq and G4 ChIP-seq in K562 (Hänsel-Hertsch et al. 2016) — the right cell line for us.',
+    'c-g4-pred':'If a G4 overlaps the dense CpG core, it could be why BASE and LOW sit at 7.4% and 9.2%. ZFPoff/CRISPRoff would then be forcing through a structural barrier, and HIGH (29.4%) is the state where the barrier has given way.',
+
+    'c-im-h':'i-motif',
+    'c-im-sig':'The C-rich strand complementary to a G4 motif. Depends on pH and negative supercoiling; it exists in cells, shown with the iMab antibody (Zeraati et al. 2018).',
+    'c-im-me':'Real, but the direction is context-dependent: 5mC shifts the transitional pH and thermal stability of i-motifs, and the literature reports shifts both ways. Do not take the sign on faith — check it for this specific sequence.',
+    'c-im-tool':'G4Hunter on the reverse complement (the C-rich side), then line the calls up against the G4 predictions — they should sit on the same coordinates, on opposite strands.',
+    'c-im-pred':'Strand asymmetry. That is the valuable part: ONT reads each strand separately, so we can measure strand-resolved methylation on the data we already have — no new experiments needed.',
+
+    'c-z-h':'Z-DNA',
+    'c-z-sig':'Alternating purine/pyrimidine, above all (CG)n and (CA)n repeats. Requires negative supercoiling — so it appears behind a moving RNA polymerase.',
+    'c-z-me':'The strongest and oldest link of any listed here: 5-methylcytosine sharply stabilises the Z form, dropping the ionic strength needed by orders of magnitude (Behe &amp; Felsenfeld 1981).',
+    'c-z-tool':'Z-Hunt (zhunt3), the ready-made hg38 Z-DNA tracks in Non-B DB.',
+    'c-z-pred':'The one class where our intervention is the cause of the structure rather than the consequence. If there is a (CG)n near the effector footprint, HIGH could be Z-prone where LOW is not — and that would be a result of the editing, not a pre-existing property of the locus.',
+
+    'c-r-h':'R-loop',
+    'c-r-sig':'GC skew: an excess of G on the non-template strand downstream of the TSS. Co-transcriptional — no transcription, no R-loop.',
+    'c-r-me':'R-loops are characteristic of unmethylated CGI promoters specifically, and they protect them from de novo methylation by DNMT3B1 (Ginno et al. 2012).',
+    'c-r-tool':'QmRLFS-finder plus GC skew in a 100 bp sliding window. Experimentally: DRIP-seq / qDRIP.',
+    'c-r-pred':'A feedback loop, and more usefully an order of events: silencing → transcription drops → the R-loop is lost → protection lifts → methylation spreads into the flanks. That predicts a lag — the core methylates before the flanks. Testable across the Day 2 → 16 → 35 series.',
+
+    'c-cr-h':'Cruciform',
+    'c-cr-sig':'Inverted repeats of ≥6 bp with a short spacer. Extrusion depends on supercoiling.',
+    'c-cr-me':'The direct link is weakly documented. There is a general argument that hairpin DNA is a poor DNMT substrate, but for this locus that is a hypothesis, not an established fact.',
+    'c-cr-tool':'EMBOSS einverted; the cruciform tracks in Non-B DB.',
+    'c-cr-pred':'A candidate explanation for the sharp edges of the significant block. Why does the signal start at CpG #20 and stop at #132 instead of fading out? The edge of a structural element is one of the few things that produces a sharp boundary.',
+
+    'c-h-h':'H-DNA / triplex',
+    'c-h-sig':'Mirror-repeat purine-rich tracts (polypurine/polypyrimidine).',
+    'c-h-me':'Weak and poorly documented. The main effect of triplexes is blocking Pol II elongation, not changing methylation.',
+    'c-h-tool':'Triplexator; the H-DNA tracks in Non-B DB.',
+    'c-h-pred':'Low priority mechanistically. Still worth checking for a technical reason: triplexes and other structures cause ONT read breaks and mapping errors, which would already be affecting our coverage and the NoFullyUnmeth filter.',
+
+    'c-nu-h':'Nucleosome positioning',
+    'c-nu-sig':'Not strictly sequence-specific, but GC content and bending stiffness strongly influence where a nucleosome sits.',
+    'c-nu-me':'DNMT3A/3B prefer nucleosomal DNA, and methylation is enriched across the nucleosome with roughly 10 bp periodicity — the helical turn (Chodavarapu et al. 2010).',
+    'c-nu-tool':'Autocorrelation of the per-CpG HIGH−LOW delta against bp distance; K562 MNase-seq; nanoNOMe / SMAC-seq, where the chromatin footprint and CpG methylation are read off the same ONT molecule.',
+    'c-nu-pred':'The cheapest prediction on this page: if the HIGH−LOW delta carries ~10 bp periodicity, the shape of the profile is set by the nucleosome, not by sequence. Computable on existing data, today, with no new experiments.',
+
+    's4-h2':'4. Annotation slots — still empty',
+    's4-lede':'This table is a form waiting to be filled. Not one field holds an invented value. Once the commands in section 6 have run on Skynet, the values land here and the structure tracks land on the figure in section 2.',
+    's4-th1':'Element','s4-th2':'Method','s4-th3':'Coordinates','s4-th4':'Score','s4-th5':'CpG overlap','s4-th6':'Status',
+    's4-r1':'G-quadruplex','s4-r2':'i-motif','s4-r3':'Z-DNA','s4-r4':'R-loop (RLFS)','s4-r5':'GC skew',
+    's4-r6':'Inverted repeats','s4-r7':'H-DNA / triplex',
+    's4-r8':'~10 bp periodicity in the delta','s4-m8':'autocorrelation',
+    's4-r9':'Strand asymmetry of methylation','s4-m9':'ONT, split by strand',
+    's4-r10':'TADs and domain boundaries','s4-r11':'CTCF loops, motif orientation',
+    'notcomputed':'not computed','datainhand':'data already in hand',
+
+    's5-h2':'5. 3D: the locus in volume',
+    's5-lede':'Above the scale of secondary structure sits the level where CD55 is no longer an isolated promoter but part of a dense gene cluster with shared regulatory architecture.',
+    's5-l1':'<strong>The neighbourhood.</strong> CD55 sits at 1q32.2 inside the RCA cluster — regulators of complement activation — alongside C4BPA/C4BPB, CR2, CR1, CR1L and CD46. The question worth putting to the data: does the ZFPoff/CRISPRoff effect stay strictly on CD55, or do neighbouring promoters in the cluster shift too? We already have deep ONT runs, so off-target profiling across this cluster is possible without new experiments.',
+    's5-l2':'<strong>TAD boundaries.</strong> First thing to find out: does the −3.5…+2.8 kb window sit inside a single domain or on its boundary? That changes the reading — on a boundary, CTCF-dependent effects dominate; inside a domain, local enhancers matter more.',
+    's5-l3':'<strong>CTCF at −565 is the most interesting spot on this page.</strong> It is the one element where 2D and 3D meet: 180 K562 ChIP-seq experiments confirm binding, CTCF binding is sensitive to methylation of its motif, and CTCF anchors chromatin loops. If methylation in HIGH evicts CTCF, the consequence is not only local — it is loop loss, i.e. a change in 3D.',
+    's5-l4':'<strong>CTCF motif orientation.</strong> Loops form between convergently oriented CTCF sites. Until we scan the window for MA0139 and learn the orientation, we cannot say whether this site participates in a loop at all. It is a sequence scan — fast.',
+    's5-l5':'<strong>A/B compartment.</strong> The status of the locus may differ between K562 and primary T cells, and that is one candidate explanation for why the cross-cell-type correlation is r = 0.784 rather than higher.',
+    's5-l6':'<strong>A single-molecule proxy on data we already hold.</strong> ONT gives long reads: how coordinated methylation is along one molecule across kilobases is an accessible surrogate for domain organisation that does not require Hi-C.',
+    's5-callout':'<strong>Where the 3D data lives.</strong> The 4D Nucleome portal and ENCODE for K562 Hi-C and Micro-C; Rao et al. 2014 for high-resolution loop maps including K562; Javierre et al. 2016 for promoter capture Hi-C in blood cells including T cells, which gives us a second cell system at the same locus.',
+
+    's6-h2':'6. Mechanistic hypotheses',
+    's6-lede':'Each with an explicit test. H0 comes first on purpose: it is the explanation any structural hypothesis has to beat before it deserves serious attention.',
+    'lbl-test':'Test',
+    'h0-h':'The peak is an effector footprint, not a structure',
+    'h0-p':'The differential peak #78–83 stops exactly 9 bp short of the CRISPRoff protospacer (+93…+112). That is precisely what a dCas9 footprint produces: methylation piles up right against the landing site and stops where the protein covers the DNA. No secondary structure is needed to explain where the peak is. Until this account is ruled out, any structural explanation of the peak position is a surplus entity.',
+    'h0-t':' — decisive and already within reach: ZFPoff has no sgRNA, so the ZFP lands somewhere else. We need the ZFP binding site (currently unspecified, see section 1). If the ZFP site differs from the protospacer and the K562 ZFPoff peak still falls on #78–83, then the peak position is set by the locus rather than the effector — and structural hypotheses earn their place. If the peak moves with the ZFP site, this whole page applies to the flanks but not to the peak.',
+    'h1-h':'A G4 keeps the promoter core unmethylated',
+    'h1-p':'The dense CpG core folds into a G4, the G4 inhibits DNMT1, and that is why BASE (7.4%) and LOW (9.2%) stay low. HIGH (29.4%) is the state where the barrier has been forced by targeted DNMT recruitment.',
+    'h1-t':' — G4Hunter plus a check against K562 G4 ChIP-seq. Functionally: a G4 stabiliser (pyridostatin) on a ZFPoff background should slow methylation gain if the hypothesis holds.',
+    'h2-h':'Methylation itself flips the region into Z form',
+    'h2-p':'Here the causality runs opposite to every other hypothesis: structure does not drive methylation, methylation creates structure. 5mC sharply stabilises Z-DNA, so Z-prone stretches could have appeared in HIGH that do not exist in LOW. That would be a secondary, self-sustaining layer of repression.',
+    'h2-t':' — Z-Hunt across the window; if a (CG)n exists, then an anti-Z-DNA antibody or Zα-based CUT&amp;RUN on the sorted HIGH and LOW fractions.',
+    'h3-h':'R-loop loss precedes the spread of methylation',
+    'h3-p':'An R-loop protects an unmethylated CGI promoter from de novo methylation. Silencing removes transcription, transcription takes the R-loop with it, protection lifts — and methylation creeps from the core out into the flanks. That accounts for why the significant block is so wide (#20–132, 3 kb) when the effector lands on a single point.',
+    'h3-t':' — a time series we already partly have: if the hypothesis holds, the core methylates before the flanks. Compare the profile shape across Day 6 / Day 28 / Day 35 — the block should widen over time. Experimentally: DRIP-seq on HIGH vs LOW.',
+    'h4-h':'The nucleosome sets the shape of the profile',
+    'h4-p':'The fine structure of the HIGH−LOW delta reflects accessibility rather than sequence: DNMT reaches CpGs facing outward from the octamer and cannot reach those facing inward. The signature is roughly 10 bp periodicity.',
+    'h4-t':' — computable today on existing data: autocorrelation of the per-CpG delta against bp distance, looking for a peak at ~10 bp. Then nanoNOMe / SMAC-seq, where the chromatin footprint and CpG methylation are read from the same molecule.',
+    'h5-h':'Methylation evicts CTCF and breaks the loop',
+    'h5-p':'The bridge from 2D to 3D. The CTCF site at −565 lies inside the significant block, its binding is sensitive to methylation of the motif, and it acts as a loop anchor. The consequence of methylation would then be not only local silencing but a rearrangement of the contacts across the region.',
+    'h5-t':' — first an MA0139 scan for motif orientation (sequence-based, fast). Then CTCF CUT&amp;RUN on sorted HIGH and LOW; then 4C or Capture-C with a viewpoint on the CD55 promoter.',
+    'h6-h':'The block edges are the edges of a structural element',
+    'h6-p':'The signal does not fade out; it starts at CpG #20 and stops at #132. A sharp edge needs a sharp cause: the edge of a structure, the edge of a nucleosome array, a repeat boundary, or a CTCF site.',
+    'h6-t':' — intersect the coordinates of #20 and #132 with the edges of the predicted elements, with RepeatMasker, and with CTCF sites. A match within tens of bp would be strong evidence; no match closes the hypothesis.',
+    'h7-h':'The structure does not form on every molecule at once',
+    'h7-p':'Structural transitions are single-molecule events: the G4 folds on one molecule and not on its neighbour. An averaged profile hides that; single-molecule data does not. If an element switches all-or-nothing, molecules should split into two modes by methylation within the element, and CpGs inside the element should correlate with each other more strongly than neighbouring CpGs at the same spacing do.',
+    'h7-t':' — entirely on the ONT data in hand. For each predicted element covering CpGs i…j: (1) a bimodality test on the per-molecule methylation fraction, (2) pairwise correlation within the element against a background matched on inter-CpG distance. This is arguably the strongest use of single-molecule resolution anywhere in the project.',
+
+    's7-h2':'7. How to fill the empty slots',
+    's7-lede':'Everything the 2D predictions need is the window sequence. After that it is intersection with our CpG coordinates.',
+    's7-callout':'<strong>Two checks before believing anything.</strong> First: these programs emit coordinates relative to the window start, not the chromosome. Add 207,318,091 (or 207,318,092, depending on whether the output is 0- or 1-based) and verify against a known point — the CpG peak coordinate must land on chr1:207,321,678. Second: all of these predictors have high false-positive rates. A predicted G4 is not a G4. The only thing that carries weight is a prediction coinciding with an independent experimental track (G4-seq, DRIP-seq, Non-B DB) or with our own methylation signal.',
+    's7-callout2':'<strong>What can be computed before any sequence at all.</strong> Three analyses on this page need neither a reference nor new experiments — only the <code>.npy</code> matrices already sitting on Skynet: ~10 bp periodicity in the HIGH−LOW delta (H4), strand asymmetry of methylation (i-motif), and per-molecule bimodality and within-element correlation (H7). That is where to start.',
+
+    's8-h2':'8. Caveats',
+    's8-l1':'No structural prediction has been made on this page. Every corresponding field is marked “not computed” on purpose — an empty slot beats a plausible number.',
+    's8-l2':'The TSS was derived arithmetically from a single anchor (peak = +58 = chr1:207,321,678), not taken from an annotation. The agreement with the distal TF positions is reassuring, but it should be confirmed against the coordinates file.',
+    's8-l3':'H0 has not been ruled out. Until the ZFP binding site is specified, the peak position is fully explained by the effector footprint and structural explanations are surplus.',
+    's8-l4':'Non-B structures are dynamic and depend on supercoiling, which means they depend on transcription. They are a property of state, not of sequence. A sequence-based prediction only yields a list of places where such a thing is possible.',
+    's8-l5':'All the ENCODE ChIP-seq comes from an unsorted K562 population, not from the LOW and HIGH fractions. That is the same limitation as on the ChIP-seq page: we are comparing our sorted signal against somebody else’s average.',
+    's8-l6':'Baseline (Day 2, mock) differs from LOW/HIGH (Day 16) in both timepoint and procedure. Any structural comparison against baseline inherits that confounder.',
+    's8-l7':'Coordinate coincidence is not mechanism. Even a perfect overlap between a predicted G4 and the methylation peak stays a correlation until there is a functional perturbation.',
+
+    's9-h2':'Sources',
+    's9-lede':'Paper links are given as PubMed searches rather than direct DOIs — the direct addresses were not verified from this environment, and an unverified link is worse than a search that is certain to resolve.',
+    'src1':'<h4>Mao S.-Q. et al. G-quadruplex structures mold the DNA methylome. <em>Nat Struct Mol Biol</em>, 2018.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=G-quadruplex+structures+mold+the+DNA+methylome">PubMed search</a></div>',
+    'src2':'<h4>Hänsel-Hertsch R. et al. The G-quadruplex landscape of human regulatory chromatin. <em>Nat Genet</em>, 2016.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=G-quadruplex+structures+mark+human+regulatory+chromatin">PubMed search</a></div>',
+    'src3':'<h4>Bedrat A., Lacroix L., Mergny J.-L. Re-evaluation of G-quadruplex propensity: the G4Hunter algorithm. <em>Nucleic Acids Res</em>, 2016.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=G4Hunter+re-evaluation+G-quadruplex+propensity">PubMed search</a></div>',
+    'src4':'<h4>Zeraati M. et al. i-motif DNA structures exist in the nuclei of living human cells. <em>Nat Chem</em>, 2018.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=i-motif+DNA+structures+nuclei+human+cells">PubMed search</a></div>',
+    'src5':'<h4>Behe M., Felsenfeld G. Effects of methylation on left-handed DNA: the behaviour of poly(dG-m5dC). <em>PNAS</em>, 1981.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=Effects+of+methylation+on+a+synthetic+polynucleotide+poly+dG-m5dC">PubMed search</a></div>',
+    'src6':'<h4>Ginno P. A. et al. R-loop formation is a distinctive characteristic of unmethylated human CpG island promoters. <em>Mol Cell</em>, 2012.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=R-loop+formation+unmethylated+human+CpG+island+promoters">PubMed search</a></div>',
+    'src7':'<h4>Chodavarapu R. K. et al. Relationship between nucleosome positioning and DNA methylation. <em>Nature</em>, 2010.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=Relationship+between+nucleosome+positioning+and+DNA+methylation">PubMed search</a></div>',
+    'src8':'<h4>Domcke S. et al. Competition between DNA methylation and transcription factor NRF1. <em>Nature</em>, 2016.</h4><div class=\'ref-meta\'><a href="https://www.nature.com/articles/nature16462">nature.com/articles/nature16462</a></div>',
+    'src9':'<h4>Rao S. S. P. et al. A 3D map of the human genome at kilobase resolution reveals principles of chromatin looping. <em>Cell</em>, 2014.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=A+3D+map+of+the+human+genome+at+kilobase+resolution+loops">PubMed search</a></div>',
+    'src10':'<h4>Javierre B. M. et al. Promoter capture Hi-C across 17 primary blood cell types. <em>Cell</em>, 2016.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=Lineage-specific+genome+architecture+links+enhancers+noncoding+disease+variants">PubMed search</a></div>',
+    'src11':'<h4>Jenjaroenpun P. et al. QmRLFS-finder: prediction of R-loop forming sequences. <em>Nucleic Acids Res</em>, 2015.</h4><div class=\'ref-meta\'><a href="https://pubmed.ncbi.nlm.nih.gov/?term=QmRLFS-finder+R-loop+forming+sequences">PubMed search</a></div>',
+    'src12':'<h4>Non-B DNA Database (Non-B DB), hg38 tracks.</h4><div class=\'ref-meta\'><a href="https://nonb-abcc.ncifcrf.gov/">nonb-abcc.ncifcrf.gov</a></div>',
+    'src13':'<h4>pqsfinder, Bioconductor.</h4><div class=\'ref-meta\'><a href="https://bioconductor.org/packages/pqsfinder/">bioconductor.org/packages/pqsfinder</a></div>',
+    'src14':'<h4>ViennaRNA (folding with DNA parameters).</h4><div class=\'ref-meta\'><a href="https://www.tbi.univie.ac.at/RNA/">tbi.univie.ac.at/RNA</a></div>',
+    'src15':'<h4>JASPAR, CTCF matrix MA0139.</h4><div class=\'ref-meta\'><a href="https://jaspar.elixir.no/">jaspar.elixir.no</a></div>',
+    'src16':'<h4>4D Nucleome portal (Hi-C, Micro-C).</h4><div class=\'ref-meta\'><a href="https://data.4dnucleome.org/">data.4dnucleome.org</a></div>',
+    'src17':'<h4>EMBOSS (einverted).</h4><div class=\'ref-meta\'><a href="http://emboss.open-bio.org/">emboss.open-bio.org</a></div>',
+
+    'footer':'epicme.bio — a map of secondary and higher-order DNA structure across the CD55 TSS. Part of the PhD project of Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. <a href="index.html">← Back to home</a>'
+  }
+};
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const dict = I18N[lang];
+    if(!dict || !(key in dict)) return;
+    /* Order matters: SVG <title> and <text> must be handled before the
+       document-title branch, otherwise a figure's accessible name would
+       overwrite document.title. SVG elements also take textContent, never
+       innerHTML. */
+    if(el.namespaceURI === SVG_NS){ el.textContent = dict[key]; }
+    else if(el.tagName === 'TITLE'){ document.title = dict[key]; }
+    else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('#lang-switch button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){}
+}
+document.querySelectorAll('#lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+(function(){
+  let saved = 'ru';
+  try{ saved = localStorage.getItem('epicme_lang') || 'ru'; }catch(e){}
+  if(saved === 'en') applyLang('en');
+})();
+// ---------- collapsing nav on scroll ----------
+// At the top of the page every link stays statically visible, same as
+// before this change. Past COLLAPSE_AT px of scroll, #site-nav gets
+// .nav-collapsed and the pill row hides behind a "Menu" toggle button;
+// scrolling back up near the top restores the full static row.
+(function(){
+  const nav = document.getElementById('site-nav');
+  const toggle = document.getElementById('nav-toggle');
+  if(!nav || !toggle) return;
+
+  const COLLAPSE_AT = 56;
+  let ticking = false;
+
+  function updateNavState(){
+    const collapsed = window.scrollY > COLLAPSE_AT;
+    nav.classList.toggle('nav-collapsed', collapsed);
+    if(!collapsed){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => {
+    if(!ticking){ requestAnimationFrame(updateNavState); ticking = true; }
+  }, { passive:true });
+  updateNavState();
+
+  toggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('nav-open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  // click outside the open dropdown closes it
+  document.addEventListener('click', (e) => {
+    if(nav.classList.contains('nav-collapsed') && nav.classList.contains('nav-open') && !nav.contains(e.target)){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Escape closes it and returns focus to the toggle
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && nav.classList.contains('nav-open')){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
