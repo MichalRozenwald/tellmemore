@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>delMC by genomic position — Mesites</title>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<style>
+  body {
+    margin: 0;
+    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+  }
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 24px 40px;
+  }
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .sub {
+    font-size: 13px;
+    color: #666;
+    margin: 0 0 18px;
+  }
+  #plot {
+    width: 100%;
+    height: 480px;
+  }
+  .hint {
+    font-size: 12px;
+    color: #888;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>delMC by genomic position</h1>
+  <p class="sub">Each point is a CpG, colored by genotype. Line segments run from 0 to the delMC value at that position.</p>
+  <div id="plot"></div>
+  <p class="hint">Scroll or drag to zoom, drag to pan, double-click to reset, click legend entries to show/hide a genotype.</p>
+</div>
+
+<script>
+const groups = {"-/-": {"position": [207321008, 207321158, 207321717, 207321722, 207321725, 207321733, 207321736, 207321810, 207321823, 207321854, 207321858, 207321879, 207321975, 207321977, 207321993, 207322138, 207322449], "value": [0.04, 0.1, 0.04, 0.02, 0.03, 0.02, 0.06, 0.04, 0.05, 0.04, 0.09, 0.05, 0.06, 0.08, 0.09, 0.04, 0.08], "color": "#d73027"}, "?/-": {"position": [207320825, 207320873, 207320878, 207321032, 207321201, 207321241, 207321251, 207321283, 207321285, 207321296, 207321304, 207321316, 207321332, 207321474, 207321507, 207321522, 207321585, 207321611, 207321633, 207321739, 207321792, 207321794, 207321797, 207321882, 207321886, 207321921, 207321981, 207321990, 207322015, 207322078, 207322102, 207322210, 207322217, 207322230, 207322257], "value": [0.02, 0.09, 0.11, 0.28, 0.25, 0.25, 0.27, 0.22, 0.14, 0.28, 0.15, 0.16, 0.29, 0.24, 0.24, 0.23, 0.29, 0.25, 0.27, 0.21, 0.16, 0.17, 0.19, 0.12, 0.13, 0.28, 0.15, 0.12, 0.26, 0.22, 0.2, 0.21, 0.22, 0.2, 0.25], "color": "#fc8d59"}, "?/?": {"position": [207320502, 207320725, 207320868, 207320880, 207322667, 207322793], "value": [0.02, 0.06, 0.12, 0.12, 0.08, 0.0], "color": "#fee08b"}, "+/-": {"position": [207320991, 207321127, 207321199, 207321213, 207321215, 207321223, 207321312, 207321360, 207321371, 207321383, 207321388, 207321423, 207321527, 207321534, 207321537, 207321551, 207321662, 207321670, 207321693, 207321698, 207321702, 207321709, 207321741, 207321757, 207321760, 207321762, 207321771, 207321774, 207321776, 207321778, 207321782, 207321786, 207321935, 207321946, 207321949, 207322018, 207322049, 207322081, 207322244, 207322435, 207322114], "value": [0.34, 0.34, 0.3, 0.4, 0.43, 0.46, 0.3, 0.35, 0.34, 0.76, 0.58, 0.3, 0.59, 0.6, 0.41, 0.56, 0.37, 0.48, 0.67, 0.36, 0.49, 0.68, 0.36, 0.63, 0.77, 0.69, 0.36, 0.5, 0.4, 0.45, 0.43, 0.44, 0.65, 0.36, 0.46, 0.33, 0.31, 0.34, 0.32, 0.29, 0.3], "color": "#6b76eb"}, "+/?": {"position": [207318092, 207320882, 207320884, 207320886, 207320888, 207320890, 207320892, 207320932, 207322466, 207322503, 207322567], "value": [0.05, 0.15, 0.22, 0.28, 0.22, 0.17, 0.18, 0.3, 0.27, 0.19, 0.19], "color": "#eb6fe1"}, "+/+": {"position": [207318412, 207318471, 207318809, 207318842, 207318856, 207318881, 207318883, 207318906, 207318932, 207318977, 207319009, 207319100, 207319112, 207319116, 207319651, 207319939, 207320084, 207320601, 207322700, 207322878, 207323409, 207323613, 207323695, 207323863, 207323917, 207324141, 207324450], "value": [-0.03, -0.03, -0.01, -0.02, -0.01, -0.05, -0.07, 0.03, -0.01, -0.02, -0.05, 0.0, 0.0, -0.03, -0.02, -0.07, -0.01, -0.03, 0.19, 0.03, 0.03, 0.03, -0.01, -0.04, -0.02, -0.01, -0.06], "color": "#45C670"}};
+
+// preserve this legend order (matches the color dict order in the python code)
+const order = ["-/-", "?/-", "?/?", "+/-", "+/?", "+/+"];
+
+const traces = [];
+order.forEach(gt => {
+  if (!groups[gt]) return;
+  const g = groups[gt];
+  const color = g.color;
+
+  // vertical stems: x,x,null / 0,value,null per point
+  const stemX = [];
+  const stemY = [];
+  g.position.forEach((x, i) => {
+    stemX.push(x, x, null);
+    stemY.push(0, g.value[i], null);
+  });
+
+  traces.push({
+    x: stemX,
+    y: stemY,
+    mode: "lines",
+    line: { color: color, width: 1.5 },
+    opacity: 0.7,
+    hoverinfo: "skip",
+    legendgroup: gt,
+    showlegend: false,
+    type: "scatter"
+  });
+
+  traces.push({
+    x: g.position,
+    y: g.value,
+    mode: "markers",
+    marker: { color: color, size: 8, line: { width: 0 } },
+    opacity: 0.85,
+    name: gt,
+    legendgroup: gt,
+    type: "scatter",
+    hovertemplate:
+      "position: %{x}<br>delMC: %{y}<br>genotype: " + gt + "<extra></extra>"
+  });
+});
+
+const layout = {
+  xaxis: {
+    title: { text: "Genomic position" },
+    range: [207321900, 207322500],
+    tickformat: "d",
+    separatethousands: false
+  },
+  yaxis: {
+    title: { text: "delMC" }
+  },
+  legend: {
+    title: { text: "Genotype" }
+  },
+  margin: { t: 20, r: 20, b: 55, l: 60 },
+  hovermode: "closest",
+  shapes: [{
+    type: "line",
+    xref: "paper", x0: 0, x1: 1,
+    yref: "y", y0: 0, y1: 0,
+    line: { color: "#cccccc", width: 1 }
+  }]
+};
+
+const config = {
+  scrollZoom: true,
+  displaylogo: false,
+  responsive: true,
+  modeBarButtonsToAdd: ["v1hovermode"]
+};
+
+Plotly.newPlot("plot", traces, layout, config);
+</script>
+</body>
+</html>

@@ -77,6 +77,44 @@
     background:var(--orange); border-color:var(--orange); color:#2B1900;
   }
 
+  /* ---------- collapsing nav on scroll ----------
+     On load / at the top of the page all links stay statically visible,
+     exactly as before. Past a small scroll threshold #site-nav gets
+     .nav-collapsed (added/removed by JS below) and the pill row hides
+     behind a single "Menu" toggle; clicking it reveals the same links
+     as a dropdown panel, so nothing about the link list itself changes —
+     only how much space it takes up while reading the page. ---------- */
+  .nav-inner{ position:relative; }
+  /* Pin the header while scrolling so the "Menu" toggle stays reachable —
+     without this the whole bar would scroll off-screen and the collapsed
+     menu would be unreachable exactly when it's needed. If assets/theme.css
+     already makes .nav sticky/fixed site-wide, this is redundant and safe;
+     if not, this is what makes the collapse behavior actually usable. */
+  #site-nav{ position:sticky; top:0; z-index:100; }
+  .nav-toggle{
+    display:none; align-items:center; gap:7px;
+    background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink);
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px;
+    padding:10px 18px; border-radius:999px; cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, color .15s ease;
+  }
+  .nav-toggle:hover, .nav-toggle:focus-visible{
+    border-color:var(--blue); color:var(--ink); background:var(--surface);
+  }
+  .nav-toggle-icon{ font-size:11px; transition:transform .15s ease; }
+  #site-nav.nav-open .nav-toggle-icon{ transform:rotate(180deg); }
+
+  #site-nav.nav-collapsed .nav-toggle{ display:inline-flex; }
+  #site-nav.nav-collapsed .nav-links{ display:none; }
+  #site-nav.nav-collapsed.nav-open .nav-links{
+    display:flex; flex-direction:column; align-items:stretch; flex-wrap:nowrap;
+    position:absolute; top:100%; left:0; right:0; margin-top:10px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:10px; gap:4px; max-height:min(70vh, 520px); overflow-y:auto;
+    box-shadow:0 18px 44px rgba(0,0,0,0.30); z-index:90;
+  }
+  #site-nav.nav-collapsed.nav-open .nav-links a{ width:100%; text-align:left; }
+
   /* ---------- Upload section — deliberately set apart from the rest of
      the page: a bordered, tinted panel rather than a plain section, so
      it reads as "do something" next to everything above that reads
@@ -226,7 +264,7 @@
 </head>
 <body>
 
-<header class="nav">
+<header class="nav" id="site-nav">
   <div class="nav-inner">
     <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
       <button type="button" data-lang="ru" class="active">RU</button>
@@ -236,7 +274,11 @@
       <span class="brand-mark">epicme</span>
       <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
     </a>
-    <nav class="nav-links">
+    <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav-links">
+      <span data-i18n="nav-toggle-label">Меню</span>
+      <span class="nav-toggle-icon" aria-hidden="true">▾</span>
+    </button>
+    <nav class="nav-links" id="site-nav-links">
       <a href="index.html" data-i18n="nav-home" class="active">Главная</a>
       <a href="about.html" data-i18n="nav-about">О проекте</a>
       <a href="about-cd55.html">CD55 explorer</a>
@@ -252,6 +294,10 @@
       <a href="methylation-generational-trauma.html" data-i18n="nav-trauma">Метилирование и травма</a>
       <a href="upload-user-input.html" data-i18n="nav-upload" class="upload-nav-link">Загрузка данных</a>
       <a href="research-ideas-todos.html" data-i18n="nav-research">Research Ideas/Todos</a>
+      <a href="pages_by_Ella/CHAPLEedited.htm" data-i18n="nav-chaple">CHAPLE-синдром</a>
+      <a href="pages_by_Ella/cd55HGSOCedited.htm" data-i18n="nav-hgsoc">CD55 и рак яичников</a>
+      <a href="pages_by_Ella/mesites_plot_wNucNEW.html" data-i18n="nav-mesites-nuc">Mesites: delMC + нуклеосомы</a>
+      <a href="pages_by_Ella/mesites_plotEDITED.htm" data-i18n="nav-mesites">Mesites: delMC</a>
     </nav>
   </div>
 </header>
@@ -647,6 +693,11 @@ const I18N = {
     'tf-mech-h3': 'Семь механизмов неровного профиля',
     'tf-mech': '<li><strong>След самого редактора</strong> dCas9 закрывает собой 20–30 п.н.; под ним метилирования почти нет, пики сидят сбоку от PAM.</li><li><strong>Предпочтения DNMT3A по фланкам</strong> Соседние ±2 п.н. меняют скорость до 100 раз: TACGYC хорошо, CGG плохо.</li><li><strong>Нуклеосомы и период 10 п.н.</strong> Фермент работает по линкерной ДНК; длина линкера и поворот спирали решают, какие CpG смотрят наружу.</li><li><strong>Занятые сайты факторов</strong> KLF4, CREB, SP1 и NF-κB физически загораживают свои CpG от метилтрансферазы.</li><li><strong>Исходный хроматин</strong> H3K4me3 отталкивает ADD-домен DNMT3A, H3K36me2 притягивает PWWP: активный промотор — враждебная территория.</li><li><strong>Деметилирование и сбои поддержания</strong> TET выедает метку, DNMT1 не всегда успевает при делении. «Не записалось» ≠ «записалось и стёрлось».</li><li><strong>Гетерогенность между молекулами</strong> Средние 40% — это «40% на каждой» или «100% на 40% молекул»? Нанопор видит это напрямую.</li>',
     'tf-note': '<strong>Важно:</strong> вся механистика по KLF4, CREB и CBP получена на эндотелиальных клетках и репортёрных конструкциях, а не на первичных человеческих T-клетках. Перенос на нашу систему — допущение, пока T-клеточный ChIP не скажет обратного. На странице механизмов это помечено отдельно, и ни одно число там не измерено заново — это гипотезы с прописанными способами проверки.',
+    'nav-toggle-label': 'Меню',
+    'nav-chaple': 'CHAPLE-синдром',
+    'nav-hgsoc': 'CD55 и рак яичников',
+    'nav-mesites-nuc': 'Mesites: delMC + нуклеосомы',
+    'nav-mesites': 'Mesites: delMC',
     'nav-upload': 'Загрузка данных',
     'upload-kicker': 'Contribute — пришлите нам свои данные',
     'upload-h2': 'Загрузите свои данные для обработки и структурированного глубокого анализа epiCme',
@@ -778,6 +829,11 @@ const I18N = {
     'tf-mech-h3': 'Seven mechanisms for a bumpy profile',
     'tf-mech': '<li><strong>Footprint of the editor itself</strong> dCas9 covers 20–30 bp; almost no methylation underneath it, with the maxima sitting off to the side of the PAM.</li><li><strong>DNMT3A flanking preferences</strong> The neighbouring ±2 bp swing the rate up to 100-fold: TACGYC good, CGG poor.</li><li><strong>Nucleosomes and the 10 bp repeat</strong> The enzyme works on linker DNA; linker length and helical twist decide which CpGs face outward.</li><li><strong>Occupied factor sites</strong> KLF4, CREB, SP1 and NF-κB physically shield their own CpGs from the methyltransferase.</li><li><strong>Pre-existing chromatin</strong> H3K4me3 repels the DNMT3A ADD domain, H3K36me2 attracts the PWWP: an active promoter is hostile territory.</li><li><strong>Erasure and maintenance failure</strong> TET eats the mark away and DNMT1 does not always keep up through division. Never written is not the same as written then erased.</li><li><strong>Molecule-to-molecule heterogeneity</strong> Does an average of 40% mean 40% on every molecule, or 100% on 40% of them? Nanopore sees this directly.</li>',
     'tf-note': '<strong>Important:</strong> all the mechanistic work on KLF4, CREB and CBP was done in endothelial cells and reporter constructs, not in primary human T cells. Carrying it over to our system is an assumption until a T-cell ChIP says otherwise. The mechanisms page flags this explicitly, and no number on it has been measured afresh — these are hypotheses with their tests written out.',
+    'nav-toggle-label': 'Menu',
+    'nav-chaple': 'CHAPLE syndrome',
+    'nav-hgsoc': 'CD55 in ovarian cancer',
+    'nav-mesites-nuc': 'Mesites: delMC + nucleosomes',
+    'nav-mesites': 'Mesites: delMC',
     'nav-upload': 'Upload data',
     'upload-kicker': 'Contribute — send us your data',
     'upload-h2': 'Upload your data for processing and epiCme structured deep analysis',
@@ -823,6 +879,56 @@ document.querySelectorAll('#lang-switch button').forEach(btn => {
   let saved = 'ru';
   try{ saved = localStorage.getItem('epicme_lang') || 'ru'; }catch(e){ /* ignore */ }
   if(saved === 'en') applyLang('en');
+})();
+
+// ---------- collapsing nav on scroll ----------
+// At the top of the page every link stays statically visible, same as
+// before this change. Past COLLAPSE_AT px of scroll, #site-nav gets
+// .nav-collapsed and the pill row hides behind a "Menu" toggle button;
+// scrolling back up near the top restores the full static row.
+(function(){
+  const nav = document.getElementById('site-nav');
+  const toggle = document.getElementById('nav-toggle');
+  if(!nav || !toggle) return;
+
+  const COLLAPSE_AT = 56;
+  let ticking = false;
+
+  function updateNavState(){
+    const collapsed = window.scrollY > COLLAPSE_AT;
+    nav.classList.toggle('nav-collapsed', collapsed);
+    if(!collapsed){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => {
+    if(!ticking){ requestAnimationFrame(updateNavState); ticking = true; }
+  }, { passive:true });
+  updateNavState();
+
+  toggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('nav-open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  // click outside the open dropdown closes it
+  document.addEventListener('click', (e) => {
+    if(nav.classList.contains('nav-collapsed') && nav.classList.contains('nav-open') && !nav.contains(e.target)){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Escape closes it and returns focus to the toggle
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && nav.classList.contains('nav-open')){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    }
+  });
 })();
 </script>
 <script src="assets/epicme-chat.js" defer></script>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHAPLE Syndrome & CD55 Deficiency — epicme.bio</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific styles for the CHAPLE syndrome page only.
+     Shared palette, typography, nav, footer, cards, tags, buttons and
+     references live in assets/theme.css — reuse those classes instead
+     of redefining colors here. */
+
+  .hero{ padding:64px 0 40px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--blue); font-weight:600; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--blue-deep); }
+  h1.display{
+    font-size:clamp(32px, 5.4vw, 50px);
+    font-weight:600; line-height:1.1; letter-spacing:-0.01em;
+    margin:0 0 20px;
+  }
+  h1.display em{ font-style:normal; color:var(--blue); }
+  .hero-sub{ font-size:18px; color:var(--ink-dim); max-width:660px; margin:0 0 30px; }
+
+  /* ---------- CHAPLE acronym strip ---------- */
+  .acro-strip{ display:flex; gap:8px; flex-wrap:wrap; margin:0 0 24px; }
+  .acro-badge{
+    flex:1 1 90px; background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:10px 10px; text-align:center;
+  }
+  .acro-badge .big{ font-size:19px; font-weight:700; color:var(--blue); line-height:1; margin-bottom:4px; font-family:'Space Grotesk',sans-serif; }
+  .acro-badge .lbl{ font-size:11.5px; color:var(--ink-dim); line-height:1.25; }
+
+  /* ---------- Cell diagram card (signature element, this page) ---------- */
+  .cell-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px 22px 18px;
+  }
+  .cell-head{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:12px; margin-bottom:6px;
+  }
+  .cell-title{ font-size:13px; color:var(--ink-faint); letter-spacing:0.04em; }
+  .toggle{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:3px; gap:2px;
+  }
+  .toggle button{
+    border:none; background:transparent; color:var(--ink-dim);
+    font-size:13px; padding:7px 14px; border-radius:999px; cursor:pointer;
+    font-weight:500; transition:all .2s ease; font-family:'Space Grotesk',sans-serif;
+  }
+  .toggle button.active{ background:var(--blue); color:#06182A; }
+  .cell-svg-wrap{ width:100%; overflow:hidden; border-radius:10px; }
+  .cell-caption{ font-size:14px; color:var(--ink-dim); margin-top:12px; min-height:42px; }
+  .cell-caption strong{ color:var(--ink); }
+
+  /* ---------- generic labeled diagram wrapper ---------- */
+  .diagram-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 18px 14px; margin:22px 0 6px;
+  }
+  .diagram-label{ font-size:12px; color:var(--ink-faint); letter-spacing:0.04em; margin-bottom:8px; }
+  .diagram-card svg{ width:100%; height:auto; display:block; }
+
+  /* ---------- triad of clinical features ---------- */
+  .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+  @media (max-width:820px){ .grid3{ grid-template-columns:1fr; } }
+  .icon-wrap{ margin:-2px 0 10px; }
+  .icon-wrap svg{ width:100%; max-width:170px; height:auto; display:block; }
+
+  .link-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub">epigenome · cytosine · methylation</span>
+    </div>
+    <nav class="nav-links">
+      <a href="about.html">About</a>
+      <a href="index.html">CD55 explorer</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day6.html">Day 6</a>
+      <a href="chaple-syndrome.html">CHAPLE</a>
+      <a href="cd55-ovarian-cancer.html">Ovarian cancer</a>
+      <a href="#references">References</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow">Disease background · CD55 in the clinic</div>
+    <h1 class="display">What happens when the body has <em>no</em> CD55 at all</h1>
+    <p class="hero-sub">This page collects a presentation I put together on CHAPLE syndrome — the rare genetic disease that first showed the world what CD55 is actually for. It's the clinical counterpart to the rest of this site: instead of switching CD55 off on purpose with CRISPRoff or ZFPoff, these patients are missing it from birth.</p>
+
+    <div class="acro-strip">
+      <div class="acro-badge"><div class="big">C</div><div class="lbl">D55 deficiency</div></div>
+      <div class="acro-badge"><div class="big">H</div><div class="lbl">yperactivation of complement</div></div>
+      <div class="acro-badge"><div class="big">A</div><div class="lbl">ngiopathic thrombosis</div></div>
+      <div class="acro-badge"><div class="big">P</div><div class="lbl">rotein</div></div>
+      <div class="acro-badge"><div class="big">L</div><div class="lbl">osing</div></div>
+      <div class="acro-badge"><div class="big">E</div><div class="lbl">nteropathy</div></div>
+    </div>
+
+    <div class="cell-card">
+      <div class="cell-head">
+        <div class="cell-title">DIAGRAM: A SINGLE CELL, ATTACKED OR PROTECTED</div>
+        <div class="toggle">
+          <button id="btn-off" class="active">Without CD55</button>
+          <button id="btn-on">With CD55</button>
+        </div>
+      </div>
+      <div class="cell-svg-wrap" id="cell-svg"></div>
+      <div class="cell-caption" id="cell-caption"></div>
+    </div>
+  </section>
+
+  <section id="genetics">
+    <div class="kicker">Genetics</div>
+    <h2>A single gene, two very different outcomes</h2>
+    <p class="lede">CD55 sits on chromosome 1. Losing one copy is common and mostly silent; losing both copies causes CHAPLE syndrome.</p>
+    <p>Heterozygous deletions of CD55 are frequent in the population and generally don't cause disease on their own — the one working copy is enough. CHAPLE syndrome only appears when a person inherits a loss-of-function mutation on <strong>both</strong> alleles, so neither copy of the gene can make functional protein. Because that requires two rare events to line up in the same person, homozygous CD55 deficiency is extraordinarily rare.</p>
+
+    <div class="diagram-card">
+      <div class="diagram-label">CHROMOSOME 1 — ONE WORKING COPY VS. NONE</div>
+      <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="14" width="12" height="12" rx="3" fill="#56B4E9"/>
+        <text x="38" y="24" font-family="IBM Plex Mono" font-size="11" fill="#A9B8B0">CD55 present</text>
+        <rect x="160" y="14" width="12" height="12" rx="3" fill="none" stroke="#E69F00" stroke-width="2" stroke-dasharray="3 2"/>
+        <text x="178" y="24" font-family="IBM Plex Mono" font-size="11" fill="#A9B8B0">CD55 deleted</text>
+
+        <line x1="320" y1="42" x2="320" y2="190" stroke="#24352E" stroke-width="1"/>
+
+        <g transform="translate(88,42)">
+          <text x="35" y="-10" text-anchor="middle" font-family="Space Grotesk" font-size="13" fill="#E9EEEA" font-weight="600">Heterozygous</text>
+          <rect x="0" y="0" width="24" height="120" rx="12" fill="#16221D" stroke="#24352E"/>
+          <rect x="0" y="34" width="24" height="16" fill="#56B4E9"/>
+          <rect x="46" y="0" width="24" height="30" rx="10" fill="#16221D" stroke="#24352E"/>
+          <rect x="46" y="54" width="24" height="66" rx="10" fill="#16221D" stroke="#24352E"/>
+          <rect x="46" y="32" width="24" height="20" fill="none" stroke="#E69F00" stroke-width="2" stroke-dasharray="3 2"/>
+          <text x="35" y="150" text-anchor="middle" font-family="IBM Plex Mono" font-size="12" fill="#A9B8B0">~1 in 1,100</text>
+          <text x="35" y="167" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#6E8079">one copy still works</text>
+        </g>
+
+        <g transform="translate(428,42)">
+          <text x="35" y="-10" text-anchor="middle" font-family="Space Grotesk" font-size="13" fill="#E9EEEA" font-weight="600">Homozygous — CHAPLE</text>
+          <rect x="0" y="0" width="24" height="30" rx="10" fill="#16221D" stroke="#24352E"/>
+          <rect x="0" y="54" width="24" height="66" rx="10" fill="#16221D" stroke="#24352E"/>
+          <rect x="0" y="32" width="24" height="20" fill="none" stroke="#E69F00" stroke-width="2" stroke-dasharray="3 2"/>
+          <rect x="46" y="0" width="24" height="30" rx="10" fill="#16221D" stroke="#24352E"/>
+          <rect x="46" y="54" width="24" height="66" rx="10" fill="#16221D" stroke="#24352E"/>
+          <rect x="46" y="32" width="24" height="20" fill="none" stroke="#E69F00" stroke-width="2" stroke-dasharray="3 2"/>
+          <text x="35" y="150" text-anchor="middle" font-family="IBM Plex Mono" font-size="12" fill="#A9B8B0">&lt;100 diagnosed worldwide</text>
+          <text x="35" y="167" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#6E8079">no working copy left</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="domain-strip">
+      <div class="domain"><div class="n">Chr 1</div><div class="t">CD55 gene locus</div></div>
+      <div class="domain"><div class="n">~1 in 1,100</div><div class="t">carry a heterozygous deletion</div></div>
+      <div class="domain"><div class="n">&lt;100</div><div class="t">homozygous cases diagnosed worldwide</div></div>
+      <div class="domain"><div class="n">11</div><div class="t">patients in the founding 2017 cohort</div></div>
+    </div>
+    <p style="font-size:13px; color:var(--ink-faint); margin-top:14px;">Population screens back this up: of roughly 640 people with IBD-like symptoms, only one carried a heterozygous CD55 deletion; screening ~60,000 exomes in the ExAC database turned up 53 heterozygous carriers and just a single homozygous individual. The low diagnosis rate is likely also a testing-availability problem, not only a true-rarity one — genetic testing for CD55 isn't routine outside specialist centers.</p>
+  </section>
+
+  <section id="mechanism">
+    <div class="kicker">Normal function</div>
+    <h2>CD55 is the complement system's off-switch</h2>
+    <p class="lede">Complement is a cascade of blood proteins that tags and destroys pathogens. Left unchecked, it destroys healthy cells too — which is exactly CD55's job to prevent.</p>
+    <p>Three separate triggers — antibody complexes (classical pathway), microbial sugars (lectin pathway), and spontaneous low-level activity (alternative pathway) — all converge on cleaving C3, which snowballs into cleaving C5. That produces C3a and C5a (anaphylatoxins that recruit neutrophils and macrophages), C3b (which opsonizes targets for phagocytosis), and C5b, which seeds the membrane attack complex that punches holes in cell membranes. CD55 — also called decay-accelerating factor — sits right in the middle of this and accelerates the decay of the C3 and C5 convertases via factors H and I, so C3b and C4b can't keep converting more C3 and C5.</p>
+
+    <div class="diagram-card">
+      <div class="diagram-label">COMPLEMENT CASCADE — WHERE CD55 INTERVENES</div>
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6E8079"/>
+          </marker>
+        </defs>
+
+        <g font-family="Space Grotesk" font-size="11" fill="#A9B8B0">
+          <rect x="10" y="18" width="130" height="30" rx="8" fill="#16221D" stroke="#24352E"/>
+          <text x="75" y="37" text-anchor="middle">Classical pathway</text>
+          <rect x="10" y="97" width="130" height="30" rx="8" fill="#16221D" stroke="#24352E"/>
+          <text x="75" y="116" text-anchor="middle">Lectin pathway</text>
+          <rect x="10" y="176" width="130" height="30" rx="8" fill="#16221D" stroke="#24352E"/>
+          <text x="75" y="195" text-anchor="middle">Alternative pathway</text>
+        </g>
+
+        <path d="M140,33 C185,33 185,120 214,120" fill="none" stroke="#6E8079" stroke-width="1.5" marker-end="url(#arrow1)"/>
+        <path d="M140,112 L214,120" fill="none" stroke="#6E8079" stroke-width="1.5" marker-end="url(#arrow1)"/>
+        <path d="M140,191 C185,191 185,124 214,122" fill="none" stroke="#6E8079" stroke-width="1.5" marker-end="url(#arrow1)"/>
+
+        <circle cx="240" cy="120" r="26" fill="#56B4E933" stroke="#56B4E9" stroke-width="2"/>
+        <text x="240" y="125" text-anchor="middle" font-family="Space Grotesk" font-size="13" fill="#56B4E9" font-weight="700">C3</text>
+
+        <line x1="266" y1="120" x2="325" y2="120" stroke="#6E8079" stroke-width="1.5" marker-end="url(#arrow1)"/>
+
+        <circle cx="360" cy="120" r="32" fill="none" stroke="#56B4E9" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="360" y="117" text-anchor="middle" font-family="Space Grotesk" font-size="12" fill="#56B4E9" font-weight="700">CD55</text>
+        <text x="360" y="131" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#56B4E9">decay ↑</text>
+        <text x="360" y="168" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#A9B8B0">accelerates convertase decay</text>
+
+        <line x1="394" y1="120" x2="453" y2="120" stroke="#6E8079" stroke-width="1.5" marker-end="url(#arrow1)"/>
+
+        <circle cx="488" cy="120" r="26" fill="#56B4E933" stroke="#56B4E9" stroke-width="2"/>
+        <text x="488" y="125" text-anchor="middle" font-family="Space Grotesk" font-size="13" fill="#56B4E9" font-weight="700">C5</text>
+
+        <line x1="514" y1="120" x2="573" y2="120" stroke="#6E8079" stroke-width="1.5" marker-end="url(#arrow1)"/>
+
+        <circle cx="610" cy="120" r="28" fill="none" stroke="#E69F00" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="610" y="125" text-anchor="middle" font-family="Space Grotesk" font-size="12" fill="#E69F00" font-weight="700">MAC</text>
+
+        <g>
+          <circle cx="610" cy="70" r="4" fill="#E69F00"><animate attributeName="cy" values="120;30" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.8s" repeatCount="indefinite"/></circle>
+          <circle cx="630" cy="70" r="4" fill="#E69F00"><animate attributeName="cy" values="120;20" dur="1.8s" begin="0.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.8s" begin="0.5s" repeatCount="indefinite"/></circle>
+          <circle cx="590" cy="70" r="4" fill="#E69F00"><animate attributeName="cy" values="120;35" dur="1.8s" begin="0.9s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.8s" begin="0.9s" repeatCount="indefinite"/></circle>
+        </g>
+        <text x="610" y="18" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#E69F00">C3a / C5a recruit</text>
+        <text x="610" y="30" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#E69F00">neutrophils, macrophages</text>
+      </svg>
+    </div>
+
+    <div class="compare" style="margin-top:16px;">
+      <div class="card">
+        <span class="tag blue">With CD55</span>
+        <h3>Cascade stays contained</h3>
+        <ul>
+          <li>C3b/C4b decay is accelerated before the cascade can escalate</li>
+          <li>C3 and C5 convertases can't keep converting substrate</li>
+          <li>No membrane attack complex forms on healthy cells</li>
+          <li>Result: no cell destruction</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag amber">Without CD55</span>
+        <h3>Cascade runs unchecked</h3>
+        <ul>
+          <li>Anaphylatoxins (C3a, C5a) keep recruiting neutrophils and macrophages</li>
+          <li>Opsonization drives phagocytosis of healthy cells</li>
+          <li>Membrane attack complexes form where they shouldn't</li>
+          <li>Result: inflammation and destruction of healthy tissue</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="cofactor">
+    <div class="kicker">Beyond complement</div>
+    <h2>CD55 also keeps T cells in check</h2>
+    <p class="lede">CD55 isn't only a complement brake — it's also a cofactor for T cell signaling, which is why losing it disrupts more than one arm of the immune system.</p>
+    <p>On CD4<sup>+</sup> helper T cells, CD55 acts as a costimulatory cofactor: it helps activate the cells and promotes their differentiation into CD4<sup>+</sup>CD25<sup>+</sup> regulatory T cells (Tregs), which in turn produce IL-10 — one of the body's key anti-inflammatory cytokines. Losing CD55 removes this brake too, independent of the complement effects above, which is part of why the CHAPLE syndrome is inflammatory on more than one front.</p>
+
+    <div class="diagram-card">
+      <div class="diagram-label">CD55 → T CELL ACTIVATION → REGULATORY OUTPUT</div>
+      <svg viewBox="0 0 640 130" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6E8079"/>
+          </marker>
+        </defs>
+
+        <polygon points="45,35 65,47 65,73 45,85 25,73 25,47" fill="#56B4E933" stroke="#56B4E9" stroke-width="2"/>
+        <text x="45" y="64" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#56B4E9" font-weight="700">CD55</text>
+
+        <line x1="70" y1="60" x2="122" y2="60" stroke="#6E8079" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+        <circle cx="165" cy="60" r="38" fill="#16221D" stroke="#56B4E9" stroke-width="2"/>
+        <text x="165" y="56" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#E9EEEA" font-weight="600">CD4⁺</text>
+        <text x="165" y="70" text-anchor="middle" font-family="Space Grotesk" font-size="9.5" fill="#A9B8B0">helper T cell</text>
+
+        <line x1="204" y1="60" x2="262" y2="60" stroke="#6E8079" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+        <circle cx="315" cy="60" r="42" fill="#16221D" stroke="#56B4E9" stroke-width="2"/>
+        <text x="315" y="55" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#E9EEEA" font-weight="600">CD4⁺CD25⁺</text>
+        <text x="315" y="69" text-anchor="middle" font-family="Space Grotesk" font-size="9.5" fill="#A9B8B0">regulatory T cell</text>
+
+        <line x1="360" y1="60" x2="418" y2="60" stroke="#6E8079" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+        <g>
+          <circle cx="500" cy="60" r="4" fill="#F0E442"><animate attributeName="r" values="3;6;3" dur="1.6s" repeatCount="indefinite"/></circle>
+          <circle cx="520" cy="42" r="3" fill="#F0E442"><animate attributeName="r" values="2;5;2" dur="1.6s" begin="0.4s" repeatCount="indefinite"/></circle>
+          <circle cx="520" cy="78" r="3" fill="#F0E442"><animate attributeName="r" values="2;5;2" dur="1.6s" begin="0.8s" repeatCount="indefinite"/></circle>
+        </g>
+        <text x="500" y="100" text-anchor="middle" font-family="Space Grotesk" font-size="13" fill="#F0E442" font-weight="700">IL-10 ↑</text>
+        <text x="500" y="115" text-anchor="middle" font-family="Space Grotesk" font-size="9.5" fill="#A9B8B0">anti-inflammatory signal</text>
+      </svg>
+    </div>
+  </section>
+
+  <section id="clinical">
+    <div class="kicker">Clinical picture</div>
+    <h2>Three faces of one missing protein</h2>
+    <p class="lede">Unchecked complement activation plays out differently depending on where in the body it happens — giving CHAPLE syndrome its three defining features.</p>
+
+    <div class="grid3">
+      <div class="card">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="42" width="180" height="36" rx="18" fill="none" stroke="#24352E" stroke-width="2"/>
+            <circle cx="35" cy="60" r="5" fill="#56B4E9" opacity="0.6"/>
+            <circle cx="52" cy="52" r="5" fill="#56B4E9" opacity="0.6"/>
+            <circle cx="52" cy="68" r="5" fill="#56B4E9" opacity="0.6"/>
+            <g>
+              <circle cx="95" cy="52" r="7" fill="#E69F00"/>
+              <circle cx="108" cy="62" r="8" fill="#E69F00"/>
+              <circle cx="92" cy="68" r="6" fill="#E69F00"/>
+              <circle cx="105" cy="48" r="6" fill="#E69F00"/>
+            </g>
+            <line x1="140" y1="60" x2="175" y2="60" stroke="#E69F00" stroke-width="2" stroke-dasharray="4 3"/>
+            <text x="157" y="52" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#E69F00">↓ flow</text>
+          </svg>
+        </div>
+        <span class="tag amber">A</span>
+        <h3>Angiopathic thrombosis (and Lymphangiectasia)</h3>
+        <p>The overactive immune system attacks blood vessel walls. Clots form to limit further damage and restrict blood flow — but that same clotting strains the vasculature. Traditional anticlotting medicine largely fails here, because the clots are a downstream symptom of complement activation, not the root problem.</p>
+      </div>
+      <div class="card">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+            <line x1="20" y1="60" x2="180" y2="60" stroke="#24352E" stroke-width="3"/>
+            <circle cx="35" cy="60" r="9" fill="#16221D" stroke="#56B4E9" stroke-width="2"/>
+            <circle cx="75" cy="60" r="9" fill="#16221D" stroke="#56B4E9" stroke-width="2"/>
+            <circle cx="130" cy="60" r="20" fill="#E69F0033" stroke="#E69F00" stroke-width="2"/>
+            <circle cx="170" cy="60" r="9" fill="#16221D" stroke="#56B4E9" stroke-width="2"/>
+            <path d="M120,42 Q113,32 120,24" fill="none" stroke="#E69F00" stroke-width="1.5"/>
+            <path d="M140,42 Q147,32 140,24" fill="none" stroke="#E69F00" stroke-width="1.5"/>
+            <path d="M130,86 Q123,96 130,104" fill="none" stroke="#E69F00" stroke-width="1.5"/>
+          </svg>
+        </div>
+
+        <p>Lymphangiectasia refers to vessel damage and clotting which cause a backup in the lymph nodes. That backup creates swelling and leakage throughout the body, as lymphatic vessels dilate under the extra pressure. </p>
+      </div>
+      <div class="card">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="ple-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#6E8079"/>
+              </marker>
+            </defs>
+            <path d="M20,40 Q20,25 40,25 Q60,25 58,45 Q56,60 40,58 Q22,56 20,40 Z" fill="#16221D" stroke="#56B4E9" stroke-width="2"/>
+            <text x="39" y="45" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#56B4E9">liver</text>
+            <path d="M60,45 C90,45 90,45 105,55" fill="none" stroke="#6E8079" stroke-width="1.5" marker-end="url(#ple-arrow)"/>
+            <path d="M110,50 q14,-10 26,0 q14,10 0,20 q-14,10 -26,0 q-10,-8 0,-20 Z" fill="none" stroke="#56B4E9" stroke-width="2"/>
+            <text x="123" y="64" text-anchor="middle" font-family="IBM Plex Mono" font-size="7.5" fill="#56B4E9">intestine</text>
+            <g>
+              <circle cx="118" cy="90" r="3.5" fill="#E69F00"><animate attributeName="cy" values="80;100" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" repeatCount="indefinite"/></circle>
+              <circle cx="130" cy="92" r="3.5" fill="#E69F00"><animate attributeName="cy" values="80;104" dur="1.6s" begin="0.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1.6s" begin="0.5s" repeatCount="indefinite"/></circle>
+            </g>
+            <text x="124" y="112" text-anchor="middle" font-family="Space Grotesk" font-size="8.5" fill="#E69F00">protein lost</text>
+          </svg>
+        </div>
+        <span class="tag crimson">P · L · E</span>
+        <h3>Protein-losing enteropathy</h3>
+        <p>Leaking, swollen intestinal lymphatics let key blood proteins — especially albumin — empty into the intestines and exit the body instead of recirculating. The resulting hypoproteinemia drives the edema and malnutrition seen in patients.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="treatment">
+    <div class="kicker">Treatment</div>
+    <h2>Replacing what's missing, not just treating symptoms</h2>
+    <p>Because the root cause is a single missing protein, treatments aimed only at symptoms — anticlotting medication, for instance — tend to be ineffective. Two strategies work by restoring what CD55 normally does:</p>
+    <div class="grid2" style="margin-top:6px;">
+      <div class="card">
+        <h3>Reconstitute CD55 itself</h3>
+        <p style="margin:0; color:var(--ink-dim); font-size:14.5px;">Genetic or protein reconstitution of functional CD55 restores decay-accelerating activity directly and reverses abnormal complement activation.</p>
+      </div>
+      <div class="card">
+        <h3>Block the cascade downstream</h3>
+        <p style="margin:0; color:var(--ink-dim); font-size:14.5px;">A complement-inhibitory therapeutic antibody (such as eculizumab) suppresses C5a production, mimicking CD55's braking effect further down the cascade — even without restoring the protein itself.</p>
+      </div>
+    </div>
+    <div class="disclaimer">
+      <strong>No CRISPR-based treatment</strong> for CHAPLE syndrome is currently in development. Both routes above work around the missing protein rather than correcting the underlying CD55 mutation.
+    </div>
+  </section>
+
+  <section id="study">
+    <div class="kicker">The founding study</div>
+    <h2>What the original cohort showed</h2>
+    <p class="lede">CHAPLE syndrome was first described in 2017, in a study built around a small, carefully characterized cohort.</p>
+    <div class="card">
+      <p style="margin:0 0 12px;">Researchers set out to explain the mechanism behind nonsyndromic primary intestinal lymphangiectasia and protein-losing enteropathy. Because CHAPLE syndrome requires mutations on both CD55 alleles, the founding cohort included just <strong>11 patients</strong>, spanning ages <strong>3 to 23 years</strong> — young enough to weight genetic over environmental causes. The team combined whole-exome sequencing with Sanger sequencing to confirm the biallelic loss-of-function variants, and ran complement assays before and after CD55 reconstitution to demonstrate the mechanism directly.</p>
+      <p style="margin:0 0 12px;">One notable finding: the IL-10 deficiency seen with CD55 loss was independent of C5a-driven complement activation — evidence that CD55's T-cell cofactor role and its complement-braking role are genuinely separate mechanisms, both contributing to disease. The team also showed that eculizumab could suppress C5a production in patient cells, supporting it as a treatment route.</p>
+      <p style="margin:0; font-size:13px; color:var(--ink-faint);">As reported in the study: patients' T lymphocytes showed increased complement activation with surface deposition of complement and generation of soluble C5a, and both costimulatory function and cytokine modulation by CD55 were defective — effects reversed by genetic reconstitution of CD55 or treatment with a complement-inhibitory antibody.<a href="#ref-1" class="cite">[1]</a></p>
+    </div>
+  </section>
+
+  <section id="connection">
+    <div class="kicker">Why this matters for epicme.bio</div>
+    <h2>From a rare disease to a research question</h2>
+    <p>CHAPLE syndrome is a natural experiment: it shows what happens when CD55 is missing entirely, from birth, in every cell. My PhD project asks a related but different question — what happens when CD55 is switched off deliberately and reversibly, in adult T cells, using epigenetic tools like ZFPoff and CRISPRoff, rather than lost through germline mutation? Reading and modeling the resulting CpG-methylation patterns with Nanopore sequencing and machine learning is the other half of that question. The clinical biology here is the reason CD55 is worth studying at the epigenome level in the first place. It's also worth seeing the opposite extreme: in <a href="cd55-ovarian-cancer.html">ovarian cancer, CD55 isn't missing — there's too much of it, and some of it ends up somewhere it shouldn't be</a>.</p>
+    <div class="link-row">
+      <a class="btn ghost" href="about.html">Back to the project overview →</a>
+      <a class="btn ghost" href="index.html">Explore the CD55 biology →</a>
+      <a class="btn ghost" href="cd55-ovarian-cancer.html">CD55 in ovarian cancer →</a>
+    </div>
+  </section>
+
+  <section id="references">
+    <div class="kicker">Bibliography</div>
+    <h2>Sources</h2>
+    <ul class="ref-list">
+      <li class="ref-item" id="ref-1">
+        <span class="ref-num">[1]</span>
+        <div class="ref-body">
+          <h4>Ozen A, Comrie WA, Ardy RC, et al., "CD55 Deficiency, Early-Onset Protein-Losing Enteropathy, and Thrombosis" — New England Journal of Medicine, 2017</h4>
+          <div class="ref-meta">The founding study describing the CHAPLE syndrome in an 11-patient cohort · <a href="https://doi.org/10.1056/NEJMoa1615887" target="_blank" rel="noopener">doi.org/10.1056/NEJMoa1615887</a></div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    epicme.bio — open research project and PhD work by Michal (Misha) Rosenwald, Streets &amp; Urnov labs, UC Berkeley.
+  </div>
+</footer>
+
+<script>
+/* ---------------- Cell diagram toggle ---------------- */
+const cellOff = `
+<svg viewBox="0 0 640 230" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="cOff-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#E69F00"/>
+    </marker>
+  </defs>
+  <circle cx="190" cy="120" r="78" fill="#111C18" stroke="#A9B8B0" stroke-width="2"/>
+  <circle cx="248" cy="80" r="15" fill="none" stroke="#E69F00" stroke-width="2.5" stroke-dasharray="4 3"/>
+  <text x="248" y="60" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#E69F00" font-weight="700">MAC</text>
+  <g>
+    <circle cx="230" cy="105" r="4" fill="#E69F00"><animate attributeName="opacity" values="0;1;0" dur="1.6s" repeatCount="indefinite"/></circle>
+    <circle cx="255" cy="120" r="4" fill="#E69F00"><animate attributeName="opacity" values="0;1;0" dur="1.6s" begin="0.4s" repeatCount="indefinite"/></circle>
+  </g>
+  <ellipse cx="470" cy="70" rx="34" ry="24" fill="#E69F0033" stroke="#E69F00" stroke-width="2"/>
+  <circle cx="478" cy="66" r="8" fill="none" stroke="#E69F00" stroke-width="1.5"/>
+  <text x="470" y="112" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#E69F00">macrophage</text>
+  <ellipse cx="470" cy="175" rx="30" ry="20" fill="#E69F0033" stroke="#E69F00" stroke-width="2"/>
+  <circle cx="477" cy="172" r="6" fill="none" stroke="#E69F00" stroke-width="1.5"/>
+  <text x="470" y="212" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#E69F00">neutrophil</text>
+  <path d="M300,90 C360,80 400,75 432,72" fill="none" stroke="#E69F00" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#cOff-arrow)"/>
+  <path d="M300,140 C360,155 400,165 434,172" fill="none" stroke="#E69F00" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#cOff-arrow)"/>
+  <text x="365" y="100" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#E69F00">C5a</text>
+  <text x="365" y="167" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#E69F00">C3a</text>
+</svg>`;
+
+const cellOn = `
+<svg viewBox="0 0 640 230" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="190" cy="120" r="78" fill="#111C18" stroke="#56B4E9" stroke-width="2.5"/>
+  <polygon points="248,58 262,66 262,84 248,92 234,84 234,66" fill="#56B4E933" stroke="#56B4E9" stroke-width="2"/>
+  <text x="248" y="80" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#56B4E9" font-weight="700">CD55</text>
+  <ellipse cx="470" cy="70" rx="34" ry="24" fill="none" stroke="#6E8079" stroke-width="1.5" opacity="0.4"/>
+  <text x="470" y="74" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#6E8079" opacity="0.6">macrophage</text>
+  <ellipse cx="470" cy="175" rx="30" ry="20" fill="none" stroke="#6E8079" stroke-width="1.5" opacity="0.4"/>
+  <text x="470" y="179" text-anchor="middle" font-family="Space Grotesk" font-size="10.5" fill="#6E8079" opacity="0.6">neutrophil</text>
+  <text x="470" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="11.5" fill="#56B4E9">no recruitment signal</text>
+</svg>`;
+
+const cellEl = document.getElementById('cell-svg');
+const captionEl = document.getElementById('cell-caption');
+const btnOff = document.getElementById('btn-off');
+const btnOn = document.getElementById('btn-on');
+
+function setCell(on){
+  cellEl.innerHTML = on ? cellOn : cellOff;
+  btnOn.classList.toggle('active', on);
+  btnOff.classList.toggle('active', !on);
+  captionEl.innerHTML = on
+    ? '<strong>With CD55:</strong> decay-accelerating activity clears C3b/C4b before the convertase can escalate — no anaphylatoxin signal goes out, so no immune cells are recruited and no membrane attack complex forms.'
+    : '<strong>Without CD55:</strong> C3a and C5a keep signaling outward, recruiting macrophages and neutrophils while a membrane attack complex assembles on the cell — this is the everyday state of a cell in a CHAPLE syndrome patient.';
+}
+btnOff.addEventListener('click', () => setCell(false));
+btnOn.addEventListener('click', () => setCell(true));
+setCell(false);
+</script>
+
+</body>
+</html>
