@@ -76,6 +76,15 @@
   .nav-links a.upload-nav-link:hover, .nav-links a.upload-nav-link:focus-visible{
     background:var(--orange); border-color:var(--orange); color:#2B1900;
   }
+  /* Ella's 4 pages get their own subtle accent so they read as a distinct
+     group in the nav, without changing the pill shape/size — same pattern
+     as .upload-nav-link above, just a different hue from the shared palette. */
+  .nav-links a.ella-link{
+    border-color:var(--yellow); color:var(--yellow);
+  }
+  .nav-links a.ella-link:hover, .nav-links a.ella-link:focus-visible{
+    background:var(--yellow); border-color:var(--yellow); color:#2B2600;
+  }
 
   /* ---------- collapsing nav on scroll ----------
      On load / at the top of the page all links stay statically visible,
@@ -294,10 +303,10 @@
       <a href="methylation-generational-trauma.html" data-i18n="nav-trauma">Метилирование и травма</a>
       <a href="upload-user-input.html" data-i18n="nav-upload" class="upload-nav-link">Загрузка данных</a>
       <a href="research-ideas-todos.html" data-i18n="nav-research">Research Ideas/Todos</a>
-      <a href="pages_by_Ella/CHAPLEedited.htm" data-i18n="nav-chaple">CHAPLE-синдром</a>
-      <a href="pages_by_Ella/cd55HGSOCedited.htm" data-i18n="nav-hgsoc">CD55 и рак яичников</a>
-      <a href="pages_by_Ella/mesites_plot_wNucNEW.html" data-i18n="nav-mesites-nuc">Mesites: delMC + нуклеосомы</a>
-      <a href="pages_by_Ella/mesites_plotEDITED.htm" data-i18n="nav-mesites">Mesites: delMC</a>
+      <a href="CHAPLEedited.htm" data-i18n="nav-chaple" class="ella-link">CHAPLE-синдром</a>
+      <a href="cd55HGSOCedited.htm" data-i18n="nav-hgsoc" class="ella-link">CD55 и рак яичников</a>
+      <a href="mesites_plot_wNucNEW.html" data-i18n="nav-mesites-nuc" class="ella-link">Mesites: delMC + нуклеосомы</a>
+      <a href="mesites_plotEDITED.htm" data-i18n="nav-mesites" class="ella-link">Mesites: delMC</a>
     </nav>
   </div>
 </header>
