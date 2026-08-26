@@ -135,11 +135,7 @@
   }
   .approach-list li strong{ color:var(--ink); }
 
-  .caveat-box{
-    display:flex; gap:12px; align-items:flex-start; background:var(--orange-dim); border:1px solid var(--orange);
-    border-radius:var(--radius); padding:14px 18px; font-size:13.5px; color:var(--ink-dim); margin:18px 0;
-  }
-  .caveat-box strong{ color:var(--orange); }
+  .snapshot-note{ font-size:12.5px; color:var(--ink-faint); margin:4px 0 24px; }
 
   .plan-steps{ margin:16px 0; }
   .plan-step{
@@ -154,15 +150,6 @@
   .plan-step .ps-body h4{ margin:0 0 4px; font-size:14.5px; color:var(--ink); }
   .plan-step .ps-body p{ margin:0; font-size:13.3px; color:var(--ink-dim); line-height:1.5; }
 
-  .disclaimer{
-    font-size:12.5px; color:var(--ink-faint); border-left:2px solid var(--line); padding-left:12px; margin:14px 0;
-  }
-
-  .ref-list{ list-style:none; margin:0; padding:0; font-size:12.8px; }
-  .ref-list li{ padding:7px 0; border-bottom:1px solid var(--line); color:var(--ink-dim); }
-  .ref-list li:last-child{ border-bottom:none; }
-  .ref-list a{ color:var(--blue); text-decoration:none; }
-  .ref-list a:hover{ text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -183,6 +170,7 @@
       <a href="about-cd55.html">CD55 explorer</a>
       <a href="k562.html" data-i18n="nav-k562">K562</a>
       <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="primary-tcell-public-data.html" data-i18n="nav-tcelldata">Данные T-клеток</a>
       <a href="genomic-foundation-models.html" data-i18n="nav-models" class="active">Foundation-модели</a>
       <a href="upload-user-input.html" data-i18n="nav-upload">Загрузка данных</a>
     </nav>
@@ -220,7 +208,7 @@
         <tbody id="cmp-body"></tbody>
       </table>
     </div>
-    <p class="disclaimer" data-i18n="ov-note">Таблица — рабочий срез на август 2026; для активно развивающихся моделей (AlphaGenome, Evo2) параметры и доступность API могли измениться — сверяйтесь с первоисточниками ниже.</p>
+    <p class="snapshot-note" data-i18n="ov-note">Таблица — рабочий срез на август 2026; для активно развивающихся моделей (AlphaGenome, Evo2) параметры и доступность API могли измениться — сверяйтесь с первоисточниками ниже.</p>
   </section>
 
   <!-- ============ 2. MODEL PROFILES ============ -->
@@ -251,10 +239,7 @@
     <h3 style="font-size:16px; color:var(--ink); margin:26px 0 10px;" data-i18n="ft-outcomes-h3">4.3 Потенциальные результаты, если это сработает</h3>
     <div class="idea-grid" id="ft-outcomes"></div>
 
-    <div class="caveat-box">
-      <span>⚠</span>
-      <span data-i18n="ft-caveat"><strong>Честная оговорка (в духе принципа сайта "no values shown without derivation"):</strong> локальные данные — это один локус (137 CpG, ~6.5 т.п.о.) и небольшое число условий/доноров. Дообучение большой sequence-модели на такой выборке рискует переобучиться на шум конкретного эксперимента, а не выучить обобщаемую биологию. Реалистичный путь — сначала предобучение/регуляризация на больших парных датасетах метилом+транскриптом (ENCODE, BLUEPRINT, Loyfer atlas, Roadmap Epigenomics), и только потом fine-tuning/адаптер на CD55-специфичных данных как downstream-задаче, а не как единственном источнике сигнала. Кроме того, Borzoi/AlphaGenome — модели bulk-покрытия; наши данные — per-molecule, так что агрегация (или отдельная per-molecule архитектура) требует явного решения.</span>
-    </div>
+    <div class="disclaimer" data-i18n="ft-caveat"><strong>Честная оговорка (в духе принципа сайта "no values shown without derivation"):</strong> локальные данные — это один локус (137 CpG, ~6.5 т.п.о.) и небольшое число условий/доноров. Дообучение большой sequence-модели на такой выборке рискует переобучиться на шум конкретного эксперимента, а не выучить обобщаемую биологию. Реалистичный путь — сначала предобучение/регуляризация на больших парных датасетах метилом+транскриптом (ENCODE, BLUEPRINT, Loyfer atlas, Roadmap Epigenomics), и только потом fine-tuning/адаптер на CD55-специфичных данных как downstream-задаче, а не как единственном источнике сигнала. Кроме того, Borzoi/AlphaGenome — модели bulk-покрытия; наши данные — per-molecule, так что агрегация (или отдельная per-molecule архитектура) требует явного решения.</div>
   </section>
 
   <!-- ============ 5. NEXT: BUILD ON/OFF PREDICTOR ============ -->
@@ -270,14 +255,11 @@
     <h3 style="font-size:16px; color:var(--ink); margin:26px 0 10px;" data-i18n="nx-val-h3">Валидация и честная отчётность</h3>
     <p style="font-size:14px; color:var(--ink-dim); line-height:1.6; max-width:780px;" data-i18n="nx-val-p">Leave-one-donor-out и leave-one-timepoint-out кросс-валидация (Day 6 и Day 35 сейчас — разные доноры, это нужно явно учитывать, а не путать эффект таймпоинта с эффектом донора — см. заметки K562/ChIP-seq страницы). Базовая линия сравнения — уже существующие metilation-only LR/RF модели (AUC 0.92–0.95 на LOW vs HIGH K562). Если добавление сырой ДНК-последовательности через предобученный Borzoi/Flashzoi backbone не улучшает эти метрики — это тоже честный и публикуемый результат, а не повод скрыть страницу.</p>
 
-    <div class="caveat-box">
-      <span>⚠</span>
-      <span data-i18n="nx-blocker"><strong>Главный блокер прямо сейчас:</strong> для обучения предиктора «→ RNA-seq on/off» нужен реальный парный RNA-seq для Day 6 / Day 35 / K562 LOW-HIGH-BASE образцов — в текущем Write → Read → Learn пайплайне это то самое "Learn", которого пока нет как отдельного измерения (Read = Nanopore/EM-seq метилирование, но не экспрессия). Ближайший практический шаг — уточнить у Ары/Фёдора и Эллы/Кэти, есть ли уже собранный или запланированный RNA-seq для этих же образцов, прежде чем проектировать архитектуру модели дальше.</span>
-    </div>
+    <div class="disclaimer" data-i18n="nx-blocker"><strong>Главный блокер прямо сейчас:</strong> для обучения предиктора «→ RNA-seq on/off» нужен реальный парный RNA-seq для Day 6 / Day 35 / K562 LOW-HIGH-BASE образцов — в текущем Write → Read → Learn пайплайне это то самое "Learn", которого пока нет как отдельного измерения (Read = Nanopore/EM-seq метилирование, но не экспрессия). Ближайший практический шаг — уточнить у Ары/Фёдора и Эллы/Кэти, есть ли уже собранный или запланированный RNA-seq для этих же образцов, прежде чем проектировать архитектуру модели дальше.</div>
   </section>
 
   <!-- ============ SOURCES ============ -->
-  <section id="sources">
+  <section id="references">
     <h2 class="section-h" data-i18n="src-h2">Источники</h2>
     <ul class="ref-list" id="src-list"></ul>
   </section>
@@ -469,7 +451,7 @@ const I18N = {
     'title':'epicme.bio — геномные foundation-модели (Borzoi, AlphaGenome и др.)',
     'brand-sub':'эпигеном · цитозин · метилирование',
     'nav-home':'Главная','nav-about':'О проекте','nav-k562':'K562','nav-chipseq':'ChIP-seq',
-    'nav-models':'Foundation-модели','nav-upload':'Загрузка данных',
+    'nav-models':'Foundation-модели','nav-upload':'Загрузка данных','nav-tcelldata':'Данные T-клеток',
     'eyebrow':'Research notes · epicme.bio',
     'h1':'Геномные foundation-модели: <em>Borzoi, AlphaGenome</em> и путь к "секвенс-ту-функция" ИИ',
     'hero-sub':'Обзор современных моделей глубокого обучения, которые предсказывают функцию генома напрямую из последовательности ДНК — от Enformer и Borzoi до AlphaGenome — и разбор того, как их можно применить (и дообучить с учётом метилирования ДНК) в рамках проекта epicme.bio: CRISPRoff/ZFPoff-сайленсинг CD55, per-molecule Nanopore-метилирование и связь эпигенома с экспрессией.',
@@ -548,7 +530,7 @@ const I18N = {
     'plan-1-h':'Собрать/уточнить парные данные RNA-seq',
     'plan-1-p':'Проверить с Арой/Фёдором/Эллой/Кэти, есть ли уже RNA-seq для тех же образцов Day 6 / Day 35 / K562 LOW-HIGH-BASE, или его нужно генерировать заново — это блокер №1.',
     'plan-2-h':'Прототип на публичных данных',
-    'plan-2-p':'Пока нет собственного RNA-seq — собрать парные WGBS+RNA-seq из ENCODE (тот же CD55 локус, K562 / CD3+ T-клетки) как suррогатный тренировочный/валидационный набор для архитектуры.',
+    'plan-2-p':'Пока нет собственного RNA-seq — собрать парные WGBS+RNA-seq из ENCODE и BLUEPRINT (тот же CD55 локус, K562 / CD3+ T-клетки) как суррогатный тренировочный/валидационный набор для архитектуры. Конкретные наборы с accession-номерами собраны на странице <a href="primary-tcell-public-data.html">Данные T-клеток</a>.',
     'plan-3-h':'Baseline: метилирование-only модель',
     'plan-3-p':'Взять уже существующие LR/RF метрики (AUC 0.92–0.95 на LOW vs HIGH) как точку отсчёта — новая модель должна как минимум не проигрывать этому baseline.',
     'plan-4-h':'Собрать ДНК-башню поверх Flashzoi',
@@ -569,7 +551,7 @@ const I18N = {
     'title':'epicme.bio — genomic foundation models (Borzoi, AlphaGenome & more)',
     'brand-sub':'epigenome · cytosine · methylation',
     'nav-home':'Home','nav-about':'About','nav-k562':'K562','nav-chipseq':'ChIP-seq',
-    'nav-models':'Foundation models','nav-upload':'Upload data',
+    'nav-models':'Foundation models','nav-upload':'Upload data','nav-tcelldata':'T cell data',
     'eyebrow':'Research notes · epicme.bio',
     'h1':'Genomic foundation models: <em>Borzoi, AlphaGenome</em>, and the road to sequence-to-function AI',
     'hero-sub':'A survey of current deep-learning models that predict genome function directly from DNA sequence — from Enformer and Borzoi to AlphaGenome — plus how they could be applied (and fine-tuned to take DNA methylation as input) within the epicme.bio project: CRISPRoff/ZFPoff CD55 silencing, per-molecule Nanopore methylation, and the link between epigenome and expression.',
@@ -648,7 +630,7 @@ const I18N = {
     'plan-1-h':'Assemble/confirm paired RNA-seq data',
     'plan-1-p':'Check with Aaron/Fyodor/Ella/Katie whether RNA-seq already exists for the same Day 6 / Day 35 / K562 LOW-HIGH-BASE samples, or whether it needs to be generated — this is blocker #1.',
     'plan-2-h':'Prototype on public data',
-    'plan-2-p':'While there\'s no in-house RNA-seq yet, assemble paired WGBS+RNA-seq from ENCODE (same CD55 locus, K562 / CD3+ T cells) as a surrogate training/validation set for the architecture.',
+    'plan-2-p':'While there\'s no in-house RNA-seq yet, assemble paired WGBS+RNA-seq from ENCODE and BLUEPRINT (same CD55 locus, K562 / CD3+ T cells) as a surrogate training/validation set for the architecture. Specific datasets with accession numbers are catalogued on the <a href="primary-tcell-public-data.html">T cell data</a> page.',
     'plan-3-h':'Baseline: methylation-only model',
     'plan-3-p':'Use the existing LR/RF metrics (AUC 0.92–0.95 on LOW vs HIGH) as the reference point — the new model should at minimum not lose to this baseline.',
     'plan-4-h':'Build the DNA tower on top of Flashzoi',
@@ -762,7 +744,14 @@ function renderPlanSteps(){
 
 function renderSources(){
   const el = document.getElementById('src-list');
-  el.innerHTML = SOURCES.map(s => `<li><a href="${s.u}" target="_blank" rel="noopener">${s.t}</a></li>`).join('');
+  el.innerHTML = SOURCES.map((s, idx) => `
+    <li class="ref-item" id="ref-${idx + 1}">
+      <span class="ref-num">[${idx + 1}]</span>
+      <div class="ref-body">
+        <h4>${s.t}</h4>
+        <div class="ref-meta"><a href="${s.u}" target="_blank" rel="noopener">${s.u}</a></div>
+      </div>
+    </li>`).join('');
 }
 
 function renderAllDynamic(){

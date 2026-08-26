@@ -299,6 +299,7 @@
       <a href="k562.html" data-i18n="nav-k562">K562</a>
       <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
       <a href="public-methylation.html" data-i18n="nav-public">Публичные данные</a>
+      <a href="primary-tcell-public-data.html" data-i18n="nav-tcelldata">Данные T-клеток</a>
       <a href="cd55-tf-tcells.html" data-i18n="nav-tf">Механизмы</a>
       <a href="cd55-dna-structures.html" data-i18n="nav-struct">Структуры ДНК</a>
       <a href="methylation-and-memory.html" data-i18n="nav-memory">Метилирование и память</a>
@@ -499,6 +500,13 @@
     <p data-i18n="pub-why-p">Три вещи, которых своими данными не получить. <strong>Базовая линия:</strong> где промотор CD55 неметилирован по умолчанию, а где несёт метку и безо всякого редактирования. <strong>Проверка платформы:</strong> наши вызовы нанопоровые и модельно-зависимые, и совпадение с бисульфитом на тех же координатах говорит больше, чем любая внутренняя метрика. <strong>Контекст типа клеток:</strong> если базовая линия в Т-клетках и в K562 разная, то часть разницы между нашими наборами — это клетка, а не редактор.</p>
 
     <div class="disclaimer" data-i18n="pub-note"><strong>Честно про статус:</strong> страница пока каталог, а не переанализ. Ни одно значение метилирования там не нарисовано, потому что ни один файл ещё не скачан и не посчитан на нашем окне — вместо цифр лежит скрипт, который вырезает срез из удалённых bigWig range-запросами, и раздел «Загруженные треки», который заполнится ровно тогда, когда скрипт отработает. Вторая оговорка: публичные Т-клетки — это разные доноры, субпопуляции и состояния активации, а K562 из ENCODE несортированный, так что всё это фон для локуса, а не компаратор для наших групп.</div>
+
+    <a class="page-card" href="primary-tcell-public-data.html" style="margin-top:16px; max-width:560px;">
+      <span class="tag blue" data-i18n="tcd-tag">Каталог · все модальности</span>
+      <h3 data-i18n="tcd-h3">Всё публичное про первичные T-клетки</h3>
+      <p data-i18n="tcd-p">Шире, чем метилирование: bulk RNA-seq (DICE, 91 донор), scRNA-seq и CITE-seq (Hao 2021 — мРНК и поверхностный белок CD55 на одной клетке), таймкурсы активации CD4⁺ (ENCODE GSE219319, Soskic 2022), WGBS/EM-seq, ATAC, CAGE и eQTL. Собран под конкретный вопрос — где взять парный сигнал «экспрессия ↔ метилирование», чтобы разблокировать модель on/off.</p>
+      <span class="go"><span data-i18n="tcd-go">Смотреть каталог данных T-клеток</span> <span class="arrow">→</span></span>
+    </a>
   </section>
 
   <section id="beyond">
@@ -666,6 +674,11 @@ const I18N = {
     'research-p': 'Растущий список конкретных экспериментов — CUT&amp;RUN на CTCF/NRF1 в отсортированных фракциях, in vitro биохимия на метилированных олигодуплексах, single-molecule совместное считывание метилирования и занятости фактора, — которые превратили бы гипотезы этого раздела в доказанный механизм.',
     'research-go': 'Смотреть Research Ideas/Todos',
     'nav-public': 'Публичные данные',
+    'nav-tcelldata': 'Данные T-клеток',
+    'tcd-tag': 'Каталог · все модальности',
+    'tcd-h3': 'Всё публичное про первичные T-клетки',
+    'tcd-p': 'Шире, чем метилирование: bulk RNA-seq (DICE, 91 донор), scRNA-seq и CITE-seq (Hao 2021 — мРНК и поверхностный белок CD55 на одной клетке), таймкурсы активации CD4⁺ (ENCODE GSE219319, Soskic 2022), WGBS/EM-seq, ATAC, CAGE и eQTL. Собран под конкретный вопрос — где взять парный сигнал «экспрессия ↔ метилирование», чтобы разблокировать модель on/off.',
+    'tcd-go': 'Смотреть каталог данных T-клеток',
     'pub-kicker': 'Learn — чужие данные на нашем окне',
     'pub-h2': 'Как выглядит этот промотор у тех, кто его не редактировал',
     'pub-lede': 'Прежде чем говорить, что CRISPRoff и ZFPoff что-то изменили, нужна базовая линия: сколько метилирования лежит на этих же 137 CpG в клетках, которых никто не трогал. Отдельная страница собирает публичные bisulfite (WGBS) и EM-seq данные ровно на наше окно 6 500 п.н. — в первую очередь Т-клетки и K562, а вместе с ними десятки других отсортированных типов человеческих клеток.',
@@ -826,6 +839,11 @@ const I18N = {
     'research-p': 'A growing list of concrete experiments — CUT&amp;RUN for CTCF/NRF1 in sorted fractions, in vitro biochemistry on methylated oligo duplexes, a single-molecule joint readout of methylation and factor occupancy — that would turn this section\'s hypotheses into a proven mechanism.',
     'research-go': 'View Research Ideas/Todos',
     'nav-public': 'Public data',
+    'nav-tcelldata': 'T cell data',
+    'tcd-tag': 'Catalog · all modalities',
+    'tcd-h3': 'Everything public on primary T cells',
+    'tcd-p': 'Broader than methylation: bulk RNA-seq (DICE, 91 donors), scRNA-seq and CITE-seq (Hao 2021 — CD55 mRNA and surface protein on the same cell), CD4⁺ activation timecourses (ENCODE GSE219319, Soskic 2022), WGBS/EM-seq, ATAC, CAGE, and eQTLs. Assembled around one question — where to find paired "expression ↔ methylation" signal to unblock the on/off model.',
+    'tcd-go': 'Browse the T cell data catalog',
     'pub-kicker': 'Learn — other people’s data on our window',
     'pub-h2': 'What this promoter looks like in cells nobody edited',
     'pub-lede': 'Before claiming that CRISPRoff and ZFPoff changed anything, you need the baseline: how much methylation sits on these same 137 CpGs in cells nobody touched. A separate page collects public bisulfite (WGBS) and EM-seq data over exactly our 6,500 bp window — T cells and K562 first, and with them dozens of other sorted human cell types.',

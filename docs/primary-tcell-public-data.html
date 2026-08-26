@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">epicme.bio — публичные данные по первичным T-клеткам</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific styles only. Shared palette, typography, nav, footer,
+     cards, tags, buttons, disclaimer and references live in
+     assets/theme.css — reuse those classes instead of redefining. */
+
+  .hero{ padding:56px 0 28px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--blue); font-weight:600; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--blue-deep); }
+  h1.display{
+    font-size:clamp(28px, 4.6vw, 42px);
+    font-weight:600; line-height:1.14; letter-spacing:-0.01em;
+    margin:0 0 18px;
+  }
+  h1.display em{ font-style:normal; color:var(--blue); }
+  .hero-sub{ font-size:17px; color:var(--ink-dim); max-width:720px; margin:0 0 20px; }
+
+  .lang-switch{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+  }
+  .lang-switch button{
+    border:none; background:transparent; color:var(--ink-dim);
+    font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+  }
+  .lang-switch button.active{ background:var(--blue); color:#06182A; }
+  .nav-inner{ flex-wrap:wrap; row-gap:10px; }
+  .nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+  .nav-links a{
+    display:inline-flex; align-items:center; padding:10px 18px; border-radius:999px;
+    border:1.5px solid var(--line); background:var(--surface-2); color:var(--ink-dim);
+    font-size:14.5px; font-weight:600; text-decoration:none;
+    transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{
+    border-color:var(--blue); color:var(--ink); background:var(--surface); transform:translateY(-1px);
+  }
+  .nav-links a.active{ background:var(--blue); border-color:var(--blue); color:#06182A; }
+
+  h2.section-h{ font-size:22px; margin:0 0 6px; color:var(--ink); }
+  p.section-sub{ font-size:14.5px; color:var(--ink-dim); max-width:780px; margin:0 0 24px; }
+  .sub-h{ font-size:17px; margin:30px 0 10px; color:var(--ink); }
+
+  /* ---------- modality summary strip ---------- */
+  .modality-strip{ display:grid; grid-template-columns:repeat(auto-fit,minmax(128px,1fr)); gap:8px; margin:20px 0 26px; }
+  .mod-item{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:9px;
+    padding:12px 10px; text-align:center;
+  }
+  .mod-item .mod-n{ font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--blue); font-weight:600; }
+  .mod-item .mod-t{ font-size:12px; color:var(--ink-dim); margin-top:3px; line-height:1.35; }
+
+  /* ---------- dataset cards ---------- */
+  .ds-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px 22px; margin-bottom:14px;
+  }
+  /* Priority tier is marked by a LEFT BORDER WEIGHT + an explicit text badge,
+     never by color alone — readable in grayscale and for any color vision. */
+  .ds-card.tier1{ border-left:5px solid var(--blue); }
+  .ds-card.tier2{ border-left:5px dashed var(--orange); }
+  .ds-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+  .ds-head h3{ margin:0; font-size:16.5px; color:var(--ink); }
+  .ds-meta{ font-size:12.2px; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace; margin-top:3px; }
+  .ds-card p{ font-size:13.8px; color:var(--ink-dim); margin:8px 0 0; line-height:1.55; }
+  .ds-tags{ display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 0; }
+  .ds-tags .tag{ margin-bottom:0; }
+  .ds-acc{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:12px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:5px;
+    padding:2px 7px; color:var(--blue); margin:8px 6px 0 0;
+  }
+  .ds-links{ margin-top:12px; display:flex; flex-direction:column; gap:5px; }
+  .ds-links a{ font-size:12.6px; color:var(--blue); text-decoration:none; word-break:break-word; }
+  .ds-links a:hover{ text-decoration:underline; }
+  .ds-why{
+    margin-top:12px; padding:10px 12px; background:var(--surface-2);
+    border-left:2px solid var(--blue-deep); border-radius:0 7px 7px 0;
+    font-size:13px; color:var(--ink-dim);
+  }
+  .ds-why strong{ color:var(--ink); }
+
+  /* ---------- priority badge ---------- */
+  .prio{
+    display:inline-flex; align-items:center; gap:5px; flex-shrink:0;
+    font-family:'Space Grotesk',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:0.05em; text-transform:uppercase; padding:4px 10px; border-radius:999px;
+  }
+  .prio.p1{ background:var(--blue-dim); color:var(--blue); border:1px solid var(--blue); }
+  .prio.p2{ background:var(--orange-dim); color:var(--orange); border:1px dashed var(--orange); }
+  .prio .sym{ font-size:10px; }
+
+  /* ---------- comparison table ---------- */
+  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); }
+  table.cmp{ width:100%; border-collapse:collapse; font-size:13px; min-width:720px; }
+  table.cmp th{
+    text-align:left; background:var(--surface-2); color:var(--ink); font-weight:600;
+    padding:10px 13px; border-bottom:1px solid var(--line); font-family:'Space Grotesk',sans-serif;
+    font-size:12px; letter-spacing:0.03em; text-transform:uppercase; white-space:nowrap;
+  }
+  table.cmp td{ padding:10px 13px; border-bottom:1px solid var(--line); color:var(--ink-dim); vertical-align:top; line-height:1.5; }
+  table.cmp tr:last-child td{ border-bottom:none; }
+  table.cmp td.mono{ font-family:'IBM Plex Mono',monospace; font-size:12px; }
+  table.cmp td strong{ color:var(--ink); }
+
+  /* ---------- gap list ---------- */
+  .gap-list{ list-style:none; margin:14px 0 0; padding:0; }
+  .gap-list li{
+    position:relative; padding:12px 14px 12px 40px; margin-bottom:9px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:9px;
+    font-size:13.6px; color:var(--ink-dim); line-height:1.55;
+  }
+  .gap-list li::before{
+    content:"✕"; position:absolute; left:14px; top:12px;
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--orange); font-weight:700;
+  }
+  .gap-list li strong{ color:var(--ink); }
+
+  .snapshot-note{ font-size:12.5px; color:var(--ink-faint); margin:10px 0 0; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="public-methylation.html" data-i18n="nav-public">Публичные данные</a>
+      <a href="primary-tcell-public-data.html" data-i18n="nav-tcelldata" class="active">Данные T-клеток</a>
+      <a href="genomic-foundation-models.html" data-i18n="nav-models">Foundation-модели</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="eyebrow" data-i18n="eyebrow">Каталог данных · epicme.bio</div>
+    <h1 class="display" data-i18n="h1">Всё публичное про <em>первичные человеческие T-клетки</em> — по модальностям</h1>
+    <p class="hero-sub" data-i18n="hero-sub">Агрегированный каталог открытых наборов данных по первичным T-клеткам: bulk RNA-seq, single-cell RNA-seq, CITE-seq (РНК + белок), WGBS и EM-seq метилирование, CAGE/TSS, ATAC и ChIP-seq, eQTL. Собран под конкретную задачу — найти парный сигнал «экспрессия ↔ метилирование» на локусе CD55, чтобы разблокировать модель «ДНК + метилирование → ген on/off» из раздела 5 страницы Foundation-моделей.</p>
+  </section>
+
+  <!-- ============ 1. HOW TO USE ============ -->
+  <section id="how-to-use">
+    <h2 class="section-h" data-i18n="use-h2">1. Как читать этот каталог</h2>
+    <p class="section-sub" data-i18n="use-sub">Наборы размечены по приоритету относительно нашей задачи, а не по «качеству» вообще. Приоритет обозначен и текстовым бейджем, и толщиной/стилем левой границы карточки — цвет никогда не единственный признак.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <span class="prio p1"><span class="sym">●</span> <span data-i18n="prio-1-lbl">Приоритет 1</span></span>
+        <h3 style="margin-top:10px;" data-i18n="prio-1-h">Прямо пригодно для модели on/off</h3>
+        <p data-i18n="prio-1-p">Первичные T-клетки, есть экспрессия (или экспрессия + метилирование на тех же или сопоставимых образцах), координаты доступны на нашем окне CD55. Это то, на чём можно строить обучающую выборку уже сейчас.</p>
+      </div>
+      <div class="card">
+        <span class="prio p2"><span class="sym">◆</span> <span data-i18n="prio-2-lbl">Приоритет 2</span></span>
+        <h3 style="margin-top:10px;" data-i18n="prio-2-h">Контекст, валидация, референс</h3>
+        <p data-i18n="prio-2-p">Полезно как фон, для аннотации типов клеток, для проверки направления эффекта или как источник координат регуляторных элементов — но напрямую как пары «метилирование → экспрессия» не годится.</p>
+      </div>
+    </div>
+
+    <div class="modality-strip" id="modality-strip"></div>
+  </section>
+
+  <!-- ============ 2. THE KEY PAIRED QUESTION ============ -->
+  <section id="paired">
+    <h2 class="section-h" data-i18n="pair-h2">2. Главное: где есть парные метилирование + экспрессия</h2>
+    <p class="section-sub" data-i18n="pair-sub">Для модели раздела 5 нужен не просто RNA-seq и не просто WGBS, а оба сигнала на одних и тех же (или максимально сопоставимых) клетках. Таких источников мало — вот они, честно с оговорками про то, насколько «те же» это образцы.</p>
+
+    <div class="table-wrap">
+      <table class="cmp">
+        <thead>
+          <tr>
+            <th data-i18n="th-source">Источник</th>
+            <th data-i18n="th-expr">Экспрессия</th>
+            <th data-i18n="th-meth">Метилирование</th>
+            <th data-i18n="th-same">Те же образцы?</th>
+            <th data-i18n="th-use">Пригодность</th>
+          </tr>
+        </thead>
+        <tbody id="paired-body"></tbody>
+      </table>
+    </div>
+    <p class="snapshot-note" data-i18n="pair-note">«Те же образцы» — критический столбец: у BLUEPRINT метилом и транскриптом действительно сняты с одного отсортированного образца одного донора, у ENCODE — это разные эксперименты на разных донорах в рамках одного проекта и той же онтологии типа клеток.</p>
+  </section>
+
+  <!-- ============ 3. DATASETS BY MODALITY ============ -->
+  <section id="datasets">
+    <h2 class="section-h" data-i18n="ds-h2">3. Наборы данных по модальностям</h2>
+    <p class="section-sub" data-i18n="ds-sub">Для каждого набора — что это, объём, accession-номера и почему это важно (или не важно) конкретно для CD55.</p>
+    <div id="dataset-groups"></div>
+  </section>
+
+  <!-- ============ 4. HONEST GAPS ============ -->
+  <section id="gaps">
+    <h2 class="section-h" data-i18n="gap-h2">4. Чего в публичных данных нет</h2>
+    <p class="section-sub" data-i18n="gap-sub">В духе принципа сайта — сначала честно перечислить, чего этот каталог не решает, прежде чем строить на нём модель.</p>
+    <ul class="gap-list" id="gap-list"></ul>
+
+    <div class="disclaimer" data-i18n="gap-note"><strong>Что это значит практически:</strong> публичные данные дают базовую линию «CD55 в нормальных T-клетках» — сколько метилирования и сколько экспрессии в невредактированных клетках, и как это меняется при активации. Этого достаточно, чтобы <em>предобучить</em> и отладить архитектуру модели раздела 5. Но обучающих примеров с CRISPRoff/ZFPoff-отредактированным CD55 в публичном доступе нет и быть не может — их даём только мы, и для этого всё равно нужен наш собственный парный RNA-seq по образцам Day 6 / Day 35 / K562.</div>
+  </section>
+
+  <!-- ============ 5. NEXT STEPS ============ -->
+  <section id="next">
+    <h2 class="section-h" data-i18n="nx-h2">5. Что с этим делать дальше</h2>
+    <p class="section-sub" data-i18n="nx-sub">Конкретные шаги, вытекающие из каталога — в том же формате, что и Research Ideas/Todos.</p>
+    <div class="grid2" id="next-cards"></div>
+
+    <a class="card" href="genomic-foundation-models.html" style="display:block; text-decoration:none; margin-top:18px; border:2px solid var(--blue-deep);">
+      <span class="tag blue" data-i18n="nx-link-tag">Связанная страница</span>
+      <h3 data-i18n="nx-link-h">Foundation-модели: куда эти данные пойдут</h3>
+      <p data-i18n="nx-link-p">Раздел 5 страницы Foundation-моделей описывает two-tower архитектуру «ДНК + метилирование → CD55 on/off». Именно её обучающая выборка собирается из наборов на этой странице — Приоритет 1 идёт в предобучение и отладку, наши собственные данные потом в fine-tuning.</p>
+    </a>
+  </section>
+
+  <!-- ============ SOURCES ============ -->
+  <section id="references">
+    <h2 class="section-h" data-i18n="src-h2">Источники и порталы</h2>
+    <ul class="ref-list" id="src-list"></ul>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap" data-i18n="footer">epicme.bio — каталог публичных данных по первичным T-клеткам для CD55 multi-omics анализа. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="index.html">← Назад на главную</a></div>
+</footer>
+
+<script>
+/* ======================================================================
+   Structured dataset catalog. Language-independent facts (accessions,
+   counts, URLs) live here once; all prose lives in I18N and is looked up
+   by key, so RU/EN never drift apart.
+   ====================================================================== */
+
+const MODALITY_STRIP = [
+  {n:'6', key:'mod-bulk'},
+  {n:'5', key:'mod-sc'},
+  {n:'4', key:'mod-meth'},
+  {n:'3', key:'mod-chrom'},
+  {n:'2', key:'mod-cage'},
+  {n:'2', key:'mod-eqtl'}
+];
+
+const PAIRED_ROWS = [
+  {
+    src:'BLUEPRINT',
+    expr_key:'pr-blueprint-expr', meth_key:'pr-blueprint-meth',
+    same_key:'pr-blueprint-same', use_key:'pr-blueprint-use'
+  },
+  {
+    src:'ENCODE',
+    expr_key:'pr-encode-expr', meth_key:'pr-encode-meth',
+    same_key:'pr-encode-same', use_key:'pr-encode-use'
+  },
+  {
+    src:'Loyfer 2023 + DICE',
+    expr_key:'pr-loyfer-expr', meth_key:'pr-loyfer-meth',
+    same_key:'pr-loyfer-same', use_key:'pr-loyfer-use'
+  },
+  {
+    src:'Roadmap Epigenomics',
+    expr_key:'pr-roadmap-expr', meth_key:'pr-roadmap-meth',
+    same_key:'pr-roadmap-same', use_key:'pr-roadmap-use'
+  }
+];
+
+const GROUPS = [
+  {
+    id:'bulk', title_key:'grp-bulk',
+    items:[
+      {
+        id:'dice', tier:1,
+        name:'DICE — Database of Immune Cell Expression, eQTLs and Epigenomics',
+        meta:'Schmiedel et al. 2018, Cell · La Jolla Institute',
+        accs:['dice-database.org', '1,561 RNA-seq samples', '91 donors'],
+        tags:[{c:'blue', k:'tg-bulk'}, {c:'blue', k:'tg-primary'}, {c:'amber', k:'tg-eqtl'}],
+        desc_key:'ds-dice-desc', why_key:'ds-dice-why',
+        links:[
+          {t:'DICE database portal', u:'https://dice-database.org/'},
+          {t:'Schmiedel et al. 2018, Cell — Impact of Genetic Polymorphisms on Human Immune Cell Gene Expression', u:'https://www.cell.com/cell/fulltext/S0092-8674(18)31331-X'}
+        ]
+      },
+      {
+        id:'encode-rna', tier:1,
+        name:'ENCODE — CD4⁺ naive T cell RNA-seq, таймкурс активации',
+        meta:'Barbara Wold lab, Caltech · ENCODE4 · released 2022',
+        accs:['GSE219319', 'ENCSR011VQI', 'ENCSR177CWW'],
+        tags:[{c:'blue', k:'tg-bulk'}, {c:'blue', k:'tg-primary'}, {c:'amber', k:'tg-activation'}],
+        desc_key:'ds-encodern-desc', why_key:'ds-encodern-why',
+        links:[
+          {t:'ENCSR011VQI — naive CD4⁺ T cell, 0 hour, no activation', u:'https://www.encodeproject.org/experiments/ENCSR011VQI/'},
+          {t:'ENCSR177CWW — activated naive CD4⁺ T cell, anti-CD3/CD28 + IL-2, 72 h', u:'https://www.encodeproject.org/experiments/ENCSR177CWW/'}
+        ]
+      },
+      {
+        id:'canogamez', tier:1,
+        name:'Cano-Gamez 2020 — эффекторность и ответ CD4⁺ на цитокины',
+        meta:'Cano-Gamez, Soskic, … Trynka 2020, Nature Communications · Sanger',
+        accs:['EGAS00001003823', 'EGAD00001005291', '>40,000 cells'],
+        tags:[{c:'blue', k:'tg-bulk'}, {c:'blue', k:'tg-sc'}, {c:'amber', k:'tg-protein'}],
+        desc_key:'ds-cano-desc', why_key:'ds-cano-why',
+        links:[
+          {t:'Cano-Gamez et al. 2020, Nature Communications', u:'https://www.nature.com/articles/s41467-020-15543-y'},
+          {t:'Trynka group data portal (interactive viewers + downloads)', u:'https://www.sanger.ac.uk/project/trynka-group-data-and-code/'}
+        ]
+      },
+      {
+        id:'lincrna', tier:2,
+        name:'De novo транскриптом 13 субпопуляций лимфоцитов',
+        meta:'63 RNA-seq samples · 13 T and B subsets · 5 биол. реплик на субпопуляцию',
+        accs:['13 subsets', '~1.7B mapped reads'],
+        tags:[{c:'blue', k:'tg-bulk'}, {c:'blue', k:'tg-primary'}],
+        desc_key:'ds-linc-desc', why_key:'ds-linc-why',
+        links:[
+          {t:'De novo transcriptome profiling of highly purified human lymphocytes', u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4587370/'}
+        ]
+      }
+    ]
+  },
+  {
+    id:'singlecell', title_key:'grp-sc',
+    items:[
+      {
+        id:'hao', tier:1,
+        name:'Hao et al. 2021 — мультимодальный CITE-seq атлас PBMC',
+        meta:'Satija lab, NYGC · Cell 2021 · 211,000 клеток, 228 антител',
+        accs:['GSE164378', '161,764 cells (10x 3′)', '228 surface proteins'],
+        tags:[{c:'blue', k:'tg-sc'}, {c:'amber', k:'tg-protein'}, {c:'blue', k:'tg-primary'}],
+        desc_key:'ds-hao-desc', why_key:'ds-hao-why',
+        links:[
+          {t:'Hao et al. 2021, Cell — Integrated analysis of multimodal single-cell data', u:'https://www.cell.com/cell/fulltext/S0092-8674(21)00583-3'},
+          {t:'UCSC Cell Browser — interactive multimodal PBMC', u:'https://cells.ucsc.edu/?ds=multimodal-pbmc'}
+        ]
+      },
+      {
+        id:'soskic', tier:1,
+        name:'Soskic & Trynka 2022 — динамика активации CD4⁺, scRNA-seq таймкурс',
+        meta:'Soskic et al. 2022, Nature Genetics · Sanger · naive + memory CD4, несколько таймпоинтов',
+        accs:['h5ad downloads', 'interactive viewer'],
+        tags:[{c:'blue', k:'tg-sc'}, {c:'amber', k:'tg-activation'}, {c:'amber', k:'tg-eqtl'}],
+        desc_key:'ds-soskic-desc', why_key:'ds-soskic-why',
+        links:[
+          {t:'Soskic et al. 2022, Nature Genetics — Immune disease risk variants regulate gene expression dynamics during CD4⁺ T cell activation', u:'https://doi.org/10.1038/s41588-022-01066-3'},
+          {t:'Trynka group data portal — scRNA-seq viewer + h5ad files', u:'https://www.sanger.ac.uk/project/trynka-group-data-and-code/'}
+        ]
+      },
+      {
+        id:'tabula', tier:2,
+        name:'Tabula Sapiens — мультиорганный атлас одиночных клеток',
+        meta:'CZ Biohub · Science 2022 · ~481,120 клеток, 24 ткани, 264,009 иммунных клеток',
+        accs:['CELLxGENE', '475 cell types', '15 donors'],
+        tags:[{c:'blue', k:'tg-sc'}, {c:'blue', k:'tg-primary'}, {c:'amber', k:'tg-atlas'}],
+        desc_key:'ds-tabula-desc', why_key:'ds-tabula-why',
+        links:[
+          {t:'The Tabula Sapiens Consortium 2022, Science', u:'https://www.science.org/doi/10.1126/science.abl4896'},
+          {t:'HCA Data Explorer — Tabula Sapiens project', u:'https://explore.data.humancellatlas.org/projects/10201832-7c73-4033-9b65-3ef13d81656a'}
+        ]
+      }
+    ]
+  },
+  {
+    id:'methylation', title_key:'grp-meth',
+    items:[
+      {
+        id:'encode-wgbs', tier:1,
+        name:'ENCODE — WGBS на CD3⁺ T-клетках',
+        meta:'ENCODE · первичные CD3⁺ T-клетки',
+        accs:['ENCSR663MXB'],
+        tags:[{c:'amber', k:'tg-meth'}, {c:'blue', k:'tg-primary'}],
+        desc_key:'ds-encodewgbs-desc', why_key:'ds-encodewgbs-why',
+        links:[
+          {t:'ENCODE portal', u:'https://www.encodeproject.org/'}
+        ]
+      },
+      {
+        id:'loyfer', tier:1,
+        name:'Human Methylation Atlas (Loyfer 2023)',
+        meta:'Loyfer et al. 2023, Nature · глубокий WGBS по 39 отсортированным типам клеток, включая CD4, CD8, наивные T',
+        accs:['GSE186458', '39 sorted cell types'],
+        tags:[{c:'amber', k:'tg-meth'}, {c:'blue', k:'tg-primary'}, {c:'amber', k:'tg-atlas'}],
+        desc_key:'ds-loyfer-desc', why_key:'ds-loyfer-why',
+        links:[
+          {t:'GEO GSE186458 — Human Methylation Atlas', u:'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE186458'}
+        ]
+      },
+      {
+        id:'blueprint', tier:1,
+        name:'BLUEPRINT — отсортированная кровь, метилом + транскриптом',
+        meta:'BLUEPRINT Epigenome · WGBS + RNA-seq на одних и тех же отсортированных образцах',
+        accs:['blueprint-epigenome.eu', 'EGA-controlled + open tracks'],
+        tags:[{c:'amber', k:'tg-meth'}, {c:'blue', k:'tg-bulk'}, {c:'blue', k:'tg-paired'}],
+        desc_key:'ds-blueprint-desc', why_key:'ds-blueprint-why',
+        links:[
+          {t:'BLUEPRINT Epigenome project', u:'http://www.blueprint-epigenome.eu/'}
+        ]
+      }
+    ]
+  },
+  {
+    id:'chromatin', title_key:'grp-chrom',
+    items:[
+      {
+        id:'calderon', tier:1,
+        name:'Calderon et al. — ATAC-seq иммунных клеток в покое и при стимуляции',
+        meta:'Calderon et al. 2019, Nature Genetics · 25 типов иммунных клеток, resting vs stimulated',
+        accs:['GSE118189'],
+        tags:[{c:'amber', k:'tg-atac'}, {c:'blue', k:'tg-primary'}, {c:'amber', k:'tg-activation'}],
+        desc_key:'ds-calderon-desc', why_key:'ds-calderon-why',
+        links:[
+          {t:'GEO GSE118189 — ATAC-seq of immune cell types', u:'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE118189'}
+        ]
+      },
+      {
+        id:'encode-dnase', tier:2,
+        name:'ENCODE — DNase-seq и Mint-ChIP на T-клеточных субпопуляциях',
+        meta:'Stamatoyannopoulos UW / Crawford Duke / Bernstein Broad · ENCODE2–4',
+        accs:['ENCSR000EML', 'ENCSR000EIF', 'ENCSR968XKX'],
+        tags:[{c:'amber', k:'tg-chip'}, {c:'blue', k:'tg-primary'}],
+        desc_key:'ds-encodednase-desc', why_key:'ds-encodednase-why',
+        links:[
+          {t:'ENCSR000EML — DNase-seq, naive CD4⁺ T cell', u:'https://www.encodeproject.org/experiments/ENCSR000EML/'},
+          {t:'ENCSR968XKX — Mint-ChIP H3K9me3, CD4⁺CD25⁺ Treg', u:'https://www.encodeproject.org/experiments/ENCSR968XKX/'}
+        ]
+      }
+    ]
+  },
+  {
+    id:'cage', title_key:'grp-cage',
+    items:[
+      {
+        id:'fantom5', tier:1,
+        name:'FANTOM5 — CAGE атлас промоторов',
+        meta:'RIKEN · >1,000 человеческих первичных клеток, клеточных линий и тканей, включая CD4⁺ T',
+        accs:['~200,000 core promoters', 'hg19 / hg38 tracks'],
+        tags:[{c:'amber', k:'tg-cage'}, {c:'blue', k:'tg-primary'}, {c:'blue', k:'tg-tss'}],
+        desc_key:'ds-fantom-desc', why_key:'ds-fantom-why',
+        links:[
+          {t:'FANTOM5 portal', u:'https://fantom.gsc.riken.jp/5/'},
+          {t:'Lizio et al. 2015, Genome Biology — Gateways to the FANTOM5 atlas', u:'https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0560-6'}
+        ]
+      }
+    ]
+  }
+];
+
+const GAPS = ['gap-1','gap-2','gap-3','gap-4','gap-5'];
+const NEXT_CARDS = ['nx-1','nx-2','nx-3','nx-4'];
+
+const SOURCES = [
+  {t:'DICE database — immune cell expression, eQTLs, epigenomics', u:'https://dice-database.org/'},
+  {t:'Schmiedel et al. 2018, Cell — Impact of Genetic Polymorphisms on Human Immune Cell Gene Expression', u:'https://www.cell.com/cell/fulltext/S0092-8674(18)31331-X'},
+  {t:'ENCODE portal', u:'https://www.encodeproject.org/'},
+  {t:'ENCSR011VQI — ENCODE naive CD4⁺ T cell RNA-seq (0 h, no activation)', u:'https://www.encodeproject.org/experiments/ENCSR011VQI/'},
+  {t:'ENCSR177CWW — ENCODE activated naive CD4⁺ T cell RNA-seq (72 h)', u:'https://www.encodeproject.org/experiments/ENCSR177CWW/'},
+  {t:'ENCSR000EML — ENCODE DNase-seq, naive CD4⁺ T cell', u:'https://www.encodeproject.org/experiments/ENCSR000EML/'},
+  {t:'ENCSR968XKX — ENCODE Mint-ChIP H3K9me3, CD4⁺CD25⁺ Treg', u:'https://www.encodeproject.org/experiments/ENCSR968XKX/'},
+  {t:'Hao et al. 2021, Cell — Integrated analysis of multimodal single-cell data (CITE-seq PBMC)', u:'https://www.cell.com/cell/fulltext/S0092-8674(21)00583-3'},
+  {t:'UCSC Cell Browser — multimodal PBMC (GSE164378)', u:'https://cells.ucsc.edu/?ds=multimodal-pbmc'},
+  {t:'Soskic et al. 2022, Nature Genetics — CD4⁺ T cell activation dynamics', u:'https://doi.org/10.1038/s41588-022-01066-3'},
+  {t:'Cano-Gamez et al. 2020, Nature Communications — effectorness gradient in CD4⁺ T cells', u:'https://www.nature.com/articles/s41467-020-15543-y'},
+  {t:'Trynka group data and code portal (Sanger)', u:'https://www.sanger.ac.uk/project/trynka-group-data-and-code/'},
+  {t:'Tabula Sapiens Consortium 2022, Science', u:'https://www.science.org/doi/10.1126/science.abl4896'},
+  {t:'HCA Data Explorer — Tabula Sapiens', u:'https://explore.data.humancellatlas.org/projects/10201832-7c73-4033-9b65-3ef13d81656a'},
+  {t:'GEO GSE186458 — Human Methylation Atlas (Loyfer 2023)', u:'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE186458'},
+  {t:'GEO GSE118189 — Calderon et al., ATAC-seq of immune cell types', u:'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE118189'},
+  {t:'BLUEPRINT Epigenome project', u:'http://www.blueprint-epigenome.eu/'},
+  {t:'FANTOM5 portal (RIKEN)', u:'https://fantom.gsc.riken.jp/5/'},
+  {t:'Lizio et al. 2015, Genome Biology — Gateways to the FANTOM5 promoter atlas', u:'https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0560-6'},
+  {t:'De novo transcriptome profiling of highly purified human lymphocytes', u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4587370/'}
+];
+
+/* ====================================================================== */
+
+const I18N = {
+  ru: {
+    'title':'epicme.bio — публичные данные по первичным T-клеткам',
+    'brand-sub':'эпигеном · цитозин · метилирование',
+    'nav-home':'Главная','nav-about':'О проекте','nav-public':'Публичные данные',
+    'nav-tcelldata':'Данные T-клеток','nav-models':'Foundation-модели',
+    'eyebrow':'Каталог данных · epicme.bio',
+    'h1':'Всё публичное про <em>первичные человеческие T-клетки</em> — по модальностям',
+    'hero-sub':'Агрегированный каталог открытых наборов данных по первичным T-клеткам: bulk RNA-seq, single-cell RNA-seq, CITE-seq (РНК + белок), WGBS и EM-seq метилирование, CAGE/TSS, ATAC и ChIP-seq, eQTL. Собран под конкретную задачу — найти парный сигнал «экспрессия ↔ метилирование» на локусе CD55, чтобы разблокировать модель «ДНК + метилирование → ген on/off» из раздела 5 страницы Foundation-моделей.',
+
+    'use-h2':'1. Как читать этот каталог',
+    'use-sub':'Наборы размечены по приоритету относительно нашей задачи, а не по «качеству» вообще. Приоритет обозначен и текстовым бейджем, и толщиной/стилем левой границы карточки — цвет никогда не единственный признак.',
+    'prio-1-lbl':'Приоритет 1','prio-2-lbl':'Приоритет 2',
+    'prio-1-h':'Прямо пригодно для модели on/off',
+    'prio-1-p':'Первичные T-клетки, есть экспрессия (или экспрессия + метилирование на тех же или сопоставимых образцах), координаты доступны на нашем окне CD55. Это то, на чём можно строить обучающую выборку уже сейчас.',
+    'prio-2-h':'Контекст, валидация, референс',
+    'prio-2-p':'Полезно как фон, для аннотации типов клеток, для проверки направления эффекта или как источник координат регуляторных элементов — но напрямую как пары «метилирование → экспрессия» не годится.',
+
+    'mod-bulk':'наборов bulk RNA-seq','mod-sc':'наборов single-cell','mod-meth':'источника метилирования',
+    'mod-chrom':'источника хроматина','mod-cage':'CAGE / TSS ресурса','mod-eqtl':'ресурса с eQTL',
+
+    'pair-h2':'2. Главное: где есть парные метилирование + экспрессия',
+    'pair-sub':'Для модели раздела 5 нужен не просто RNA-seq и не просто WGBS, а оба сигнала на одних и тех же (или максимально сопоставимых) клетках. Таких источников мало — вот они, честно с оговорками про то, насколько «те же» это образцы.',
+    'th-source':'Источник','th-expr':'Экспрессия','th-meth':'Метилирование','th-same':'Те же образцы?','th-use':'Пригодность',
+    'pr-blueprint-expr':'RNA-seq по отсортированным субпопуляциям крови',
+    'pr-blueprint-meth':'WGBS по тем же отсортированным субпопуляциям',
+    'pr-blueprint-same':'<strong>Да</strong> — один донор, один отсортированный образец, обе модальности',
+    'pr-blueprint-use':'Лучший из доступных источник настоящих пар для предобучения',
+    'pr-encode-expr':'RNA-seq на naive CD4⁺, включая таймкурс активации',
+    'pr-encode-meth':'WGBS на CD3⁺ T-клетках',
+    'pr-encode-same':'<strong>Нет</strong> — разные эксперименты, разные доноры, общая онтология типа клеток',
+    'pr-encode-use':'Годится как пара «на уровне типа клеток», не на уровне образца',
+    'pr-loyfer-expr':'DICE (отдельный проект, 91 донор)',
+    'pr-loyfer-meth':'Loyfer 2023, глубокий WGBS по 39 отсортированным типам',
+    'pr-loyfer-same':'<strong>Нет</strong> — независимые когорты, сопоставление только по типу клеток',
+    'pr-loyfer-use':'Максимальная глубина и разрешение по типам, но пара искусственная',
+    'pr-roadmap-expr':'RNA-seq по части эпигеномов',
+    'pr-roadmap-meth':'WGBS/RRBS по тем же эпигеномам',
+    'pr-roadmap-same':'<strong>Частично</strong> — совпадает не для всех эпигеномов, нужно проверять по каждому',
+    'pr-roadmap-use':'Полезен, но требует ручной проверки соответствия по каждому образцу',
+    'pair-note':'«Те же образцы» — критический столбец: у BLUEPRINT метилом и транскриптом действительно сняты с одного отсортированного образца одного донора, у ENCODE — это разные эксперименты на разных донорах в рамках одного проекта и той же онтологии типа клеток.',
+
+    'ds-h2':'3. Наборы данных по модальностям',
+    'ds-sub':'Для каждого набора — что это, объём, accession-номера и почему это важно (или не важно) конкретно для CD55.',
+
+    'grp-bulk':'Bulk RNA-seq — экспрессия по отсортированным популяциям',
+    'grp-sc':'Single-cell RNA-seq и CITE-seq — экспрессия по отдельным клеткам',
+    'grp-meth':'Метилирование — WGBS и EM-seq',
+    'grp-chrom':'Хроматин — ATAC-seq, DNase-seq, ChIP-seq',
+    'grp-cage':'CAGE / TSS — активность промоторов с разрешением до основания',
+
+    'tg-bulk':'bulk RNA-seq','tg-sc':'single-cell','tg-primary':'первичные клетки','tg-eqtl':'eQTL',
+    'tg-activation':'таймкурс активации','tg-protein':'белок на поверхности','tg-meth':'метилирование',
+    'tg-atlas':'атлас','tg-paired':'парные модальности','tg-atac':'ATAC-seq','tg-chip':'ChIP / DNase',
+    'tg-cage':'CAGE','tg-tss':'TSS-разрешение',
+
+    'ds-dice-desc':'RNA-seq по 13 типам иммунных клеток (субпопуляции T, B, моноциты, NK) у 91 здорового генотипированного донора — всего 1,561 образец с нормализованными TPM. Плюс полноценный eQTL-модуль: можно смотреть, как SNP влияют на экспрессию гена именно в конкретной T-клеточной субпопуляции.',
+    'ds-dice-why':'<strong>Почему это важно для CD55:</strong> это лучший источник базовой линии «сколько CD55 экспрессируется в нормальной невредактированной T-клетке» с разбивкой по субпопуляциям и с оценкой межиндивидуальной вариабельности по 91 донору. Даёт понять, насколько разброс экспрессии CD55 между нашими донорами — это норма, а не эффект редактирования.',
+
+    'ds-encodern-desc':'Total RNA-seq на первичных naive CD4⁺ αβ T-клетках из лаборатории Barbara Wold (Caltech) в рамках ENCODE4. Ключевое: это не одна точка, а таймкурс — от «0 часов, без активации» (ENCSR011VQI) до активированных анти-CD3/CD28 бусинами плюс 50 U/mL IL-2 в течение 72 часов (ENCSR177CWW). Данные также зеркалированы в GEO под GSE219319.',
+    'ds-encodern-why':'<strong>Почему это важно для CD55:</strong> это ближайший публичный аналог нашей собственной системы — первичные донорские T-клетки, активированные анти-CD3/CD28, ровно как в нашем протоколе перед электропорацией. Позволяет отделить «CD55 изменился из-за редактора» от «CD55 меняется при любой активации T-клетки», а это ровно та путаница, которая иначе съест сигнал.',
+
+    'ds-cano-desc':'Количественная протеомика, bulk RNA-seq и scRNA-seq более чем 40,000 наивных и памятьных CD4⁺ T-клеток человека, поляризованных разными цитокинами. Показывает «градиент эффекторности», формирующий ответ клетки на цитокины. Сырые данные под контролируемым доступом в EGA (EGAS00001003823), но интерактивные просмотрщики открыты.',
+    'ds-cano-why':'<strong>Почему это важно для CD55:</strong> три модальности на одних и тех же клетках (белок + bulk РНК + одиночные клетки) — редкое сочетание. Если CD55 меняется по градиенту эффекторности, это ещё один конфаундер, который нужно учесть при сравнении наших доноров и таймпоинтов.',
+
+    'ds-linc-desc':'63 RNA-seq образца по 13 строго очищенным субпопуляциям T- и B-лимфоцитов (CD4 naive/Th1/Th2/Th17/Treg/TCM/TEM, CD8 naive/TCM/TEM, B naive/memory/CD5⁺), по пять биологических реплик на субпопуляцию. Использовался для de novo сборки транскриптома и поиска новых lincRNA.',
+    'ds-linc-why':'<strong>Почему это важно для CD55:</strong> полезен как проверка на уровне субпопуляций — CD55 экспрессируется по-разному в наивных и памятьных клетках, и наши культуры Day 6 vs Day 35 почти наверняка отличаются по составу субпопуляций.',
+
+    'ds-hao-desc':'CITE-seq атлас 211,000 PBMC от восьми доноров, с одновременным измерением транскриптома и до 228 поверхностных белков на клетку. 161,764 клетки в основной 10x 3′ выборке. Аннотация в трёх уровнях детализации — от восьми широких категорий до 57 кластеров высокого разрешения.',
+    'ds-hao-why':'<strong>Почему это критично для CD55:</strong> CD55 — это поверхностный белок (DAF), и именно по нему мы сортируем клетки. CITE-seq — единственный публичный тип данных, где на одной и той же клетке измерены и мРНК CD55, и белок CD55 на поверхности. Это даёт прямую эмпирическую оценку того, насколько мРНК предсказывает поверхностный сигнал — то самое допущение, на котором держится интерпретация наших K562 LOW/HIGH фракций.',
+
+    'ds-soskic-desc':'scRNA-seq наивных и памятьных CD4⁺ T-клеток в нескольких точках после активации, с привязкой к вариантам риска иммунных заболеваний. Показывает, как генетические варианты регулируют динамику экспрессии именно в процессе активации, а не в покое. Доступны h5ad-файлы и интерактивный просмотрщик.',
+    'ds-soskic-why':'<strong>Почему это важно для CD55:</strong> даёт разрешение по времени и по отдельным клеткам одновременно — можно посмотреть, насколько гетерогенна экспрессия CD55 между клетками одной культуры в каждый момент после активации. Это прямой аналог нашего вопроса про гетерогенность между молекулами в нанопоровых данных, только со стороны РНК.',
+
+    'ds-tabula-desc':'Атлас ~481,120 клеток из 24 тканей и органов 15 доноров, включая 264,009 иммунных клеток, кровь, лимфоузел, селезёнку и тимус. Использованы и Smart-seq2 на FACS-отсортированных клетках в планшетах, и 10x капли. 475 аннотированных типов клеток. Исследуется через CELLxGENE.',
+    'ds-tabula-why':'<strong>Почему это важно для CD55:</strong> в первую очередь как широкий контекст — насколько экспрессия CD55 в T-клетках крови отличается от T-клеток в тканях, и от других типов клеток вообще. Полезно для страницы про CHAPLE и рак яичников не меньше, чем для основной линии.',
+
+    'ds-encodewgbs-desc':'Полногеномное бисульфитное секвенирование первичных CD3⁺ T-клеток человека в рамках ENCODE — уже фигурирует в нашем каталоге публичных метиломов.',
+    'ds-encodewgbs-why':'<strong>Почему это важно для CD55:</strong> базовая линия метилирования по нашим 137 CpG в невредактированных T-клетках, из той же экосистемы ENCODE, что и RNA-seq выше — значит координаты и обработка совместимы. Подробный разбор — на странице <a href="public-methylation.html">Публичные данные</a>.',
+
+    'ds-loyfer-desc':'Глубокий WGBS по 39 отсортированным типам человеческих клеток, включая CD4, CD8 и наивные T-клетки. На сегодня — самое высокое разрешение по типам клеток среди публичных метиломов человека.',
+    'ds-loyfer-why':'<strong>Почему это важно для CD55:</strong> позволяет проверить, отличается ли базовое метилирование промотора CD55 между наивными и памятьными T-клетками. Если да — часть разницы между нашими Day 6 и Day 35 может быть просто разным составом культуры, а не эффектом времени или редактора.',
+
+    'ds-blueprint-desc':'Проект BLUEPRINT сделал WGBS и RNA-seq на одних и тех же отсортированных образцах клеток крови от одних и тех же доноров. Часть данных открыта как треки, часть под контролируемым доступом через EGA.',
+    'ds-blueprint-why':'<strong>Почему это ключевой набор:</strong> это единственный источник в каталоге, где метилом и транскриптом сняты действительно с одного и того же образца, а не сопоставлены по названию типа клеток. Именно на таких парах имеет смысл предобучать модель «метилирование → экспрессия» из раздела 5, прежде чем дообучать её на нашем локусе.',
+
+    'ds-calderon-desc':'ATAC-seq по 25 типам иммунных клеток в состоянии покоя и после стимуляции — включает несколько T-клеточных субпопуляций в обоих состояниях. Уже используется в нашем анализе транскрипционных факторов.',
+    'ds-calderon-why':'<strong>Почему это важно для CD55:</strong> доступность хроматина на промоторе CD55 до и после активации — прямая проверка гипотезы «активный промотор — враждебная территория для DNMT3A» из списка семи механизмов. Если промотор открывается при активации, эффективность CRISPRoff должна зависеть от того, когда именно после стимуляции сделана электропорация.',
+
+    'ds-encodednase-desc':'DNase-seq на naive CD4⁺ и Th0 (Stamatoyannopoulos, Crawford), плюс Mint-ChIP по гистоновым меткам на CD4⁺CD25⁺ регуляторных T-клетках (Bernstein, Broad). Разные поколения ENCODE, разное качество и разрешение.',
+    'ds-encodednase-why':'<strong>Почему это важно для CD55:</strong> дополнительный слой к нашему ChIP-seq разбору по K562 — но уже в T-клетках, где, как честно отмечено на странице «Механизмы», промотор CD55 фактически не изучали. Ближайший доступный ответ на вопрос «а как этот участок выглядит в T-клетке вообще».',
+
+    'ds-fantom-desc':'CAGE-профилирование более 1,000 человеческих первичных клеток, клеточных линий и тканей, включая CD4⁺ T-клетки. Определено около 200,000 коровых промоторных участков с разрешением до одного основания. Ключевая особенность CAGE — она видит именно позицию старта транскрипции, а не суммарную экспрессию гена.',
+    'ds-fantom-why':'<strong>Почему это важно для CD55:</strong> у нас всё привязано к TSS (T2T chr1:206,586,916), и все координаты — протоспейсер +93…+112, пик метилирования +58…+84, сайты KLF — отсчитываются от него. FANTOM5 даёт независимое эмпирическое подтверждение положения TSS CD55 именно в T-клетках, а не аннотацию из общего каталога. Если реальный TSS в T-клетках смещён, вся геометрия наших выводов сдвигается.',
+
+    'gap-h2':'4. Чего в публичных данных нет',
+    'gap-sub':'В духе принципа сайта — сначала честно перечислить, чего этот каталог не решает, прежде чем строить на нём модель.',
+    'gap-1':'<strong>Нет ни одного публичного набора с CRISPRoff или ZFPoff на CD55.</strong> Отредактированное состояние локуса существует только в наших данных — обучающих примеров «отредактировано → выключено» извне взять негде.',
+    'gap-2':'<strong>Нет одномолекулярных данных, где метилирование и экспрессия сняты с одной и той же молекулы или клетки.</strong> CITE-seq даёт РНК + белок на клетку, но не метилирование. Все «пары» метилирование↔экспрессия в каталоге — это агрегаты по популяции, а не совместное измерение.',
+    'gap-3':'<strong>Нет нанопоровых метиломов первичных T-клеток на нашем окне в открытом доступе.</strong> Публичные метиломы T-клеток — это бисульфит и EM-seq; сравнение с нашими ONT-вызовами всегда будет межплатформенным, со всеми оговорками про порог 0.995 и фильтры.',
+    'gap-4':'<strong>Публичные T-клетки — это другие доноры, субпопуляции и состояния активации.</strong> Использовать их как компаратор для наших групп нельзя; это фон для локуса, а не контроль эксперимента.',
+    'gap-5':'<strong>Значительная часть по-настоящему парных данных под контролируемым доступом.</strong> BLUEPRINT и EGA-депозиты Sanger требуют заявки на доступ — это не «скачал и посчитал», а отдельная процедура с сроками.',
+    'gap-note':'<strong>Что это значит практически:</strong> публичные данные дают базовую линию «CD55 в нормальных T-клетках» — сколько метилирования и сколько экспрессии в невредактированных клетках, и как это меняется при активации. Этого достаточно, чтобы <em>предобучить</em> и отладить архитектуру модели раздела 5. Но обучающих примеров с CRISPRoff/ZFPoff-отредактированным CD55 в публичном доступе нет и быть не может — их даём только мы, и для этого всё равно нужен наш собственный парный RNA-seq по образцам Day 6 / Day 35 / K562.',
+
+    'nx-h2':'5. Что с этим делать дальше',
+    'nx-sub':'Конкретные шаги, вытекающие из каталога — в том же формате, что и Research Ideas/Todos.',
+    'nx-1-h':'Вырезать окно CD55 из всех Приоритет-1 наборов',
+    'nx-1-p':'Тот же подход, что уже описан на странице публичных метиломов: range-запросы к удалённым файлам без полного скачивания. Собрать таблицу «набор × CD55-экспрессия/метилирование» на наших 137 CpG и координатах GRCh38 chr1:207,318,092–207,324,450.',
+    'nx-2-h':'Проверить TSS CD55 по FANTOM5 в T-клетках',
+    'nx-2-p':'Быстрая и дешёвая проверка с высокой отдачей: если эмпирический TSS в T-клетках смещён относительно аннотации, все относительные координаты (протоспейсер +93…+112, пик +58…+84) нужно пересчитать.',
+    'nx-3-h':'Оценить связь мРНК CD55 ↔ белок CD55 по CITE-seq',
+    'nx-3-p':'На данных Hao 2021 посчитать корреляцию мРНК и поверхностного белка CD55 по отдельным клеткам. Это напрямую проверяет допущение, на котором стоит интерпретация K562 LOW/HIGH фракций.',
+    'nx-4-h':'Подать заявку на доступ к BLUEPRINT / EGA',
+    'nx-4-p':'Единственный источник настоящих парных «один образец → метилом + транскриптом». Процедура доступа занимает время, так что подавать стоит заранее, параллельно с работой над остальным.',
+    'nx-link-tag':'Связанная страница',
+    'nx-link-h':'Foundation-модели: куда эти данные пойдут',
+    'nx-link-p':'Раздел 5 страницы Foundation-моделей описывает two-tower архитектуру «ДНК + метилирование → CD55 on/off». Именно её обучающая выборка собирается из наборов на этой странице — Приоритет 1 идёт в предобучение и отладку, наши собственные данные потом в fine-tuning.',
+
+    'src-h2':'Источники и порталы',
+    'footer':'epicme.bio — каталог публичных данных по первичным T-клеткам для CD55 multi-omics анализа. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="index.html">← Назад на главную</a>'
+  },
+  en: {
+    'title':'epicme.bio — public primary T cell data',
+    'brand-sub':'epigenome · cytosine · methylation',
+    'nav-home':'Home','nav-about':'About','nav-public':'Public data',
+    'nav-tcelldata':'T cell data','nav-models':'Foundation models',
+    'eyebrow':'Data catalog · epicme.bio',
+    'h1':'Everything public on <em>primary human T cells</em> — by modality',
+    'hero-sub':'An aggregated catalog of open datasets on primary human T cells: bulk RNA-seq, single-cell RNA-seq, CITE-seq (RNA + protein), WGBS and EM-seq methylation, CAGE/TSS, ATAC and ChIP-seq, eQTLs. Assembled for one specific purpose — finding paired "expression ↔ methylation" signal at the CD55 locus, to unblock the "DNA + methylation → gene on/off" model from section 5 of the Foundation models page.',
+
+    'use-h2':'1. How to read this catalog',
+    'use-sub':'Datasets are ranked by priority relative to our specific task, not by general "quality." Priority is marked by both a text badge and the weight/style of the card\'s left border — color is never the only cue.',
+    'prio-1-lbl':'Priority 1','prio-2-lbl':'Priority 2',
+    'prio-1-h':'Directly usable for the on/off model',
+    'prio-1-p':'Primary T cells, with expression (or expression + methylation on the same or comparable samples), and coordinates available across our CD55 window. This is what a training set can be built from right now.',
+    'prio-2-h':'Context, validation, reference',
+    'prio-2-p':'Useful as background, for cell-type annotation, for checking effect direction, or as a source of regulatory-element coordinates — but not directly usable as "methylation → expression" pairs.',
+
+    'mod-bulk':'bulk RNA-seq datasets','mod-sc':'single-cell datasets','mod-meth':'methylation sources',
+    'mod-chrom':'chromatin sources','mod-cage':'CAGE / TSS resources','mod-eqtl':'resources with eQTLs',
+
+    'pair-h2':'2. The key question: where paired methylation + expression exists',
+    'pair-sub':'The section-5 model needs neither RNA-seq alone nor WGBS alone, but both signals on the same (or maximally comparable) cells. Few sources qualify — here they are, with honest caveats about how "same" those samples really are.',
+    'th-source':'Source','th-expr':'Expression','th-meth':'Methylation','th-same':'Same samples?','th-use':'Usability',
+    'pr-blueprint-expr':'RNA-seq across sorted blood subpopulations',
+    'pr-blueprint-meth':'WGBS across the same sorted subpopulations',
+    'pr-blueprint-same':'<strong>Yes</strong> — one donor, one sorted sample, both modalities',
+    'pr-blueprint-use':'Best available source of genuine pairs for pretraining',
+    'pr-encode-expr':'RNA-seq on naive CD4⁺, including an activation timecourse',
+    'pr-encode-meth':'WGBS on CD3⁺ T cells',
+    'pr-encode-same':'<strong>No</strong> — different experiments, different donors, shared cell-type ontology',
+    'pr-encode-use':'Works as a cell-type-level pair, not a sample-level one',
+    'pr-loyfer-expr':'DICE (separate project, 91 donors)',
+    'pr-loyfer-meth':'Loyfer 2023, deep WGBS across 39 sorted types',
+    'pr-loyfer-same':'<strong>No</strong> — independent cohorts, matched only by cell type',
+    'pr-loyfer-use':'Maximum depth and cell-type resolution, but the pairing is artificial',
+    'pr-roadmap-expr':'RNA-seq for a subset of epigenomes',
+    'pr-roadmap-meth':'WGBS/RRBS for the same epigenomes',
+    'pr-roadmap-same':'<strong>Partly</strong> — not matched for every epigenome, needs per-sample checking',
+    'pr-roadmap-use':'Useful, but requires manual verification of matching per sample',
+    'pair-note':'"Same samples" is the critical column: in BLUEPRINT the methylome and transcriptome really are taken from one sorted sample from one donor, whereas in ENCODE these are different experiments on different donors within one project and the same cell-type ontology.',
+
+    'ds-h2':'3. Datasets by modality',
+    'ds-sub':'For each dataset — what it is, its scale, accession numbers, and why it matters (or doesn\'t) specifically for CD55.',
+
+    'grp-bulk':'Bulk RNA-seq — expression across sorted populations',
+    'grp-sc':'Single-cell RNA-seq and CITE-seq — expression per individual cell',
+    'grp-meth':'Methylation — WGBS and EM-seq',
+    'grp-chrom':'Chromatin — ATAC-seq, DNase-seq, ChIP-seq',
+    'grp-cage':'CAGE / TSS — promoter activity at base resolution',
+
+    'tg-bulk':'bulk RNA-seq','tg-sc':'single-cell','tg-primary':'primary cells','tg-eqtl':'eQTL',
+    'tg-activation':'activation timecourse','tg-protein':'surface protein','tg-meth':'methylation',
+    'tg-atlas':'atlas','tg-paired':'paired modalities','tg-atac':'ATAC-seq','tg-chip':'ChIP / DNase',
+    'tg-cage':'CAGE','tg-tss':'TSS resolution',
+
+    'ds-dice-desc':'RNA-seq across 13 immune cell types (T, B, monocyte, and NK subsets) in 91 healthy genotyped donors — 1,561 samples in total with normalized TPMs. Plus a full eQTL module: you can see how SNPs affect a gene\'s expression within one specific T cell subset.',
+    'ds-dice-why':'<strong>Why this matters for CD55:</strong> this is the best source for the baseline question "how much CD55 does a normal unedited T cell express," broken down by subset and with an estimate of inter-individual variability across 91 donors. It shows whether the spread in CD55 expression between our donors is normal variation rather than an editing effect.',
+
+    'ds-encodern-desc':'Total RNA-seq on primary naive CD4⁺ αβ T cells from Barbara Wold\'s lab (Caltech) as part of ENCODE4. The key point: this is not a single timepoint but a timecourse — from "0 hour, no activation" (ENCSR011VQI) to cells activated with anti-CD3/CD28 beads plus 50 U/mL IL-2 for 72 hours (ENCSR177CWW). The data are also mirrored in GEO under GSE219319.',
+    'ds-encodern-why':'<strong>Why this matters for CD55:</strong> this is the closest public analogue of our own system — primary donor T cells activated with anti-CD3/CD28, exactly as in our protocol before electroporation. It lets us separate "CD55 changed because of the editor" from "CD55 changes whenever a T cell is activated," which is precisely the confound that would otherwise eat the signal.',
+
+    'ds-cano-desc':'Quantitative proteomics, bulk RNA-seq, and scRNA-seq of over 40,000 human naive and memory CD4⁺ T cells polarized by different cytokines. Describes an "effectorness gradient" shaping how cells respond to cytokines. Raw data is under controlled access at EGA (EGAS00001003823), but the interactive viewers are open.',
+    'ds-cano-why':'<strong>Why this matters for CD55:</strong> three modalities on the same cells (protein + bulk RNA + single cells) is a rare combination. If CD55 varies along the effectorness gradient, that\'s another confounder to account for when comparing our donors and timepoints.',
+
+    'ds-linc-desc':'63 RNA-seq samples across 13 highly purified T and B lymphocyte subsets (CD4 naive/Th1/Th2/Th17/Treg/TCM/TEM, CD8 naive/TCM/TEM, B naive/memory/CD5⁺), with five biological replicates per subset. Used for de novo transcriptome assembly and discovery of novel lincRNAs.',
+    'ds-linc-why':'<strong>Why this matters for CD55:</strong> useful as a subset-level check — CD55 is expressed differently in naive versus memory cells, and our Day 6 vs Day 35 cultures almost certainly differ in subset composition.',
+
+    'ds-hao-desc':'A CITE-seq atlas of 211,000 PBMCs from eight donors, simultaneously measuring the transcriptome and up to 228 surface proteins per cell. 161,764 cells in the main 10x 3′ set. Annotated at three levels of granularity — from eight broad categories to 57 high-resolution clusters.',
+    'ds-hao-why':'<strong>Why this is critical for CD55:</strong> CD55 is a surface protein (DAF), and it is exactly what we sort cells on. CITE-seq is the only public data type where both CD55 mRNA and CD55 surface protein are measured on the same cell. That gives a direct empirical estimate of how well mRNA predicts the surface signal — the very assumption underpinning our interpretation of the K562 LOW/HIGH fractions.',
+
+    'ds-soskic-desc':'scRNA-seq of naive and memory CD4⁺ T cells across several timepoints after activation, linked to immune disease risk variants. Shows how genetic variants regulate expression dynamics during activation specifically, rather than at rest. h5ad files and an interactive viewer are available.',
+    'ds-soskic-why':'<strong>Why this matters for CD55:</strong> it provides resolution in time and across individual cells simultaneously — you can see how heterogeneous CD55 expression is between cells of one culture at each point after activation. That\'s the direct analogue of our molecule-to-molecule heterogeneity question in the Nanopore data, viewed from the RNA side.',
+
+    'ds-tabula-desc':'An atlas of ~481,120 cells from 24 tissues and organs across 15 donors, including 264,009 immune cells, blood, lymph node, spleen, and thymus. Uses both Smart-seq2 on FACS-sorted cells in plates and 10x droplets. 475 annotated cell types. Explorable via CELLxGENE.',
+    'ds-tabula-why':'<strong>Why this matters for CD55:</strong> mainly as broad context — how CD55 expression in blood T cells differs from T cells in tissues, and from other cell types generally. Useful for the CHAPLE and ovarian cancer pages as much as for the main line of work.',
+
+    'ds-encodewgbs-desc':'Whole-genome bisulfite sequencing of primary human CD3⁺ T cells as part of ENCODE — already catalogued in our public methylomes page.',
+    'ds-encodewgbs-why':'<strong>Why this matters for CD55:</strong> a methylation baseline across our 137 CpGs in unedited T cells, from the same ENCODE ecosystem as the RNA-seq above — so coordinates and processing are compatible. Full breakdown on the <a href="public-methylation.html">Public data</a> page.',
+
+    'ds-loyfer-desc':'Deep WGBS across 39 sorted human cell types, including CD4, CD8, and naive T cells. Currently the highest cell-type resolution among public human methylomes.',
+    'ds-loyfer-why':'<strong>Why this matters for CD55:</strong> it lets us check whether baseline CD55 promoter methylation differs between naive and memory T cells. If it does, part of the difference between our Day 6 and Day 35 may simply be different culture composition rather than a time or editor effect.',
+
+    'ds-blueprint-desc':'The BLUEPRINT project ran WGBS and RNA-seq on the same sorted blood cell samples from the same donors. Some data is open as tracks, some is under controlled access via EGA.',
+    'ds-blueprint-why':'<strong>Why this is the key dataset:</strong> it is the only source in this catalog where methylome and transcriptome are genuinely taken from the same sample rather than matched by cell-type label. Pairs like these are what the section-5 "methylation → expression" model should be pretrained on, before fine-tuning it on our locus.',
+
+    'ds-calderon-desc':'ATAC-seq across 25 immune cell types at rest and after stimulation — including several T cell subsets in both states. Already used in our transcription-factor analysis.',
+    'ds-calderon-why':'<strong>Why this matters for CD55:</strong> chromatin accessibility at the CD55 promoter before and after activation is a direct test of the "an active promoter is hostile territory for DNMT3A" hypothesis from the seven-mechanisms list. If the promoter opens on activation, CRISPRoff efficiency should depend on exactly when after stimulation electroporation is done.',
+
+    'ds-encodednase-desc':'DNase-seq on naive CD4⁺ and Th0 cells (Stamatoyannopoulos, Crawford), plus Mint-ChIP for histone marks on CD4⁺CD25⁺ regulatory T cells (Bernstein, Broad). Different ENCODE generations, with differing quality and resolution.',
+    'ds-encodednase-why':'<strong>Why this matters for CD55:</strong> an extra layer on top of our K562 ChIP-seq breakdown — but in T cells, where, as the Mechanisms page honestly notes, the CD55 promoter has essentially not been studied. The closest available answer to "what does this region even look like in a T cell."',
+
+    'ds-fantom-desc':'CAGE profiling of over 1,000 human primary cells, cell lines, and tissues, including CD4⁺ T cells. Roughly 200,000 core promoter regions defined at single-base resolution. CAGE\'s key property is that it sees the position of transcription initiation, not just a gene\'s total expression.',
+    'ds-fantom-why':'<strong>Why this matters for CD55:</strong> everything we do is anchored to the TSS (T2T chr1:206,586,916), and all our coordinates — protospacer +93…+112, methylation peak +58…+84, KLF sites — are measured from it. FANTOM5 gives independent empirical confirmation of the CD55 TSS position in T cells specifically, rather than an annotation from a general catalog. If the real T cell TSS is shifted, the entire geometry of our conclusions shifts with it.',
+
+    'gap-h2':'4. What the public data does not have',
+    'gap-sub':'In the spirit of the site\'s principle — state honestly what this catalog does not solve, before building a model on it.',
+    'gap-1':'<strong>There is no public dataset with CRISPRoff or ZFPoff at CD55.</strong> The edited state of this locus exists only in our data — there is nowhere external to get "edited → silenced" training examples.',
+    'gap-2':'<strong>There is no single-molecule data where methylation and expression are read from the same molecule or cell.</strong> CITE-seq gives RNA + protein per cell, but not methylation. Every methylation↔expression "pair" in this catalog is a population aggregate, not a joint measurement.',
+    'gap-3':'<strong>There are no public Nanopore methylomes of primary T cells over our window.</strong> Public T cell methylomes are bisulfite and EM-seq; comparison with our ONT calls will always be cross-platform, with all the caveats about the 0.995 threshold and filters.',
+    'gap-4':'<strong>Public T cells are different donors, subsets, and activation states.</strong> They cannot be used as a comparator for our groups; they are background for the locus, not an experimental control.',
+    'gap-5':'<strong>A substantial fraction of the genuinely paired data is under controlled access.</strong> BLUEPRINT and the Sanger EGA deposits require an access application — not "download and compute" but a separate process with its own timeline.',
+    'gap-note':'<strong>What this means practically:</strong> public data provides the "CD55 in normal T cells" baseline — how much methylation and how much expression in unedited cells, and how that shifts on activation. That is enough to <em>pretrain</em> and debug the section-5 model architecture. But training examples with CRISPRoff/ZFPoff-edited CD55 do not and cannot exist publicly — only we produce those, and for that we still need our own paired RNA-seq on the Day 6 / Day 35 / K562 samples.',
+
+    'nx-h2':'5. What to do with this next',
+    'nx-sub':'Concrete steps arising from the catalog — in the same format as Research Ideas/Todos.',
+    'nx-1-h':'Extract the CD55 window from every Priority-1 dataset',
+    'nx-1-p':'The same approach already described on the public methylomes page: range requests against remote files without downloading them in full. Build a "dataset × CD55 expression/methylation" table across our 137 CpGs and GRCh38 coordinates chr1:207,318,092–207,324,450.',
+    'nx-2-h':'Verify the CD55 TSS in T cells against FANTOM5',
+    'nx-2-p':'A fast, cheap, high-return check: if the empirical T cell TSS is shifted relative to the annotation, all relative coordinates (protospacer +93…+112, peak +58…+84) need recomputing.',
+    'nx-3-h':'Estimate the CD55 mRNA ↔ CD55 protein relationship from CITE-seq',
+    'nx-3-p':'Using the Hao 2021 data, compute the per-cell correlation between CD55 mRNA and surface protein. This directly tests the assumption underlying the K562 LOW/HIGH fraction interpretation.',
+    'nx-4-h':'Apply for BLUEPRINT / EGA access',
+    'nx-4-p':'The only source of genuine "one sample → methylome + transcriptome" pairs. The access process takes time, so it is worth applying early, in parallel with everything else.',
+    'nx-link-tag':'Related page',
+    'nx-link-h':'Foundation models: where this data goes',
+    'nx-link-p':'Section 5 of the Foundation models page describes the two-tower "DNA + methylation → CD55 on/off" architecture. Its training set is assembled precisely from the datasets on this page — Priority 1 feeds pretraining and debugging, with our own data used later for fine-tuning.',
+
+    'src-h2':'Sources and portals',
+    'footer':'epicme.bio — a catalog of public primary T cell data for CD55 multi-omics analysis. Part of the PhD project of Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. <a href="index.html">← Back to home</a>'
+  }
+};
+
+let CURRENT_LANG = 'ru';
+
+function renderModalityStrip(){
+  const dict = I18N[CURRENT_LANG];
+  document.getElementById('modality-strip').innerHTML = MODALITY_STRIP.map(m =>
+    `<div class="mod-item"><div class="mod-n">${m.n}</div><div class="mod-t">${dict[m.key]}</div></div>`
+  ).join('');
+}
+
+function renderPairedTable(){
+  const dict = I18N[CURRENT_LANG];
+  document.getElementById('paired-body').innerHTML = PAIRED_ROWS.map(r => `
+    <tr>
+      <td><strong>${r.src}</strong></td>
+      <td>${dict[r.expr_key]}</td>
+      <td>${dict[r.meth_key]}</td>
+      <td>${dict[r.same_key]}</td>
+      <td>${dict[r.use_key]}</td>
+    </tr>`).join('');
+}
+
+function renderDatasets(){
+  const dict = I18N[CURRENT_LANG];
+  document.getElementById('dataset-groups').innerHTML = GROUPS.map(g => `
+    <h3 class="sub-h">${dict[g.title_key]}</h3>
+    ${g.items.map(it => `
+      <div class="ds-card tier${it.tier}">
+        <div class="ds-head">
+          <div>
+            <h3>${it.name}</h3>
+            <div class="ds-meta">${it.meta}</div>
+          </div>
+          <span class="prio p${it.tier}"><span class="sym">${it.tier === 1 ? '●' : '◆'}</span> ${dict['prio-' + it.tier + '-lbl']}</span>
+        </div>
+        <div>${it.accs.map(a => `<span class="ds-acc">${a}</span>`).join('')}</div>
+        <div class="ds-tags">${it.tags.map(t => `<span class="tag ${t.c}">${dict[t.k]}</span>`).join('')}</div>
+        <p>${dict[it.desc_key]}</p>
+        <div class="ds-why">${dict[it.why_key]}</div>
+        <div class="ds-links">
+          ${it.links.map(l => `<a href="${l.u}" target="_blank" rel="noopener">↗ ${l.t}</a>`).join('')}
+        </div>
+      </div>`).join('')}
+  `).join('');
+}
+
+function renderGaps(){
+  const dict = I18N[CURRENT_LANG];
+  document.getElementById('gap-list').innerHTML = GAPS.map(k => `<li>${dict[k]}</li>`).join('');
+}
+
+function renderNextCards(){
+  const dict = I18N[CURRENT_LANG];
+  document.getElementById('next-cards').innerHTML = NEXT_CARDS.map(k => `
+    <div class="card">
+      <h3>${dict[k + '-h']}</h3>
+      <p>${dict[k + '-p']}</p>
+    </div>`).join('');
+}
+
+function renderSources(){
+  document.getElementById('src-list').innerHTML = SOURCES.map((s, i) => `
+    <li class="ref-item" id="ref-${i + 1}">
+      <span class="ref-num">[${i + 1}]</span>
+      <div class="ref-body">
+        <h4>${s.t}</h4>
+        <div class="ref-meta"><a href="${s.u}" target="_blank" rel="noopener">${s.u}</a></div>
+      </div>
+    </li>`).join('');
+}
+
+function renderAllDynamic(){
+  renderModalityStrip();
+  renderPairedTable();
+  renderDatasets();
+  renderGaps();
+  renderNextCards();
+  renderSources();
+}
+
+function applyLang(lang){
+  CURRENT_LANG = lang;
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const dict = I18N[lang];
+    if(!dict || !(key in dict)) return;
+    if(el.tagName === 'TITLE'){ document.title = dict[key]; }
+    else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('#lang-switch button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  renderAllDynamic();
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){}
+}
+document.querySelectorAll('#lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+(function(){
+  let saved = 'ru';
+  try{ saved = localStorage.getItem('epicme_lang') || 'ru'; }catch(e){}
+  applyLang(saved === 'en' ? 'en' : 'ru');
+})();
+</script>
+
+</body>
+</html>
