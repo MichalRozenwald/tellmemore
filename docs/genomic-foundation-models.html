@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">epicme.bio — геномные foundation-модели (Borzoi, AlphaGenome и др.)</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific styles — reuses assets/theme.css tokens (--orange, --blue, --yellow,
+     --surface, --ink, --line, --radius, etc.) throughout, no off-palette colors. */
+
+  .hero{ padding:56px 0 28px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--orange); font-weight:600; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--orange); }
+  h1.display{
+    font-size:clamp(28px, 4.6vw, 42px);
+    font-weight:600; line-height:1.14; letter-spacing:-0.01em;
+    margin:0 0 18px;
+  }
+  h1.display em{ font-style:normal; color:var(--orange); }
+  .hero-sub{ font-size:16.5px; color:var(--ink-dim); max-width:720px; margin:0 0 20px; }
+
+  .lang-switch{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+  }
+  .lang-switch button{
+    border:none; background:transparent; color:var(--ink-dim);
+    font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+  }
+  .lang-switch button.active{ background:var(--blue); color:#06182A; }
+  .nav-inner{ flex-wrap:wrap; row-gap:10px; }
+  .nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+  .nav-links a{
+    display:inline-flex; align-items:center; padding:10px 18px; border-radius:999px;
+    border:1.5px solid var(--line); background:var(--surface-2); color:var(--ink-dim);
+    font-size:14.5px; font-weight:600; text-decoration:none;
+    transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{
+    border-color:var(--blue); color:var(--ink); background:var(--surface); transform:translateY(-1px);
+  }
+  .nav-links a.active{ background:var(--orange); border-color:var(--orange); color:#2B1900; }
+
+  section{ padding:36px 0; border-top:1px solid var(--line); }
+  section.hero{ border-top:none; }
+  h2.section-h{ font-size:22px; margin:0 0 6px; color:var(--ink); }
+  p.section-sub{ font-size:14.5px; color:var(--ink-dim); max-width:760px; margin:0 0 24px; }
+
+  /* ---------- timeline / overview strip ---------- */
+  .timeline{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:10px; margin-bottom:26px;
+  }
+  .tl-item{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:12px 14px;
+    text-align:center;
+  }
+  .tl-item .tl-year{ font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--blue); font-size:14px; }
+  .tl-item .tl-name{ font-size:12.5px; color:var(--ink-dim); margin-top:4px; }
+
+  /* ---------- comparison table ---------- */
+  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); margin-bottom:8px; }
+  table.cmp{ width:100%; border-collapse:collapse; font-size:13px; min-width:760px; }
+  table.cmp th{
+    text-align:left; background:var(--surface-2); color:var(--ink-dim); font-weight:600;
+    padding:10px 12px; border-bottom:1px solid var(--line); font-family:'Space Grotesk',sans-serif;
+    font-size:12px; letter-spacing:0.03em; text-transform:uppercase; white-space:nowrap;
+  }
+  table.cmp td{ padding:10px 12px; border-bottom:1px solid var(--line); color:var(--ink); vertical-align:top; }
+  table.cmp tr:last-child td{ border-bottom:none; }
+  table.cmp td.mono{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-dim); }
+
+  /* ---------- model profile cards ---------- */
+  .model-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px 24px; margin-bottom:16px;
+  }
+  .model-card.highlight{ border-color:var(--blue); box-shadow:0 10px 28px rgba(86,180,233,0.10); }
+  .model-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+  .model-head h3{ margin:0; font-size:18px; color:var(--ink); }
+  .model-meta{ font-size:12.3px; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace; margin-top:3px; }
+  .model-card p{ font-size:14px; color:var(--ink-dim); margin:8px 0; line-height:1.55; }
+  .model-card .tag-row{ display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 4px; }
+  .model-specs{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;
+    margin:14px 0; padding:12px 14px; background:var(--surface-2); border-radius:9px; border:1px solid var(--line);
+  }
+  .model-specs .spec-k{ font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-faint); font-family:'Space Grotesk',sans-serif; }
+  .model-specs .spec-v{ font-size:13px; color:var(--ink); margin-top:2px; font-family:'IBM Plex Mono',monospace; }
+  .model-card a.cite-link{ font-size:12.8px; color:var(--blue); text-decoration:none; word-break:break-word; }
+  .model-card a.cite-link:hover{ text-decoration:underline; }
+
+  /* ---------- idea cards ---------- */
+  .idea-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+  .idea-card{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 20px;
+  }
+  .idea-card .idea-num{
+    display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px;
+    border-radius:50%; background:var(--blue-dim); color:var(--blue); font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:12.5px; margin-bottom:10px;
+  }
+  .idea-card h4{ margin:0 0 6px; font-size:15px; color:var(--ink); }
+  .idea-card p{ margin:0; font-size:13.3px; color:var(--ink-dim); line-height:1.5; }
+
+  /* ---------- architecture diagram blocks ---------- */
+  .arch-flow{
+    display:flex; align-items:stretch; gap:0; flex-wrap:wrap; margin:18px 0; border:1px solid var(--line);
+    border-radius:var(--radius); overflow:hidden;
+  }
+  .arch-step{
+    flex:1 1 160px; padding:16px 16px; background:var(--surface-2); border-right:1px solid var(--line);
+    display:flex; flex-direction:column; gap:6px; min-width:160px;
+  }
+  .arch-step:last-child{ border-right:none; background:var(--blue-dim); }
+  .arch-step .arch-k{ font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--orange); font-family:'Space Grotesk',sans-serif; font-weight:700; }
+  .arch-step p{ margin:0; font-size:12.8px; color:var(--ink-dim); line-height:1.45; }
+  .arch-step:last-child p{ color:var(--ink); }
+
+  .approach-list{ counter-reset:approach; list-style:none; margin:16px 0; padding:0; }
+  .approach-list li{
+    counter-increment:approach; position:relative; padding:14px 16px 14px 52px; margin-bottom:10px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:9px; font-size:13.8px; color:var(--ink-dim); line-height:1.55;
+  }
+  .approach-list li::before{
+    content:counter(approach); position:absolute; left:14px; top:14px; width:24px; height:24px; border-radius:50%;
+    background:var(--yellow-dim); color:#cbbf3e; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12.5px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .approach-list li strong{ color:var(--ink); }
+
+  .caveat-box{
+    display:flex; gap:12px; align-items:flex-start; background:var(--orange-dim); border:1px solid var(--orange);
+    border-radius:var(--radius); padding:14px 18px; font-size:13.5px; color:var(--ink-dim); margin:18px 0;
+  }
+  .caveat-box strong{ color:var(--orange); }
+
+  .plan-steps{ margin:16px 0; }
+  .plan-step{
+    display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--line);
+  }
+  .plan-step:last-child{ border-bottom:none; }
+  .plan-step .ps-num{
+    flex:0 0 auto; width:30px; height:30px; border-radius:50%; background:var(--surface-2); border:1.5px solid var(--blue);
+    color:var(--blue); font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .plan-step .ps-body h4{ margin:0 0 4px; font-size:14.5px; color:var(--ink); }
+  .plan-step .ps-body p{ margin:0; font-size:13.3px; color:var(--ink-dim); line-height:1.5; }
+
+  .disclaimer{
+    font-size:12.5px; color:var(--ink-faint); border-left:2px solid var(--line); padding-left:12px; margin:14px 0;
+  }
+
+  .ref-list{ list-style:none; margin:0; padding:0; font-size:12.8px; }
+  .ref-list li{ padding:7px 0; border-bottom:1px solid var(--line); color:var(--ink-dim); }
+  .ref-list li:last-child{ border-bottom:none; }
+  .ref-list a{ color:var(--blue); text-decoration:none; }
+  .ref-list a:hover{ text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="genomic-foundation-models.html" data-i18n="nav-models" class="active">Foundation-модели</a>
+      <a href="upload-user-input.html" data-i18n="nav-upload">Загрузка данных</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="eyebrow" data-i18n="eyebrow">Research notes · epicme.bio</div>
+    <h1 class="display" data-i18n="h1">Геномные foundation-модели: <em>Borzoi, AlphaGenome</em> и путь к "секвенс-ту-функция" ИИ</h1>
+    <p class="hero-sub" data-i18n="hero-sub">Обзор современных моделей глубокого обучения, которые предсказывают функцию генома напрямую из последовательности ДНК — от Enformer и Borzoi до AlphaGenome — и разбор того, как их можно применить (и дообучить с учётом метилирования ДНК) в рамках проекта epicme.bio: CRISPRoff/ZFPoff-сайленсинг CD55, per-molecule Nanopore-метилирование и связь эпигенома с экспрессией.</p>
+  </section>
+
+  <!-- ============ 1. OVERVIEW ============ -->
+  <section id="overview">
+    <h2 class="section-h" data-i18n="ov-h2">1. Общая картина: от "предсказать один класс хроматина" до "предсказать весь RNA-seq трек"</h2>
+    <p class="section-sub" data-i18n="ov-sub">За последние пять лет геномные foundation-модели прошли путь от классификаторов коротких мотивов до систем, которые берут сотни тысяч — миллион пар оснований ДНК и одним проходом предсказывают тысячи молекулярных дорожек: экспрессию, сплайсинг, полиаденилирование, доступность хроматина, связывание транскрипционных факторов.</p>
+
+    <div class="timeline" id="timeline"></div>
+
+    <div class="table-wrap">
+      <table class="cmp">
+        <thead>
+          <tr>
+            <th data-i18n="th-model">Модель</th>
+            <th data-i18n="th-org">Разработчик</th>
+            <th data-i18n="th-year">Год</th>
+            <th data-i18n="th-arch">Архитектура</th>
+            <th data-i18n="th-context">Контекст</th>
+            <th data-i18n="th-output">Выход</th>
+          </tr>
+        </thead>
+        <tbody id="cmp-body"></tbody>
+      </table>
+    </div>
+    <p class="disclaimer" data-i18n="ov-note">Таблица — рабочий срез на август 2026; для активно развивающихся моделей (AlphaGenome, Evo2) параметры и доступность API могли измениться — сверяйтесь с первоисточниками ниже.</p>
+  </section>
+
+  <!-- ============ 2. MODEL PROFILES ============ -->
+  <section id="profiles">
+    <h2 class="section-h" data-i18n="pr-h2">2. Модели подробно</h2>
+    <p class="section-sub" data-i18n="pr-sub">Каждая карточка — архитектура, вход/выход, что модель фактически предсказывает и почему это может быть релевантно для локуса CD55.</p>
+    <div id="model-cards"></div>
+  </section>
+
+  <!-- ============ 3. IDEAS FOR EPICME.BIO ============ -->
+  <section id="ideas">
+    <h2 class="section-h" data-i18n="id-h2">3. Как это применимо к epicme.bio</h2>
+    <p class="section-sub" data-i18n="id-sub">Конкретные точки, где Borzoi/AlphaGenome и подобные модели могут усилить или проверить то, что уже есть на сайте (Day 6 / Day 35 CRISPRoff, ZFPoff K562, ChIP-seq deep-dive).</p>
+    <div class="idea-grid" id="idea-grid"></div>
+  </section>
+
+  <!-- ============ 4. FINE-TUNING WITH METHYLATION INPUT ============ -->
+  <section id="methylation-finetune">
+    <h2 class="section-h" data-i18n="ft-h2">4. Дообучение на ДНК + сигнал метилирования</h2>
+    <p class="section-sub" data-i18n="ft-sub">Ключевой пробел: Borzoi, AlphaGenome и Enformer принимают на вход <em style="color:var(--ink); font-style:normal;">только</em> последовательность ДНК (плюс дискретный "тип клетки/трек" как выходной селектор). Они выучивают усреднённое по обучающей выборке эпигенетическое состояние для этого типа клеток, но не могут быть явно обусловлены на <em style="color:var(--ink); font-style:normal;">измеренное</em> метилирование конкретной молекулы или образца.</p>
+
+    <h3 style="font-size:16px; color:var(--ink); margin:22px 0 10px;" data-i18n="ft-gap-h3">4.1 Почему это ограничение важно именно для нашего проекта</h3>
+    <p style="font-size:14px; color:var(--ink-dim); line-height:1.6; max-width:780px;" data-i18n="ft-gap-p">Наш пайплайн Write → Read → Learn даёт ровно то, чего не хватает этим моделям на входе: per-molecule и per-CpG метилирование (Nanopore, EM-seq) в паре с известным статусом редактирования (CRISPRoff / ZFPoff / mock / unedited). Модель, дообученная так, чтобы явно принимать вектор метилирования как условие, в теории могла бы отвечать на контрфактические вопросы вида «что будет с экспрессией CD55, если именно этот CpG-кластер (#78–83) станет полностью метилированным» — а не только «какая экспрессия типична для этого типа клеток в среднем».</p>
+
+    <h3 style="font-size:16px; color:var(--ink); margin:26px 0 10px;" data-i18n="ft-arch-h3">4.2 Архитектурные пути дообучения</h3>
+    <ol class="approach-list" id="ft-approaches"></ol>
+
+    <h3 style="font-size:16px; color:var(--ink); margin:26px 0 10px;" data-i18n="ft-outcomes-h3">4.3 Потенциальные результаты, если это сработает</h3>
+    <div class="idea-grid" id="ft-outcomes"></div>
+
+    <div class="caveat-box">
+      <span>⚠</span>
+      <span data-i18n="ft-caveat"><strong>Честная оговорка (в духе принципа сайта "no values shown without derivation"):</strong> локальные данные — это один локус (137 CpG, ~6.5 т.п.о.) и небольшое число условий/доноров. Дообучение большой sequence-модели на такой выборке рискует переобучиться на шум конкретного эксперимента, а не выучить обобщаемую биологию. Реалистичный путь — сначала предобучение/регуляризация на больших парных датасетах метилом+транскриптом (ENCODE, BLUEPRINT, Loyfer atlas, Roadmap Epigenomics), и только потом fine-tuning/адаптер на CD55-специфичных данных как downstream-задаче, а не как единственном источнике сигнала. Кроме того, Borzoi/AlphaGenome — модели bulk-покрытия; наши данные — per-molecule, так что агрегация (или отдельная per-molecule архитектура) требует явного решения.</span>
+    </div>
+  </section>
+
+  <!-- ============ 5. NEXT: BUILD ON/OFF PREDICTOR ============ -->
+  <section id="next-steps">
+    <h2 class="section-h" data-i18n="nx-h2">5. Next: обучить модель ДНК + метилирование → CD55 «on/off» по RNA-seq</h2>
+    <p class="section-sub" data-i18n="nx-sub">Конкретный, выполнимый следующий шаг: two-tower модель, которая объединяет (а) последовательность ДНК вокруг CD55 и (б) вектор метилирования по 137 CpG, чтобы предсказать бинарный/непрерывный статус гена по RNA-seq сигналу.</p>
+
+    <div class="arch-flow" id="arch-flow"></div>
+
+    <h3 style="font-size:16px; color:var(--ink); margin:24px 0 10px;" data-i18n="nx-plan-h3">План действий</h3>
+    <div class="plan-steps" id="plan-steps"></div>
+
+    <h3 style="font-size:16px; color:var(--ink); margin:26px 0 10px;" data-i18n="nx-val-h3">Валидация и честная отчётность</h3>
+    <p style="font-size:14px; color:var(--ink-dim); line-height:1.6; max-width:780px;" data-i18n="nx-val-p">Leave-one-donor-out и leave-one-timepoint-out кросс-валидация (Day 6 и Day 35 сейчас — разные доноры, это нужно явно учитывать, а не путать эффект таймпоинта с эффектом донора — см. заметки K562/ChIP-seq страницы). Базовая линия сравнения — уже существующие metilation-only LR/RF модели (AUC 0.92–0.95 на LOW vs HIGH K562). Если добавление сырой ДНК-последовательности через предобученный Borzoi/Flashzoi backbone не улучшает эти метрики — это тоже честный и публикуемый результат, а не повод скрыть страницу.</p>
+
+    <div class="caveat-box">
+      <span>⚠</span>
+      <span data-i18n="nx-blocker"><strong>Главный блокер прямо сейчас:</strong> для обучения предиктора «→ RNA-seq on/off» нужен реальный парный RNA-seq для Day 6 / Day 35 / K562 LOW-HIGH-BASE образцов — в текущем Write → Read → Learn пайплайне это то самое "Learn", которого пока нет как отдельного измерения (Read = Nanopore/EM-seq метилирование, но не экспрессия). Ближайший практический шаг — уточнить у Ары/Фёдора и Эллы/Кэти, есть ли уже собранный или запланированный RNA-seq для этих же образцов, прежде чем проектировать архитектуру модели дальше.</span>
+    </div>
+  </section>
+
+  <!-- ============ SOURCES ============ -->
+  <section id="sources">
+    <h2 class="section-h" data-i18n="src-h2">Источники</h2>
+    <ul class="ref-list" id="src-list"></ul>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap" data-i18n="footer">epicme.bio — заметки об исследовании геномных foundation-моделей для CD55 multi-omics анализа. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="index.html">← Назад на главную</a></div>
+</footer>
+
+<script>
+/* ======================================================================
+   Structured content data — rendered into the DOM so RU/EN stay in one
+   place per item instead of duplicating markup. Populated after I18N.
+   ====================================================================== */
+
+const TIMELINE = [
+  {year:'2021', key:'tl-enformer'},
+  {year:'2023', key:'tl-nt'},
+  {year:'2023', key:'tl-hyena'},
+  {year:'2024', key:'tl-borzoi'},
+  {year:'2024', key:'tl-evo'},
+  {year:'2025', key:'tl-alphagenome'},
+  {year:'2025', key:'tl-flashzoi'},
+  {year:'2026', key:'tl-open'}
+];
+
+const CMP_ROWS = [
+  {model:'Enformer', org:'DeepMind / Calico', year:'2021', arch:'CNN + Transformer (self-attention)', ctx:'~200 kb', out_key:'cmp-out-enformer'},
+  {model:'Nucleotide Transformer (v2)', org:'InstaDeep / NVIDIA / TUM', year:'2023–2025', arch:'BERT-style transformer, multispecies pretraining', ctx:'до 12 kb (context per fine-tune task)', out_key:'cmp-out-nt'},
+  {model:'HyenaDNA', org:'Stanford / HazyResearch', year:'2023', arch:'Hyena (implicit long convolutions), single-nucleotide tokens', ctx:'до 1 Mb', out_key:'cmp-out-hyena'},
+  {model:'Borzoi / Flashzoi', org:'Calico Life Sciences', year:'2024 / 2025', arch:'U-Net CNN + Transformer (Flashzoi: RoPE + FlashAttention-2)', ctx:'524 kb', out_key:'cmp-out-borzoi'},
+  {model:'Evo / Evo2', org:'Arc Institute / Stanford / NVIDIA', year:'2024', arch:'StripedHyena (гибрид attention + свёртки), byte-level', ctx:'131 kb (Evo) / межгеномный масштаб (Evo2)', out_key:'cmp-out-evo'},
+  {model:'AlphaGenome', org:'Google DeepMind', year:'2025', arch:'CNN + Transformer, U-Net-подобная multi-task голова (наследует Enformer)', ctx:'до 1 Mb, single-base разрешение выхода', out_key:'cmp-out-alphagenome'},
+  {model:'DeepCpG / CpGPT / MethylGPT', org:'разные (EMBL-EBI; независимые группы)', year:'2017 / 2024 / 2024', arch:'CNN+BiGRU (DeepCpG) → Transformer++ с ротационными эмбеддингами (CpGPT, MethylGPT)', ctx:'локальная последовательность + соседние CpG / полный метилом', out_key:'cmp-out-methyl'}
+];
+
+const MODELS = [
+  {
+    id:'enformer', highlight:false,
+    title:'Enformer',
+    meta:'DeepMind & Calico Life Sciences · 2021 · Nature Methods',
+    specs:[
+      {k:'spec-ctx', v:'~200 kb (196,608 bp)'},
+      {k:'spec-arch', v:'CNN tower → 11 × transformer'},
+      {k:'spec-out', v:'~5,300 human / ~1,600 mouse геномных трека (CAGE, ChIP, DNase, ATAC)'}
+    ],
+    body_key:'model-enformer-body',
+    links:[
+      {t:'Avsec et al. 2021, Nature Methods — "Effective gene expression prediction from sequence by integrating long-range interactions"', u:'https://www.nature.com/articles/s41592-021-01252-x'}
+    ]
+  },
+  {
+    id:'nt', highlight:false,
+    title:'Nucleotide Transformer',
+    meta:'InstaDeep, NVIDIA, TUM, Google · 2023 (препринт) / 2025 (Nature Methods, v2)',
+    specs:[
+      {k:'spec-ctx', v:'до 12 kb на fine-tune задачу'},
+      {k:'spec-arch', v:'BERT-style, до 2.5B параметров, multispecies'},
+      {k:'spec-out', v:'Embeddings → fine-tune на 18 downstream-задачах (промотор, сплайсинг, энхансеры)'}
+    ],
+    body_key:'model-nt-body',
+    links:[
+      {t:'Dalla-Torre et al. 2025, Nature Methods — "Nucleotide Transformer: building and evaluating robust foundation models for human genomics"', u:'https://www.nature.com/articles/s41592-024-02523-z'}
+    ]
+  },
+  {
+    id:'hyena', highlight:false,
+    title:'HyenaDNA',
+    meta:'Stanford (HazyResearch) · 2023 · NeurIPS',
+    specs:[
+      {k:'spec-ctx', v:'до 1 млн п.о., single-nucleotide токены'},
+      {k:'spec-arch', v:'Hyena — неявные длинные свёртки вместо self-attention'},
+      {k:'spec-out', v:'Эмбеддинги/классификация; SOTA на 12 из 18 задач NT-бенчмарка при значительно меньшем числе параметров'}
+    ],
+    body_key:'model-hyena-body',
+    links:[
+      {t:'Nguyen et al. 2023, NeurIPS — "HyenaDNA: Long-Range Genomic Sequence Modeling at Single Nucleotide Resolution"', u:'https://proceedings.neurips.cc/paper_files/paper/2023/file/f60d7045b84232757579f164627993a4-Paper-Conference.pdf'}
+    ]
+  },
+  {
+    id:'borzoi', highlight:true,
+    title:'Borzoi (+ Flashzoi)',
+    meta:'Calico Life Sciences · 2024 (bioRxiv) / 2025 (Nature Genetics) · Flashzoi 2025 (Bioinformatics)',
+    specs:[
+      {k:'spec-ctx', v:'524 kb вход → выход 32 bp разрешение'},
+      {k:'spec-arch', v:'U-Net CNN + 8 × transformer; Flashzoi: RoPE + FlashAttention-2, ×3 быстрее'},
+      {k:'spec-out', v:'Полное RNA-seq покрытие (не одно число!) по клеточным типам/тканям ENCODE+GTEx, плюс ChIP/DNase/ATAC/CAGE'}
+    ],
+    body_key:'model-borzoi-body',
+    links:[
+      {t:'Linder, Srivastava, Yuan, Agarwal, Kelley 2025, Nature Genetics — "Predicting RNA-seq coverage from DNA sequence as a unifying model of gene regulation"', u:'https://www.nature.com/articles/s41588-024-02053-6'},
+      {t:'GitHub: calico/borzoi', u:'https://github.com/calico/borzoi'},
+      {t:'Flashzoi 2025, Bioinformatics — enhanced Borzoi with RoPE + FlashAttention-2', u:'https://academic.oup.com/bioinformatics/article/41/9/btaf467/8248080'}
+    ]
+  },
+  {
+    id:'evo', highlight:false,
+    title:'Evo / Evo2',
+    meta:'Arc Institute, Stanford, NVIDIA, TogetherAI · 2024',
+    specs:[
+      {k:'spec-ctx', v:'131 kb (Evo); межгеномный масштаб, single-base разрешение (Evo2)'},
+      {k:'spec-arch', v:'StripedHyena — гибрид attention + data-controlled свёрток, byte-level'},
+      {k:'spec-out', v:'Генеративная модель ДНК (может и предсказывать, и генерировать последовательности); обучена на >300 млрд нуклеотидов'}
+    ],
+    body_key:'model-evo-body',
+    links:[
+      {t:'Nguyen et al. 2024, Science — "Sequence modeling and design from molecular to genome scale with Evo"', u:'https://www.science.org/doi/10.1126/science.ado9336'}
+    ]
+  },
+  {
+    id:'alphagenome', highlight:true,
+    title:'AlphaGenome',
+    meta:'Google DeepMind · июнь 2025 (препринт/API) → январь 2026 (Nature, открытый код)',
+    specs:[
+      {k:'spec-ctx', v:'до 1 млн п.о. на входе; single-base разрешение части выходов'},
+      {k:'spec-arch', v:'CNN + transformer, наследует Enformer; unified multi-task голова'},
+      {k:'spec-out', v:'Тысячи молекулярных свойств: экспрессия, RNA-seq покрытие, сайты и junction-специфичный сплайсинг, доступность хроматина, вариант-эффекты одним проходом'}
+    ],
+    body_key:'model-alphagenome-body',
+    links:[
+      {t:'Google DeepMind blog — "AlphaGenome: AI for better understanding the genome"', u:'https://deepmind.google/blog/alphagenome-ai-for-better-understanding-the-genome/'},
+      {t:'Callaway 2025, Nature News — "DeepMind\'s new AlphaGenome AI tackles the \'dark matter\' in our DNA"', u:'https://www.nature.com/articles/d41586-025-01998-w'},
+      {t:'AlphaGenome API / модель', u:'https://deepmind.google.com/science/alphagenome/'}
+    ]
+  },
+  {
+    id:'methyl', highlight:false,
+    title:'DeepCpG · CpGPT · MethylGPT — метилом-специфичные модели',
+    meta:'EMBL-EBI (DeepCpG, 2017) · независимые группы (CpGPT, MethylGPT — 2024)',
+    specs:[
+      {k:'spec-ctx', v:'Локальная ДНК + соседние CpG (DeepCpG) → до полного метилома, тысячи CpG (CpGPT/MethylGPT)'},
+      {k:'spec-arch', v:'CNN+BiGRU (DeepCpG) → Transformer++ с ротационными эмбеддингами и epigenetic-status энкодером (CpGPT, MethylGPT)'},
+      {k:'spec-out', v:'Предсказание/импутация уровня метилирования по CpG-сайтам, sample-level эмбеддинги для biological-age и downstream задач'}
+    ],
+    body_key:'model-methyl-body',
+    links:[
+      {t:'Angermueller et al. 2017, Genome Biology — "DeepCpG: accurate prediction of single-cell DNA methylation states using deep learning"', u:'https://genomebiology.biomedcentral.com/articles/10.1186/s13059-017-1189-z'},
+      {t:'CpGPT — "A Foundation Model for DNA Methylation" (bioRxiv 2024)', u:'https://www.biorxiv.org/content/10.1101/2024.10.24.619766.full.pdf'},
+      {t:'Ying et al. 2024, MethylGPT — "A foundation model for the DNA methylome"', u:'https://pubmed.ncbi.nlm.nih.gov/39574641/'}
+    ]
+  }
+];
+
+const IDEAS = [
+  {n:1, key:'idea-1'},
+  {n:2, key:'idea-2'},
+  {n:3, key:'idea-3'},
+  {n:4, key:'idea-4'},
+  {n:5, key:'idea-5'},
+  {n:6, key:'idea-6'},
+  {n:7, key:'idea-7'},
+  {n:8, key:'idea-8'}
+];
+
+const FT_APPROACHES = ['ft-app-1','ft-app-2','ft-app-3','ft-app-4'];
+const FT_OUTCOMES = ['ft-out-1','ft-out-2','ft-out-3'];
+
+const ARCH_FLOW = ['arch-1','arch-2','arch-3','arch-4'];
+const PLAN_STEPS = ['plan-1','plan-2','plan-3','plan-4','plan-5'];
+
+const SOURCES = [
+  {t:'Avsec et al. 2021, Nature Methods — Enformer', u:'https://www.nature.com/articles/s41592-021-01252-x'},
+  {t:'Linder et al. 2025, Nature Genetics — Borzoi', u:'https://www.nature.com/articles/s41588-024-02053-6'},
+  {t:'Borzoi preprint, bioRxiv 2023', u:'https://www.biorxiv.org/content/10.1101/2023.08.30.555582v1'},
+  {t:'GitHub — calico/borzoi', u:'https://github.com/calico/borzoi'},
+  {t:'Flashzoi, Bioinformatics 2025', u:'https://academic.oup.com/bioinformatics/article/41/9/btaf467/8248080'},
+  {t:'Flashzoi, PMC full text', u:'https://pmc.ncbi.nlm.nih.gov/articles/PMC12457734/'},
+  {t:'DeepMind blog — AlphaGenome', u:'https://deepmind.google/blog/alphagenome-ai-for-better-understanding-the-genome/'},
+  {t:'Callaway 2025, Nature News — AlphaGenome', u:'https://www.nature.com/articles/d41586-025-01998-w'},
+  {t:'AlphaGenome model/API page, Google DeepMind', u:'https://deepmind.google.com/science/alphagenome/'},
+  {t:'STAT News — AlphaGenome source code release, Jan 2026', u:'https://www.statnews.com/2026/01/28/deepmind-opens-alphagenome-source-code/'},
+  {t:'Wikipedia — AlphaGenome (overview + citations)', u:'https://en.wikipedia.org/wiki/AlphaGenome'},
+  {t:'Dalla-Torre et al. 2025, Nature Methods — Nucleotide Transformer', u:'https://www.nature.com/articles/s41592-024-02523-z'},
+  {t:'Nguyen et al. 2023, NeurIPS — HyenaDNA', u:'https://proceedings.neurips.cc/paper_files/paper/2023/file/f60d7045b84232757579f164627993a4-Paper-Conference.pdf'},
+  {t:'Nguyen et al. 2024, Science — Evo', u:'https://www.science.org/doi/10.1126/science.ado9336'},
+  {t:'Benchmarking DNA foundation models, Nature Communications 2025', u:'https://www.nature.com/articles/s41467-025-65823-8'},
+  {t:'Technology Networks — Foundation Models for Genomics overview', u:'https://www.technologynetworks.com/informatics/articles/foundation-models-for-genomics-what-dna-bert-nucleotide-transformer-and-evo-mean-for-research-414376'},
+  {t:'Angermueller et al. 2017, Genome Biology — DeepCpG', u:'https://genomebiology.biomedcentral.com/articles/10.1186/s13059-017-1189-z'},
+  {t:'CpGPT, bioRxiv 2024 — foundation model for DNA methylation', u:'https://www.biorxiv.org/content/10.1101/2024.10.24.619766.full.pdf'},
+  {t:'Ying et al. 2024 — MethylGPT', u:'https://pubmed.ncbi.nlm.nih.gov/39574641/'},
+  {t:'DeepMethylation, PLOS Comp Biol — review of sequence-based methylation predictors', u:'https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1014476'}
+];
+
+/* ====================================================================== */
+
+const I18N = {
+  ru: {
+    'title':'epicme.bio — геномные foundation-модели (Borzoi, AlphaGenome и др.)',
+    'brand-sub':'эпигеном · цитозин · метилирование',
+    'nav-home':'Главная','nav-about':'О проекте','nav-k562':'K562','nav-chipseq':'ChIP-seq',
+    'nav-models':'Foundation-модели','nav-upload':'Загрузка данных',
+    'eyebrow':'Research notes · epicme.bio',
+    'h1':'Геномные foundation-модели: <em>Borzoi, AlphaGenome</em> и путь к "секвенс-ту-функция" ИИ',
+    'hero-sub':'Обзор современных моделей глубокого обучения, которые предсказывают функцию генома напрямую из последовательности ДНК — от Enformer и Borzoi до AlphaGenome — и разбор того, как их можно применить (и дообучить с учётом метилирования ДНК) в рамках проекта epicme.bio: CRISPRoff/ZFPoff-сайленсинг CD55, per-molecule Nanopore-метилирование и связь эпигенома с экспрессией.',
+
+    'ov-h2':'1. Общая картина: от "предсказать один класс хроматина" до "предсказать весь RNA-seq трек"',
+    'ov-sub':'За последние пять лет геномные foundation-модели прошли путь от классификаторов коротких мотивов до систем, которые берут сотни тысяч — миллион пар оснований ДНК и одним проходом предсказывают тысячи молекулярных дорожек: экспрессию, сплайсинг, полиаденилирование, доступность хроматина, связывание транскрипционных факторов.',
+    'ov-note':'Таблица — рабочий срез на август 2026; для активно развивающихся моделей (AlphaGenome, Evo2) параметры и доступность API могли измениться — сверяйтесь с первоисточниками ниже.',
+
+    'th-model':'Модель','th-org':'Разработчик','th-year':'Год','th-arch':'Архитектура','th-context':'Контекст','th-output':'Выход',
+    'cmp-out-enformer':'~5,300 геномных треков (экспрессия как единичное число на ген)',
+    'cmp-out-nt':'Эмбеддинги ДНК → fine-tune на классификацию/регрессию',
+    'cmp-out-hyena':'Эмбеддинги/классификация на сверхдлинном контексте',
+    'cmp-out-borzoi':'Полное RNA-seq покрытие по клеточным типам (32 bp разрешение)',
+    'cmp-out-evo':'Генеративная + предиктивная модель ДНК, вариант-эффекты',
+    'cmp-out-alphagenome':'Единая multi-task модель: экспрессия, сплайсинг, хроматин, вариант-эффекты',
+    'cmp-out-methyl':'Предсказание/импутация метилирования по CpG (не экспрессии)',
+
+    'pr-h2':'2. Модели подробно',
+    'pr-sub':'Каждая карточка — архитектура, вход/выход, что модель фактически предсказывает и почему это может быть релевантно для локуса CD55.',
+
+    'model-enformer-body':'Enformer — модель-предшественник и Borzoi, и AlphaGenome. Она первой показала, что комбинация свёрточных слоёв (для сжатия сотен тысяч п.о. до управляемого числа "токенов") и self-attention трансформера (для передачи информации на большие расстояния — энхансер-промоторные взаимодействия) позволяет предсказывать экспрессию гена по последовательности точнее прежних CNN-моделей с ограниченным контекстом. Ключевое ограничение: выход — одно число на ген (bin), а не полный профиль покрытия, поэтому она не различает эффекты на транскрипцию, сплайсинг и полиаденилирование по отдельности — именно эту проблему позже решает Borzoi.',
+    'model-nt-body':'Nucleotide Transformer (NT) — BERT-подобная модель, предобученная в стиле masked language modeling на геномах человека и множества других видов одновременно ("multispecies"). В отличие от Enformer/Borzoi, NT не заточена на предсказание конкретных биологических треков "из коробки" — вместо этого она даёт общие эмбеддинги последовательности, которые дообучаются (fine-tune) под конкретную задачу: промотор/не-промотор, эффект сплайс-сайта, эффект варианта. По бенчмаркам мультивидовая предобученность помогает генерализации, но на длинных задачах, требующих понимания дистальной регуляции (энхансеры), специализированные модели вроде Enformer/Borzoi всё ещё выигрывают.',
+    'model-hyena-body':'HyenaDNA — первая модель, показавшая, что можно уйти от self-attention (с его квадратичной сложностью по длине) к архитектуре Hyena — неявным длинным свёрткам — и обрабатывать последовательности длиной до миллиона нуклеотидов на уровне отдельных букв, а не k-mer токенов. Это важно для локусов вроде CD55, где регуляторные элементы (энхансеры, CTCF-сайты) могут находиться за десятки тысяч п.о. от промотора — HyenaDNA принципиально может "увидеть" весь такой контекст в одном проходе, хотя её основная сила — эффективность и длина контекста, а не точность на задачах экспрессии, где выигрывают Borzoi/AlphaGenome.',
+    'model-borzoi-body':'Borzoi — прямой потомок Enformer, но с принципиально другим выходом: не одно число на ген, а <strong>полный профиль RNA-seq покрытия</strong> на разрешении 32 п.о. по всему гену. Это позволяет модели (и исследователю) разложить эффект варианта или мутации по слоям регуляции — транскрипция ли меняется, сплайсинг, или стабильность/полиаденилирование РНК — глядя на то, как меняется форма предсказанного профиля покрытия, а не просто его высота. Обучена на данных ENCODE + GTEx (RNA-seq) плюс переобработанные данные Enformer (ChIP-seq, DNase, ATAC, CAGE). Flashzoi (2025) — тот же Borzoi, но с ротационными позиционными эмбеддингами и FlashAttention-2 вместо относительных позиционных кодов — даёт то же или лучшее качество при вчетверо меньшей памяти и втрое быстрее, что практически важно, если планировать локальный fine-tuning.',
+    'model-evo-body':'Evo и Evo2 (Arc Institute) — модели другого класса: скорее геномные "языковые модели общего назначения", обученные на сотнях миллиардов нуклеотидов преимущественно прокариотических и фаговых геномов (Evo) с расширением на межгеномный масштаб (Evo2). В отличие от Borzoi/AlphaGenome/Enformer, которые прежде всего <em>предсказывают</em> функцию по заданной последовательности, Evo умеет и <em>генерировать</em> новые последовательности — экспериментальный, но интересный потенциал для дизайна синтетических конструкций (в духе нашей планируемой synthetic CD55 ROI baseline страницы).',
+    'model-alphagenome-body':'AlphaGenome (Google DeepMind, июнь 2025, открытый код — январь 2026) — на сегодня наиболее полная "единая" модель: один проход по последовательности до 1 млн п.о. даёт тысячи молекулярных предсказаний одновременно — экспрессию, полное RNA-seq покрытие, доступность хроматина, ChIP-сигналы, И, что принципиально новое, — <strong>прямое предсказание сайтов сплайсинга, использования сайтов и конкретных сплайс-junction\u2019ов</strong>, а не только косвенную оценку через изменение покрытия. По независимым оценкам (Anshul Kundaje, Stanford) AlphaGenome — "реальное улучшение практически по всем current state-of-the-art sequence-to-function моделям". С января 2026 модель и веса открыты для некоммерческого использования — это делает её реалистичным кандидатом для собственных экспериментов на локусе CD55, а не только облачным API.',
+    'model-methyl-body':'Эта группа моделей решает задачу, обратную нашей: они предсказывают метилирование <em>по</em> последовательности ДНК (и соседним CpG), а не используют измеренное метилирование как вход для предсказания экспрессии. DeepCpG (2017) — классика: CNN по локальной последовательности + BiGRU по соседним CpG-сайтам, объединённые joint-модулем — концептуальный прообраз архитектуры "ДНК-башня + метилирование-башня", которую мы обсуждаем в разделе 4 ниже. CpGPT и MethylGPT (оба 2024) — более новые transformer-based foundation-модели метилома: они учат sample-level эмбеддинги по десяткам–сотням тысяч CpG сразу, с явным "эпигенетическим статус-энкодером", который превращает бета-значение метилирования каждого сайта в обучаемый эмбеддинг — именно такой энкодер является наиболее прямым архитектурным прецедентом для того, что нужно нашему проекту.',
+
+    'id-h2':'3. Как это применимо к epicme.bio',
+    'id-sub':'Конкретные точки, где Borzoi/AlphaGenome и подобные модели могут усилить или проверить то, что уже есть на сайте (Day 6 / Day 35 CRISPRoff, ZFPoff K562, ChIP-seq deep-dive).',
+    'idea-1-h':'Виртуальная кросс-валидация CTCF/NRF1-гипотезы',
+    'idea-1-p':'Рабочая гипотеза со страницы K562 ChIP-seq — метилирование в CD55-HIGH может вытеснять CTCF и NRF1 из их сайтов связывания (#43–86 и #13–43). AlphaGenome и Borzoi предсказывают ChIP-подобные треки по последовательности — можно сравнить их предсказанное связывание TF в этом окне с реально наблюдаемым сдвигом покрытия, как ещё один независимый источник свидетельств, не заменяющий, но дополняющий планируемый CUT&RUN.',
+    'idea-2-h':'In silico скрининг ZFP/dCas9-сайтов до wet-lab',
+    'idea-2-p':'Перед выбором новых guide/ZFP-мишеней — прогонять кандидатные окна через AlphaGenome/Borzoi, чтобы заранее увидеть предсказанный off-target регуляторный риск (не только генетический off-target, но и "заденет ли этот сайт соседний ген или сплайс-элемент").',
+    'idea-3-h':'"Виртуальный EM-seq": предсказание эффекта конкретного паттерна метилирования',
+    'idea-3-p':'Если дообучить модель по методам раздела 4 — можно будет подавать реальные per-molecule метилирование-векторы (уже есть из ONT) как условие и сравнивать предсказанный сдвиг экспрессии с фактически наблюдаемым ZFPoff-индуцированным сдвигом методичного day16/day35 сравнения.',
+    'idea-4-h':'Проверка направления канонической модели',
+    'idea-4-p':'Текущая интерпретация CD55-LOW/HIGH опирается на модель "метилирование промотора → сайленсинг" — Borzoi напрямую обучен именно на этой связи в широком корпусе тканей ENCODE/GTEx; сравнение его baseline-предсказания для немодифицированного CD55-промотора с нашими наблюдениями — независимая проверка того, что направление эффекта в нашей системе не является артефактом сортировки.',
+    'idea-5-h':'Помощь с недостающим crosswalk EM-seq ↔ ONT',
+    'idea-5-p':'Модели с single-base разрешением выхода (AlphaGenome) требуют точных геномных координат — при построении финального crosswalk-пайплайна их выходные координатные системы (обычно GRCh38 0-based) можно использовать как дополнительную сверку для validation офсета T2T↔GRCh38 (уже подтверждённого как 734,704 п.о.).',
+    'idea-6-h':'Дизайн synthetic CD55 ROI конструкта',
+    'idea-6-p':'Для планируемой страницы synthetic-cd55-roi-baseline.html — Evo/Evo2 (генеративные модели) в перспективе могли бы предложить дизайн вариантов синтетической последовательности с контролируемым паттерном CpG, а Borzoi/AlphaGenome — заранее оценить их предсказанный профиль экспрессии до синтеза.',
+    'idea-7-h':'Образовательный слой для публичной страницы',
+    'idea-7-p':'Простой интерактивный виджет "введите последовательность/локус → посмотрите AlphaGenome-подобное предсказание" хорошо ложится в образовательную миссию epicme.bio — наглядно показывает разницу между "один ген = одно число экспрессии" и полным профилем регуляции.',
+    'idea-8-h':'Неинвазивная интерпретация CHAPLE-мутаций',
+    'idea-8-p':'Для страницы про CHAPLE-синдром — вариант-эффект предсказания AlphaGenome/Borzoi для известных патогенных вариантов CD55 дают дополнительный вычислительный контекст к литературным данным, без необходимости новых wet-lab экспериментов.',
+
+    'ft-h2':'4. Дообучение на ДНК + сигнал метилирования',
+    'ft-sub':'Ключевой пробел: Borzoi, AlphaGenome и Enformer принимают на вход только последовательность ДНК (плюс дискретный "тип клетки/трек" как выходной селектор). Они выучивают усреднённое по обучающей выборке эпигенетическое состояние для этого типа клеток, но не могут быть явно обусловлены на измеренное метилирование конкретной молекулы или образца.',
+    'ft-gap-h3':'4.1 Почему это ограничение важно именно для нашего проекта',
+    'ft-gap-p':'Наш пайплайн Write → Read → Learn даёт ровно то, чего не хватает этим моделям на входе: per-molecule и per-CpG метилирование (Nanopore, EM-seq) в паре с известным статусом редактирования (CRISPRoff / ZFPoff / mock / unedited). Модель, дообученная так, чтобы явно принимать вектор метилирования как условие, в теории могла бы отвечать на контрфактические вопросы вида «что будет с экспрессией CD55, если именно этот CpG-кластер (#78–83) станет полностью метилированным» — а не только «какая экспрессия типична для этого типа клеток в среднем».',
+    'ft-arch-h3':'4.2 Архитектурные пути дообучения',
+    'ft-app-1':'<strong>Дополнительный входной канал.</strong> Добавить per-CpG (или per-base интерполированное) значение метилирования как ещё одну "дорожку" рядом с one-hot ДНК-каналами на входе свёрточной башни Borzoi/Flashzoi — концептуально аналог CpG-модуля из DeepCpG, но встроенный прямо во входной тензор большой модели.',
+    'ft-app-2':'<strong>Cross-attention адаптер.</strong> Заморозить предобученный ДНК-backbone и добавить лёгкий адаптерный модуль, который инжектирует эмбеддинг метилирования (по образцу epigenetic status encoder из CpGPT) через cross-attention на промежуточных слоях transformer-блоков — дешевле в обучении, меньше риск переобучения на маленькой локальной выборке.',
+    'ft-app-3':'<strong>LoRA/адаптерный fine-tuning на локальных данных.</strong> Дообучить только последние conv+transformer блоки Flashzoi (выбран за счёт скорости/памяти) с добавленным каналом метилирования на собственных парных Day 6/Day 35/K562 ONT+EM-seq данных — реалистичный масштаб для одного локуса, но с явным риском переобучения (см. оговорку ниже).',
+    'ft-app-4':'<strong>Мультимодальная модель "с нуля" через fusion-слой.</strong> ДНК-эмбеддинг (из Nucleotide Transformer или Evo) + эмбеддинг метилирования (эпигенетический энкодер в духе CpGPT) объединяются fusion-трансформером, выход — предсказанное RNA-seq покрытие; обучается на больших парных датасетах метилом+транскриптом (ENCODE WGBS+RNA-seq по тем же образцам, Loyfer atlas, BLUEPRINT) — самый затратный, но самый обобщаемый путь.',
+    'ft-outcomes-h3':'4.3 Потенциальные результаты, если это сработает',
+    'ft-out-1-h':'Контрфактические предсказания по молекулам',
+    'ft-out-1-p':'Возможность спросить модель "что если именно этот CpG-кластер метилирован" — а не только получить одно усреднённое предсказание на тип клеток.',
+    'ft-out-2-h':'Разделение эффектов таймпоинта и донора',
+    'ft-out-2-p':'Явное включение метилирования как признака может помочь статистически отделить биологический эффект редактирования от искажающих факторов (Day 6 vs Day 35 — разные доноры), которые сейчас confounded в сырых сравнениях.',
+    'ft-out-3-h':'Виртуальный dose-response скрининг ZFPoff',
+    'ft-out-3-p':'В перспективе — оценка предсказанного эффекта разных гипотетических уровней метилирования без постановки новых экспериментов на каждый уровень дозы.',
+
+    'ft-caveat':'<strong>Честная оговорка (в духе принципа сайта "no values shown without derivation"):</strong> локальные данные — это один локус (137 CpG, ~6.5 т.п.о.) и небольшое число условий/доноров. Дообучение большой sequence-модели на такой выборке рискует переобучиться на шум конкретного эксперимента, а не выучить обобщаемую биологию. Реалистичный путь — сначала предобучение/регуляризация на больших парных датасетах метилом+транскриптом (ENCODE, BLUEPRINT, Loyfer atlas, Roadmap Epigenomics), и только потом fine-tuning/адаптер на CD55-специфичных данных как downstream-задаче, а не как единственном источнике сигнала. Кроме того, Borzoi/AlphaGenome — модели bulk-покрытия; наши данные — per-molecule, так что агрегация (или отдельная per-molecule архитектура) требует явного решения.',
+
+    'nx-h2':'5. Next: обучить модель ДНК + метилирование → CD55 «on/off» по RNA-seq',
+    'nx-sub':'Конкретный, выполнимый следующий шаг: two-tower модель, которая объединяет (а) последовательность ДНК вокруг CD55 и (б) вектор метилирования по 137 CpG, чтобы предсказать бинарный/непрерывный статус гена по RNA-seq сигналу.',
+
+    'arch-1-k':'Вход A — ДНК','arch-1-p':'Окно последовательности вокруг CD55 TSS: полные 524 kb (как у Borzoi) или локальные ~6.5 kb ROI (T2T chr1:206,583,354–206,589,854).',
+    'arch-2-k':'Вход B — метилирование','arch-2-p':'Вектор из 137 CpG-значений — как усреднённая bulk-величина, так и (в расширенной версии) per-molecule распределение из ONT.',
+    'arch-3-k':'Слияние','arch-3-p':'ДНК-башня (предобученный/LoRA Flashzoi) + метилирование-башня (MLP/GRU в духе CpG-модуля DeepCpG) → fusion-слой объединяет оба эмбеддинга.',
+    'arch-4-k':'Выход','arch-4-p':'Логит "CD55 on/off" или непрерывная оценка RNA-seq покрытия/уровня экспрессии на локусе.',
+
+    'nx-plan-h3':'План действий',
+    'plan-1-h':'Собрать/уточнить парные данные RNA-seq',
+    'plan-1-p':'Проверить с Арой/Фёдором/Эллой/Кэти, есть ли уже RNA-seq для тех же образцов Day 6 / Day 35 / K562 LOW-HIGH-BASE, или его нужно генерировать заново — это блокер №1.',
+    'plan-2-h':'Прототип на публичных данных',
+    'plan-2-p':'Пока нет собственного RNA-seq — собрать парные WGBS+RNA-seq из ENCODE (тот же CD55 локус, K562 / CD3+ T-клетки) как suррогатный тренировочный/валидационный набор для архитектуры.',
+    'plan-3-h':'Baseline: метилирование-only модель',
+    'plan-3-p':'Взять уже существующие LR/RF метрики (AUC 0.92–0.95 на LOW vs HIGH) как точку отсчёта — новая модель должна как минимум не проигрывать этому baseline.',
+    'plan-4-h':'Собрать ДНК-башню поверх Flashzoi',
+    'plan-4-p':'Загрузить предобученные веса Flashzoi (быстрее Borzoi по памяти/скорости), заморозить большую часть, добавить LoRA-адаптеры на последние блоки.',
+    'plan-5-h':'Обучить fusion-голову и провалидировать честно',
+    'plan-5-p':'Leave-one-donor-out / leave-one-timepoint-out; задокументировать результат как есть — включая null-результат, если модель не превосходит baseline, в духе эпистемической честности сайта.',
+
+    'nx-val-h3':'Валидация и честная отчётность',
+    'nx-val-p':'Leave-one-donor-out и leave-one-timepoint-out кросс-валидация (Day 6 и Day 35 сейчас — разные доноры, это нужно явно учитывать, а не путать эффект таймпоинта с эффектом донора — см. заметки K562/ChIP-seq страницы). Базовая линия сравнения — уже существующие metilation-only LR/RF модели (AUC 0.92–0.95 на LOW vs HIGH K562). Если добавление сырой ДНК-последовательности через предобученный Borzoi/Flashzoi backbone не улучшает эти метрики — это тоже честный и публикуемый результат, а не повод скрыть страницу.',
+    'nx-blocker':'<strong>Главный блокер прямо сейчас:</strong> для обучения предиктора «→ RNA-seq on/off» нужен реальный парный RNA-seq для Day 6 / Day 35 / K562 LOW-HIGH-BASE образцов — в текущем Write → Read → Learn пайплайне это то самое "Learn", которого пока нет как отдельного измерения (Read = Nanopore/EM-seq метилирование, но не экспрессия). Ближайший практический шаг — уточнить у Ары/Фёдора и Эллы/Кэти, есть ли уже собранный или запланированный RNA-seq для этих же образцов, прежде чем проектировать архитектуру модели дальше.',
+
+    'src-h2':'Источники',
+    'footer':'epicme.bio — заметки об исследовании геномных foundation-моделей для CD55 multi-omics анализа. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="index.html">← Назад на главную</a>',
+
+    'tl-enformer':'Enformer','tl-nt':'Nucleotide<br>Transformer','tl-hyena':'HyenaDNA','tl-borzoi':'Borzoi','tl-evo':'Evo / Evo2','tl-alphagenome':'AlphaGenome','tl-flashzoi':'Flashzoi','tl-open':'AlphaGenome<br>открытый код'
+  },
+  en: {
+    'title':'epicme.bio — genomic foundation models (Borzoi, AlphaGenome & more)',
+    'brand-sub':'epigenome · cytosine · methylation',
+    'nav-home':'Home','nav-about':'About','nav-k562':'K562','nav-chipseq':'ChIP-seq',
+    'nav-models':'Foundation models','nav-upload':'Upload data',
+    'eyebrow':'Research notes · epicme.bio',
+    'h1':'Genomic foundation models: <em>Borzoi, AlphaGenome</em>, and the road to sequence-to-function AI',
+    'hero-sub':'A survey of current deep-learning models that predict genome function directly from DNA sequence — from Enformer and Borzoi to AlphaGenome — plus how they could be applied (and fine-tuned to take DNA methylation as input) within the epicme.bio project: CRISPRoff/ZFPoff CD55 silencing, per-molecule Nanopore methylation, and the link between epigenome and expression.',
+
+    'ov-h2':'1. The landscape: from "classify one chromatin mark" to "predict the whole RNA-seq track"',
+    'ov-sub':'Over the past five years, genomic foundation models have moved from short-motif classifiers to systems that take hundreds of thousands — up to a million — base pairs of DNA and predict thousands of molecular tracks in a single pass: expression, splicing, polyadenylation, chromatin accessibility, transcription-factor binding.',
+    'ov-note':'This table is a working snapshot as of August 2026; for fast-moving models (AlphaGenome, Evo2) parameters and API availability may have changed — check the primary sources below.',
+
+    'th-model':'Model','th-org':'Developer','th-year':'Year','th-arch':'Architecture','th-context':'Context','th-output':'Output',
+    'cmp-out-enformer':'~5,300 genomic tracks (expression as a single number per gene)',
+    'cmp-out-nt':'DNA embeddings → fine-tuned for classification/regression',
+    'cmp-out-hyena':'Embeddings/classification over ultra-long context',
+    'cmp-out-borzoi':'Full RNA-seq coverage per cell type (32 bp resolution)',
+    'cmp-out-evo':'Generative + predictive DNA model, variant effects',
+    'cmp-out-alphagenome':'Unified multi-task model: expression, splicing, chromatin, variant effects',
+    'cmp-out-methyl':'Methylation prediction/imputation per CpG (not expression)',
+
+    'pr-h2':'2. Models in detail',
+    'pr-sub':'Each card covers architecture, input/output, what the model actually predicts, and why it might matter for the CD55 locus.',
+
+    'model-enformer-body':'Enformer is the ancestor of both Borzoi and AlphaGenome. It was the first model to show that combining convolutional layers (to compress hundreds of thousands of bp down to a manageable number of "tokens") with self-attention transformers (to propagate information across long distances — enhancer-promoter interactions) predicts gene expression from sequence more accurately than earlier CNNs with limited context. Its key limitation: output is a single number per gene bin, not a full coverage profile, so it can\'t separately distinguish effects on transcription, splicing, and polyadenylation — the exact problem Borzoi later solves.',
+    'model-nt-body':'Nucleotide Transformer (NT) is a BERT-style model pretrained with masked language modeling on the human genome and many other species simultaneously ("multispecies"). Unlike Enformer/Borzoi, NT is not tuned out-of-the-box to predict specific biological tracks — instead it produces general sequence embeddings that get fine-tuned per task: promoter/non-promoter, splice-site effect, variant effect. Benchmarks show multispecies pretraining helps generalization, but on long tasks requiring distal regulatory understanding (enhancers), specialized models like Enformer/Borzoi still win.',
+    'model-hyena-body':'HyenaDNA was the first model to show it\'s possible to move away from self-attention (with its quadratic cost in sequence length) toward the Hyena architecture — implicit long convolutions — and process sequences up to a million nucleotides at single-letter resolution rather than k-mer tokens. This matters for loci like CD55, where regulatory elements (enhancers, CTCF sites) can sit tens of thousands of bp from the promoter — HyenaDNA can in principle "see" that whole context in one pass, though its main strength is efficiency and context length rather than accuracy on expression tasks, where Borzoi/AlphaGenome still lead.',
+    'model-borzoi-body':'Borzoi is a direct descendant of Enformer but with a fundamentally different output: not one number per gene, but a <strong>full RNA-seq coverage profile</strong> at 32 bp resolution across the whole gene. This lets the model (and the researcher) decompose a variant\'s or mutation\'s effect by regulatory layer — is transcription changing, splicing, or RNA stability/polyadenylation — by looking at how the shape of the predicted coverage profile changes, not just its height. Trained on ENCODE + GTEx RNA-seq plus reprocessed Enformer training data (ChIP-seq, DNase, ATAC, CAGE). Flashzoi (2025) is the same Borzoi with rotary positional embeddings and FlashAttention-2 instead of relative positional codes — same or better accuracy at roughly a quarter of the memory and three times the speed, which matters practically if local fine-tuning is on the table.',
+    'model-evo-body':'Evo and Evo2 (Arc Institute) are a different class of model: general-purpose genomic "language models," trained on hundreds of billions of nucleotides, mostly prokaryotic and phage genomes (Evo), extended to cross-genome scale (Evo2). Unlike Borzoi/AlphaGenome/Enformer, which mainly <em>predict</em> function from a given sequence, Evo can also <em>generate</em> new sequences — an experimental but interesting capability for designing synthetic constructs (in the spirit of our planned synthetic CD55 ROI baseline page).',
+    'model-alphagenome-body':'AlphaGenome (Google DeepMind, June 2025, open-sourced January 2026) is currently the most complete "unified" model: a single pass over a sequence up to 1 million bp yields thousands of molecular predictions at once — expression, full RNA-seq coverage, chromatin accessibility, ChIP-like signals, and, notably new, <strong>direct prediction of splice sites, site usage, and specific splice junctions</strong>, rather than just an indirect estimate from coverage change. Independent assessment (Anshul Kundaje, Stanford) called it "a genuine improvement in pretty much all current state-of-the-art sequence-to-function models." As of January 2026 the model and weights are open for non-commercial use — making it a realistic candidate for our own CD55-locus experiments, not just a cloud API.',
+    'model-methyl-body':'This group of models solves the reverse of our problem: they predict methylation <em>from</em> DNA sequence (and neighboring CpGs), rather than using measured methylation as an input to predict expression. DeepCpG (2017) is the classic: a CNN over local sequence plus a BiGRU over neighboring CpG sites, joined by a fusion module — a conceptual ancestor of the "DNA tower + methylation tower" architecture discussed in section 4 below. CpGPT and MethylGPT (both 2024) are newer transformer-based methylome foundation models: they learn sample-level embeddings across tens to hundreds of thousands of CpGs at once, with an explicit "epigenetic status encoder" that turns each site\'s methylation beta value into a learnable embedding — exactly the kind of encoder that is the most direct architectural precedent for what our project needs.',
+
+    'id-h2':'3. How this applies to epicme.bio',
+    'id-sub':'Concrete points where Borzoi/AlphaGenome and similar models could strengthen or cross-check what already exists on the site (Day 6 / Day 35 CRISPRoff, ZFPoff K562, the ChIP-seq deep-dive).',
+    'idea-1-h':'Virtual cross-validation of the CTCF/NRF1 hypothesis',
+    'idea-1-p':'The working hypothesis on the K562 ChIP-seq page is that methylation in CD55-HIGH may displace CTCF and NRF1 from their binding sites (#43–86 and #13–43). AlphaGenome and Borzoi predict ChIP-like tracks from sequence — their predicted TF binding in this window could be compared to the observed coverage shift as one more independent line of evidence, complementing (not replacing) the planned CUT&RUN.',
+    'idea-2-h':'In-silico screening of ZFP/dCas9 sites before wet-lab',
+    'idea-2-p':'Before choosing new guide/ZFP targets, candidate windows could be run through AlphaGenome/Borzoi to preview predicted off-target regulatory risk — not just genetic off-targets, but whether a site would touch a neighboring gene or splice element.',
+    'idea-3-h':'"Virtual EM-seq": predicting the effect of a specific methylation pattern',
+    'idea-3-p':'If a model is fine-tuned per the methods in section 4, real per-molecule methylation vectors (already available from ONT) could be fed in as a condition and the predicted expression shift compared against the actual ZFPoff-induced shift from the Day 16/Day 35 comparison.',
+    'idea-4-h':'Testing the canonical-model direction',
+    'idea-4-p':'The current CD55-LOW/HIGH interpretation relies on the "promoter methylation → silencing" model — Borzoi is trained directly on that relationship across the wide ENCODE/GTEx tissue corpus; comparing its baseline prediction for an unmodified CD55 promoter against our observations is an independent check that the effect direction isn\'t a sorting artifact.',
+    'idea-5-h':'Help with the missing EM-seq ↔ ONT crosswalk',
+    'idea-5-p':'Models with single-base output resolution (AlphaGenome) require precise genomic coordinates — when building the final crosswalk pipeline, their output coordinate systems (typically GRCh38 0-based) could serve as an extra check on the already-confirmed T2T↔GRCh38 offset (734,704 bp).',
+    'idea-6-h':'Designing the synthetic CD55 ROI construct',
+    'idea-6-p':'For the planned synthetic-cd55-roi-baseline.html page — Evo/Evo2 (generative models) could eventually propose synthetic sequence variants with a controlled CpG pattern, while Borzoi/AlphaGenome could estimate their predicted expression profile before synthesis.',
+    'idea-7-h':'Educational layer for the public site',
+    'idea-7-p':'A simple interactive widget — "enter a sequence/locus → see an AlphaGenome-like prediction" — fits epicme.bio\'s educational mission well, visually showing the difference between "one gene = one expression number" and a full regulatory profile.',
+    'idea-8-h':'Non-invasive interpretation of CHAPLE mutations',
+    'idea-8-p':'For the CHAPLE syndrome page — AlphaGenome/Borzoi variant-effect predictions for known pathogenic CD55 variants add computational context to the literature, without requiring new wet-lab experiments.',
+
+    'ft-h2':'4. Fine-tuning on DNA + methylation signal',
+    'ft-sub':'The key gap: Borzoi, AlphaGenome, and Enformer take only DNA sequence as input (plus a discrete "cell type/track" output selector). They learn an averaged-over-training-set epigenetic state for that cell type, but can\'t be explicitly conditioned on the measured methylation of a specific molecule or sample.',
+    'ft-gap-h3':'4.1 Why this limitation matters for our project specifically',
+    'ft-gap-p':'Our Write → Read → Learn pipeline provides exactly what these models are missing as input: per-molecule and per-CpG methylation (Nanopore, EM-seq) paired with a known editing status (CRISPRoff / ZFPoff / mock / unedited). A model fine-tuned to explicitly accept a methylation vector as a condition could in principle answer counterfactual questions like "what happens to CD55 expression if exactly this CpG cluster (#78–83) becomes fully methylated" — not just "what expression is typical for this cell type on average."',
+    'ft-arch-h3':'4.2 Architectural paths for fine-tuning',
+    'ft-app-1':'<strong>Additional input channel.</strong> Add a per-CpG (or per-base interpolated) methylation value as one more "track" alongside the one-hot DNA channels feeding Borzoi/Flashzoi\'s convolutional tower — conceptually the DeepCpG-style CpG module, but built directly into the large model\'s input tensor.',
+    'ft-app-2':'<strong>Cross-attention adapter.</strong> Freeze the pretrained DNA backbone and add a light adapter module that injects a methylation embedding (modeled on CpGPT\'s epigenetic status encoder) via cross-attention at intermediate transformer layers — cheaper to train, lower overfitting risk on a small local dataset.',
+    'ft-app-3':'<strong>LoRA/adapter fine-tuning on local data.</strong> Fine-tune only the last conv+transformer blocks of Flashzoi (chosen for speed/memory) with an added methylation channel, using our own paired Day 6/Day 35/K562 ONT+EM-seq data — a realistic scale for one locus, but with a clear overfitting risk (see caveat below).',
+    'ft-app-4':'<strong>Multimodal model built from scratch via a fusion layer.</strong> A DNA embedding (from Nucleotide Transformer or Evo) plus a methylation embedding (an epigenetic encoder in the spirit of CpGPT) are combined by a fusion transformer, outputting predicted RNA-seq coverage; trained on large paired methylome+transcriptome datasets (ENCODE WGBS+RNA-seq on matched samples, the Loyfer atlas, BLUEPRINT) — the most expensive but most generalizable path.',
+    'ft-outcomes-h3':'4.3 Potential outcomes if this works',
+    'ft-out-1-h':'Molecule-level counterfactual predictions',
+    'ft-out-1-p':'The ability to ask the model "what if exactly this CpG cluster is methylated" instead of only getting one cell-type-averaged prediction.',
+    'ft-out-2-h':'Separating timepoint and donor effects',
+    'ft-out-2-p':'Explicitly including methylation as a feature could help statistically separate the biological editing effect from confounding factors (Day 6 vs Day 35 being different donors) that are currently confounded in raw comparisons.',
+    'ft-out-3-h':'Virtual dose-response screening for ZFPoff',
+    'ft-out-3-p':'Eventually, estimating the predicted effect of different hypothetical methylation levels without running a new wet-lab experiment for every dose.',
+
+    'ft-caveat':'<strong>An honest caveat (in the site\'s "no values shown without derivation" spirit):</strong> the local data is one locus (137 CpGs, ~6.5 kb) and a small number of conditions/donors. Fine-tuning a large sequence model on that scale risks overfitting to the noise of one specific experiment rather than learning generalizable biology. The realistic path is pretraining/regularizing first on large paired methylome+transcriptome datasets (ENCODE, BLUEPRINT, the Loyfer atlas, Roadmap Epigenomics), and only then fine-tuning/adapting on CD55-specific data as a downstream task, not as the sole source of signal. Also, Borzoi/AlphaGenome are bulk-coverage models; our data is per-molecule, so aggregation (or a dedicated per-molecule architecture) needs an explicit decision.',
+
+    'nx-h2':'5. Next: train a DNA + methylation → CD55 "on/off" model from RNA-seq signal',
+    'nx-sub':'A concrete, achievable next step: a two-tower model combining (a) DNA sequence around CD55 and (b) a 137-CpG methylation vector to predict binary/continuous gene status from RNA-seq signal.',
+
+    'arch-1-k':'Input A — DNA','arch-1-p':'Sequence window around the CD55 TSS: the full 524 kb (Borzoi-style) or the local ~6.5 kb ROI (T2T chr1:206,583,354–206,589,854).',
+    'arch-2-k':'Input B — methylation','arch-2-p':'A 137-value CpG vector — bulk-averaged, and in an extended version, the full per-molecule distribution from ONT.',
+    'arch-3-k':'Fusion','arch-3-p':'DNA tower (pretrained/LoRA-tuned Flashzoi) + methylation tower (MLP/GRU in the spirit of DeepCpG\'s CpG module) → a fusion layer combines both embeddings.',
+    'arch-4-k':'Output','arch-4-p':'A "CD55 on/off" logit, or a continuous estimate of RNA-seq coverage/expression level at the locus.',
+
+    'nx-plan-h3':'Action plan',
+    'plan-1-h':'Assemble/confirm paired RNA-seq data',
+    'plan-1-p':'Check with Aaron/Fyodor/Ella/Katie whether RNA-seq already exists for the same Day 6 / Day 35 / K562 LOW-HIGH-BASE samples, or whether it needs to be generated — this is blocker #1.',
+    'plan-2-h':'Prototype on public data',
+    'plan-2-p':'While there\'s no in-house RNA-seq yet, assemble paired WGBS+RNA-seq from ENCODE (same CD55 locus, K562 / CD3+ T cells) as a surrogate training/validation set for the architecture.',
+    'plan-3-h':'Baseline: methylation-only model',
+    'plan-3-p':'Use the existing LR/RF metrics (AUC 0.92–0.95 on LOW vs HIGH) as the reference point — the new model should at minimum not lose to this baseline.',
+    'plan-4-h':'Build the DNA tower on top of Flashzoi',
+    'plan-4-p':'Load pretrained Flashzoi weights (faster/lighter than Borzoi), freeze most of it, add LoRA adapters to the last blocks.',
+    'plan-5-h':'Train the fusion head and validate honestly',
+    'plan-5-p':'Leave-one-donor-out / leave-one-timepoint-out; document the result as-is — including a null result if the model doesn\'t beat baseline, in keeping with the site\'s epistemic-honesty principle.',
+
+    'nx-val-h3':'Validation and honest reporting',
+    'nx-val-p':'Leave-one-donor-out and leave-one-timepoint-out cross-validation (Day 6 and Day 35 are currently different donors, which needs to be explicitly accounted for rather than conflated with the timepoint effect — see the K562/ChIP-seq page notes). The comparison baseline is the existing methylation-only LR/RF models (AUC 0.92–0.95 on LOW vs HIGH K562). If adding raw DNA sequence through a pretrained Borzoi/Flashzoi backbone doesn\'t improve on those metrics, that\'s also an honest, publishable result rather than a reason to hide the page.',
+    'nx-blocker':'<strong>The main blocker right now:</strong> training a "→ RNA-seq on/off" predictor needs real paired RNA-seq for the Day 6 / Day 35 / K562 LOW-HIGH-BASE samples — in the current Write → Read → Learn pipeline, that\'s exactly the "Learn" dimension that doesn\'t yet exist separately (Read = Nanopore/EM-seq methylation, not expression). The nearest practical step is checking with Aaron/Fyodor and Ella/Katie whether RNA-seq for these same samples already exists or is planned, before designing the model architecture further.',
+
+    'src-h2':'Sources',
+    'footer':'epicme.bio — research notes on genomic foundation models for CD55 multi-omics analysis. Part of the PhD project of Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. <a href="index.html">← Back to home</a>',
+
+    'tl-enformer':'Enformer','tl-nt':'Nucleotide<br>Transformer','tl-hyena':'HyenaDNA','tl-borzoi':'Borzoi','tl-evo':'Evo / Evo2','tl-alphagenome':'AlphaGenome','tl-flashzoi':'Flashzoi','tl-open':'AlphaGenome<br>open-sourced'
+  }
+};
+
+let CURRENT_LANG = 'ru';
+
+function renderTimeline(){
+  const dict = I18N[CURRENT_LANG];
+  const el = document.getElementById('timeline');
+  el.innerHTML = TIMELINE.map(t => `<div class="tl-item"><div class="tl-year">${t.year}</div><div class="tl-name">${dict[t.key]}</div></div>`).join('');
+}
+
+function renderCmpTable(){
+  const dict = I18N[CURRENT_LANG];
+  const el = document.getElementById('cmp-body');
+  el.innerHTML = CMP_ROWS.map(r => `
+    <tr>
+      <td><strong>${r.model}</strong></td>
+      <td>${r.org}</td>
+      <td class="mono">${r.year}</td>
+      <td>${r.arch}</td>
+      <td class="mono">${r.ctx}</td>
+      <td>${dict[r.out_key]}</td>
+    </tr>`).join('');
+}
+
+function renderModelCards(){
+  const dict = I18N[CURRENT_LANG];
+  const el = document.getElementById('model-cards');
+  el.innerHTML = MODELS.map(m => `
+    <div class="model-card ${m.highlight ? 'highlight' : ''}">
+      <div class="model-head">
+        <div>
+          <h3>${m.title}</h3>
+          <div class="model-meta">${m.meta}</div>
+        </div>
+      </div>
+      <div class="model-specs">
+        ${m.specs.map(s => `<div><div class="spec-k">${s.k === 'spec-ctx' ? (CURRENT_LANG==='ru'?'Контекст':'Context') : s.k === 'spec-arch' ? (CURRENT_LANG==='ru'?'Архитектура':'Architecture') : (CURRENT_LANG==='ru'?'Выход':'Output')}</div><div class="spec-v">${s.v}</div></div>`).join('')}
+      </div>
+      <p>${dict[m.body_key]}</p>
+      <div style="margin-top:12px; display:flex; flex-direction:column; gap:5px;">
+        ${m.links.map(l => `<a class="cite-link" href="${l.u}" target="_blank" rel="noopener">↗ ${l.t}</a>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderIdeas(){
+  const dict = I18N[CURRENT_LANG];
+  const el = document.getElementById('idea-grid');
+  el.innerHTML = IDEAS.map(i => `
+    <div class="idea-card">
+      <div class="idea-num">${i.n}</div>
+      <h4>${dict[i.key + '-h']}</h4>
+      <p>${dict[i.key + '-p']}</p>
+    </div>`).join('');
+}
+
+function renderFtApproaches(){
+  const dict = I18N[CURRENT_LANG];
+  const el = document.getElementById('ft-approaches');
+  el.innerHTML = FT_APPROACHES.map(k => `<li>${dict[k]}</li>`).join('');
+}
+
+function renderFtOutcomes(){
+  const dict = I18N[CURRENT_LANG];
+  const el = document.getElementById('ft-outcomes');
+  el.innerHTML = FT_OUTCOMES.map(k => `
+    <div class="idea-card">
+      <h4>${dict[k + '-h']}</h4>
+      <p>${dict[k + '-p']}</p>
+    </div>`).join('');
+}
+
+function renderArchFlow(){
+  const dict = I18N[CURRENT_LANG];
+  const el = document.getElementById('arch-flow');
+  el.innerHTML = ARCH_FLOW.map(k => `
+    <div class="arch-step">
+      <div class="arch-k">${dict[k + '-k']}</div>
+      <p>${dict[k + '-p']}</p>
+    </div>`).join('');
+}
+
+function renderPlanSteps(){
+  const dict = I18N[CURRENT_LANG];
+  const el = document.getElementById('plan-steps');
+  el.innerHTML = PLAN_STEPS.map((k, idx) => `
+    <div class="plan-step">
+      <div class="ps-num">${idx + 1}</div>
+      <div class="ps-body">
+        <h4>${dict[k + '-h']}</h4>
+        <p>${dict[k + '-p']}</p>
+      </div>
+    </div>`).join('');
+}
+
+function renderSources(){
+  const el = document.getElementById('src-list');
+  el.innerHTML = SOURCES.map(s => `<li><a href="${s.u}" target="_blank" rel="noopener">${s.t}</a></li>`).join('');
+}
+
+function renderAllDynamic(){
+  renderTimeline();
+  renderCmpTable();
+  renderModelCards();
+  renderIdeas();
+  renderFtApproaches();
+  renderFtOutcomes();
+  renderArchFlow();
+  renderPlanSteps();
+  renderSources();
+}
+
+function applyLang(lang){
+  CURRENT_LANG = lang;
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const dict = I18N[lang];
+    if(!dict || !(key in dict)) return;
+    if(el.tagName === 'TITLE'){ document.title = dict[key]; }
+    else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('#lang-switch button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  renderAllDynamic();
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){}
+}
+document.querySelectorAll('#lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+(function(){
+  let saved = 'ru';
+  try{ saved = localStorage.getItem('epicme_lang') || 'ru'; }catch(e){}
+  applyLang(saved === 'en' ? 'en' : 'ru');
+})();
+</script>
+
+</body>
+</html>

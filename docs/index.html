@@ -305,6 +305,7 @@
       <a href="methylation-generational-trauma.html" data-i18n="nav-trauma">Метилирование и травма</a>
       <a href="upload-user-input.html" data-i18n="nav-upload" class="upload-nav-link">Загрузка данных</a>
       <a href="research-ideas-todos.html" data-i18n="nav-research">Research Ideas/Todos</a>
+      <a href="genomic-foundation-models.html" data-i18n="nav-models">Foundation-модели</a>
       <a href="synthetic-cd55-roi-baseline.html" data-i18n="nav-synth">Synthetic ROI</a>
       <a href="CHAPLEedited.htm" data-i18n="nav-chaple" class="ella-link">CHAPLE-синдром</a>
       <a href="cd55HGSOCedited.htm" data-i18n="nav-hgsoc" class="ella-link">CD55 и рак яичников</a>
@@ -545,6 +546,41 @@
     <div class="disclaimer" data-i18n="beyond-overlap"><strong>Где они пересекаются:</strong> FKBP5 и NR3C1 встречаются на обеих страницах, но отвечают на разные вопросы. На странице про память — осталась ли метка у самого человека, пережившего стресс. На странице про травму — появилась ли она у его ребёнка. Это единственное место, где темы соприкасаются, и оно помечено на обеих страницах перекрёстными ссылками.</div>
   </section>
 
+  <section id="foundation-models">
+    <div class="kicker-shaped learn"><span class="shape"></span><span class="lbl" data-i18n="fm-kicker">Learn — вычислительные модели генома</span></div>
+    <h2 data-i18n="fm-h2">Могут ли Borzoi и AlphaGenome проверить то, что мы уже увидели на CD55</h2>
+    <p class="lede" data-i18n="fm-lede">Отдельная страница разбирает современные геномные foundation-модели — от Enformer до Borzoi и AlphaGenome — и то, как их можно применить к нашему локусу: как ещё одну независимую проверку гипотез (CTCF/NRF1, направление метилирование→сайленсинг), как способ скринить будущие ZFP/CRISPRoff-мишени in silico, и как отправную точку для дообучения на реальном сигнале метилирования, а не только на последовательности ДНК.</p>
+
+    <a class="start-card" href="genomic-foundation-models.html" style="text-decoration:none; margin-bottom:8px;">
+      <div class="txt">
+        <h3 data-i18n="fm-card-h3">Геномные foundation-модели: Borzoi, AlphaGenome и epicme.bio</h3>
+        <p data-i18n="fm-card-p">Обзор Enformer, Nucleotide Transformer, HyenaDNA, Borzoi/Flashzoi, Evo/Evo2 и AlphaGenome с архитектурой и ссылками на первоисточники; восемь идей применения к CD55; архитектуры дообучения на ДНК + метилирование; и план следующего шага — модель «ДНК + метилирование → CD55 on/off» по RNA-seq.</p>
+      </div>
+      <span class="btn ghost" data-i18n="fm-card-go">Открыть →</span>
+    </a>
+
+    <h3 class="sub-h" data-i18n="fm-ideas-h3">Коротко — что могут дать эти модели проекту</h3>
+    <div class="grid3">
+      <div class="card">
+        <span class="tag blue" data-i18n="fm-i1-tag">Проверка гипотез</span>
+        <h3 data-i18n="fm-i1-h">Независимая сверка CTCF/NRF1</h3>
+        <p data-i18n="fm-i1-p">AlphaGenome и Borzoi предсказывают ChIP-подобные треки по последовательности — их предсказанное связывание TF в окне #43–86/#13–43 можно сравнить с наблюдаемым сдвигом покрытия ещё до постановки CUT&amp;RUN.</p>
+      </div>
+      <div class="card">
+        <span class="tag blue" data-i18n="fm-i2-tag">Планирование экспериментов</span>
+        <h3 data-i18n="fm-i2-h">In silico скрининг ZFP/dCas9-мишеней</h3>
+        <p data-i18n="fm-i2-p">Прогонять кандидатные окна через AlphaGenome/Borzoi до wet-lab — заранее видеть предсказанный регуляторный off-target риск, не только генетический.</p>
+      </div>
+      <div class="card">
+        <span class="tag amber" data-i18n="fm-i3-tag">Дообучение + Next</span>
+        <h3 data-i18n="fm-i3-h">ДНК + метилирование → CD55 on/off</h3>
+        <p data-i18n="fm-i3-p">Четыре архитектурных пути дообучения Borzoi/Flashzoi на реальном сигнале метилирования (не только последовательности), и конкретный план two-tower модели, предсказывающей on/off по RNA-seq — с честно названным блокером: нужен парный RNA-seq для наших образцов.</p>
+      </div>
+    </div>
+
+    <div class="disclaimer" data-i18n="fm-note"><strong>Честно про статус:</strong> это research-заметки и архитектурные предложения, а не обученная модель — ни одна из идей выше ещё не реализована и не провалидирована на наших данных. Полная разбивка, ссылки на первоисточники и оговорки — на странице <a href="genomic-foundation-models.html">Foundation-модели</a>.</div>
+  </section>
+
   <section id="upload">
     <div class="upload-panel">
       <div class="kicker-shaped upload"><span class="shape"></span><span class="lbl" data-i18n="upload-kicker">Contribute — пришлите нам свои данные</span></div>
@@ -602,7 +638,25 @@
 const I18N = {
   ru: {
     'nav-research': 'Research Ideas/Todos',
+    'nav-models': 'Foundation-модели',
     'nav-synth': 'Synthetic ROI',
+    'fm-kicker': 'Learn — вычислительные модели генома',
+    'fm-h2': 'Могут ли Borzoi и AlphaGenome проверить то, что мы уже увидели на CD55',
+    'fm-lede': 'Отдельная страница разбирает современные геномные foundation-модели — от Enformer до Borzoi и AlphaGenome — и то, как их можно применить к нашему локусу: как ещё одну независимую проверку гипотез (CTCF/NRF1, направление метилирование→сайленсинг), как способ скринить будущие ZFP/CRISPRoff-мишени in silico, и как отправную точку для дообучения на реальном сигнале метилирования, а не только на последовательности ДНК.',
+    'fm-card-h3': 'Геномные foundation-модели: Borzoi, AlphaGenome и epicme.bio',
+    'fm-card-p': 'Обзор Enformer, Nucleotide Transformer, HyenaDNA, Borzoi/Flashzoi, Evo/Evo2 и AlphaGenome с архитектурой и ссылками на первоисточники; восемь идей применения к CD55; архитектуры дообучения на ДНК + метилирование; и план следующего шага — модель «ДНК + метилирование → CD55 on/off» по RNA-seq.',
+    'fm-card-go': 'Открыть →',
+    'fm-ideas-h3': 'Коротко — что могут дать эти модели проекту',
+    'fm-i1-tag': 'Проверка гипотез',
+    'fm-i1-h': 'Независимая сверка CTCF/NRF1',
+    'fm-i1-p': 'AlphaGenome и Borzoi предсказывают ChIP-подобные треки по последовательности — их предсказанное связывание TF в окне #43–86/#13–43 можно сравнить с наблюдаемым сдвигом покрытия ещё до постановки CUT&amp;RUN.',
+    'fm-i2-tag': 'Планирование экспериментов',
+    'fm-i2-h': 'In silico скрининг ZFP/dCas9-мишеней',
+    'fm-i2-p': 'Прогонять кандидатные окна через AlphaGenome/Borzoi до wet-lab — заранее видеть предсказанный регуляторный off-target риск, не только генетический.',
+    'fm-i3-tag': 'Дообучение + Next',
+    'fm-i3-h': 'ДНК + метилирование → CD55 on/off',
+    'fm-i3-p': 'Четыре архитектурных пути дообучения Borzoi/Flashzoi на реальном сигнале метилирования (не только последовательности), и конкретный план two-tower модели, предсказывающей on/off по RNA-seq — с честно названным блокером: нужен парный RNA-seq для наших образцов.',
+    'fm-note': '<strong>Честно про статус:</strong> это research-заметки и архитектурные предложения, а не обученная модель — ни одна из идей выше ещё не реализована и не провалидирована на наших данных. Полная разбивка, ссылки на первоисточники и оговорки — на странице <a href="genomic-foundation-models.html">Foundation-модели</a>.',
     'struct-tag': 'Гипотезы · структура ДНК',
     'struct-h3': 'Форма ДНК на том же окне',
     'struct-p': 'Тот же вопрос, что и выше, но не «кто сидит на промоторе», а «во что складывается сама ДНК»: G-квадруплексы, i-мотивы, Z-форма, R-петли, нуклеосомы и петли хроматина. Ни одна структура ещё не посчитана — страница честно держит пустые слоты и список того, что считается на уже имеющихся данных.',
@@ -744,7 +798,25 @@ const I18N = {
   },
   en: {
     'nav-research': 'Research Ideas/Todos',
+    'nav-models': 'Foundation models',
     'nav-synth': 'Synthetic ROI',
+    'fm-kicker': 'Learn — computational genome models',
+    'fm-h2': 'Could Borzoi and AlphaGenome test what we\u2019ve already seen on CD55',
+    'fm-lede': 'A dedicated page surveys current genomic foundation models — from Enformer to Borzoi and AlphaGenome — and how they could apply to our locus: as one more independent check on our hypotheses (CTCF/NRF1, the methylation→silencing direction), as a way to screen future ZFP/CRISPRoff targets in silico, and as a starting point for fine-tuning on real measured methylation signal rather than DNA sequence alone.',
+    'fm-card-h3': 'Genomic foundation models: Borzoi, AlphaGenome, and epicme.bio',
+    'fm-card-p': 'A survey of Enformer, Nucleotide Transformer, HyenaDNA, Borzoi/Flashzoi, Evo/Evo2, and AlphaGenome with architecture details and primary-source links; eight ideas for applying them to CD55; fine-tuning architectures for DNA + methylation input; and a concrete next-step plan — a "DNA + methylation → CD55 on/off" model from RNA-seq.',
+    'fm-card-go': 'Open →',
+    'fm-ideas-h3': 'In short — what these models could give the project',
+    'fm-i1-tag': 'Hypothesis testing',
+    'fm-i1-h': 'Independent cross-check of CTCF/NRF1',
+    'fm-i1-p': 'AlphaGenome and Borzoi predict ChIP-like tracks from sequence — their predicted TF binding in the #43–86/#13–43 window could be compared against the observed coverage shift ahead of the planned CUT&amp;RUN.',
+    'fm-i2-tag': 'Experiment planning',
+    'fm-i2-h': 'In-silico screening of ZFP/dCas9 targets',
+    'fm-i2-p': 'Run candidate windows through AlphaGenome/Borzoi before wet-lab work — preview predicted regulatory off-target risk, not just genetic off-targets.',
+    'fm-i3-tag': 'Fine-tuning + Next',
+    'fm-i3-h': 'DNA + methylation → CD55 on/off',
+    'fm-i3-p': 'Four architectural paths for fine-tuning Borzoi/Flashzoi on real measured methylation signal (not just sequence), plus a concrete two-tower model plan predicting on/off from RNA-seq — with an honestly named blocker: paired RNA-seq is needed for our samples.',
+    'fm-note': '<strong>Honest status note:</strong> these are research notes and architectural proposals, not a trained model — none of the ideas above have been implemented or validated on our data yet. The full breakdown, primary-source links, and caveats live on the <a href="genomic-foundation-models.html">Foundation models</a> page.',
     'struct-tag': 'Hypotheses · DNA structure',
     'struct-h3': 'The shape of the DNA across the same window',
     'struct-p': 'The same question as above, but not “who sits on the promoter” — “what does the DNA itself fold into”: G-quadruplexes, i-motifs, Z-form, R-loops, nucleosomes and chromatin loops. No structure has been computed yet — the page honestly keeps empty slots plus a list of what is computable on data already in hand.',
