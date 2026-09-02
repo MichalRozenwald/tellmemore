@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">epicme.bio — эпигеном · CRISPRoff · метилирование</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific styles for the home / anchor page only.
+     Shared palette, typography, nav, footer, cards, tags, buttons and
+     references live in assets/theme.css — reuse those classes instead
+     of redefining colors here. */
+
+  .hero{ padding:64px 0 36px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--blue); font-weight:600; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--blue-deep); }
+  h1.display{
+    font-size:clamp(26px, 4vw, 40px);
+    font-weight:600; line-height:1.2; letter-spacing:-0.01em;
+    margin:0 0 20px; max-width:840px;
+  }
+  h1.display em{ font-style:normal; color:var(--blue); }
+  .hero-sub{ font-size:18px; color:var(--ink-dim); max-width:640px; margin:0 0 28px; }
+  .hero-cta{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+
+  /* ---------- epiCme logo: nav wordmark + larger hero lockup ----------
+     The mark is a stylized 5-methylcytosine: a hexagonal base with "C"
+     inside, plus a small branched methyl group hanging off it — so the
+     shape itself (hexagon + branched appendage), not just its color,
+     carries the "cytosine + added methylation" idea. */
+  .brand-logo{ display:flex; align-items:center; gap:9px; }
+  .logo-mark{ flex:0 0 auto; display:block; }
+  .brand-stack{ display:flex; flex-direction:column; line-height:1.2; }
+  .brand-word{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px;
+    letter-spacing:-0.01em; color:var(--ink);
+  }
+  .brand-word .accent-c{ color:var(--orange); }
+
+  .hero-logo{ display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+  .hero-logo .logo-mark{ width:52px; height:52px; }
+  .hero-logo .brand-word{ font-size:30px; }
+  .logo-caption{ font-size:13px; color:var(--ink-faint); margin:4px 0 0; }
+  .logo-caption b{ color:var(--ink-dim); font-weight:600; }
+
+  .hero-byline{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    font-size:14.5px; color:var(--ink-dim); margin:0 0 18px;
+  }
+  .hero-byline strong{ color:var(--ink); font-weight:600; }
+  .byline-name{
+    color:var(--ink); text-decoration:none; border-bottom:1.5px solid var(--line);
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .byline-name:hover, .byline-name:focus-visible{ color:var(--blue); border-color:var(--blue); }
+
+  .social-links{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 26px; }
+  .social-link{
+    display:inline-flex; align-items:center; gap:6px;
+    border:1.5px solid var(--line); border-radius:999px; padding:5px 13px 5px 10px;
+    color:var(--ink-dim); text-decoration:none; font-size:13px; font-weight:600;
+    font-family:'Space Grotesk',sans-serif;
+    transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .social-link:hover, .social-link:focus-visible{
+    border-color:var(--blue); color:var(--ink); background:var(--surface);
+  }
+  .social-link svg{ flex:0 0 auto; }
+
+  /* ---------- language switch, top-left of nav — deliberately large:
+     this is the one control on the page that changes everything else,
+     so it earns more visual weight than a normal nav link. ---------- */
+  .lang-switch{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+  }
+  .lang-switch button{
+    border:none; background:transparent; color:var(--ink-dim);
+    font-size:15px; font-weight:700; padding:9px 20px; border-radius:999px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em; transition:all .15s ease;
+  }
+  .lang-switch button.active{ background:var(--blue); color:#06182A; }
+  .nav-inner{ flex-wrap:wrap; row-gap:10px; }
+
+  /* ---------- primary cross-page navigation — big, easy-to-hit pill
+     buttons so switching between pages is obvious from anywhere on
+     the site, not a row of small text links. ---------- */
+  .nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+  .nav-links a{
+    display:inline-flex; align-items:center;
+    padding:10px 18px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:var(--surface-2);
+    color:var(--ink-dim);
+    font-size:14.5px; font-weight:600;
+    text-decoration:none;
+    transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{
+    border-color:var(--blue);
+    color:var(--ink);
+    background:var(--surface);
+    transform:translateY(-1px);
+  }
+  .nav-links a.active{
+    background:var(--blue);
+    border-color:var(--blue);
+    color:#06182A;
+  }
+  /* the upload link is an action, not just a destination — it earns a
+     standing accent border instead of waiting for hover like its siblings */
+  .nav-links a.upload-nav-link{
+    border-color:var(--orange); color:var(--orange);
+  }
+  .nav-links a.upload-nav-link:hover, .nav-links a.upload-nav-link:focus-visible{
+    background:var(--orange); border-color:var(--orange); color:#2B1900;
+  }
+  /* Ella's 4 pages get their own subtle accent so they read as a distinct
+     group in the nav, without changing the pill shape/size — same pattern
+     as .upload-nav-link above, just a different hue from the shared palette. */
+  /* Ella's 4 pages look exactly like every other nav pill at rest — the
+     only difference is the hover/focus outline color (gold instead of
+     the default blue), so the group is discoverable without standing
+     out from the rest of the nav. */
+  .nav-links a.ella-link:hover, .nav-links a.ella-link:focus-visible{
+    border-color:#cbbf3e; color:var(--ink); background:var(--surface);
+  }
+
+  /* ---------- collapsing nav on scroll ----------
+     On load / at the top of the page all links stay statically visible,
+     exactly as before. Past a small scroll threshold #site-nav gets
+     .nav-collapsed (added/removed by JS below) and the pill row hides
+     behind a single "Menu" toggle; clicking it reveals the same links
+     as a dropdown panel, so nothing about the link list itself changes —
+     only how much space it takes up while reading the page. ---------- */
+  .nav-inner{ position:relative; }
+  /* Pin the header while scrolling so the "Menu" toggle stays reachable —
+     without this the whole bar would scroll off-screen and the collapsed
+     menu would be unreachable exactly when it's needed. If assets/theme.css
+     already makes .nav sticky/fixed site-wide, this is redundant and safe;
+     if not, this is what makes the collapse behavior actually usable. */
+  #site-nav{ position:sticky; top:0; z-index:100; }
+  .nav-toggle{
+    display:none; align-items:center; gap:7px;
+    background:var(--surface-2); border:1.5px solid var(--line); color:var(--ink);
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px;
+    padding:10px 18px; border-radius:999px; cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, color .15s ease;
+  }
+  .nav-toggle:hover, .nav-toggle:focus-visible{
+    border-color:var(--blue); color:var(--ink); background:var(--surface);
+  }
+  .nav-toggle-icon{ font-size:11px; transition:transform .15s ease; }
+  #site-nav.nav-open .nav-toggle-icon{ transform:rotate(180deg); }
+
+  #site-nav.nav-collapsed .nav-toggle{ display:inline-flex; }
+  #site-nav.nav-collapsed .nav-links{ display:none; }
+  #site-nav.nav-collapsed.nav-open .nav-links{
+    display:flex; flex-direction:column; align-items:stretch; flex-wrap:nowrap;
+    position:absolute; top:100%; left:0; right:0; margin-top:10px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:10px; gap:4px; max-height:min(70vh, 520px); overflow-y:auto;
+    box-shadow:0 18px 44px rgba(0,0,0,0.30); z-index:90;
+  }
+  #site-nav.nav-collapsed.nav-open .nav-links a{ width:100%; text-align:left; }
+
+  /* ---------- Upload section — deliberately set apart from the rest of
+     the page: a bordered, tinted panel rather than a plain section, so
+     it reads as "do something" next to everything above that reads
+     "learn something". Uses only the existing blue/orange hues. ---------- */
+  #upload{ border-top:2px solid var(--orange); }
+  .upload-panel{
+    background:linear-gradient(160deg, rgba(230,159,0,0.10), rgba(86,180,233,0.06) 65%);
+    border:2px solid var(--orange);
+    border-radius:var(--radius);
+    padding:30px 28px 28px;
+  }
+  .upload-panel .kicker-shaped .shape{ background:var(--orange); border-radius:3px; transform:rotate(45deg); }
+  .upload-panel .kicker-shaped span.lbl{ color:var(--orange); }
+  .upload-panel .card{ background:var(--surface); }
+  .upload-cta{
+    border:2px solid var(--blue-deep) !important;
+    background:linear-gradient(135deg, rgba(86,180,233,0.14), var(--surface-2) 60%) !important;
+  }
+
+  /* ---------- shape vocabulary, shared meaning across the whole site:
+     square/orange = Write, circle/blue = Read, hexagon/yellow = Learn.
+     Colorblind-safe: shape differs, not just hue, and the kicker text
+     always names the category too. ---------- */
+  .kicker-shaped{ display:flex; align-items:center; gap:9px; margin-bottom:10px; }
+  .kicker-shaped .shape{ width:12px; height:12px; flex-shrink:0; }
+  .kicker-shaped.write .shape{ background:var(--orange); border-radius:3px; }
+  .kicker-shaped.write span.lbl{ color:var(--orange); }
+  .kicker-shaped.read .shape{ background:var(--blue); border-radius:50%; }
+  .kicker-shaped.read span.lbl{ color:var(--blue); }
+  .kicker-shaped.learn .shape{ background:var(--yellow); clip-path:polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+  .kicker-shaped.learn span.lbl{ color:var(--yellow); }
+  .kicker-shaped span.lbl{ font-size:12px; letter-spacing:0.12em; text-transform:uppercase; font-weight:600; }
+
+  /* ---------- Start-here card (About), full width, elevated ---------- */
+  .start-card{
+    display:flex; gap:20px; align-items:center; flex-wrap:wrap;
+    background:linear-gradient(135deg, rgba(86,180,233,0.10), var(--surface) 60%);
+    border:2px solid var(--blue-deep); border-radius:var(--radius);
+    padding:24px 26px;
+  }
+  .start-card .txt{ flex:1 1 320px; }
+  .start-card h3{ margin:0 0 8px; font-size:19px; }
+  .start-card p{ margin:0; font-size:14.5px; }
+
+  /* ---------- Page-card grids ---------- */
+  .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; }
+  @media (max-width:820px){ .grid3{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:560px){ .grid3{ grid-template-columns:1fr; } }
+
+  /* Cards are links — make that unmistakable: thicker always-visible
+     border, roomier padding, a lift + glow on hover/focus, and a bold
+     arrow-led call to action instead of a quiet text link. */
+  .page-card{
+    position:relative;
+    background:var(--surface-2);
+    border:2px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 22px 20px;
+    display:flex; flex-direction:column; height:100%;
+    text-decoration:none;
+    transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .page-card:hover, .page-card:focus-visible{
+    border-color:var(--blue);
+    background:var(--surface);
+    transform:translateY(-3px);
+    box-shadow:0 10px 28px rgba(86,180,233,0.16);
+  }
+  .page-card h3{ font-size:17px; margin:0 0 8px; color:var(--ink); }
+  .page-card p{ font-size:14px; margin:0; color:var(--ink-dim); flex:1; }
+  .page-card .go{
+    margin-top:16px; font-size:14px; color:var(--blue); font-weight:700;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .page-card .go .arrow{ transition:transform .15s ease; }
+  .page-card:hover .go .arrow{ transform:translateX(3px); }
+
+  .draft-note{ font-size:12.5px; color:var(--ink-faint); margin-top:8px; }
+
+  /* Comparison cards in #beyond are links too — same affordance as
+     .page-card so it is obvious they lead somewhere, not just describe. */
+  .diff-card{
+    display:flex; flex-direction:column; text-decoration:none;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .diff-card h3{ color:var(--ink); }
+  .diff-card ul{ flex:1; }
+  .diff-card:hover, .diff-card:focus-visible{
+    border-color:var(--blue); transform:translateY(-2px);
+  }
+  .diff-card .go{
+    margin-top:14px; font-size:14px; color:var(--blue); font-weight:700;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .diff-card .go .arrow{ transition:transform .15s ease; }
+  .diff-card:hover .go .arrow{ transform:translateX(3px); }
+
+  /* ---------- Factors / mechanisms section ----------
+     No new hues: only --blue / --orange / --yellow from the shared
+     palette, and every colored element is also distinguished by
+     shape, border style or a text label. ---------- */
+  .sub-h{ font-size:17px; margin:32px 0 10px; color:var(--ink); }
+  .tf-tablewrap{
+    overflow-x:auto; border:1px solid var(--line);
+    border-radius:var(--radius); background:var(--surface);
+  }
+  .tf-tablewrap table{ border-collapse:collapse; width:100%; min-width:660px; }
+  .tf-tablewrap th, .tf-tablewrap td{
+    text-align:left; padding:10px 14px; border-bottom:1px solid var(--line);
+    vertical-align:top; font-size:13.5px; color:var(--ink-dim); line-height:1.5;
+  }
+  .tf-tablewrap th{
+    font-family:'Space Grotesk',sans-serif; font-size:12.5px; font-weight:600;
+    color:var(--ink); background:var(--surface-2);
+  }
+  .tf-tablewrap tr:last-child td{ border-bottom:none; }
+  .tf-tablewrap td strong{ color:var(--ink); font-weight:600; }
+  .tf-tablewrap td .pos{ font-family:'IBM Plex Mono',monospace; font-size:12px; }
+
+  .coordlist{ list-style:none; margin:0; padding:0; }
+  .coordlist li{
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-dim);
+    padding:8px 0; border-bottom:1px solid var(--line);
+  }
+  .coordlist li:last-child{ border-bottom:none; }
+  .coordlist li b{ color:var(--blue); font-weight:600; }
+
+  .mech-list{
+    list-style:none; margin:0; padding:0; counter-reset:m;
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  }
+  @media (max-width:700px){ .mech-list{ grid-template-columns:1fr; } }
+  .mech-list li{
+    counter-increment:m; position:relative;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+    padding:13px 15px 13px 48px; font-size:14px; color:var(--ink-dim); line-height:1.5;
+  }
+  .mech-list li::before{
+    content:"M" counter(m); position:absolute; left:14px; top:14px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; color:var(--blue);
+  }
+  .mech-list li strong{
+    display:block; margin-bottom:3px; color:var(--ink);
+    font-family:'Space Grotesk',sans-serif; font-weight:600;
+  }
+</style>
+</head>
+<body>
+
+<header class="nav" id="site-nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand brand-logo" style="text-decoration:none;">
+      <svg class="logo-mark" viewBox="0 0 40 40" width="26" height="26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <polygon points="16,7 25,12.5 25,27.5 16,33 7,27.5 7,12.5" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="2"/>
+        <text x="16" y="24" font-family="'IBM Plex Mono', monospace" font-size="13" font-weight="700" fill="var(--ink)" text-anchor="middle">C</text>
+        <line x1="22" y1="11" x2="28" y2="7" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="30" cy="8" r="3.4" fill="var(--orange)"/>
+        <line x1="30" y1="4.6" x2="30" y2="1.8" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="27.3" y1="9.7" x2="24.8" y2="11.3" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="32.7" y1="9.7" x2="35.2" y2="11.3" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-stack">
+        <span class="brand-word">epi<span class="accent-c">C</span>me</span>
+        <span class="brand-sub" data-i18n="brand-sub">эпигеном · CRISPRoff · метилирование</span>
+      </span>
+    </a>
+    <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav-links">
+      <span data-i18n="nav-toggle-label">Меню</span>
+      <span class="nav-toggle-icon" aria-hidden="true">▾</span>
+    </button>
+    <nav class="nav-links" id="site-nav-links">
+      <a href="index.html" data-i18n="nav-home" class="active">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="day6.html">Day 6</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day35-emseq.html" data-i18n="nav-emseq">EM-seq · Day 35</a>
+      <a href="day6VSday35.html">Day 35 vs Day 6</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="public-methylation.html" data-i18n="nav-public">Публичные данные</a>
+      <a href="primary-tcell-public-data.html" data-i18n="nav-tcelldata">Публичные данные первичных T-клеток</a>
+      <a href="cd55-tf-tcells.html" data-i18n="nav-tf">Механизмы</a>
+      <a href="cd55-dna-structures.html" data-i18n="nav-struct">Структуры ДНК</a>
+      <a href="methylation-and-memory.html" data-i18n="nav-memory">Метилирование и память</a>
+      <a href="methylation-generational-trauma.html" data-i18n="nav-trauma">Метилирование и травма</a>
+      <a href="upload-user-input.html" data-i18n="nav-upload" class="upload-nav-link">Загрузка данных</a>
+      <a href="research-ideas-todos.html" data-i18n="nav-research">Research Ideas/Todos</a>
+      <a href="genomic-foundation-models.html" data-i18n="nav-models">Foundation-модели</a>
+      <a href="synthetic-cd55-roi-baseline.html" data-i18n="nav-synth">Synthetic ROI</a>
+      <a href="CHAPLEedited.htm" data-i18n="nav-chaple" class="ella-link">CHAPLE-синдром</a>
+      <a href="cd55HGSOCedited.htm" data-i18n="nav-hgsoc" class="ella-link">CD55 и рак яичников</a>
+      <a href="mesites_plot_wNucNEW.html" data-i18n="nav-mesites-nuc" class="ella-link">Mesites: delMC + нуклеосомы</a>
+      <a href="mesites_plotEDITED.htm" data-i18n="nav-mesites" class="ella-link">Mesites: delMC</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow" data-i18n="eyebrow">epicme.bio · открытый научный проект и PhD-капстон</div>
+
+    <div class="hero-logo">
+      <svg class="logo-mark" viewBox="0 0 40 40" width="52" height="52" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <polygon points="16,7 25,12.5 25,27.5 16,33 7,27.5 7,12.5" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="2"/>
+        <text x="16" y="24" font-family="'IBM Plex Mono', monospace" font-size="13" font-weight="700" fill="var(--ink)" text-anchor="middle">C</text>
+        <line x1="22" y1="11" x2="28" y2="7" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="30" cy="8" r="3.4" fill="var(--orange)"/>
+        <line x1="30" y1="4.6" x2="30" y2="1.8" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="27.3" y1="9.7" x2="24.8" y2="11.3" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="32.7" y1="9.7" x2="35.2" y2="11.3" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-stack">
+        <span class="brand-word">epi<span class="accent-c">C</span>me</span>
+        <p class="logo-caption" data-i18n="logo-caption"><b>epi</b> — редактирование эпигенома · <b>C</b> — CRISPRoff · <b>me</b> — через присоединение метильной группы</p>
+      </span>
+    </div>
+
+    <h1 class="display" data-i18n="h1">Фреймворк <em>Write–Read–Learn</em>: глубокое погружение в причинно-следственные связи между метилированием ДНК и экспрессией гена иммунного поверхностного маркера — <em>CD55</em></h1>
+    <p class="hero-sub" data-i18n="hero-sub">Эта страница — карта проекта: отсюда можно попасть в любой раздел — контекст исследования, разбор гена CD55, сырые данные метилирования по временным точкам и более широкие заметки о том, куда всё это ведёт.</p>
+
+    <div class="hero-byline">
+      <span data-i18n="byline"><a class="byline-name" href="https://www.linkedin.com/in/michal-rozenwald" target="_blank" rel="noopener"><strong>Михаль (Миша) Розенвальд</strong></a> — PhD-кандидат по вычислительной биологии, UC Berkeley, лаборатории Aaron Streets и Fyodor Urnov</span>
+    </div>
+
+    <div class="social-links">
+      <a class="social-link" href="https://www.linkedin.com/in/michal-rozenwald" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+        <span data-i18n="linkedin-label">LinkedIn</span>
+      </a>
+      <a class="social-link" href="https://www.instagram.com/michalush.roz/" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/></svg>
+        <span data-i18n="instagram-label">Instagram</span>
+      </a>
+      <a class="social-link" href="https://m.facebook.com/michal.rozenwald/" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h-3a4 4 0 0 0-4 4v3H6v4h3v7h4v-7h3.2l.8-4H13V7a1 1 0 0 1 1-1h2z"/></svg>
+        <span data-i18n="facebook-label">Facebook</span>
+      </a>
+      <a class="social-link" href="https://t.me/michalula" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 14 21l-3-7-7-3 17-8z"/><line x1="21" y1="3" x2="10" y2="14"/></svg>
+        <span data-i18n="telegram-label">Telegram</span>
+      </a>
+    </div>
+
+    <div class="hero-cta">
+      <a class="btn" href="about.html" data-i18n="cta-context">Начать с контекста →</a>
+      <a class="btn ghost" href="about-cd55.html" data-i18n="cta-cd55">Сразу к биологии CD55 →</a>
+    </div>
+  </section>
+
+  <section id="start" style="padding-top:0;">
+    <a class="start-card" href="about.html" style="text-decoration:none;">
+      <div class="txt">
+        <h3 data-i18n="start-h3">О проекте</h3>
+        <p data-i18n="start-p">Зачем изучать эпигеном, подход Write → Read → Learn, модельная система — CD55 в донорских T-клетках, лаборатории Aaron Streets и Fyodor Urnov, UC Berkeley.</p>
+      </div>
+      <span class="btn ghost" data-i18n="start-go">Читать →</span>
+    </a>
+  </section>
+
+  <section id="write">
+    <div class="kicker-shaped write"><span class="shape"></span><span class="lbl" data-i18n="write-kicker">Write — что редактируем</span></div>
+    <h2 data-i18n="write-h2">Ген, который «выключают» CRISPRoff и ZFPoff</h2>
+    <p class="lede" data-i18n="write-lede">Прежде чем смотреть на данные метилирования, стоит понимать, что вообще такое CD55 — молекулярный механизм, биология и клиническое значение гена.</p>
+    <a class="page-card" href="about-cd55.html" style="max-width:460px;">
+      <span class="tag amber" data-i18n="write-tag">Биология гена</span>
+      <h3 data-i18n="write-card-h3">CD55 / DAF — молекулярный разбор</h3>
+      <p data-i18n="write-card-p">Как DAF разбирает C3-конвертазу, где ещё работает этот ген, CHAPLE-синдром vs PNH, разбор вариантов вроде rs2564978 — и чат с ИИ, если нужно копнуть глубже.</p>
+      <span class="go"><span data-i18n="write-card-go">Открыть explorer</span> <span class="arrow">→</span></span>
+    </a>
+  </section>
+
+  <section id="read">
+    <div class="kicker-shaped read"><span class="shape"></span><span class="lbl" data-i18n="read-kicker">Read — что видит секвенатор</span></div>
+    <h2 data-i18n="read-h2">Одномолекульные данные метилирования</h2>
+    <p class="lede" data-i18n="read-lede">Nanopore-секвенирование локуса CD55 с разрешением до одной молекулы, Unedited vs CRISPRoff-silenced, по временным точкам после редактирования.</p>
+    <div class="grid3">
+      <a class="page-card" href="day6.html">
+        <span class="tag blue" data-i18n="day6-tag">Данные · Day 6</span>
+        <h3 data-i18n="day6-h3">Day 6 post-электропорации</h3>
+        <p data-i18n="day6-p">Donor 0, 6 дней после CRISPRoff. Тепловые карты и профили по 137 CpG-сайтам, Unedited vs CRISPRoff.</p>
+        <span class="go"><span data-i18n="day6-go">Смотреть Day 6</span> <span class="arrow">→</span></span>
+      </a>
+      <a class="page-card" href="day35.html">
+        <span class="tag blue" data-i18n="day35-tag">Данные · Day 35</span>
+        <h3 data-i18n="day35-h3">Day 35 post-электропорации</h3>
+        <p data-i18n="day35-p">Другой донор, 35 дней после CRISPRoff. Та же логика Unedited vs CRISPRoff, более поздняя точка.</p>
+        <span class="go"><span data-i18n="day35-go">Смотреть Day 35</span> <span class="arrow">→</span></span>
+      </a>
+      <a class="page-card" href="day6VSday35.html">
+        <span class="tag blue" data-i18n="compare-tag">Сравнение</span>
+        <h3>Day 35 vs Day 6</h3>
+        <p data-i18n="compare-p">Оба донора и оба таймпоинта рядом: охват, доля метилирования, дифференциальные CpG-сайты, модели.</p>
+        <span class="go"><span data-i18n="compare-go">Сравнить</span> <span class="arrow">→</span></span>
+      </a>
+      <a class="page-card" href="day35-emseq.html">
+        <span class="tag amber" data-i18n="emseq-tag">Данные · EM-seq</span>
+        <h3 data-i18n="emseq-h3">EM-seq — ортогональная проверка Day 35</h3>
+        <p data-i18n="emseq-p">Тот же донор и тот же день, что на странице Day 35, но другая химия — EM-seq вместо Nanopore. Один донор на все условия и реплики: цифры и буквы в именах образцов (NT_1B, ZFP_3A и т.д.) — это биологические и технические реплики, не разные доноры.</p>
+        <span class="go"><span data-i18n="emseq-go">Смотреть EM-seq</span> <span class="arrow">→</span></span>
+      </a>
+      <a class="page-card" href="k562.html">
+        <span class="tag amber" data-i18n="k562-tag">Данные · K562</span>
+        <h3 data-i18n="k562-h3">K562 — сортировка по CD55</h3>
+        <p data-i18n="k562-p">Другая клеточная линия, сортировка по самому белку CD55 (LOW/HIGH), а не просто edited/unedited. ML-классификаторы, геномные координаты и проверка сигнала на T-клетках.</p>
+        <span class="go"><span data-i18n="k562-go">Смотреть K562</span> <span class="arrow">→</span></span>
+      </a>
+      <a class="page-card" href="k562-chipseq.html">
+        <span class="tag amber" data-i18n="chipseq-tag">Данные · ChIP-seq</span>
+        <h3 data-i18n="chipseq-h3">Кто сидит на промоторе CD55</h3>
+        <p data-i18n="chipseq-p">Публичные данные ENCODE ChIP-seq по K562 транскрипционным факторам поверх значимого CpG-кластера со страницы K562 — CTCF и NRF1 как кандидаты на «метилирование мешает связыванию».</p>
+        <span class="go"><span data-i18n="chipseq-go">Смотреть ChIP-seq</span> <span class="arrow">→</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section id="factors">
+    <div class="kicker-shaped learn"><span class="shape"></span><span class="lbl" data-i18n="tf-kicker">Learn — как устроен CD55</span></div>
+    <h2 data-i18n="tf-h2">Кто сидит на промоторе CD55 — и почему метилирование ложится неровно</h2>
+    <p class="lede" data-i18n="tf-lede">Метилирование после CRISPRoff не размазано ровным слоем: одни CpG уходят почти в ноль, а соседние в 30 п.н. едва двигаются. Здесь собрано, что публично известно про транскрипционные факторы на этом промоторе, и семь механизмов, которые объясняют форму профиля — почти все проверяются на данных, которые уже есть.</p>
+
+    <a class="start-card" href="cd55-tf-tcells.html" style="text-decoration:none; margin-bottom:8px;">
+      <div class="txt">
+        <h3 data-i18n="tf-card-h3">Транскрипционные факторы и семь механизмов</h3>
+        <p data-i18n="tf-card-p">Карта промотора в масштабе, координаты гайда CRISPRoff относительно TSS, список публичных наборов данных с прямыми ссылками и план из шести анализов.</p>
+      </div>
+      <span class="btn ghost" data-i18n="tf-card-go">Открыть →</span>
+    </a>
+
+    <h3 class="sub-h" data-i18n="tf-table-h3">Что известно про факторы на этом промоторе</h3>
+    <div class="tf-tablewrap" data-i18n="tf-table">
+      <table>
+        <thead><tr><th>Фактор</th><th>Сайт</th><th>Доказательства</th><th>Клетки</th><th>Значимость для T-клеток</th></tr></thead>
+        <tbody>
+          <tr><td><strong>KLF4</strong></td><td class="pos">парные CACCC: −106/−95 (A), −228/−214, −310/−302 (B), −567/−549, −667/−652 (C)</td><td>ChIP показывает занятость всех трёх сайтов A–C; урезанный промотор 190 п.н. с одним сайтом A даёт почти ту же активность, что полные 848 п.н.</td><td>HUVEC, репортёр в K562</td><td><strong>Высокая.</strong> При активации CD4⁺ KLF4 падает синхронно с CD55 — значит занятость сайта зависит от того, как стимулировали донорские клетки.</td></tr>
+          <tr><td><strong>CREB / p-CREB + CBP</strong></td><td class="pos">CRE рядом с сайтами A, B и C</td><td>ChIP: p-CREB и CBP идут следом за KLF4 на всех трёх сайтах</td><td>HUVEC</td><td><strong>Высокая.</strong> Путь идёт через аденилатциклазу, которую сам CD55 регулирует через C3aR/C5aR — то есть петля обратной связи прямо в CD4⁺ T-клетках.</td></tr>
+          <tr><td><strong>SP1</strong></td><td class="pos">GC-бокс(ы), проксимальный промотор</td><td>Мутагенез промотора; конститутивная экспрессия мышиного Daf1 приписана SP1</td><td>Huh7.5, спленоциты мыши</td><td>Средняя. Сайты GC-богатые и содержат CpG — идеальный субстрат для CRISPRoff; классически считается, что метилирование связывание SP1 не блокирует.</td></tr>
+          <tr><td><strong>NF-κB (RelA)</strong></td><td class="pos">предсказанный сайт в 2 kb 5′-фланка, подтверждён ChIP</td><td>ChIP с антителом к NF-κB и сайт-специфичными праймерами</td><td>LOVO / HCT116 (рак толстой кишки)</td><td>Средне-высокая. NF-κB центральный при активации T-клеток, но точное смещение относительно TSS в работе не приведено — на наши CpG не ложится.</td></tr>
+          <tr><td><strong>TFCP2</strong></td><td class="pos">предсказанный сайт, 5′-фланк</td><td>Мутация сайта снижает активность промотора на 66%</td><td>HCT116 / LOVO</td><td>Низко-средняя. Эффект сильный, но контекст — рак толстой кишки; для нас нужен ChIP в T-клетках.</td></tr>
+          <tr><td><strong>AP-1</strong></td><td class="pos">сайт в проксимальном промоторе</td><td>Точечная мутация не повлияла на индукцию через HCV core</td><td>Huh7.5</td><td>Низкая как доказательство, высокая как гипотеза: AP-1 — один из основных факторов активации T-клеток.</td></tr>
+          <tr><td><strong>HIF-1α</strong></td><td class="pos">апикальная индукция CD55 при гипоксии</td><td>HIF-зависимая индукция CD55</td><td>кишечный эпителий</td><td>Низкая для T-клеток, но важна для любой гипоксичной культуры или тканевого контекста.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-h" data-i18n="tf-gap-h3">Кого на этом промоторе никто не проверял</h3>
+    <p data-i18n="tf-gap-p">Ни одна публикация не помещает на промотор CD55 <strong>NFAT, ETS1, RUNX1, TCF7/LEF1, GATA3, STAT5 или CTCF</strong>. Это отсутствие доказательств, а не доказательство отсутствия: вся механистика выше сделана на эндотелии, эпителии и линиях рака толстой кишки — в T-клетках этот промотор просто не изучали. Правильный ход — не спекулировать, а прогнать наше окно через ChIP-Atlas, ReMap и UniBind с фильтром по клеткам крови и посмотреть, что вернётся. Кстати, CTCF уже проверен на самом K562 в нашем собственном ChIP-seq-разборе — пика там нет, но это ещё не T-клетки.</p>
+
+    <h3 class="sub-h" data-i18n="tf-meth-h3">Метилирование не просто «выключает» факторы</h3>
+    <p data-i18n="tf-meth-p">Систематический скрининг 542 человеческих факторов методом methyl-SELEX дал более сложную картину, и она специфически важна для T-клеток: связывание семейств <strong>bHLH, bZIP и ETS</strong> метилирование подавляет за счёт стерического конфликта, а <strong>homeodomain, POU и NFAT</strong>, наоборот, предпочитают метилированный CpG. То есть метка, которую кладёт CRISPRoff, не выселяет всех подряд — она может перераспределить, кто вообще способен сесть на этот участок.</p>
+
+    <h3 class="sub-h" data-i18n="tf-coords-h3">Координаты, к которым всё привязано</h3>
+    <ul class="coordlist" data-i18n="tf-coords">
+      <li><b>TSS</b> ≈ chr1:207,321,620 (GRCh38) · T2T-CHM13v2.0 chr1:206,586,916</li>
+      <li><b>Окно анализа</b> chr1:207,318,092–207,324,450 (GRCh38), 137 CpG</li>
+      <li><b>Протоспейсер CRISPRoff</b> chr1:207,321,713–207,321,732 = +93…+112 от TSS</li>
+      <li><b>Сайты KLF</b> A −106/−95 · B −310/−302 · C −667/−652; TATA на −81</li>
+      <li><b>Пик дифференциального сигнала</b> CpG #78–83 = +58…+84 — обрывается за 9 п.н. до протоспейсера</li>
+      <li><b>Значимый блок</b> CpG #20–132 = −1 077…+1 935</li>
+      <li><b>Сдвиг GRCh38 − T2T</b> на этом локусе: 734 704 п.н., одинаковый на обоих концах</li>
+    </ul>
+
+    <h3 class="sub-h" data-i18n="tf-mech-h3">Семь механизмов неровного профиля</h3>
+    <ol class="mech-list" data-i18n="tf-mech">
+      <li><strong>След самого редактора</strong> dCas9 закрывает собой 20–30 п.н.; под ним метилирования почти нет, пики сидят сбоку от PAM.</li>
+      <li><strong>Предпочтения DNMT3A по фланкам</strong> Соседние ±2 п.н. меняют скорость до 100 раз: TACGYC хорошо, CGG плохо.</li>
+      <li><strong>Нуклеосомы и период 10 п.н.</strong> Фермент работает по линкерной ДНК; длина линкера и поворот спирали решают, какие CpG смотрят наружу.</li>
+      <li><strong>Занятые сайты факторов</strong> KLF4, CREB, SP1 и NF-κB физически загораживают свои CpG от метилтрансферазы.</li>
+      <li><strong>Исходный хроматин</strong> H3K4me3 отталкивает ADD-домен DNMT3A, H3K36me2 притягивает PWWP: активный промотор — враждебная территория.</li>
+      <li><strong>Деметилирование и сбои поддержания</strong> TET выедает метку, DNMT1 не всегда успевает при делении. «Не записалось» ≠ «записалось и стёрлось».</li>
+      <li><strong>Гетерогенность между молекулами</strong> Средние 40% — это «40% на каждой» или «100% на 40% молекул»? Нанопор видит это напрямую.</li>
+    </ol>
+
+    <div class="disclaimer" data-i18n="tf-note"><strong>Важно:</strong> вся механистика по KLF4, CREB и CBP получена на эндотелиальных клетках и репортёрных конструкциях, а не на первичных человеческих T-клетках. Перенос на нашу систему — допущение, пока T-клеточный ChIP не скажет обратного. На странице механизмов это помечено отдельно, и ни одно число там не измерено заново — это гипотезы с прописанными способами проверки.</div>
+
+    <a class="page-card" href="cd55-dna-structures.html" style="margin-top:16px; max-width:560px;">
+      <span class="tag amber" data-i18n="struct-tag">Гипотезы · структура ДНК</span>
+      <h3 data-i18n="struct-h3">Форма ДНК на том же окне</h3>
+      <p data-i18n="struct-p">Тот же вопрос, что и выше, но не «кто сидит на промоторе», а «во что складывается сама ДНК»: G-квадруплексы, i-мотивы, Z-форма, R-петли, нуклеосомы и петли хроматина. Ни одна структура ещё не посчитана — страница честно держит пустые слоты и список того, что считается на уже имеющихся данных.</p>
+      <span class="go"><span data-i18n="struct-go">Смотреть структуры ДНК</span> <span class="arrow">→</span></span>
+    </a>
+
+    <a class="page-card" href="research-ideas-todos.html" style="margin-top:16px; max-width:560px;">
+      <span class="tag amber" data-i18n="research-tag">Рабочие заметки</span>
+      <h3 data-i18n="research-h3">Как это провалидировать дальше</h3>
+      <p data-i18n="research-p">Растущий список конкретных экспериментов — CUT&amp;RUN на CTCF/NRF1 в отсортированных фракциях, in vitro биохимия на метилированных олигодуплексах, single-molecule совместное считывание метилирования и занятости фактора, — которые превратили бы гипотезы этого раздела в доказанный механизм.</p>
+      <span class="go"><span data-i18n="research-go">Смотреть Research Ideas/Todos</span> <span class="arrow">→</span></span>
+    </a>
+  </section>
+
+
+  <section id="public">
+    <div class="kicker-shaped learn"><span class="shape"></span><span class="lbl" data-i18n="pub-kicker">Learn — чужие данные на нашем окне</span></div>
+    <h2 data-i18n="pub-h2">Как выглядит этот промотор у тех, кто его не редактировал</h2>
+    <p class="lede" data-i18n="pub-lede">Прежде чем говорить, что CRISPRoff и ZFPoff что-то изменили, нужна базовая линия: сколько метилирования лежит на этих же 137 CpG в клетках, которых никто не трогал. Отдельная страница собирает публичные bisulfite (WGBS) и EM-seq данные ровно на наше окно 6 500 п.н. — в первую очередь Т-клетки и K562, а вместе с ними десятки других отсортированных типов человеческих клеток.</p>
+
+    <a class="start-card" href="public-methylation.html" style="text-decoration:none; margin-bottom:8px;">
+      <div class="txt">
+        <h3 data-i18n="pub-card-h3">Публичные bisulfite и EM-seq данные на окне CD55</h3>
+        <p data-i18n="pub-card-p">Каталог выверенных датасетов с прямыми ссылками в первичные репозитории, координаты в T2T и hg38 с переключателем между ними, ссылки, открывающие окно сразу в геномном браузере, и команды, которыми срез вырезается из удалённых файлов без их скачивания.</p>
+      </div>
+      <span class="btn ghost" data-i18n="pub-card-go">Открыть →</span>
+    </a>
+
+    <h3 class="sub-h" data-i18n="pub-what-h3">Что там собрано</h3>
+    <div class="grid2">
+      <div class="card">
+        <span class="tag blue" data-i18n="pub-t-tag">Приоритет · Т-клетки</span>
+        <h3 data-i18n="pub-t-h">Т-клетки</h3>
+        <p data-i18n="pub-t-p">Первичные CD3⁺ из ENCODE; атлас метилирования человека Loyfer 2023 — глубокий WGBS по 39 отсортированным типам клеток, включая CD4, CD8 и наивные Т; отсортированная кровь BLUEPRINT; серия DEEP по дифференцировке CD4-памяти. Это и есть та самая базовая линия «до редактора».</p>
+      </div>
+      <div class="card">
+        <span class="tag amber" data-i18n="pub-k-tag">Приоритет · K562</span>
+        <h3 data-i18n="pub-k-h">K562 и референсы платформ</h3>
+        <p data-i18n="pub-k-p">Метилом K562 из ENCODE — тот самый, который берут за ground truth в бенчмарках нанопора, но это несортированная популяция, а не наши фракции CD55-LOW и CD55-HIGH. Рядом — парный эксперимент NEB: одна и та же ДНК NA12878, прогнанная и как EM-seq, и как WGBS, так что разницу платформ на нашем окне можно измерить, а не предположить.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-h" data-i18n="pub-why-h3">Зачем это в проекте</h3>
+    <p data-i18n="pub-why-p">Три вещи, которых своими данными не получить. <strong>Базовая линия:</strong> где промотор CD55 неметилирован по умолчанию, а где несёт метку и безо всякого редактирования. <strong>Проверка платформы:</strong> наши вызовы нанопоровые и модельно-зависимые, и совпадение с бисульфитом на тех же координатах говорит больше, чем любая внутренняя метрика. <strong>Контекст типа клеток:</strong> если базовая линия в Т-клетках и в K562 разная, то часть разницы между нашими наборами — это клетка, а не редактор.</p>
+
+    <div class="disclaimer" data-i18n="pub-note"><strong>Честно про статус:</strong> страница пока каталог, а не переанализ. Ни одно значение метилирования там не нарисовано, потому что ни один файл ещё не скачан и не посчитан на нашем окне — вместо цифр лежит скрипт, который вырезает срез из удалённых bigWig range-запросами, и раздел «Загруженные треки», который заполнится ровно тогда, когда скрипт отработает. Вторая оговорка: публичные Т-клетки — это разные доноры, субпопуляции и состояния активации, а K562 из ENCODE несортированный, так что всё это фон для локуса, а не компаратор для наших групп.</div>
+
+    <a class="page-card" href="primary-tcell-public-data.html" style="margin-top:16px; max-width:560px;">
+      <span class="tag blue" data-i18n="tcd-tag">Каталог · все модальности</span>
+      <h3 data-i18n="tcd-h3">Всё публичное про первичные T-клетки</h3>
+      <p data-i18n="tcd-p">Шире, чем метилирование: bulk RNA-seq (DICE, 91 донор), scRNA-seq и CITE-seq (Hao 2021 — мРНК и поверхностный белок CD55 на одной клетке), таймкурсы активации CD4⁺ (ENCODE GSE219319, Soskic 2022), WGBS/EM-seq, ATAC, CAGE и eQTL. Собран под конкретный вопрос — где взять парный сигнал «экспрессия ↔ метилирование», чтобы разблокировать модель on/off.</p>
+      <span class="go"><span data-i18n="tcd-go">Смотреть каталог данных T-клеток</span> <span class="arrow">→</span></span>
+    </a>
+  </section>
+
+  <section id="beyond">
+    <div class="kicker-shaped learn"><span class="shape"></span><span class="lbl" data-i18n="beyond-kicker">Additionally, about methylation — за пределами CD55</span></div>
+    <h2 data-i18n="beyond-h2">Две заметки: одна про память, одна про поколения</h2>
+    <p class="lede" data-i18n="beyond-lede">Всё выше — про один ген в донорских T-клетках. Эти две страницы берут ту же метку, CpG-метилирование, и спрашивают, что она делает за пределами моей темы. Обе — обзоры чужой литературы с оригинальными статьями и оговорками, а не мои данные.</p>
+
+    <div class="grid2">
+      <a class="page-card" href="methylation-and-memory.html">
+        <span class="tag amber" data-i18n="beyond-tag1">Заметки · внутри одной жизни</span>
+        <h3>One Mark, Three Memories</h3>
+        <p data-i18n="beyond-p1">Как клетка записывает собственный опыт: гиппокамп ставит и снимает метки за часы после обучения, T-клетка памяти реметилирует PDCD1, а истощённая оставляет его открытым навсегда, стресс оседает на FKBP5 и NR3C1. Главный вопрос страницы — что делает метку обратимой, а что запирает её.</p>
+        <span class="go"><span data-i18n="beyond-go">Читать</span> <span class="arrow">→</span></span>
+      </a>
+      <a class="page-card" href="methylation-generational-trauma.html">
+        <span class="tag amber" data-i18n="beyond-tag2">Заметки · через поколения</span>
+        <h3>Inherited Marks</h3>
+        <p data-i18n="beyond-p2">Переживает ли метка границу между поколениями: голландский голод, дети выживших в Холокосте и геноциде тутси, мыши Dias &amp; Ressler и Mansuy, барьер Вейсмана и два раунда стирания. Главный вопрос — доходит ли вообще что-нибудь до внука и метилирование ли это.</p>
+        <span class="go"><span data-i18n="beyond-go2">Читать</span> <span class="arrow">→</span></span>
+      </a>
+    </div>
+
+    <h3 class="sub-h" data-i18n="beyond-diff-h3">В чём разница между ними</h3>
+    <div class="compare">
+      <a class="card diff-card" href="methylation-and-memory.html">
+        <h3 data-i18n="beyond-c1-h">Память — ось «одна жизнь»</h3>
+        <ul>
+          <li data-i18n="beyond-c1-a">Соматические клетки: нейрон, T-клетка, клетки HPA-оси.</li>
+          <li data-i18n="beyond-c1-b">Вопрос: сколько держится метка и почему одни стираются, а другие запираются.</li>
+          <li data-i18n="beyond-c1-c">Связь с моей работой прямая: донорские T-клетки уже несут этот метилом до редактирования.</li>
+        </ul>
+        <span class="go"><span data-i18n="beyond-c1-go">Открыть «One Mark, Three Memories»</span> <span class="arrow">→</span></span>
+      </a>
+      <a class="card diff-card" href="methylation-generational-trauma.html">
+        <h3 data-i18n="beyond-c2-h">Травма — ось «поколения»</h3>
+        <ul>
+          <li data-i18n="beyond-c2-a">Зародышевая линия: сперматозоид, ооцит, F0 → F1 → F2 → F3.</li>
+          <li data-i18n="beyond-c2-b">Вопрос: считается ли найденное наследованием или это просто прямое воздействие на ещё одно поколение.</li>
+          <li data-i18n="beyond-c2-c">Связь с моей работой косвенная: вся эта литература корреляционна, а редактирование эпигенома — недостающий инструмент записи.</li>
+        </ul>
+        <span class="go"><span data-i18n="beyond-c2-go">Открыть «Inherited Marks»</span> <span class="arrow">→</span></span>
+      </a>
+    </div>
+
+    <div class="disclaimer" data-i18n="beyond-overlap"><strong>Где они пересекаются:</strong> FKBP5 и NR3C1 встречаются на обеих страницах, но отвечают на разные вопросы. На странице про память — осталась ли метка у самого человека, пережившего стресс. На странице про травму — появилась ли она у его ребёнка. Это единственное место, где темы соприкасаются, и оно помечено на обеих страницах перекрёстными ссылками.</div>
+  </section>
+
+  <section id="foundation-models">
+    <div class="kicker-shaped learn"><span class="shape"></span><span class="lbl" data-i18n="fm-kicker">Learn — вычислительные модели генома</span></div>
+    <h2 data-i18n="fm-h2">Могут ли Borzoi и AlphaGenome проверить то, что мы уже увидели на CD55</h2>
+    <p class="lede" data-i18n="fm-lede">Отдельная страница разбирает современные геномные foundation-модели — от Enformer до Borzoi и AlphaGenome — и то, как их можно применить к нашему локусу: как ещё одну независимую проверку гипотез (CTCF/NRF1, направление метилирование→сайленсинг), как способ скринить будущие ZFP/CRISPRoff-мишени in silico, и как отправную точку для дообучения на реальном сигнале метилирования, а не только на последовательности ДНК.</p>
+
+    <a class="start-card" href="genomic-foundation-models.html" style="text-decoration:none; margin-bottom:8px;">
+      <div class="txt">
+        <h3 data-i18n="fm-card-h3">Геномные foundation-модели: Borzoi, AlphaGenome и epicme.bio</h3>
+        <p data-i18n="fm-card-p">Обзор Enformer, Nucleotide Transformer, HyenaDNA, Borzoi/Flashzoi, Evo/Evo2 и AlphaGenome с архитектурой и ссылками на первоисточники; восемь идей применения к CD55; архитектуры дообучения на ДНК + метилирование; и план следующего шага — модель «ДНК + метилирование → CD55 on/off» по RNA-seq.</p>
+      </div>
+      <span class="btn ghost" data-i18n="fm-card-go">Открыть →</span>
+    </a>
+
+    <h3 class="sub-h" data-i18n="fm-ideas-h3">Коротко — что могут дать эти модели проекту</h3>
+    <div class="grid3">
+      <div class="card">
+        <span class="tag blue" data-i18n="fm-i1-tag">Проверка гипотез</span>
+        <h3 data-i18n="fm-i1-h">Независимая сверка CTCF/NRF1</h3>
+        <p data-i18n="fm-i1-p">AlphaGenome и Borzoi предсказывают ChIP-подобные треки по последовательности — их предсказанное связывание TF в окне #43–86/#13–43 можно сравнить с наблюдаемым сдвигом покрытия ещё до постановки CUT&amp;RUN.</p>
+      </div>
+      <div class="card">
+        <span class="tag blue" data-i18n="fm-i2-tag">Планирование экспериментов</span>
+        <h3 data-i18n="fm-i2-h">In silico скрининг ZFP/dCas9-мишеней</h3>
+        <p data-i18n="fm-i2-p">Прогонять кандидатные окна через AlphaGenome/Borzoi до wet-lab — заранее видеть предсказанный регуляторный off-target риск, не только генетический.</p>
+      </div>
+      <div class="card">
+        <span class="tag amber" data-i18n="fm-i3-tag">Дообучение + Next</span>
+        <h3 data-i18n="fm-i3-h">ДНК + метилирование → CD55 on/off</h3>
+        <p data-i18n="fm-i3-p">Четыре архитектурных пути дообучения Borzoi/Flashzoi на реальном сигнале метилирования (не только последовательности), и конкретный план two-tower модели, предсказывающей on/off по RNA-seq — с честно названным блокером: нужен парный RNA-seq для наших образцов.</p>
+      </div>
+    </div>
+
+    <div class="disclaimer" data-i18n="fm-note"><strong>Честно про статус:</strong> это research-заметки и архитектурные предложения, а не обученная модель — ни одна из идей выше ещё не реализована и не провалидирована на наших данных. Полная разбивка, ссылки на первоисточники и оговорки — на странице <a href="genomic-foundation-models.html">Foundation-модели</a>.</div>
+  </section>
+
+  <section id="upload">
+    <div class="upload-panel">
+      <div class="kicker-shaped upload"><span class="shape"></span><span class="lbl" data-i18n="upload-kicker">Contribute — пришлите нам свои данные</span></div>
+      <h2 data-i18n="upload-h2">Загрузите свои данные для обработки и структурированного глубокого анализа epiCme</h2>
+      <p class="lede" data-i18n="upload-lede">Кроме наборов, уже разобранных на этом сайте, мы принимаем данные метилирования CD55 от других лабораторий, доноров и клеточных линий — чтобы прогнать их через тот же пайплайн epiCme и сопоставить с уже накопленной картой промотора, факторами и профилями on/off.</p>
+
+      <div class="grid3">
+        <div class="card">
+          <span class="tag blue" data-i18n="upload-nano-tag">Сырые данные · Nanopore</span>
+          <h3 data-i18n="upload-nano-h">Сырые прогоны Oxford Nanopore</h3>
+          <p data-i18n="upload-nano-p">POD5 / FAST5 / FASTQ — мы выполним базовое вызывание и вызов CpG-метилирования на выбранном пороге достоверности через наш пайплайн epiCme, тот же, что использован для всех данных на этом сайте.</p>
+        </div>
+        <div class="card">
+          <span class="tag amber" data-i18n="upload-proc-tag">Обработанные данные</span>
+          <h3 data-i18n="upload-proc-h">Уже обработанные профили метилирования</h3>
+          <p data-i18n="upload-proc-p">Готовые per-CpG таблицы (CSV/TSV, bedMethyl) — для прямого сравнения on/off клеток (отредактированные vs контроль) на тех же координатах, что и наши наборы K562 и T-клеток.</p>
+        </div>
+        <div class="card">
+          <span class="tag blue" data-i18n="upload-cross-tag">Сопоставление</span>
+          <h3 data-i18n="upload-cross-h">Сверка с уже накопленным анализом</h3>
+          <p data-i18n="upload-cross-p">Ваши профили можно наложить на карту транскрипционных факторов, ChIP-seq треки и семь механизмов неровного метилирования, разобранные на страницах K562 и «Механизмы».</p>
+        </div>
+      </div>
+
+      <a class="start-card upload-cta" href="upload-user-input.html" style="text-decoration:none; margin-top:20px;">
+        <div class="txt">
+          <h3 data-i18n="upload-cta-h3">Открыть форму загрузки данных</h3>
+          <p data-i18n="upload-cta-p">Демо-интерфейс формы: собирает метаданные образца по обоим типам данных и объясняет, как передать сами файлы — большие Nanopore-раны через браузер надёжно не передать.</p>
+        </div>
+        <span class="btn" data-i18n="upload-cta-go">Перейти к загрузке →</span>
+      </a>
+
+      <div class="disclaimer" data-i18n="upload-note"><strong>Статус:</strong> форма загрузки — черновик интерфейса. Реальный приём файлов ещё не подключён; после отправки формы вы увидите демонстрационный ID заявки и описание того, как это будет работать в финальной версии (Globus / SFTP / защищённая ссылка для больших файлов).</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap" data-i18n="footer">
+    epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. Эта страница — точка входа: полная библиография — на страницах <a href="about.html">о проекте</a> и <a href="about-cd55.html">CD55 explorer</a>.
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   Bilingual RU/EN toggle.
+   Every translatable element carries data-i18n="key". Both
+   languages are stored here in full — switching never derives
+   one language from the other, so content stays exactly in
+   sync by construction, not by hoping a diff didn't drift.
+   Choice persists in localStorage so it can carry across pages
+   once this same block is added to them.
+   ============================================================ */
+const I18N = {
+  ru: {
+    'nav-research': 'Research Ideas/Todos',
+    'nav-models': 'Foundation-модели',
+    'nav-synth': 'Synthetic ROI',
+    'fm-kicker': 'Learn — вычислительные модели генома',
+    'fm-h2': 'Могут ли Borzoi и AlphaGenome проверить то, что мы уже увидели на CD55',
+    'fm-lede': 'Отдельная страница разбирает современные геномные foundation-модели — от Enformer до Borzoi и AlphaGenome — и то, как их можно применить к нашему локусу: как ещё одну независимую проверку гипотез (CTCF/NRF1, направление метилирование→сайленсинг), как способ скринить будущие ZFP/CRISPRoff-мишени in silico, и как отправную точку для дообучения на реальном сигнале метилирования, а не только на последовательности ДНК.',
+    'fm-card-h3': 'Геномные foundation-модели: Borzoi, AlphaGenome и epicme.bio',
+    'fm-card-p': 'Обзор Enformer, Nucleotide Transformer, HyenaDNA, Borzoi/Flashzoi, Evo/Evo2 и AlphaGenome с архитектурой и ссылками на первоисточники; восемь идей применения к CD55; архитектуры дообучения на ДНК + метилирование; и план следующего шага — модель «ДНК + метилирование → CD55 on/off» по RNA-seq.',
+    'fm-card-go': 'Открыть →',
+    'fm-ideas-h3': 'Коротко — что могут дать эти модели проекту',
+    'fm-i1-tag': 'Проверка гипотез',
+    'fm-i1-h': 'Независимая сверка CTCF/NRF1',
+    'fm-i1-p': 'AlphaGenome и Borzoi предсказывают ChIP-подобные треки по последовательности — их предсказанное связывание TF в окне #43–86/#13–43 можно сравнить с наблюдаемым сдвигом покрытия ещё до постановки CUT&amp;RUN.',
+    'fm-i2-tag': 'Планирование экспериментов',
+    'fm-i2-h': 'In silico скрининг ZFP/dCas9-мишеней',
+    'fm-i2-p': 'Прогонять кандидатные окна через AlphaGenome/Borzoi до wet-lab — заранее видеть предсказанный регуляторный off-target риск, не только генетический.',
+    'fm-i3-tag': 'Дообучение + Next',
+    'fm-i3-h': 'ДНК + метилирование → CD55 on/off',
+    'fm-i3-p': 'Четыре архитектурных пути дообучения Borzoi/Flashzoi на реальном сигнале метилирования (не только последовательности), и конкретный план two-tower модели, предсказывающей on/off по RNA-seq — с честно названным блокером: нужен парный RNA-seq для наших образцов.',
+    'fm-note': '<strong>Честно про статус:</strong> это research-заметки и архитектурные предложения, а не обученная модель — ни одна из идей выше ещё не реализована и не провалидирована на наших данных. Полная разбивка, ссылки на первоисточники и оговорки — на странице <a href="genomic-foundation-models.html">Foundation-модели</a>.',
+    'struct-tag': 'Гипотезы · структура ДНК',
+    'struct-h3': 'Форма ДНК на том же окне',
+    'struct-p': 'Тот же вопрос, что и выше, но не «кто сидит на промоторе», а «во что складывается сама ДНК»: G-квадруплексы, i-мотивы, Z-форма, R-петли, нуклеосомы и петли хроматина. Ни одна структура ещё не посчитана — страница честно держит пустые слоты и список того, что считается на уже имеющихся данных.',
+    'struct-go': 'Смотреть структуры ДНК',
+    'research-tag': 'Рабочие заметки',
+    'research-h3': 'Как это провалидировать дальше',
+    'research-p': 'Растущий список конкретных экспериментов — CUT&amp;RUN на CTCF/NRF1 в отсортированных фракциях, in vitro биохимия на метилированных олигодуплексах, single-molecule совместное считывание метилирования и занятости фактора, — которые превратили бы гипотезы этого раздела в доказанный механизм.',
+    'research-go': 'Смотреть Research Ideas/Todos',
+    'nav-public': 'Публичные данные',
+    'nav-tcelldata': 'Публичные данные первичных T-клеток',
+    'tcd-tag': 'Каталог · все модальности',
+    'tcd-h3': 'Всё публичное про первичные T-клетки',
+    'tcd-p': 'Шире, чем метилирование: bulk RNA-seq (DICE, 91 донор), scRNA-seq и CITE-seq (Hao 2021 — мРНК и поверхностный белок CD55 на одной клетке), таймкурсы активации CD4⁺ (ENCODE GSE219319, Soskic 2022), WGBS/EM-seq, ATAC, CAGE и eQTL. Собран под конкретный вопрос — где взять парный сигнал «экспрессия ↔ метилирование», чтобы разблокировать модель on/off.',
+    'tcd-go': 'Смотреть каталог данных T-клеток',
+    'pub-kicker': 'Learn — чужие данные на нашем окне',
+    'pub-h2': 'Как выглядит этот промотор у тех, кто его не редактировал',
+    'pub-lede': 'Прежде чем говорить, что CRISPRoff и ZFPoff что-то изменили, нужна базовая линия: сколько метилирования лежит на этих же 137 CpG в клетках, которых никто не трогал. Отдельная страница собирает публичные bisulfite (WGBS) и EM-seq данные ровно на наше окно 6 500 п.н. — в первую очередь Т-клетки и K562, а вместе с ними десятки других отсортированных типов человеческих клеток.',
+    'pub-card-h3': 'Публичные bisulfite и EM-seq данные на окне CD55',
+    'pub-card-p': 'Каталог выверенных датасетов с прямыми ссылками в первичные репозитории, координаты в T2T и hg38 с переключателем между ними, ссылки, открывающие окно сразу в геномном браузере, и команды, которыми срез вырезается из удалённых файлов без их скачивания.',
+    'pub-card-go': 'Открыть →',
+    'pub-what-h3': 'Что там собрано',
+    'pub-t-tag': 'Приоритет · Т-клетки',
+    'pub-t-h': 'Т-клетки',
+    'pub-t-p': 'Первичные CD3⁺ из ENCODE; атлас метилирования человека Loyfer 2023 — глубокий WGBS по 39 отсортированным типам клеток, включая CD4, CD8 и наивные Т; отсортированная кровь BLUEPRINT; серия DEEP по дифференцировке CD4-памяти. Это и есть та самая базовая линия «до редактора».',
+    'pub-k-tag': 'Приоритет · K562',
+    'pub-k-h': 'K562 и референсы платформ',
+    'pub-k-p': 'Метилом K562 из ENCODE — тот самый, который берут за ground truth в бенчмарках нанопора, но это несортированная популяция, а не наши фракции CD55-LOW и CD55-HIGH. Рядом — парный эксперимент NEB: одна и та же ДНК NA12878, прогнанная и как EM-seq, и как WGBS, так что разницу платформ на нашем окне можно измерить, а не предположить.',
+    'pub-why-h3': 'Зачем это в проекте',
+    'pub-why-p': 'Три вещи, которых своими данными не получить. <strong>Базовая линия:</strong> где промотор CD55 неметилирован по умолчанию, а где несёт метку и безо всякого редактирования. <strong>Проверка платформы:</strong> наши вызовы нанопоровые и модельно-зависимые, и совпадение с бисульфитом на тех же координатах говорит больше, чем любая внутренняя метрика. <strong>Контекст типа клеток:</strong> если базовая линия в Т-клетках и в K562 разная, то часть разницы между нашими наборами — это клетка, а не редактор.',
+    'pub-note': '<strong>Честно про статус:</strong> страница пока каталог, а не переанализ. Ни одно значение метилирования там не нарисовано, потому что ни один файл ещё не скачан и не посчитан на нашем окне — вместо цифр лежит скрипт, который вырезает срез из удалённых bigWig range-запросами, и раздел «Загруженные треки», который заполнится ровно тогда, когда скрипт отработает. Вторая оговорка: публичные Т-клетки — это разные доноры, субпопуляции и состояния активации, а K562 из ENCODE несортированный, так что всё это фон для локуса, а не компаратор для наших групп.',
+    'title': 'epicme.bio — эпигеном · CRISPRoff · метилирование',
+    'brand-sub': 'эпигеном · CRISPRoff · метилирование',
+    'nav-home': 'Главная',
+    'beyond-kicker': 'Additionally, about methylation — за пределами CD55',
+    'beyond-h2': 'Две заметки: одна про память, одна про поколения',
+    'beyond-lede': 'Всё выше — про один ген в донорских T-клетках. Эти две страницы берут ту же метку, CpG-метилирование, и спрашивают, что она делает за пределами моей темы. Обе — обзоры чужой литературы с оригинальными статьями и оговорками, а не мои данные.',
+    'beyond-tag1': 'Заметки · внутри одной жизни',
+    'beyond-p1': 'Как клетка записывает собственный опыт: гиппокамп ставит и снимает метки за часы после обучения, T-клетка памяти реметилирует PDCD1, а истощённая оставляет его открытым навсегда, стресс оседает на FKBP5 и NR3C1. Главный вопрос страницы — что делает метку обратимой, а что запирает её.',
+    'beyond-go': 'Читать',
+    'beyond-tag2': 'Заметки · через поколения',
+    'beyond-p2': 'Переживает ли метка границу между поколениями: голландский голод, дети выживших в Холокосте и геноциде тутси, мыши Dias &amp; Ressler и Mansuy, барьер Вейсмана и два раунда стирания. Главный вопрос — доходит ли вообще что-нибудь до внука и метилирование ли это.',
+    'beyond-go2': 'Читать',
+    'beyond-diff-h3': 'В чём разница между ними',
+    'beyond-c1-h': 'Память — ось «одна жизнь»',
+    'beyond-c1-go': 'Открыть «One Mark, Three Memories»',
+    'beyond-c1-a': 'Соматические клетки: нейрон, T-клетка, клетки HPA-оси.',
+    'beyond-c1-b': 'Вопрос: сколько держится метка и почему одни стираются, а другие запираются.',
+    'beyond-c1-c': 'Связь с моей работой прямая: донорские T-клетки уже несут этот метилом до редактирования.',
+    'beyond-c2-h': 'Травма — ось «поколения»',
+    'beyond-c2-go': 'Открыть «Inherited Marks»',
+    'beyond-c2-a': 'Зародышевая линия: сперматозоид, ооцит, F0 → F1 → F2 → F3.',
+    'beyond-c2-b': 'Вопрос: считается ли найденное наследованием или это просто прямое воздействие на ещё одно поколение.',
+    'beyond-c2-c': 'Связь с моей работой косвенная: вся эта литература корреляционна, а редактирование эпигенома — недостающий инструмент записи.',
+    'beyond-overlap': '<strong>Где они пересекаются:</strong> FKBP5 и NR3C1 встречаются на обеих страницах, но отвечают на разные вопросы. На странице про память — осталась ли метка у самого человека, пережившего стресс. На странице про травму — появилась ли она у его ребёнка. Это единственное место, где темы соприкасаются, и оно помечено на обеих страницах перекрёстными ссылками.',
+    'nav-about': 'О проекте',
+    'eyebrow': 'epicme.bio · открытый научный проект и PhD-капстон',
+    'h1': 'Фреймворк <em>Write–Read–Learn</em>: глубокое погружение в причинно-следственные связи между метилированием ДНК и экспрессией гена иммунного поверхностного маркера — <em>CD55</em>',
+    'hero-sub': 'Эта страница — карта проекта: отсюда можно попасть в любой раздел — контекст исследования, разбор гена CD55, сырые данные метилирования по временным точкам и более широкие заметки о том, куда всё это ведёт.',
+    'logo-caption': '<b>epi</b> — редактирование эпигенома · <b>C</b> — CRISPRoff · <b>me</b> — через присоединение метильной группы',
+    'byline': '<a class="byline-name" href="https://www.linkedin.com/in/michal-rozenwald" target="_blank" rel="noopener"><strong>Михаль (Миша) Розенвальд</strong></a> — PhD-кандидат по вычислительной биологии, UC Berkeley, лаборатории Aaron Streets и Fyodor Urnov',
+    'linkedin-label': 'LinkedIn',
+    'instagram-label': 'Instagram',
+    'facebook-label': 'Facebook',
+    'telegram-label': 'Telegram',
+    'cta-context': 'Начать с контекста →',
+    'cta-cd55': 'Сразу к биологии CD55 →',
+    'start-h3': 'О проекте',
+    'start-p': 'Зачем изучать эпигеном, подход Write → Read → Learn, модельная система — CD55 в донорских T-клетках, лаборатории Aaron Streets и Fyodor Urnov, UC Berkeley.',
+    'start-go': 'Читать →',
+    'write-kicker': 'Write — что редактируем',
+    'write-h2': 'Ген, который «выключают» CRISPRoff и ZFPoff',
+    'write-lede': 'Прежде чем смотреть на данные метилирования, стоит понимать, что вообще такое CD55 — молекулярный механизм, биология и клиническое значение гена.',
+    'write-tag': 'Биология гена',
+    'write-card-h3': 'CD55 / DAF — молекулярный разбор',
+    'write-card-p': 'Как DAF разбирает C3-конвертазу, где ещё работает этот ген, CHAPLE-синдром vs PNH, разбор вариантов вроде rs2564978 — и чат с ИИ, если нужно копнуть глубже.',
+    'write-card-go': 'Открыть explorer',
+    'read-kicker': 'Read — что видит секвенатор',
+    'read-h2': 'Одномолекульные данные метилирования',
+    'read-lede': 'Nanopore-секвенирование локуса CD55 с разрешением до одной молекулы, Unedited vs CRISPRoff-silenced, по временным точкам после редактирования.',
+    'day6-tag': 'Данные · Day 6',
+    'day6-h3': 'Day 6 post-электропорации',
+    'day6-p': 'Donor 0, 6 дней после CRISPRoff. Тепловые карты и профили по 137 CpG-сайтам, Unedited vs CRISPRoff.',
+    'day6-go': 'Смотреть Day 6',
+    'day35-tag': 'Данные · Day 35',
+    'day35-h3': 'Day 35 post-электропорации',
+    'day35-p': 'Другой донор, 35 дней после CRISPRoff. Та же логика Unedited vs CRISPRoff, более поздняя точка.',
+    'day35-go': 'Смотреть Day 35',
+    'compare-tag': 'Сравнение',
+    'compare-p': 'Оба донора и оба таймпоинта рядом: охват, доля метилирования, дифференциальные CpG-сайты, модели.',
+    'compare-go': 'Сравнить',
+    'nav-emseq': 'EM-seq · Day 35',
+    'emseq-tag': 'Данные · EM-seq',
+    'emseq-h3': 'EM-seq — ортогональная проверка Day 35',
+    'emseq-p': 'Тот же донор и тот же день, что на странице Day 35, но другая химия — EM-seq вместо Nanopore. Один донор на все условия и реплики: цифры и буквы в именах образцов (NT_1B, ZFP_3A и т.д.) — это биологические и технические реплики, не разные доноры.',
+    'emseq-go': 'Смотреть EM-seq',
+    'nav-k562': 'K562',
+    'k562-tag': 'Данные · K562',
+    'k562-h3': 'K562 — сортировка по CD55',
+    'k562-p': 'Другая клеточная линия, сортировка по самому белку CD55 (LOW/HIGH), а не просто edited/unedited. ML-классификаторы, геномные координаты и проверка сигнала на T-клетках.',
+    'k562-go': 'Смотреть K562',
+    'nav-chipseq': 'ChIP-seq',
+    'chipseq-tag': 'Данные · ChIP-seq',
+    'chipseq-h3': 'Кто сидит на промоторе CD55',
+    'chipseq-p': 'Публичные данные ENCODE ChIP-seq по K562 транскрипционным факторам поверх значимого CpG-кластера со страницы K562 — CTCF и NRF1 как кандидаты на «метилирование мешает связыванию».',
+    'chipseq-go': 'Смотреть ChIP-seq',
+    'nav-tf': 'Механизмы',
+    'nav-struct': 'Структуры ДНК',
+    'nav-memory': 'Метилирование и память',
+    'nav-trauma': 'Метилирование и травма',
+    'tf-kicker': 'Learn — как устроен CD55',
+    'tf-h2': 'Кто сидит на промоторе CD55 — и почему метилирование ложится неровно',
+    'tf-lede': 'Метилирование после CRISPRoff не размазано ровным слоем: одни CpG уходят почти в ноль, а соседние в 30 п.н. едва двигаются. Здесь собрано, что публично известно про транскрипционные факторы на этом промоторе, и семь механизмов, которые объясняют форму профиля — почти все проверяются на данных, которые уже есть.',
+    'tf-card-h3': 'Транскрипционные факторы и семь механизмов',
+    'tf-card-p': 'Карта промотора в масштабе, координаты гайда CRISPRoff относительно TSS, список публичных наборов данных с прямыми ссылками и план из шести анализов.',
+    'tf-card-go': 'Открыть →',
+    'tf-table-h3': 'Что известно про факторы на этом промоторе',
+    'tf-table': '<table><thead><tr><th>Фактор</th><th>Сайт</th><th>Доказательства</th><th>Клетки</th><th>Значимость для T-клеток</th></tr></thead><tbody><tr><td><strong>KLF4</strong></td><td class="pos">парные CACCC: −106/−95 (A), −228/−214, −310/−302 (B), −567/−549, −667/−652 (C)</td><td>ChIP показывает занятость всех трёх сайтов A–C; урезанный промотор 190 п.н. с одним сайтом A даёт почти ту же активность, что полные 848 п.н.</td><td>HUVEC, репортёр в K562</td><td><strong>Высокая.</strong> При активации CD4⁺ KLF4 падает синхронно с CD55 — значит занятость сайта зависит от того, как стимулировали донорские клетки.</td></tr><tr><td><strong>CREB / p-CREB + CBP</strong></td><td class="pos">CRE рядом с сайтами A, B и C</td><td>ChIP: p-CREB и CBP идут следом за KLF4 на всех трёх сайтах</td><td>HUVEC</td><td><strong>Высокая.</strong> Путь идёт через аденилатциклазу, которую сам CD55 регулирует через C3aR/C5aR — то есть петля обратной связи прямо в CD4⁺ T-клетках.</td></tr><tr><td><strong>SP1</strong></td><td class="pos">GC-бокс(ы), проксимальный промотор</td><td>Мутагенез промотора; конститутивная экспрессия мышиного Daf1 приписана SP1</td><td>Huh7.5, спленоциты мыши</td><td>Средняя. Сайты GC-богатые и содержат CpG — идеальный субстрат для CRISPRoff; классически считается, что метилирование связывание SP1 не блокирует.</td></tr><tr><td><strong>NF-κB (RelA)</strong></td><td class="pos">предсказанный сайт в 2 kb 5′-фланка, подтверждён ChIP</td><td>ChIP с антителом к NF-κB и сайт-специфичными праймерами</td><td>LOVO / HCT116 (рак толстой кишки)</td><td>Средне-высокая. NF-κB центральный при активации T-клеток, но точное смещение относительно TSS в работе не приведено — на наши CpG не ложится.</td></tr><tr><td><strong>TFCP2</strong></td><td class="pos">предсказанный сайт, 5′-фланк</td><td>Мутация сайта снижает активность промотора на 66%</td><td>HCT116 / LOVO</td><td>Низко-средняя. Эффект сильный, но контекст — рак толстой кишки; для нас нужен ChIP в T-клетках.</td></tr><tr><td><strong>AP-1</strong></td><td class="pos">сайт в проксимальном промоторе</td><td>Точечная мутация не повлияла на индукцию через HCV core</td><td>Huh7.5</td><td>Низкая как доказательство, высокая как гипотеза: AP-1 — один из основных факторов активации T-клеток.</td></tr><tr><td><strong>HIF-1α</strong></td><td class="pos">апикальная индукция CD55 при гипоксии</td><td>HIF-зависимая индукция CD55</td><td>кишечный эпителий</td><td>Низкая для T-клеток, но важна для любой гипоксичной культуры или тканевого контекста.</td></tr></tbody></table>',
+    'tf-gap-h3': 'Кого на этом промоторе никто не проверял',
+    'tf-gap-p': 'Ни одна публикация не помещает на промотор CD55 <strong>NFAT, ETS1, RUNX1, TCF7/LEF1, GATA3, STAT5 или CTCF</strong>. Это отсутствие доказательств, а не доказательство отсутствия: вся механистика выше сделана на эндотелии, эпителии и линиях рака толстой кишки — в T-клетках этот промотор просто не изучали. Правильный ход — не спекулировать, а прогнать наше окно через ChIP-Atlas, ReMap и UniBind с фильтром по клеткам крови и посмотреть, что вернётся. Кстати, CTCF уже проверен на самом K562 в нашем собственном ChIP-seq-разборе — пика там нет, но это ещё не T-клетки.',
+    'tf-meth-h3': 'Метилирование не просто «выключает» факторы',
+    'tf-meth-p': 'Систематический скрининг 542 человеческих факторов методом methyl-SELEX дал более сложную картину, и она специфически важна для T-клеток: связывание семейств <strong>bHLH, bZIP и ETS</strong> метилирование подавляет за счёт стерического конфликта, а <strong>homeodomain, POU и NFAT</strong>, наоборот, предпочитают метилированный CpG. То есть метка, которую кладёт CRISPRoff, не выселяет всех подряд — она может перераспределить, кто вообще способен сесть на этот участок.',
+    'tf-coords-h3': 'Координаты, к которым всё привязано',
+    'tf-coords': '<li><b>TSS</b> ≈ chr1:207,321,620 (GRCh38) · T2T-CHM13v2.0 chr1:206,586,916</li><li><b>Окно анализа</b> chr1:207,318,092–207,324,450 (GRCh38), 137 CpG</li><li><b>Протоспейсер CRISPRoff</b> chr1:207,321,713–207,321,732 = +93…+112 от TSS</li><li><b>Сайты KLF</b> A −106/−95 · B −310/−302 · C −667/−652; TATA на −81</li><li><b>Пик дифференциального сигнала</b> CpG #78–83 = +58…+84 — обрывается за 9 п.н. до протоспейсера</li><li><b>Значимый блок</b> CpG #20–132 = −1 077…+1 935</li><li><b>Сдвиг GRCh38 − T2T</b> на этом локусе: 734 704 п.н., одинаковый на обоих концах</li>',
+    'tf-mech-h3': 'Семь механизмов неровного профиля',
+    'tf-mech': '<li><strong>След самого редактора</strong> dCas9 закрывает собой 20–30 п.н.; под ним метилирования почти нет, пики сидят сбоку от PAM.</li><li><strong>Предпочтения DNMT3A по фланкам</strong> Соседние ±2 п.н. меняют скорость до 100 раз: TACGYC хорошо, CGG плохо.</li><li><strong>Нуклеосомы и период 10 п.н.</strong> Фермент работает по линкерной ДНК; длина линкера и поворот спирали решают, какие CpG смотрят наружу.</li><li><strong>Занятые сайты факторов</strong> KLF4, CREB, SP1 и NF-κB физически загораживают свои CpG от метилтрансферазы.</li><li><strong>Исходный хроматин</strong> H3K4me3 отталкивает ADD-домен DNMT3A, H3K36me2 притягивает PWWP: активный промотор — враждебная территория.</li><li><strong>Деметилирование и сбои поддержания</strong> TET выедает метку, DNMT1 не всегда успевает при делении. «Не записалось» ≠ «записалось и стёрлось».</li><li><strong>Гетерогенность между молекулами</strong> Средние 40% — это «40% на каждой» или «100% на 40% молекул»? Нанопор видит это напрямую.</li>',
+    'tf-note': '<strong>Важно:</strong> вся механистика по KLF4, CREB и CBP получена на эндотелиальных клетках и репортёрных конструкциях, а не на первичных человеческих T-клетках. Перенос на нашу систему — допущение, пока T-клеточный ChIP не скажет обратного. На странице механизмов это помечено отдельно, и ни одно число там не измерено заново — это гипотезы с прописанными способами проверки.',
+    'nav-toggle-label': 'Меню',
+    'nav-chaple': 'CHAPLE-синдром',
+    'nav-hgsoc': 'CD55 и рак яичников',
+    'nav-mesites-nuc': 'Mesites: delMC + нуклеосомы',
+    'nav-mesites': 'Mesites: delMC',
+    'nav-upload': 'Загрузка данных',
+    'upload-kicker': 'Contribute — пришлите нам свои данные',
+    'upload-h2': 'Загрузите свои данные для обработки и структурированного глубокого анализа epiCme',
+    'upload-lede': 'Кроме наборов, уже разобранных на этом сайте, мы принимаем данные метилирования CD55 от других лабораторий, доноров и клеточных линий — чтобы прогнать их через тот же пайплайн epiCme и сопоставить с уже накопленной картой промотора, факторами и профилями on/off.',
+    'upload-nano-tag': 'Сырые данные · Nanopore',
+    'upload-nano-h': 'Сырые прогоны Oxford Nanopore',
+    'upload-nano-p': 'POD5 / FAST5 / FASTQ — мы выполним базовое вызывание и вызов CpG-метилирования на выбранном пороге достоверности через наш пайплайн epiCme, тот же, что использован для всех данных на этом сайте.',
+    'upload-proc-tag': 'Обработанные данные',
+    'upload-proc-h': 'Уже обработанные профили метилирования',
+    'upload-proc-p': 'Готовые per-CpG таблицы (CSV/TSV, bedMethyl) — для прямого сравнения on/off клеток (отредактированные vs контроль) на тех же координатах, что и наши наборы K562 и T-клеток.',
+    'upload-cross-tag': 'Сопоставление',
+    'upload-cross-h': 'Сверка с уже накопленным анализом',
+    'upload-cross-p': 'Ваши профили можно наложить на карту транскрипционных факторов, ChIP-seq треки и семь механизмов неровного метилирования, разобранные на страницах K562 и «Механизмы».',
+    'upload-cta-h3': 'Открыть форму загрузки данных',
+    'upload-cta-p': 'Демо-интерфейс формы: собирает метаданные образца по обоим типам данных и объясняет, как передать сами файлы — большие Nanopore-раны через браузер надёжно не передать.',
+    'upload-cta-go': 'Перейти к загрузке →',
+    'upload-note': '<strong>Статус:</strong> форма загрузки — черновик интерфейса. Реальный приём файлов ещё не подключён; после отправки формы вы увидите демонстрационный ID заявки и описание того, как это будет работать в финальной версии (Globus / SFTP / защищённая ссылка для больших файлов).',
+    'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. Эта страница — точка входа: полная библиография — на страницах <a href="about.html">о проекте</a> и <a href="about-cd55.html">CD55 explorer</a>.'
+  },
+  en: {
+    'nav-research': 'Research Ideas/Todos',
+    'nav-models': 'Foundation models',
+    'nav-synth': 'Synthetic ROI',
+    'fm-kicker': 'Learn — computational genome models',
+    'fm-h2': 'Could Borzoi and AlphaGenome test what we\u2019ve already seen on CD55',
+    'fm-lede': 'A dedicated page surveys current genomic foundation models — from Enformer to Borzoi and AlphaGenome — and how they could apply to our locus: as one more independent check on our hypotheses (CTCF/NRF1, the methylation→silencing direction), as a way to screen future ZFP/CRISPRoff targets in silico, and as a starting point for fine-tuning on real measured methylation signal rather than DNA sequence alone.',
+    'fm-card-h3': 'Genomic foundation models: Borzoi, AlphaGenome, and epicme.bio',
+    'fm-card-p': 'A survey of Enformer, Nucleotide Transformer, HyenaDNA, Borzoi/Flashzoi, Evo/Evo2, and AlphaGenome with architecture details and primary-source links; eight ideas for applying them to CD55; fine-tuning architectures for DNA + methylation input; and a concrete next-step plan — a "DNA + methylation → CD55 on/off" model from RNA-seq.',
+    'fm-card-go': 'Open →',
+    'fm-ideas-h3': 'In short — what these models could give the project',
+    'fm-i1-tag': 'Hypothesis testing',
+    'fm-i1-h': 'Independent cross-check of CTCF/NRF1',
+    'fm-i1-p': 'AlphaGenome and Borzoi predict ChIP-like tracks from sequence — their predicted TF binding in the #43–86/#13–43 window could be compared against the observed coverage shift ahead of the planned CUT&amp;RUN.',
+    'fm-i2-tag': 'Experiment planning',
+    'fm-i2-h': 'In-silico screening of ZFP/dCas9 targets',
+    'fm-i2-p': 'Run candidate windows through AlphaGenome/Borzoi before wet-lab work — preview predicted regulatory off-target risk, not just genetic off-targets.',
+    'fm-i3-tag': 'Fine-tuning + Next',
+    'fm-i3-h': 'DNA + methylation → CD55 on/off',
+    'fm-i3-p': 'Four architectural paths for fine-tuning Borzoi/Flashzoi on real measured methylation signal (not just sequence), plus a concrete two-tower model plan predicting on/off from RNA-seq — with an honestly named blocker: paired RNA-seq is needed for our samples.',
+    'fm-note': '<strong>Honest status note:</strong> these are research notes and architectural proposals, not a trained model — none of the ideas above have been implemented or validated on our data yet. The full breakdown, primary-source links, and caveats live on the <a href="genomic-foundation-models.html">Foundation models</a> page.',
+    'struct-tag': 'Hypotheses · DNA structure',
+    'struct-h3': 'The shape of the DNA across the same window',
+    'struct-p': 'The same question as above, but not “who sits on the promoter” — “what does the DNA itself fold into”: G-quadruplexes, i-motifs, Z-form, R-loops, nucleosomes and chromatin loops. No structure has been computed yet — the page honestly keeps empty slots plus a list of what is computable on data already in hand.',
+    'struct-go': 'View DNA structures',
+    'research-tag': 'Working notes',
+    'research-h3': 'Validating this further',
+    'research-p': 'A growing list of concrete experiments — CUT&amp;RUN for CTCF/NRF1 in sorted fractions, in vitro biochemistry on methylated oligo duplexes, a single-molecule joint readout of methylation and factor occupancy — that would turn this section\'s hypotheses into a proven mechanism.',
+    'research-go': 'View Research Ideas/Todos',
+    'nav-public': 'Public data',
+    'nav-tcelldata': 'Public Primary T cells data',
+    'tcd-tag': 'Catalog · all modalities',
+    'tcd-h3': 'Everything public on primary T cells',
+    'tcd-p': 'Broader than methylation: bulk RNA-seq (DICE, 91 donors), scRNA-seq and CITE-seq (Hao 2021 — CD55 mRNA and surface protein on the same cell), CD4⁺ activation timecourses (ENCODE GSE219319, Soskic 2022), WGBS/EM-seq, ATAC, CAGE, and eQTLs. Assembled around one question — where to find paired "expression ↔ methylation" signal to unblock the on/off model.',
+    'tcd-go': 'Browse the T cell data catalog',
+    'pub-kicker': 'Learn — other people’s data on our window',
+    'pub-h2': 'What this promoter looks like in cells nobody edited',
+    'pub-lede': 'Before claiming that CRISPRoff and ZFPoff changed anything, you need the baseline: how much methylation sits on these same 137 CpGs in cells nobody touched. A separate page collects public bisulfite (WGBS) and EM-seq data over exactly our 6,500 bp window — T cells and K562 first, and with them dozens of other sorted human cell types.',
+    'pub-card-h3': 'Public bisulfite and EM-seq data over the CD55 window',
+    'pub-card-p': 'A catalogue of verified datasets linking straight into the primary repositories, coordinates in T2T and hg38 with a switch between them, links that open the window directly in a genome browser, and the commands that cut the slice out of remote files without downloading them.',
+    'pub-card-go': 'Open →',
+    'pub-what-h3': 'What is in it',
+    'pub-t-tag': 'Priority · T cells',
+    'pub-t-h': 'T cells',
+    'pub-t-p': 'Primary CD3⁺ cells from ENCODE; the Loyfer 2023 human methylation atlas — deep WGBS across 39 sorted cell types including CD4, CD8 and naive T; BLUEPRINT sorted blood; the DEEP series on CD4 memory differentiation. This is the before-the-editor baseline.',
+    'pub-k-tag': 'Priority · K562',
+    'pub-k-h': 'K562 and platform references',
+    'pub-k-p': 'The ENCODE K562 methylome — the same one used as ground truth in nanopore benchmarks, though it is an unsorted population rather than our CD55-LOW and CD55-HIGH fractions. Alongside it sits the matched NEB experiment: one NA12878 DNA sample run both as EM-seq and as WGBS, so the platform difference over our window can be measured instead of assumed.',
+    'pub-why-h3': 'Why the project needs it',
+    'pub-why-p': 'Three things our own data cannot give. <strong>A baseline:</strong> where the CD55 promoter is unmethylated by default and where it carries the mark with no editing at all. <strong>A platform check:</strong> our calls are nanopore and model-dependent, and agreement with bisulfite at the same coordinates says more than any internal metric. <strong>Cell-type context:</strong> if the baseline differs between T cells and K562, part of the difference between our datasets is the cell, not the editor.',
+    'pub-note': '<strong>Status, stated plainly:</strong> the page is a catalogue, not a re-analysis. Not one methylation value is drawn there, because no file has been downloaded and quantified over our window yet — in place of numbers there is a script that pulls the slice out of remote bigWigs by range request, and a “Loaded tracks” section that fills in exactly when that script has run. A second caveat: public T cells span different donors, subsets and activation states, and the ENCODE K562 is unsorted — so all of it is background for the locus, not a comparator for our groups.',
+    'title': 'epicme.bio — epigenome · CRISPRoff · methylation',
+    'brand-sub': 'epigenome · CRISPRoff · methylation',
+    'nav-home': 'Home',
+    'beyond-kicker': 'Additionally, about methylation — beyond CD55',
+    'beyond-h2': 'Two notes: one on memory, one on generations',
+    'beyond-lede': 'Everything above is about one gene in donor T cells. These two pages take the same mark, CpG methylation, and ask what it does outside my own topic. Both are reviews of other people\u2019s literature, with the original papers and the caveats — not my data.',
+    'beyond-tag1': 'Notes · within one lifetime',
+    'beyond-p1': 'How a cell records its own experience: the hippocampus adds and removes marks within hours of learning, a memory T cell re-methylates PDCD1 while an exhausted one leaves it open for good, and stress settles on FKBP5 and NR3C1. The question the page asks is what keeps a mark reversible and what locks it.',
+    'beyond-go': 'Read',
+    'beyond-tag2': 'Notes · across generations',
+    'beyond-p2': 'Whether a mark survives the boundary between generations: the Dutch famine, children of Holocaust and Tutsi genocide survivors, the Dias &amp; Ressler and Mansuy mice, the Weismann barrier and the two rounds of erasure. The question is whether anything reaches a grandchild at all — and whether it is methylation.',
+    'beyond-go2': 'Read',
+    'beyond-diff-h3': 'How they differ',
+    'beyond-c1-h': 'Memory — the one-lifetime axis',
+    'beyond-c1-go': 'Open \u201cOne Mark, Three Memories\u201d',
+    'beyond-c1-a': 'Somatic cells: neuron, T cell, cells of the HPA axis.',
+    'beyond-c1-b': 'The question: how long a mark lasts, and why some are erased while others lock.',
+    'beyond-c1-c': 'Directly connected to my work: donor T cells already carry this methylome before I edit anything.',
+    'beyond-c2-h': 'Trauma — the across-generations axis',
+    'beyond-c2-go': 'Open \u201cInherited Marks\u201d',
+    'beyond-c2-a': 'The germline: sperm, oocyte, F0 → F1 → F2 → F3.',
+    'beyond-c2-b': 'The question: whether a finding counts as inheritance, or is simply direct exposure reaching one more generation.',
+    'beyond-c2-c': 'Indirectly connected: that whole literature is correlational, and epigenome editing is the missing writing tool.',
+    'beyond-overlap': '<strong>Where they overlap:</strong> FKBP5 and NR3C1 appear on both pages, but they answer different questions. On the memory page: did a mark persist in the person who lived through the stress. On the trauma page: did it appear in their child. That is the only place the topics touch, and both pages cross-link at that point.',
+    'nav-about': 'About',
+    'eyebrow': 'epicme.bio · an open science project and PhD capstone',
+    'h1': '<em>Write–Read–Learn</em> framework: a deep dive into causal relationships between DNA methylation and gene expression of an immune surface marker gene — <em>CD55</em>',
+    'hero-sub': 'This page is the project map — from here you can reach every section: the research context, a deep dive into the CD55 gene, raw methylation data by timepoint, and broader notes on where this all leads.',
+    'logo-caption': '<b>epi</b> — epigenome editing · <b>C</b> — CRISPRoff · <b>me</b> — via addition of a methyl group',
+    'byline': '<a class="byline-name" href="https://www.linkedin.com/in/michal-rozenwald" target="_blank" rel="noopener"><strong>Michal (Misha) Rozenwald</strong></a> — a UC Berkeley Computational Biology PhD Candidate from the Streets &amp; Urnov Labs',
+    'linkedin-label': 'LinkedIn',
+    'instagram-label': 'Instagram',
+    'facebook-label': 'Facebook',
+    'telegram-label': 'Telegram',
+    'cta-context': 'Start with the context →',
+    'cta-cd55': 'Jump straight to CD55 biology →',
+    'start-h3': 'About the project',
+    'start-p': 'Why study the epigenome, the Write → Read → Learn approach, the model system — CD55 in donor T cells, the Aaron Streets and Fyodor Urnov labs at UC Berkeley.',
+    'start-go': 'Read →',
+    'write-kicker': 'Write — what we edit',
+    'write-h2': 'The gene that CRISPRoff and ZFPoff switch off',
+    'write-lede': 'Before looking at methylation data, it helps to know what CD55 actually is — the molecular mechanism, biology, and clinical significance of the gene.',
+    'write-tag': 'Gene biology',
+    'write-card-h3': 'CD55 / DAF — a molecular deep dive',
+    'write-card-p': 'How DAF disassembles the C3 convertase, where else the gene is active, CHAPLE syndrome vs PNH, a look at variants like rs2564978 — plus an AI chat if you want to go deeper.',
+    'write-card-go': 'Open the explorer',
+    'read-kicker': 'Read — what the sequencer sees',
+    'read-h2': 'Single-molecule methylation data',
+    'read-lede': 'Nanopore sequencing of the CD55 locus at single-molecule resolution, Unedited vs CRISPRoff-silenced, across timepoints after editing.',
+    'day6-tag': 'Data · Day 6',
+    'day6-h3': 'Day 6 post-electroporation',
+    'day6-p': 'Donor 0, 6 days after CRISPRoff. Heatmaps and profiles across 137 CpG sites, Unedited vs CRISPRoff.',
+    'day6-go': 'View Day 6',
+    'day35-tag': 'Data · Day 35',
+    'day35-h3': 'Day 35 post-electroporation',
+    'day35-p': 'A different donor, 35 days after CRISPRoff. Same Unedited vs CRISPRoff logic, a later timepoint.',
+    'day35-go': 'View Day 35',
+    'compare-tag': 'Comparison',
+    'compare-p': 'Both donors and both timepoints side by side: coverage, percent methylation, differential CpG sites, models.',
+    'compare-go': 'Compare',
+    'nav-emseq': 'EM-seq · Day 35',
+    'emseq-tag': 'Data · EM-seq',
+    'emseq-h3': 'EM-seq — an orthogonal check of Day 35',
+    'emseq-p': 'The same donor and the same day as the Day 35 page, but a different chemistry — EM-seq instead of Nanopore. One donor for every condition and replicate: the numbers and letters in the sample names (NT_1B, ZFP_3A, etc.) are biological and technical replicates, not different donors.',
+    'emseq-go': 'View EM-seq',
+    'nav-k562': 'K562',
+    'k562-tag': 'Data · K562',
+    'k562-h3': 'K562 — sorted by CD55',
+    'k562-p': 'A different cell line, sorted directly on CD55 protein (LOW/HIGH) rather than just edited/unedited. ML classifiers, genomic coordinates, and a cross-check against T-cell data.',
+    'k562-go': 'View K562',
+    'nav-chipseq': 'ChIP-seq',
+    'chipseq-tag': 'Data · ChIP-seq',
+    'chipseq-h3': 'Who sits on the CD55 promoter',
+    'chipseq-p': 'Public ENCODE ChIP-seq data for K562 transcription factors, overlaid on the significant CpG cluster from the K562 page — CTCF and NRF1 as candidates for "methylation blocks binding."',
+    'chipseq-go': 'View ChIP-seq',
+    'nav-tf': 'Mechanisms',
+    'nav-struct': 'DNA structures',
+    'nav-memory': 'Methylation &amp; memory',
+    'nav-trauma': 'Methylation &amp; trauma',
+    'tf-kicker': 'Learn — how CD55 is put together',
+    'tf-h2': 'What sits on the CD55 promoter — and why methylation lands unevenly',
+    'tf-lede': 'Methylation after CRISPRoff is not a flat coat: some CpGs drop almost to zero while neighbours 30 bp away barely move. This section gathers what is publicly known about transcription factors at this promoter, plus seven mechanisms that account for the shape of the profile — nearly all of them testable on data we already hold.',
+    'tf-card-h3': 'Transcription factors and seven mechanisms',
+    'tf-card-p': 'The promoter mapped to scale, the CRISPRoff guide coordinates relative to the TSS, a list of public datasets with direct links, and a plan of six analyses.',
+    'tf-card-go': 'Open →',
+    'tf-table-h3': 'What is known about factors at this promoter',
+    'tf-table': '<table><thead><tr><th>Factor</th><th>Site</th><th>Evidence</th><th>Cells</th><th>Relevance to T cells</th></tr></thead><tbody><tr><td><strong>KLF4</strong></td><td class="pos">paired CACCC: −106/−95 (A), −228/−214, −310/−302 (B), −567/−549, −667/−652 (C)</td><td>ChIP shows occupancy at all three A–C sites; a truncated 190 bp promoter carrying only site A gives nearly the same activity as the full 848 bp</td><td>HUVEC, K562 reporter</td><td><strong>High.</strong> KLF4 falls in step with CD55 when CD4⁺ cells are activated, so occupancy depends on how the donor cells were stimulated.</td></tr><tr><td><strong>CREB / p-CREB + CBP</strong></td><td class="pos">CRE elements beside sites A, B and C</td><td>ChIP: p-CREB and CBP follow KLF4 at all three sites</td><td>HUVEC</td><td><strong>High.</strong> The route runs through adenylyl cyclase, which CD55 itself controls via C3aR/C5aR — a feedback loop operating inside CD4⁺ T cells.</td></tr><tr><td><strong>SP1</strong></td><td class="pos">GC box(es), proximal promoter</td><td>Promoter mutagenesis; constitutive expression of murine Daf1 attributed to SP1</td><td>Huh7.5, mouse splenocytes</td><td>Medium. The sites are GC-rich and CpG-containing — prime CRISPRoff substrate; SP1 binding is classically reported as insensitive to methylation.</td></tr><tr><td><strong>NF-κB (RelA)</strong></td><td class="pos">predicted site in the 2 kb 5′ flank, ChIP-validated</td><td>ChIP with an NF-κB antibody and site-specific primers</td><td>LOVO / HCT116 (colon cancer)</td><td>Medium-high. NF-κB is central to T-cell activation, but the paper gives no offset that can be mapped onto our CpGs.</td></tr><tr><td><strong>TFCP2</strong></td><td class="pos">predicted site, 5′ flank</td><td>Mutating the site cuts promoter activity by 66%</td><td>HCT116 / LOVO</td><td>Low-medium. Strong effect, colon cancer context; a T-cell ChIP is what would make it matter here.</td></tr><tr><td><strong>AP-1</strong></td><td class="pos">site in the proximal promoter</td><td>A point mutation had no effect on HCV core-driven induction</td><td>Huh7.5</td><td>Low as evidence, high as a hypothesis: AP-1 is a core T-cell activation factor.</td></tr><tr><td><strong>HIF-1α</strong></td><td class="pos">apical CD55 induction under hypoxia</td><td>HIF-dependent induction of CD55</td><td>intestinal epithelium</td><td>Low for T cells, but relevant to any hypoxic culture or tissue context.</td></tr></tbody></table>',
+    'tf-gap-h3': 'Who has never been checked at this promoter',
+    'tf-gap-p': 'No published study places <strong>NFAT, ETS1, RUNX1, TCF7/LEF1, GATA3, STAT5 or CTCF</strong> on the CD55 promoter. That is an absence of evidence, not evidence of absence: all the mechanistic work above was done in endothelium, epithelium and colon cancer lines — nobody has studied this promoter in T cells. The right move is not to speculate but to run our window through ChIP-Atlas, ReMap and UniBind filtered to blood cell types, and see what comes back. CTCF, incidentally, has already been checked in K562 itself in our own ChIP-seq breakdown — no peak there, though that is still not T cells.',
+    'tf-meth-h3': 'Methylation does not simply switch factors off',
+    'tf-meth-p': 'A systematic methyl-SELEX screen of 542 human factors gave a messier picture, and the mess is specifically relevant to T cells: methylation suppresses binding by the <strong>bHLH, bZIP and ETS</strong> families through steric clash, while <strong>homeodomain, POU and NFAT</strong> factors prefer methylated CpG. So the mark CRISPRoff deposits does not evict everyone — it can redistribute which factors are able to engage the region at all.',
+    'tf-coords-h3': 'The coordinates everything hangs off',
+    'tf-coords': '<li><b>TSS</b> ≈ chr1:207,321,620 (GRCh38) · T2T-CHM13v2.0 chr1:206,586,916</li><li><b>Analysis window</b> chr1:207,318,092–207,324,450 (GRCh38), 137 CpGs</li><li><b>CRISPRoff protospacer</b> chr1:207,321,713–207,321,732 = +93…+112 from the TSS</li><li><b>KLF sites</b> A −106/−95 · B −310/−302 · C −667/−652; TATA at −81</li><li><b>Peak differential signal</b> CpG #78–83 = +58…+84 — stops 9 bp before the protospacer</li><li><b>Significant block</b> CpG #20–132 = −1,077…+1,935</li><li><b>GRCh38 − T2T offset</b> at this locus: 734,704 bp, identical at both endpoints</li>',
+    'tf-mech-h3': 'Seven mechanisms for a bumpy profile',
+    'tf-mech': '<li><strong>Footprint of the editor itself</strong> dCas9 covers 20–30 bp; almost no methylation underneath it, with the maxima sitting off to the side of the PAM.</li><li><strong>DNMT3A flanking preferences</strong> The neighbouring ±2 bp swing the rate up to 100-fold: TACGYC good, CGG poor.</li><li><strong>Nucleosomes and the 10 bp repeat</strong> The enzyme works on linker DNA; linker length and helical twist decide which CpGs face outward.</li><li><strong>Occupied factor sites</strong> KLF4, CREB, SP1 and NF-κB physically shield their own CpGs from the methyltransferase.</li><li><strong>Pre-existing chromatin</strong> H3K4me3 repels the DNMT3A ADD domain, H3K36me2 attracts the PWWP: an active promoter is hostile territory.</li><li><strong>Erasure and maintenance failure</strong> TET eats the mark away and DNMT1 does not always keep up through division. Never written is not the same as written then erased.</li><li><strong>Molecule-to-molecule heterogeneity</strong> Does an average of 40% mean 40% on every molecule, or 100% on 40% of them? Nanopore sees this directly.</li>',
+    'tf-note': '<strong>Important:</strong> all the mechanistic work on KLF4, CREB and CBP was done in endothelial cells and reporter constructs, not in primary human T cells. Carrying it over to our system is an assumption until a T-cell ChIP says otherwise. The mechanisms page flags this explicitly, and no number on it has been measured afresh — these are hypotheses with their tests written out.',
+    'nav-toggle-label': 'Menu',
+    'nav-chaple': 'CHAPLE syndrome',
+    'nav-hgsoc': 'CD55 in ovarian cancer',
+    'nav-mesites-nuc': 'Mesites: delMC + nucleosomes',
+    'nav-mesites': 'Mesites: delMC',
+    'nav-upload': 'Upload data',
+    'upload-kicker': 'Contribute — send us your data',
+    'upload-h2': 'Upload your data for processing and epiCme structured deep analysis',
+    'upload-lede': 'Beyond the datasets already worked through on this site, we accept CD55 methylation data from other labs, donors and cell lines — to run it through the same epiCme pipeline and cross-reference it against the promoter map, factors, and on/off profiles already built up here.',
+    'upload-nano-tag': 'Raw data · Nanopore',
+    'upload-nano-h': 'Raw Oxford Nanopore runs',
+    'upload-nano-p': 'POD5 / FAST5 / FASTQ — we run basecalling and CpG methylation calling at your chosen confidence threshold through our epiCme pipeline, the same one used for every dataset on this site.',
+    'upload-proc-tag': 'Processed data',
+    'upload-proc-h': 'Already-processed methylation profiles',
+    'upload-proc-p': 'Ready per-CpG tables (CSV/TSV, bedMethyl) — for direct on/off cell comparison (edited vs control) on the same coordinates as our K562 and T-cell datasets.',
+    'upload-cross-tag': 'Cross-referencing',
+    'upload-cross-h': 'Checked against our existing analysis',
+    'upload-cross-p': 'Your profiles can be laid over the transcription-factor map, ChIP-seq tracks, and the seven mechanisms behind uneven methylation worked out on the K562 and Mechanisms pages.',
+    'upload-cta-h3': 'Open the data submission form',
+    'upload-cta-p': 'A demo interface: it collects sample metadata for both data types and explains how to transfer the files themselves — large Nanopore runs can’t be sent reliably through a browser.',
+    'upload-cta-go': 'Go to upload →',
+    'upload-note': '<strong>Status:</strong> the upload form is an interface draft. Real file intake isn’t wired up yet — after submitting, you’ll see a demo submission ID and a description of how this will work in the final version (Globus / SFTP / a protected link for large files).',
+    'footer': 'epicme.bio — an open science project and PhD work by Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. This page is the entry point: the full bibliography lives on the <a href="about.html">about</a> and <a href="about-cd55.html">CD55 explorer</a> pages.'
+  }
+};
+
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const dict = I18N[lang];
+    if(!dict || !(key in dict)) return;
+    if(el.tagName === 'TITLE'){ document.title = dict[key]; }
+    else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('#lang-switch button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){ /* ignore */ }
+}
+
+document.querySelectorAll('#lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+
+// restore saved language choice (falls back to ru, the shipped default)
+(function(){
+  let saved = 'ru';
+  try{ saved = localStorage.getItem('epicme_lang') || 'ru'; }catch(e){ /* ignore */ }
+  if(saved === 'en') applyLang('en');
+})();
+
+// ---------- collapsing nav on scroll ----------
+// At the top of the page every link stays statically visible, same as
+// before this change. Past COLLAPSE_AT px of scroll, #site-nav gets
+// .nav-collapsed and the pill row hides behind a "Menu" toggle button;
+// scrolling back up near the top restores the full static row.
+(function(){
+  const nav = document.getElementById('site-nav');
+  const toggle = document.getElementById('nav-toggle');
+  if(!nav || !toggle) return;
+
+  const COLLAPSE_AT = 56;
+  let ticking = false;
+
+  function updateNavState(){
+    const collapsed = window.scrollY > COLLAPSE_AT;
+    nav.classList.toggle('nav-collapsed', collapsed);
+    if(!collapsed){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => {
+    if(!ticking){ requestAnimationFrame(updateNavState); ticking = true; }
+  }, { passive:true });
+  updateNavState();
+
+  toggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('nav-open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  // click outside the open dropdown closes it
+  document.addEventListener('click', (e) => {
+    if(nav.classList.contains('nav-collapsed') && nav.classList.contains('nav-open') && !nav.contains(e.target)){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Escape closes it and returns focus to the toggle
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && nav.classList.contains('nav-open')){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    }
+  });
+})();
+</script>
+<script src="assets/epicme-chat.js" defer></script>
+
+</body>
+</html>
