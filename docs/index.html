@@ -367,6 +367,8 @@
       <a href="cd55HGSOCedited.htm" data-i18n="nav-hgsoc" class="ella-link">CD55 и рак яичников</a>
       <a href="mesites_plot_wNucNEW.html" data-i18n="nav-mesites-nuc" class="ella-link">Mesites: delMC + нуклеосомы</a>
       <a href="mesites_plotEDITED.htm" data-i18n="nav-mesites" class="ella-link">Mesites: delMC</a>
+      <a href="visualize/crisproff-all-visualisations.html" data-i18n="nav-viz">Визуализации CRISPRoff</a>
+      <a href="visualize/crisproff-movie.html" data-i18n="nav-viz-movie">Видео: моделирование</a>
     </nav>
   </div>
 </header>
@@ -446,7 +448,283 @@
     </a>
   </section>
 
-  <section id="read">
+  <section id="viz">
+  <div class="kicker" data-i18n="viz-kicker">Модели — как это выглядит на молекулярном уровне</div>
+  <h2 data-i18n="viz-h2">Визуализации: как работает CRISPRoff</h2>
+  <p class="lede" data-i18n="viz-lede" style="font-size:16px;">Одно и то же событие показано в разных размерностях — в истинном масштабе, объёмной моделью, по шагам и видео. Ниже живые превью, полные версии на отдельных страницах.</p>
+
+  <div class="viz-grid">
+
+    <!-- 1. истинный масштаб -->
+    <article class="viz-card">
+      <div class="viz-stage"><svg id="viz-scale" viewBox="0 0 520 300" role="img"
+        aria-label="CD55 ROI at true scale"></svg></div>
+      <span class="tag blue" data-i18n="viz-t1">Истинный масштаб</span>
+      <h3 data-i18n="viz-h-scale">Весь ROI — 2210 нм</h3>
+      <p data-i18n="viz-p-scale">137 CpG на 6500 парах оснований, координаты из hg38. Белок CRISPRoff в том же масштабе — та самая точка сверху, 0.45 % ширины кадра.</p>
+      <a class="btn" href="visualize/crisproff-true-scale.html" data-i18n="viz-go-scale">Открыть масштабные кадры →</a>
+    </article>
+
+    <!-- 2. объёмная модель -->
+    <article class="viz-card">
+      <div class="viz-stage"><canvas id="viz-3d" width="520" height="300"
+        aria-label="Space-filling model of dCas9 on DNA"></canvas></div>
+      <span class="tag amber" data-i18n="viz-t2">Объёмная модель</span>
+      <h3 data-i18n="viz-h-3d">dCas9 на ДНК</h3>
+      <p data-i18n="viz-p-3d">Каждая сфера — один остаток или нуклеотид, объёмы доменов из молекулярных масс. Модель вращается: потяните её мышкой или пальцем.</p>
+      <a class="btn" href="visualize/crisproff-spacefill.html" data-i18n="viz-go-3d">Открыть объёмные модели →</a>
+    </article>
+
+    <!-- 3. механизм по шагам -->
+    <article class="viz-card">
+      <div class="viz-stage"><canvas id="viz-foot" width="520" height="300"
+        aria-label="Methylation footprint animation"></canvas></div>
+      <span class="tag blue" data-i18n="viz-t3">Механизм</span>
+      <h3 data-i18n="viz-h-foot">Метки ложатся, но не под белком</h3>
+      <p data-i18n="viz-p-foot">Фермент обрабатывает CpG по сторонам, а накрытые комплексом остаются чистыми. Это футпринт на CpG 74–78 из наших данных по CD55.</p>
+      <a class="btn" href="visualize/crisproff-mechanism.html" data-i18n="viz-go-foot">Открыть анимации механизма →</a>
+    </article>
+
+    <!-- 4. фильм -->
+    <article class="viz-card">
+      <div class="viz-stage viz-stage-video">
+        <video id="viz-video" controls playsinline preload="metadata"
+               src="visualize/crisproff-methylation-ru.mp4"></video>
+      </div>
+      <span class="tag orange" data-i18n="viz-t4">Видео</span>
+      <h3 data-i18n="viz-h-vid">Процесс целиком, 24 секунды</h3>
+      <p data-i18n="viz-p-vid">Комплекс садится на мишень, расплетает ДНК, выворачивает цитозины и ставит метки. Под белком CpG остаются чистыми, затем белок уходит.</p>
+      <a class="btn" href="visualize/crisproff-movie.html" data-i18n="viz-go-vid">Открыть фильм с главами →</a>
+    </article>
+  </div>
+
+  <p class="viz-all-label" data-i18n="viz-all">Все визуализации по отдельности:</p>
+  <nav class="viz-links" aria-label="Visualisation pages">
+    <a href="visualize/crisproff-all-visualisations.html" data-i18n="viz-l0">Всё на одной странице</a>
+    <a href="visualize/crisproff-true-scale.html" data-i18n="viz-l1">Истинный масштаб</a>
+    <a href="visualize/crisproff-mechanism.html" data-i18n="viz-l2">Механизм: четыре анимации</a>
+    <a href="visualize/crisproff-3d.html" data-i18n="viz-l3">3D-схемы доменов</a>
+    <a href="visualize/crisproff-folds.html" data-i18n="viz-l4">Белковые укладки</a>
+    <a href="visualize/crisproff-spacefill.html" data-i18n="viz-l5">Объёмные модели</a>
+    <a href="visualize/crisproff-movie.html" data-i18n="viz-l6">Фильм о метилировании</a>
+  </nav>
+</section>
+
+<style>
+  .viz-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0 26px;}
+  @media (max-width:640px){ .viz-grid{grid-template-columns:1fr;} }
+  .viz-card{background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--radius);padding:0 0 18px;display:flex;flex-direction:column;}
+  .viz-card .tag{margin:14px 16px 0;align-self:flex-start;}
+  .viz-card h3{margin:6px 16px 6px;font-size:15.5px;color:var(--ink);}
+  .viz-card p{margin:0 16px 14px;font-size:13.5px;color:var(--ink-dim);flex:1;}
+  .viz-card .btn{display:inline-block;margin:0 16px;align-self:flex-start;font-size:13px;
+    padding:9px 14px;text-decoration:none;}
+  .viz-stage{background:var(--surface-2);border-bottom:1px solid var(--line);
+    border-radius:var(--radius) var(--radius) 0 0;overflow:hidden;}
+  .viz-stage svg,.viz-stage canvas{display:block;width:100%;height:auto;aspect-ratio:520/300;}
+  .viz-stage-video{aspect-ratio:16/9;background:#000;}
+  .viz-stage-video video{display:block;width:100%;height:100%;object-fit:cover;}
+  #viz-3d{cursor:grab;touch-action:none;}
+  #viz-3d:active{cursor:grabbing;}
+  .viz-all-label{font-size:13px;color:var(--ink-faint);margin:0 0 10px;}
+  .viz-links{display:flex;flex-wrap:wrap;gap:8px;}
+  .viz-links a{display:inline-flex;align-items:center;padding:9px 14px;border-radius:999px;
+    border:1px solid var(--line);background:var(--surface-2);color:var(--ink-dim);
+    font-size:13.5px;font-weight:600;text-decoration:none;
+    transition:border-color .15s ease,color .15s ease;}
+  .viz-links a:hover,.viz-links a:focus-visible{border-color:var(--blue);color:var(--ink);}
+  @media (prefers-reduced-motion:reduce){ #viz-3d,#viz-foot{animation:none;} }
+</style>
+
+<script>
+/* Превью для блока визуализаций. Всё автономно, ничего не тянется извне.
+   Палитра берётся из theme.css, чтобы блок не заводил собственных цветов. */
+(function(){
+  var css=getComputedStyle(document.documentElement);
+  var C={
+    blue:  (css.getPropertyValue('--blue')||'#56B4E9').trim(),
+    deep:  (css.getPropertyValue('--blue-deep')||'#0072B2').trim(),
+    orange:(css.getPropertyValue('--orange')||'#E69F00').trim(),
+    dim:   (css.getPropertyValue('--ink-dim')||'#A9B8B0').trim(),
+    faint: (css.getPropertyValue('--ink-faint')||'#6E8079').trim(),
+    line:  (css.getPropertyValue('--line')||'#24352E').trim(),
+    surf2: (css.getPropertyValue('--surface-2')||'#16221D').trim(),
+    ink:   (css.getPropertyValue('--ink')||'#E9EEEA').trim()
+  };
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- 1. масштабная полоса (SVG) ---------- */
+  (function(){
+    var s=document.getElementById('viz-scale'); if(!s) return;
+    var NS='http://www.w3.org/2000/svg';
+    function el(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);
+      s.appendChild(e);return e;}
+    var X0=26,W=468,Y=170;
+    el('rect',{x:X0,y:Y-2,width:W,height:4,fill:C.dim});
+    /* 137 CpG на 6500 bp: шаг равномерный, положение сайта — реальное */
+    for(var i=0;i<137;i++){
+      var x=X0+W*(i/136);
+      el('line',{x1:x.toFixed(1),y1:Y-14,x2:x.toFixed(1),y2:Y-4,
+        stroke:(i>=73&&i<=77)?C.orange:C.blue,'stroke-width':1.7,
+        opacity:(i>=73&&i<=77)?1:0.55});
+    }
+    /* CRISPRoff в том же масштабе: 10 нм на 2210 нм */
+    var xp=X0+W*0.5;
+    el('circle',{cx:xp.toFixed(1),cy:Y-30,r:2.2,fill:C.blue});
+    el('line',{x1:xp.toFixed(1),y1:Y-27,x2:xp.toFixed(1),y2:Y-16,stroke:C.blue,'stroke-width':1.4});
+    el('line',{x1:xp.toFixed(1),y1:Y-60,x2:xp.toFixed(1),y2:Y-36,stroke:C.blue,
+      'stroke-width':1.4,'stroke-dasharray':'4 4'});
+    var t1=el('text',{x:xp+12,y:Y-66,fill:C.blue,'font-size':19,'font-weight':600});
+    t1.textContent='CRISPRoff — 10 нм'; t1.setAttribute('data-i18n','viz-svg-prot');
+    var t2=el('text',{x:X0,y:Y+34,fill:C.faint,'font-size':18});
+    t2.textContent='0'; 
+    var t3=el('text',{x:X0+W,y:Y+34,fill:C.faint,'font-size':18,'text-anchor':'end'});
+    t3.textContent='2210 нм'; t3.setAttribute('data-i18n','viz-svg-end');
+    var t4=el('text',{x:X0,y:Y+64,fill:C.dim,'font-size':18});
+    t4.textContent='137 CpG · оранжевым — сайт связывания';
+    t4.setAttribute('data-i18n','viz-svg-key');
+  })();
+
+  /* ---------- 2. объёмная модель (canvas, вращается) ---------- */
+  (function(){
+    var cv=document.getElementById('viz-3d'); if(!cv) return;
+    var x=cv.getContext('2d'),W=cv.width,H=cv.height;
+    var yaw=0.6,pitch=-0.12,dist=168,foc=560,atoms=[];
+    function rnd(i){var v=Math.sin(i*127.1+11.7)*43758.5453;return v-Math.floor(v);}
+    function nrm(a){var l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l];}
+    function lobe(c,rad,n,col,seed){
+      var ga=Math.PI*(3-Math.sqrt(5));
+      for(var i=0;i<n;i++){
+        var yv=1-(i/(n-1))*2,r=Math.sqrt(Math.max(0,1-yv*yv)),th=ga*i;
+        var nn=[Math.cos(th)*r,yv,Math.sin(th)*r];
+        var b=1+.13*Math.sin(nn[0]*3.1+seed)+.10*Math.sin(nn[1]*4.3+seed*1.7)
+               +.08*Math.sin(nn[2]*5.2+seed*2.3);
+        var R=rad*b;
+        atoms.push({p:[c[0]+nn[0]*R,c[1]+nn[1]*R,c[2]+nn[2]*R],r:rad*.17,c:col,n:nrm(nn)});
+      }
+    }
+    function dna(){
+      for(var i=0;i<=34;i++){
+        var px=-62+124*(i/34),th=i*(2*Math.PI/10.5);
+        for(var s=0;s<2;s++){
+          var a=th+s*Math.PI, col=s?C.dim:C.blue;
+          for(var k=0;k<2;k++){
+            var rr=4.2*(1-k*.08), nn=[0,Math.cos(a+k*.25),Math.sin(a+k*.25)];
+            atoms.push({p:[px,-17+nn[1]*rr,nn[2]*rr],r:1.5,c:col,n:nn});
+          }
+        }
+      }
+    }
+    lobe([-15,10,1],17,190,C.ink,3);
+    lobe([14,6,-2],15,160,C.ink,17);
+    lobe([-34,22,7],8,70,C.orange,41);
+    dna();
+    var LIGHT=nrm([-.45,.72,.55]);
+    function shade(hex,t,dif){
+      var h=hex.replace('#','');
+      if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+      var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+      r=r*(.72+.4*dif);g=g*(.72+.4*dif);b=b*(.72+.4*dif);
+      return 'rgb('+[r,g,b].map(function(v){return Math.round(Math.max(0,Math.min(255,v)));}).join(',')+')';
+    }
+    function draw(){
+      x.clearRect(0,0,W,H);
+      x.fillStyle=C.surf2;x.fillRect(0,0,W,H);
+      var cp=Math.cos(pitch),sp=Math.sin(pitch),cy=Math.cos(yaw),sy=Math.sin(yaw);
+      var P=atoms.map(function(a){
+        var y1=a.p[1]*cp-a.p[2]*sp,z1=a.p[1]*sp+a.p[2]*cp;
+        var x2=a.p[0]*cy+z1*sy,z2=-a.p[0]*sy+z1*cy;
+        var zc=z2+dist,k=foc/Math.max(zc,12);
+        var ny1=a.n[1]*cp-a.n[2]*sp,nz1=a.n[1]*sp+a.n[2]*cp;
+        var nx=a.n[0]*cy+nz1*sy;
+        var dif=Math.max(0,nx*LIGHT[0]+ny1*LIGHT[1]+(-a.n[0]*sy+nz1*cy)*LIGHT[2]);
+        return {sx:W/2+x2*k-14,sy:H*0.50-y1*k,R:Math.max(.5,a.r*k),z:zc,c:a.c,dif:dif};
+      }).sort(function(m,n){return n.z-m.z;});
+      for(var i=0;i<P.length;i++){
+        var q=P[i];
+        var g=x.createRadialGradient(q.sx-q.R*.34,q.sy-q.R*.4,q.R*.08,q.sx,q.sy,q.R);
+        g.addColorStop(0,'rgba(255,255,255,.42)');
+        g.addColorStop(.55,shade(q.c,q.z,q.dif));
+        g.addColorStop(1,shade(q.c,q.z,q.dif*.35));
+        x.fillStyle=g;x.beginPath();x.arc(q.sx,q.sy,q.R,0,Math.PI*2);x.fill();
+      }
+    }
+    var spin=!reduce,drag=false,px0=0,py0=0;
+    cv.addEventListener('pointerdown',function(e){drag=true;spin=false;px0=e.clientX;py0=e.clientY;
+      try{cv.setPointerCapture(e.pointerId);}catch(_){}});
+    cv.addEventListener('pointermove',function(e){if(!drag)return;
+      yaw+=(e.clientX-px0)*.008;
+      pitch=Math.max(-1.2,Math.min(1.2,pitch-(e.clientY-py0)*.006));
+      px0=e.clientX;py0=e.clientY;draw();});
+    cv.addEventListener('pointerup',function(){drag=false;});
+    cv.addEventListener('pointercancel',function(){drag=false;});
+    var last=0;
+    function loop(ts){ if(spin){ if(!last)last=ts; yaw+=(ts-last)*.00022; last=ts; draw(); }
+      requestAnimationFrame(loop); }
+    draw(); if(!reduce) requestAnimationFrame(loop);
+  })();
+
+  /* ---------- 3. футпринт: метки появляются мимо сайта ---------- */
+  (function(){
+    var cv=document.getElementById('viz-foot'); if(!cv) return;
+    var x=cv.getContext('2d'),W=cv.width,H=cv.height;
+    var SITES=[40,80,120,160,200,240,280,320,360,400,440,480];
+    var UNDER=[240,280,320];
+    var t=0;
+    function draw(){
+      x.fillStyle=C.surf2;x.fillRect(0,0,W,H);
+      var Y=H*0.60;
+      /* дуплекс */
+      x.strokeStyle=C.dim;x.lineWidth=4;x.globalAlpha=.9;
+      for(var s=0;s<2;s++){
+        x.beginPath();
+        for(var px=20;px<=500;px+=4)
+          x['lineTo'](px,Y+Math.sin(px/16+s*Math.PI)*9);
+        x.stroke();
+      }
+      x.globalAlpha=1;
+      /* комплекс над сайтом */
+      x.fillStyle=C.blue;x.globalAlpha=.30;
+      x.beginPath();x.ellipse(280,Y-30,70,38,0,0,Math.PI*2);x.fill();
+      x.globalAlpha=1;
+      x.fillStyle=C.blue;x.font="600 22px 'Space Grotesk',sans-serif";x.textAlign='center';
+      x.fillText('CRISPRoff',280,Y-24);
+      /* метки: по одной, слева направо, кроме накрытых */
+      var n=Math.floor(t*SITES.length);
+      for(var i=0;i<SITES.length;i++){
+        var sx=SITES[i], under=UNDER.indexOf(sx)>=0;
+        if(under){
+          x.strokeStyle=C.blue;x.lineWidth=3;
+          x.strokeRect(sx-7,Y+18,14,14);
+          continue;
+        }
+        if(i>=n) continue;
+        x.strokeStyle=C.orange;x.lineWidth=3.5;
+        x.beginPath();x.moveTo(sx,Y+12);x.lineTo(sx,Y+24);x.stroke();
+        x.fillStyle=C.orange;x.beginPath();x.arc(sx,Y+32,7,0,Math.PI*2);x.fill();
+      }
+      x.font="19px 'Space Grotesk',sans-serif";x.textAlign='left';
+      x.fillStyle=C.orange;x.fillText(LBL.mark,20,H-34);
+      x.fillStyle=C.blue;x.fillText(LBL.bare,20,H-14);
+    }
+    var LBL={mark:'круг — CpG метилирован',bare:'квадрат — CpG под белком, метки нет'};
+    window.__vizFootLabels=function(a,b){LBL.mark=a;LBL.bare=b;draw();};
+    if(reduce){ t=1; draw(); }
+    else{
+      var last=0;
+      (function loop(ts){
+        if(!last)last=ts;
+        t+=(ts-last)/4200; last=ts;
+        if(t>1.35) t=0;
+        draw(); requestAnimationFrame(loop);
+      })(0);
+    }
+  })();
+})();
+</script>
+
+<section id="read">
     <div class="kicker-shaped read"><span class="shape"></span><span class="lbl" data-i18n="read-kicker">Read — что видит секвенатор</span></div>
     <h2 data-i18n="read-h2">Одномолекульные данные метилирования</h2>
     <p class="lede" data-i18n="read-lede">Nanopore-секвенирование локуса CD55 с разрешением до одной молекулы, Unedited vs CRISPRoff-silenced, по временным точкам после редактирования.</p>
@@ -741,6 +1019,38 @@
    ============================================================ */
 const I18N = {
   ru: {
+    'nav-viz':'Визуализации CRISPRoff',
+    'nav-viz-movie':'Видео: моделирование',
+    'viz-kicker':'Модели — как это выглядит на молекулярном уровне',
+    'viz-h2':'Визуализации: как работает CRISPRoff',
+    'viz-lede':'Одно и то же событие показано в разных размерностях — в истинном масштабе, объёмной моделью, по шагам и видео. Ниже живые превью, полные версии на отдельных страницах.',
+    'viz-t1':'Истинный масштаб',
+    'viz-h-scale':'Весь ROI — 2210 нм',
+    'viz-p-scale':'137 CpG на 6500 парах оснований, координаты из hg38. Белок CRISPRoff в том же масштабе — та самая точка сверху, 0.45 % ширины кадра.',
+    'viz-go-scale':'Открыть масштабные кадры →',
+    'viz-t2':'Объёмная модель',
+    'viz-h-3d':'dCas9 на ДНК',
+    'viz-p-3d':'Каждая сфера — один остаток или нуклеотид, объёмы доменов из молекулярных масс. Модель вращается: потяните её мышкой или пальцем.',
+    'viz-go-3d':'Открыть объёмные модели →',
+    'viz-t3':'Механизм',
+    'viz-h-foot':'Метки ложатся, но не под белком',
+    'viz-p-foot':'Фермент обрабатывает CpG по сторонам, а накрытые комплексом остаются чистыми. Это футпринт на CpG 74–78 из наших данных по CD55.',
+    'viz-go-foot':'Открыть анимации механизма →',
+    'viz-t4':'Видео',
+    'viz-h-vid':'Процесс целиком, 24 секунды',
+    'viz-p-vid':'Комплекс садится на мишень, расплетает ДНК, выворачивает цитозины и ставит метки. Под белком CpG остаются чистыми, затем белок уходит.',
+    'viz-go-vid':'Открыть фильм с главами →',
+    'viz-all':'Все визуализации по отдельности:',
+    'viz-l0':'Всё на одной странице',
+    'viz-l1':'Истинный масштаб',
+    'viz-l2':'Механизм: четыре анимации',
+    'viz-l3':'3D-схемы доменов',
+    'viz-l4':'Белковые укладки',
+    'viz-l5':'Объёмные модели',
+    'viz-l6':'Фильм о метилировании',
+    'viz-svg-prot':'CRISPRoff — 10 нм',
+    'viz-svg-end':'2210 нм',
+    'viz-svg-key':'137 CpG · оранжевым — сайт связывания',
     'nav-research': 'Research Ideas/Todos',
     'nav-models': 'Foundation-модели',
     'nav-synth': 'Synthetic ROI',
@@ -912,6 +1222,38 @@ const I18N = {
     'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. Эта страница — точка входа: полная библиография — на страницах <a href="about.html">о проекте</a> и <a href="about-cd55.html">CD55 explorer</a>.'
   },
   en: {
+    'nav-viz':'CRISPRoff visualisations',
+    'nav-viz-movie':'Video: the simulation',
+    'viz-kicker':'Models — what this looks like at molecular level',
+    'viz-h2':'Visualisations: how CRISPRoff works',
+    'viz-lede':'The same event shown in different dimensions — at true scale, as a space-filling model, step by step, and as video. Live previews below; the full versions are separate pages.',
+    'viz-t1':'True scale',
+    'viz-h-scale':'The whole ROI — 2210 nm',
+    'viz-p-scale':'137 CpGs across 6500 base pairs, coordinates from hg38. The CRISPRoff protein at the same scale is that dot above the line: 0.45 % of the frame width.',
+    'viz-go-scale':'Open the scale frames →',
+    'viz-t2':'Space-filling model',
+    'viz-h-3d':'dCas9 on DNA',
+    'viz-p-3d':'Every sphere is one residue or nucleotide, domain volumes from molecular masses. The model rotates: drag it with a mouse or a finger.',
+    'viz-go-3d':'Open the space-filling models →',
+    'viz-t3':'Mechanism',
+    'viz-h-foot':'Marks land beside the protein, not under it',
+    'viz-p-foot':'The enzyme works through the CpGs on either side while those covered by the complex stay clean. This is the footprint at CpG 74–78 from our CD55 data.',
+    'viz-go-foot':'Open the mechanism animations →',
+    'viz-t4':'Video',
+    'viz-h-vid':'The whole process, 24 seconds',
+    'viz-p-vid':'The complex lands on its target, unwinds the DNA, flips cytosines out and marks them. The CpGs under the protein stay clean, then the protein leaves.',
+    'viz-go-vid':'Open the film with chapters →',
+    'viz-all':'Each visualisation on its own:',
+    'viz-l0':'Everything on one page',
+    'viz-l1':'True scale',
+    'viz-l2':'Mechanism: four animations',
+    'viz-l3':'3D domain schematics',
+    'viz-l4':'Protein folds',
+    'viz-l5':'Space-filling models',
+    'viz-l6':'The methylation film',
+    'viz-svg-prot':'CRISPRoff — 10 nm',
+    'viz-svg-end':'2210 nm',
+    'viz-svg-key':'137 CpGs · orange marks the binding site',
     'nav-research': 'Research Ideas/Todos',
     'nav-models': 'Foundation models',
     'nav-synth': 'Synthetic ROI',
@@ -1096,6 +1438,15 @@ function applyLang(lang){
   document.querySelectorAll('#lang-switch button').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === lang);
   });
+  if(window.__vizFootLabels){
+    window.__vizFootLabels(
+      lang==='ru' ? 'круг — CpG метилирован' : 'circle — CpG is methylated',
+      lang==='ru' ? 'квадрат — CpG под белком, метки нет'
+                  : 'square — CpG under the protein, no mark');
+  }
+  var vv=document.getElementById('viz-video');
+  if(vv){ vv.src = (lang==='ru') ? 'visualize/crisproff-methylation-ru.mp4'
+                                 : 'visualize/crisproff-methylation-en.mp4'; }
   try{ localStorage.setItem('epicme_lang', lang); }catch(e){ /* ignore */ }
 }
 
