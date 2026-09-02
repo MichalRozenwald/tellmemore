@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">CRISPRoff в 3D — домены, KRAB и последствия метилирования</title>
+<style>
+  :root{--ink:#0E2033;--ink2:#152C43;--line:#2A4560;--text:#E8EEF4;--dim:#9FB4C7;
+    --faint:#6B8299;--sky:#56B4E9;--green:#009E73;--verm:#D55E00}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text);line-height:1.55;
+    font-family:'Space Grotesk','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 26px 90px}
+  .top{display:flex;justify-content:space-between;gap:24px;padding:44px 0 6px;flex-wrap:wrap}
+  h1{font-size:clamp(27px,3.5vw,40px);line-height:1.1;margin:0 0 15px;font-weight:600;
+    letter-spacing:-.015em;max-width:22ch}
+  .lede{font-size:16.5px;color:var(--dim);max-width:72ch;margin:0}
+  .lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;
+    background:var(--ink2);height:fit-content}
+  .lang button{border:0;background:transparent;color:var(--dim);cursor:pointer;
+    font:600 14px/1 inherit;padding:9px 17px;border-radius:999px}
+  .lang button[aria-pressed="true"]{background:var(--sky);color:#06182A}
+  section{margin-top:46px;border-top:1px solid var(--line);padding-top:26px}
+  h2{font-size:23px;margin:0 0 8px;font-weight:600;letter-spacing:-.01em}
+  .sub{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:78ch}
+  .stage{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:12px}
+  canvas{display:block;width:100%;border-radius:9px;cursor:grab;touch-action:none;background:#0B1B2C}
+  canvas:active{cursor:grabbing}
+  canvas:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .bar{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+  button.ctl{border:0;border-radius:9px;background:var(--sky);color:#06182A;cursor:pointer;
+    font:600 14px/1 inherit;padding:11px 18px}
+  button.ghost{background:var(--ink);color:var(--dim);border:1px solid var(--line)}
+  button.ctl:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+  .track{flex:1 1 220px;height:7px;border-radius:99px;background:#1B3853;position:relative;
+    cursor:pointer;min-width:160px}
+  .fill{position:absolute;inset:0 auto 0 0;width:0;border-radius:99px;background:var(--sky)}
+  .stepno{color:var(--faint);font-size:13px;white-space:nowrap}
+  .cap{margin-top:12px;min-height:72px;border-left:3px solid var(--sky);padding:3px 0 3px 15px}
+  .cap b{display:block;font-size:16.5px;margin-bottom:4px}
+  .cap span{color:var(--dim);font-size:14.5px}
+  .hint{color:var(--faint);font-size:12.5px;margin-top:9px}
+  .note{margin-top:22px;border-left:3px solid var(--verm);background:var(--ink2);
+    padding:15px 19px;border-radius:0 9px 9px 0}
+  .note h3{margin:0 0 6px;font-size:15.5px;color:var(--verm);font-weight:600}
+  .note p{margin:0;color:var(--dim);font-size:14.5px;max-width:82ch}
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:18px;
+    color:var(--faint);font-size:13px}
+
+  .zoom{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto}
+  .zoom button{width:38px;height:38px;padding:0;border:1px solid var(--line);
+    background:var(--ink);color:var(--text);border-radius:9px;cursor:pointer;
+    font:600 19px/1 inherit}
+  .zoom button:hover{border-color:var(--sky);color:var(--sky)}
+  .zoom button:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .zoom input[type=range]{width:132px;accent-color:var(--sky);cursor:pointer}
+  .zoom label{font-size:12.5px;color:var(--faint)}
+  @media (max-width:720px){.wrap{padding:0 14px 60px}}
+</style>
+<style>.back-home{position:fixed;left:14px;top:12px;z-index:200;font:600 13px/1 'Space Grotesk',Arial,sans-serif;text-decoration:none;color:#9FB4C7;background:rgba(14,32,51,.82);border:1px solid #2A4560;border-radius:999px;padding:8px 13px;backdrop-filter:blur(6px)}.back-home:hover{color:#56B4E9;border-color:#56B4E9}</style></head>
+<body>
+<a href="../index.html" target="_top" class="back-home" aria-label="epicme.bio">← epicme.bio</a>
+<div class="wrap">
+
+<div class="top">
+  <div>
+    <h1 data-i18n="title">CRISPRoff в 3D — домены, KRAB и последствия метилирования</h1>
+    <p class="lede" data-i18n="lede">Три сцены, которые можно вращать мышкой. Первая — весь комплекс на ДНК и за что отвечает каждый домен. Вторая — что именно делает KRAB и как из одного маленького домена вырастает гетерохроматин. Третья — что запускает метка, которую поставил DNMT.</p>
+  </div>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+</div>
+
+<section>
+  <h2 data-i18n="a-h">1. Весь комплекс на ДНК: кто за что отвечает</h2>
+  <p class="sub" data-i18n="a-sub">Один белок, четыре части, четыре разные работы. Покрутите сцену — видно, что домены сидят на гибких линкерах и болтаются вокруг dCas9, а не стоят в жёсткой геометрии.</p>
+  <div class="stage">
+    <canvas id="c1" tabindex="0" aria-label="3D view of the CRISPRoff complex on DNA"></canvas>
+    <div class="bar">
+      <button class="ctl" data-play="1" data-i18n="play">▶ Запустить</button>
+      <button class="ctl ghost" data-spin="1" data-i18n="spin">⟳ Вращение</button>
+      <div class="track" data-track="1"><div class="fill" id="f1"></div></div>
+      <span class="stepno" id="n1"></span>
+    </div>
+    <div class="cap"><b id="t1"></b><span id="d1"></span></div>
+    <p class="hint" data-i18n="hint">Тяните мышкой или пальцем, чтобы повернуть. Колесо — приблизить.</p>
+  </div>
+</section>
+
+<section>
+  <h2 data-i18n="b-h">2. Что делает KRAB и как</h2>
+  <p class="sub" data-i18n="b-sub">KRAB не фермент и не связывает ДНК. Он делает ровно одно: держит KAP1. Всё остальное собирается уже на KAP1, и дальше запускается петля, которая сама себя поддерживает и расползается по хроматину.</p>
+  <div class="stage">
+    <canvas id="c2" tabindex="0" aria-label="3D view of the KRAB recruitment cascade"></canvas>
+    <div class="bar">
+      <button class="ctl" data-play="2" data-i18n="play">▶ Запустить</button>
+      <button class="ctl ghost" data-spin="2" data-i18n="spin">⟳ Вращение</button>
+      <div class="track" data-track="2"><div class="fill" id="f2"></div></div>
+      <span class="stepno" id="n2"></span>
+    </div>
+    <div class="cap"><b id="t2"></b><span id="d2"></span></div>
+  </div>
+</section>
+
+<section>
+  <h2 data-i18n="c-h">3. Что запускает метка, поставленная DNMT</h2>
+  <p class="sub" data-i18n="c-sub">Метилирование само по себе ничего не выключает. Оно работает через три последствия: мешает посадке части транскрипционных факторов, притягивает белки-читатели с деацетилазами и попадает в контур поддержания, который копирует его при каждом делении.</p>
+  <div class="stage">
+    <canvas id="c3" tabindex="0" aria-label="3D view of downstream consequences of DNA methylation"></canvas>
+    <div class="bar">
+      <button class="ctl" data-play="3" data-i18n="play">▶ Запустить</button>
+      <button class="ctl ghost" data-spin="3" data-i18n="spin">⟳ Вращение</button>
+      <div class="track" data-track="3"><div class="fill" id="f3"></div></div>
+      <span class="stepno" id="n3"></span>
+    </div>
+    <div class="cap"><b id="t3"></b><span id="d3"></span></div>
+  </div>
+  <div class="note">
+    <h3 data-i18n="c-note-h">Связь с нашим CD55</h3>
+    <p data-i18n="c-note">CTCF и NRF1 попали в эту сцену не случайно: это единственные два фактора из подтверждённых в K562 по ENCODE над нашим окном, для которых есть прямые экспериментальные данные, что метилирование мотива мешает их посадке. Оба лежат внутри значимого кластера CpG. Это остаётся гипотезой: ENCODE-данные сняты на несортированной популяции K562, а не на наших фракциях HIGH и LOW. Проверка — CUT&RUN по CTCF и NRF1 в отсортированных фракциях.</p>
+  </div>
+</section>
+
+<footer data-i18n="foot">Формы белков условны — это сферы, а не структуры. В масштабе показаны только относительные размеры доменов. CD55 · epicme.bio</footer>
+</div>
+
+<script>
+/* ==================== tiny 3D engine (no deps) ==================== */
+function Scene(canvas){
+  const S={cv:canvas,ctx:canvas.getContext('2d'),yaw:.5,pitch:-.28,dist:150,foc:760,
+           oy:.5,objs:[],spin:false,dpr:Math.min(window.devicePixelRatio||1,2)};
+  function resize(){
+    const w=canvas.clientWidth||900, h=Math.round(w*0.46);
+    canvas.width=w*S.dpr; canvas.height=h*S.dpr; canvas.style.height=h+'px';
+    S.w=w; S.h=h;
+  }
+  S.resize=resize; resize();
+  new ResizeObserver(()=>{resize();S.draw();}).observe(canvas);
+
+  S.proj=function(p){
+    const cy=Math.cos(S.pitch),sy=Math.sin(S.pitch);
+    const y1=p[1]*cy-p[2]*sy, z1=p[1]*sy+p[2]*cy;
+    const cx=Math.cos(S.yaw),sx=Math.sin(S.yaw);
+    const x2=p[0]*cx+z1*sx, z2=-p[0]*sx+z1*cx;
+    const zc=z2+S.dist;
+    const k=S.foc/Math.max(zc,12);
+    return {x:S.w/2+x2*k, y:S.h*S.oy-y1*k, z:zc, k:k};
+  };
+  // depth shading: blend toward the background as things recede
+  function shade(hex,zc){
+    const t=Math.max(0,Math.min(1,(zc-S.dist+70)/170));
+    let h=String(hex||'#8FA3B8').replace('#','');
+    if(h.length===3) h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    if(h.length!==6||/[^0-9a-fA-F]/.test(h)) h='8FA3B8';
+    const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+    const br=11,bg=27,bb=44;
+    return 'rgb('+Math.round(r+(br-r)*t*.72)+','+Math.round(g+(bg-g)*t*.72)+','
+                 +Math.round(b+(bb-b)*t*.72)+')';
+  }
+  S.clear=function(){S.objs.length=0;};
+  S.ball=function(p,r,c,label,lc){S.objs.push({t:'b',p:p,r:r,c:c,l:label,lc:lc||c});};
+  S.stick=function(a,b,r,c){S.objs.push({t:'s',a:a,b:b,r:r,c:c});};
+  S.ring=function(p,r,c){S.objs.push({t:'r',p:p,r:r,c:c});};
+
+  S.draw=function(){
+    const x=S.ctx; x.setTransform(S.dpr,0,0,S.dpr,0,0);
+    x.clearRect(0,0,S.w,S.h);
+    x.fillStyle='#0B1B2C'; x.fillRect(0,0,S.w,S.h);
+    const prims=[];
+    for(const o of S.objs){
+      if(o.t==='b'||o.t==='r'){const q=S.proj(o.p); prims.push({z:q.z,o:o,q:q});}
+      else {const A=S.proj(o.a),B=S.proj(o.b); prims.push({z:(A.z+B.z)/2,o:o,A:A,B:B});}
+    }
+    prims.sort((p,q)=>q.z-p.z);          // painter's algorithm, far first
+    const labels=[];
+    for(const pr of prims){
+      const o=pr.o;
+      if(o.t==='s'){
+        x.strokeStyle=shade(o.c,pr.z);
+        x.lineWidth=Math.max(1,o.r*pr.A.k*2*0.5+o.r*pr.B.k*2*0.5);
+        x.lineCap='round';
+        x.beginPath(); x.moveTo(pr.A.x,pr.A.y); x.lineTo(pr.B.x,pr.B.y); x.stroke();
+      } else if(o.t==='r'){
+        const R=o.r*pr.q.k;
+        x.strokeStyle=shade(o.c,pr.z); x.lineWidth=2;
+        x.beginPath(); x.ellipse(pr.q.x,pr.q.y,R,R*0.34,0,0,Math.PI*2); x.stroke();
+      } else {
+        const R=Math.max(.6,o.r*pr.q.k);
+        const base=shade(o.c,pr.z);
+        const g=x.createRadialGradient(pr.q.x-R*.36,pr.q.y-R*.42,R*.12,pr.q.x,pr.q.y,R);
+        g.addColorStop(0,'rgba(255,255,255,.42)');
+        g.addColorStop(.45,base);
+        g.addColorStop(1,shade(o.c,pr.z+80));
+        x.fillStyle=g; x.beginPath(); x.arc(pr.q.x,pr.q.y,R,0,Math.PI*2); x.fill();
+        if(o.l) labels.push({x:pr.q.x,y:Math.max(15,pr.q.y-R-7),t:o.l,c:o.lc,s:Math.max(10,Math.min(15,R*.42))});
+      }
+    }
+    x.textAlign='center';
+    for(const L of labels){
+      x.font='600 '+L.s+"px 'Space Grotesk',Arial,sans-serif";
+      x.lineWidth=3.5; x.strokeStyle='rgba(11,27,44,.85)';
+      x.strokeText(L.t,L.x,L.y); x.fillStyle=L.c; x.fillText(L.t,L.x,L.y);
+    }
+  };
+
+  // orbit controls
+  let drag=false,px=0,py=0;
+  canvas.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;
+    canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener('pointermove',e=>{ if(!drag)return;
+    S.yaw+=(e.clientX-px)*.008; S.pitch=Math.max(-1.35,Math.min(1.35,S.pitch-(e.clientY-py)*.006));
+    px=e.clientX;py=e.clientY; S.build&&S.build(); S.draw();});
+  canvas.addEventListener('pointerup',()=>drag=false);
+  canvas.addEventListener('pointercancel',()=>drag=false);
+  canvas.addEventListener('wheel',e=>{e.preventDefault();
+    S.dist=Math.max(70,Math.min(330,S.dist+e.deltaY*.22)); S.build&&S.build(); S.draw();},
+    {passive:false});
+  canvas.addEventListener('keydown',e=>{
+    const k={ArrowLeft:[-.12,0],ArrowRight:[.12,0],ArrowUp:[0,-.09],ArrowDown:[0,.09]}[e.key];
+    if(!k)return; e.preventDefault(); S.yaw+=k[0];
+    S.pitch=Math.max(-1.35,Math.min(1.35,S.pitch+k[1])); S.build&&S.build(); S.draw();});
+  return S;
+}
+
+/* ---------- shared geometry helpers ---------- */
+const COL={dna:'#8FA3B8',dcas9:'#0072B2',d3a:'#CC79A7',d3l:'#B5679A',bfp:'#D55E00',
+  krab:'#E69F00',kap1:'#56B4E9',setdb1:'#009E73',nurd:'#CC79A7',hp1:'#F0E442',
+  me:'#009E73',nuc:'#3A5C7D',ub:'#CC79A7',dnmt1:'#0072B2',uhrf1:'#E69F00',
+  tf:'#F0E442',mbd:'#D55E00',hdac:'#8FA3B8',sam:'#009E73',sah:'#6B8299',base:'#F0E442'};
+const lerp=(a,b,t)=>a+(b-a)*Math.max(0,Math.min(1,t));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function seg(p,i){return clamp(p-i+1,0,1);}
+
+function helixPair(S,x0,x1,R,pitchN,step,bulge,bub){
+  for(let x=x0;x<=x1;x+=step){
+    const th=2*Math.PI*x/pitchN;
+    const inB=bub&&x>bub[0]&&x<bub[1];
+    const s=inB?bulge:0;
+    const a=[x,Math.cos(th)*R+s,Math.sin(th)*R];
+    const b=[x,Math.cos(th+Math.PI)*R-s,Math.sin(th+Math.PI)*R];
+    S.ball(a,1.6,COL.dna); S.ball(b,1.6,'#6F8698');
+    if(!inB && Math.round(x/step)%2===0) S.stick(a,b,.42,'#4E6A85');
+  }
+}
+
+/* ============================ SCENE 1 ============================ */
+const SC1=(function(){
+  const S=Scene(document.getElementById('c1'));
+  S.dist=168; S.oy=.70;
+  const N=6;
+  let P=0;
+  S.build=function(){
+    S.clear();
+    const p=P;
+    helixPair(S,-72,72,11,34,2.4,0,null);
+    // dCas9 body sits on the duplex
+    const on=clamp(p,0,1);
+    const cx=lerp(-62,0,ease(on));
+    S.ball([cx,4,0],17,COL.dcas9,'dCas9','#BFE3F7');
+    S.ball([cx-9,-2,7],9,'#0A6699');
+    S.ball([cx+9,-1,-6],9,'#0A6699');
+    // flexible tether + the three fused parts
+    const wob=Math.sin(Date.now()/900);
+    const s1=seg(p,1),s2=seg(p,2),s3=seg(p,3),s4=seg(p,4),s5=seg(p,5);
+    if(s1>0){
+      const a=[cx-22+2*wob,26+3*wob,10];
+      S.stick([cx-12,10,4],a,1.2,'#6B8299');
+      S.ball(a,11,COL.d3a,'DNMT3A','#F0C6E0');
+      const b=[cx-38+3*wob,20-2*wob,-6];
+      S.stick(a,b,1.1,'#6B8299'); S.ball(b,9.5,COL.d3l,'DNMT3L','#F0C6E0');
+    }
+    if(s2>0){
+      const a=[cx+24-2*wob,22+2*wob,-12];
+      S.stick([cx+12,9,-4],a,1.2,'#6B8299');
+      S.ball(a,7,COL.bfp,'BFP','#F5C09A');
+    }
+    if(s3>0){
+      const a=[cx+40-3*wob,30-3*wob,6];
+      S.stick([cx+14,10,2],a,1.2,'#6B8299');
+      S.ball(a,6,COL.krab,'KRAB','#F7D79A');
+    }
+    if(s4>0){ // KAP1 arrives on KRAB
+      S.ball([cx+58,42,14],10,COL.kap1,'KAP1','#BFE3F7');
+      S.stick([cx+42,32,8],[cx+56,41,13],1.1,'#6B8299');
+    }
+    if(s5>0){ // methyl marks appear on the flanks, not under the body
+      for(let i=-5;i<=5;i++){
+        const x=i*11; if(Math.abs(x-cx)<19) continue;
+        const th=2*Math.PI*x/34;
+        S.ball([x,Math.cos(th)*11+6,Math.sin(th)*11],3.4,COL.me);
+      }
+    }
+  };
+  return {S:S,n:N,set(v){P=v;S.build();S.draw();},get(){return P;}};
+})();
+
+/* ============================ SCENE 2 ============================ */
+const SC2=(function(){
+  const S=Scene(document.getElementById('c2'));
+  S.dist=182; S.oy=.64;
+  const N=6;
+  let P=0;
+  // nucleosomes strung along a gentle arc
+  const NUC=8;
+  S.build=function(){
+    S.clear();
+    const p=P;
+    const s1=seg(p,1),s2=seg(p,2),s3=seg(p,3),s4=seg(p,4),s5=seg(p,5);
+    const compact=ease(s5);                       // chromatin closes up at the end
+    const spread=lerp(20,10.5,compact);
+    const pos=[];
+    for(let i=0;i<NUC;i++){
+      const t=i-(NUC-1)/2;
+      const x=t*spread;
+      const y=-14+Math.cos(t*.55)*lerp(5,13,compact);
+      const z=Math.sin(t*.75)*lerp(6,20,compact);
+      pos.push([x,y,z]);
+    }
+    for(let i=0;i<NUC;i++){
+      if(i) S.stick(pos[i-1],pos[i],1.4,COL.dna);
+      S.ball(pos[i],9.5,COL.nuc);
+      S.ring(pos[i],11,'#587FA6');
+    }
+    // the KRAB domain, anchored to its dCas9
+    S.ball([-46,26,0],13,COL.dcas9,'dCas9','#BFE3F7');
+    S.ball([-30,30,4],6,COL.krab,'KRAB','#F7D79A');
+    S.stick([-36,28,2],[-31,30,4],1.1,'#6B8299');
+    if(s1>0){ // KAP1 binds KRAB — reported as three KAP1 per KRAB
+      const base=[-12,33,2];
+      S.stick([-25,31,4],base,1.2,'#6B8299');
+      for(let i=0;i<3;i++){
+        const a=i*2.1;
+        S.ball([base[0]+Math.cos(a)*6,base[1]+Math.sin(a)*5,base[2]+Math.sin(a*1.7)*6],
+               8.5,COL.kap1,i===0?'KAP1 ×3':null,'#BFE3F7');
+      }
+    }
+    if(s2>0){ // SUMO on the bromodomain switches the platform on
+      S.ball([-4,46,-6],4.2,'#CC79A7','SUMO','#F0C6E0');
+    }
+    if(s3>0){ // SETDB1 and NuRD dock on the SUMOylated platform
+      S.ball([14,40,10],9.5,COL.setdb1,'SETDB1','#7FE0C4');
+      S.ball([16,26,-14],10,COL.nurd,'NuRD','#F0C6E0');
+      S.stick([-6,34,4],[12,39,9],1.1,'#6B8299');
+      S.stick([-6,33,0],[14,27,-12],1.1,'#6B8299');
+    }
+    if(s4>0){ // H3K9me3 written on the tails, HP1 reads it
+      for(let i=0;i<NUC;i++){
+        const v=clamp(s4*NUC-i*.7,0,1); if(v<=0) continue;
+        const q=[pos[i][0],pos[i][1]+13,pos[i][2]];
+        S.stick(pos[i],q,.7,COL.setdb1);
+        S.ball(q,3.6,COL.me);
+      }
+      if(s4>.45) for(let i=1;i<NUC;i+=2)
+        S.ball([pos[i][0],pos[i][1]+20,pos[i][2]+3],6,COL.hp1,i===1?'HP1':null,'#F5EFA0');
+    }
+  };
+  return {S:S,n:N,set(v){P=v;S.build();S.draw();},get(){return P;}};
+})();
+
+/* ============================ SCENE 3 ============================ */
+const SC3=(function(){
+  const S=Scene(document.getElementById('c3'));
+  S.dist=162; S.oy=.53;
+  const N=6;
+  let P=0;
+  S.build=function(){
+    S.clear();
+    const p=P;
+    const s1=seg(p,1),s2=seg(p,2),s3=seg(p,3),s4=seg(p,4),s5=seg(p,5);
+    const R=11, PITCH=34;
+    // duplex, with a bubble where the base is flipped out
+    const flip=ease(clamp(p,0,1))*(1-ease(s2));
+    helixPair(S,-70,70,R,PITCH,2.4,0,null);
+    // the target cytosine: rides out of the stack and back
+    const bx=0, th=2*Math.PI*bx/PITCH;
+    const rr=lerp(R,R+21,flip);
+    const bp=[bx,Math.cos(th)*rr,Math.sin(th)*rr];
+    S.ball(bp,4.6,COL.base,flip>.25?'C':null,'#F5EFA0');
+    if(p<1.6){
+      S.ball([bx-16,26,10],12,COL.d3a,'DNMT3A','#F0C6E0');
+      const cof=clamp(p,0,1);
+      S.ball([bx-3,20,16],4.6,cof>.6?COL.sah:COL.sam,cof>.6?'SAH':'SAM','#7FE0C4');
+    }
+    // the finished methyl mark
+    if(s2>0){
+      const mp=[bx,Math.cos(th)*(R+5.5),Math.sin(th)*(R+5.5)];
+      S.stick([bx,Math.cos(th)*R,Math.sin(th)*R],mp,.8,COL.me);
+      S.ball(mp,4,COL.me,'5mC','#7FE0C4');
+    }
+    // consequence 1 — a methylation-sensitive factor cannot land
+    if(s3>0){
+      const back=ease(clamp(s3*1.5-.35,0,1));
+      const d=lerp(16,46,back);
+      S.ball([bx+6,d,10],11,COL.tf,'CTCF / NRF1','#F5EFA0');
+      if(back>.4){
+        S.stick([bx+2,d-9,8],[bx+2,d-15,8],1.1,'#D55E00');
+        S.ball([bx+2,d-19,8],3.2,'#D55E00');
+      }
+    }
+    // consequence 2 — a reader lands and brings deacetylase
+    if(s4>0){
+      const din=lerp(-46,-16,ease(s4));
+      S.ball([bx-4,din,-14],9.5,COL.mbd,'MBD / MeCP2','#F5C09A');
+      if(s4>.55) S.ball([bx-18,din-8,-22],8,COL.hdac,'HDAC','#C9D6E2');
+    }
+    // consequence 3 — the maintenance loop picks it up
+    if(s5>0){
+      S.ball([bx+34,-26,16],9,COL.uhrf1,'UHRF1','#F7D79A');
+      S.ball([bx+52,-16,4],10,COL.dnmt1,'DNMT1','#BFE3F7');
+      S.stick([bx+40,-24,13],[bx+49,-18,6],1.1,'#6B8299');
+      S.ball([bx+40,-10,20],3.4,COL.ub,'Ub','#F0C6E0');
+    }
+  };
+  return {S:S,n:N,set(v){P=v;S.build();S.draw();},get(){return P;}};
+})();
+
+/* ========================= captions ========================= */
+const CAPS={
+1:[
+ {ru:['Комплекс садится на мишень','sgRNA внутри dCas9 задаёт адрес. Сам dCas9 — только транспорт и якорь: он находит место и держится на нём, но ничего не режет и не модифицирует.'],
+  en:['The complex lands on the target','The sgRNA inside dCas9 supplies the address. dCas9 itself is only transport and anchor: it finds the place and holds on, cutting and modifying nothing.']},
+ {ru:['DNMT3A и DNMT3L — рабочий фермент','DNMT3A переносит метильную группу на цитозин. DNMT3L каталитически мёртв: у него нет активного центра, но, связываясь с DNMT3A, он резко повышает его активность.'],
+  en:['DNMT3A and DNMT3L are the working enzyme','DNMT3A transfers the methyl group onto the cytosine. DNMT3L is catalytically dead: it has no active site, but binding DNMT3A sharply raises its activity.']},
+ {ru:['BFP ничего не делает с ДНК','Это флуоресцентный белок. Он нужен только экспериментатору: по его свечению отбирают клетки, в которые конструкт реально попал.'],
+  en:['BFP does nothing to the DNA','It is a fluorescent protein, there purely for the experimenter: its glow is how you sort the cells that actually received the construct.']},
+ {ru:['KRAB — посадочная площадка','Самый маленький домен и единственный, который сам ничего не катализирует. Его работа — связать KAP1 и через него подтянуть репрессивную машину к гистонам.'],
+  en:['KRAB is a landing pad','The smallest domain and the only one that catalyses nothing itself. Its job is to bind KAP1 and through it pull the repressive machinery over to the histones.']},
+ {ru:['KAP1 приходит и начинается вторая ветка','С этого момента у комплекса два независимых выхода: метилирование ДНК через DNMT3A и модификация гистонов через KRAB. Они усиливают друг друга.'],
+  en:['KAP1 arrives and the second branch opens','From here the complex has two independent outputs: DNA methylation through DNMT3A and histone modification through KRAB. They reinforce each other.']},
+ {ru:['Метки ложатся вокруг, но не под самим белком','Фермент дотягивается до CpG по сторонам. Те, что физически накрыты телом комплекса, остаются чистыми — это и есть футпринт, который видно в наших данных на CD55.'],
+  en:['Marks land around the protein, not under it','The enzyme reaches the CpGs to either side. Those physically covered by the body of the complex stay clean — the footprint we see in our CD55 data.']}
+],
+2:[
+ {ru:['Исходно: открытый хроматин','Нуклеосомы стоят свободно, участок доступен для транскрипции. KRAB висит рядом на своём dCas9 и пока ни с чем не связан.'],
+  en:['Starting point: open chromatin','The nucleosomes sit loosely and the region is accessible to transcription. KRAB hangs nearby on its dCas9, bound to nothing yet.']},
+ {ru:['KRAB связывает KAP1','Единственное прямое действие KRAB. KAP1 садится на него своим N-концевым участком RBCC; описана стехиометрия три KAP1 на один KRAB.'],
+  en:['KRAB binds KAP1','The only direct action KRAB takes. KAP1 docks through its N-terminal RBCC region; a stoichiometry of three KAP1 per KRAB has been reported.']},
+ {ru:['KAP1 модифицируется SUMO и включается','Собственный PHD-домен KAP1 сажает SUMO на его же бромодомен. Без этой модификации платформа не работает — она нужна, чтобы привлечь следующих участников.'],
+  en:['KAP1 is SUMOylated and switches on','KAP1’s own PHD domain places SUMO onto its bromodomain. Without that modification the platform is inert — it is what recruits the next participants.']},
+ {ru:['На платформу садятся SETDB1 и NuRD','SETDB1 — гистоновая метилтрансфераза. NuRD несёт деацетилазу и ремоделирующую активность: снимает ацетилирование и двигает нуклеосомы.'],
+  en:['SETDB1 and NuRD dock onto the platform','SETDB1 is a histone methyltransferase. NuRD carries deacetylase and remodelling activity: it strips acetylation and repositions nucleosomes.']},
+ {ru:['H3K9me3 и HP1 замыкают петлю','SETDB1 метилирует лизин 9 гистона H3. HP1 читает эту метку и одновременно держится за KAP1 — комплекс закрепляется и ставит метку дальше по соседним нуклеосомам.'],
+  en:['H3K9me3 and HP1 close the loop','SETDB1 methylates lysine 9 of histone H3. HP1 reads that mark while also holding KAP1 — the complex is retained and writes the mark onto neighbouring nucleosomes.']},
+ {ru:['Хроматин уплотняется и репрессия расползается','Из-за обратной связи молчание не остаётся в точке посадки: метка и HP1 распространяются от места связывания к промотору на заметное расстояние.'],
+  en:['The chromatin compacts and repression spreads','Because of the feedback, silencing does not stay at the landing site: the mark and HP1 spread from the binding site toward the promoter over a substantial distance.']}
+],
+3:[
+ {ru:['DNMT3A выворачивает цитозин и метилирует его','Основание выходит из стопки в карман фермента, получает метильную группу с SAM, кофактор уходит как SAH.'],
+  en:['DNMT3A flips the cytosine out and methylates it','The base leaves the stack for the enzyme pocket, receives a methyl group from SAM, and the cofactor departs as SAH.']},
+ {ru:['Основание вернулось — метка в большой бороздке','Метильная группа торчит наружу в большую бороздку. Последовательность не изменилась ни на одну букву, но поверхность ДНК в этом месте теперь другая.'],
+  en:['The base is back — the mark sits in the major groove','The methyl group protrudes into the major groove. Not a single letter of sequence has changed, but the surface of the DNA here is now different.']},
+ {ru:['Последствие первое: часть факторов больше не садится','Для некоторых транскрипционных факторов метильная группа физически мешает узнаванию мотива. CTCF и NRF1 — как раз такие, и оба лежат внутри нашего значимого кластера на CD55.'],
+  en:['Consequence one: some factors can no longer bind','For certain transcription factors the methyl group physically blocks motif recognition. CTCF and NRF1 are two such factors, and both sit inside our significant cluster at CD55.']},
+ {ru:['Последствие второе: приходят читатели','Белки с метил-связывающим доменом, например MeCP2, наоборот узнают метку и садятся на неё. Они приводят с собой деацетилазы, и хроматин закрывается ещё сильнее.'],
+  en:['Consequence two: readers arrive','Proteins with a methyl-binding domain, MeCP2 among them, recognise the mark instead and dock onto it. They bring deacetylases along, closing the chromatin further.']},
+ {ru:['Последствие третье: метка попадает в контур поддержания','UHRF1 узнаёт полуметилированный сайт после репликации, ставит убиквитин на хвост гистона и приводит DNMT1. Так метка копируется в каждом делении — из разовой она становится наследуемой.'],
+  en:['Consequence three: the mark enters the maintenance loop','UHRF1 recognises the hemimethylated site after replication, ubiquitinates the histone tail and brings in DNMT1. That copies the mark at every division — a one-off becomes heritable.']},
+ {ru:['Три последствия усиливают друг друга','UHRF1 читает и метилирование ДНК, и H3K9me3, поэтому ветка KRAB и ветка DNMT сходятся именно здесь. Это и объясняет, почему CRISPRoff держится дольше, чем каждый домен по отдельности.'],
+  en:['The three consequences reinforce each other','UHRF1 reads both DNA methylation and H3K9me3, so the KRAB branch and the DNMT branch converge right here. That is why CRISPRoff holds longer than either domain would alone.']}
+]};
+
+const T={
+ru:{title:'CRISPRoff в 3D — домены, KRAB и последствия метилирования',
+ lede:'Три сцены, которые можно вращать мышкой. Первая — весь комплекс на ДНК и за что отвечает каждый домен. Вторая — что именно делает KRAB и как из одного маленького домена вырастает гетерохроматин. Третья — что запускает метка, которую поставил DNMT.',
+ play:'▶ Запустить',pause:'❚❚ Пауза',replay:'↻ Заново',spin:'⟳ Вращение',spinoff:'⟳ Стоп',
+ 'a-h':'1. Весь комплекс на ДНК: кто за что отвечает',
+ 'a-sub':'Один белок, четыре части, четыре разные работы. Покрутите сцену — видно, что домены сидят на гибких линкерах и болтаются вокруг dCas9, а не стоят в жёсткой геометрии.',
+ 'b-h':'2. Что делает KRAB и как',
+ 'b-sub':'KRAB не фермент и не связывает ДНК. Он делает ровно одно: держит KAP1. Всё остальное собирается уже на KAP1, и дальше запускается петля, которая сама себя поддерживает и расползается по хроматину.',
+ 'c-h':'3. Что запускает метка, поставленная DNMT',
+ 'c-sub':'Метилирование само по себе ничего не выключает. Оно работает через три последствия: мешает посадке части транскрипционных факторов, притягивает белки-читатели с деацетилазами и попадает в контур поддержания, который копирует его при каждом делении.',
+ 'c-note-h':'Связь с нашим CD55',
+ 'c-note':'CTCF и NRF1 попали в эту сцену не случайно: это единственные два фактора из подтверждённых в K562 по ENCODE над нашим окном, для которых есть прямые экспериментальные данные, что метилирование мотива мешает их посадке. Оба лежат внутри значимого кластера CpG. Это остаётся гипотезой: ENCODE-данные сняты на несортированной популяции K562, а не на наших фракциях HIGH и LOW. Проверка — CUT&RUN по CTCF и NRF1 в отсортированных фракциях.',
+ hint:'Тяните мышкой или пальцем, чтобы повернуть. Колесо — приблизить.',
+ foot:'Формы белков условны — это сферы, а не структуры. В масштабе показаны только относительные размеры доменов. CD55 · epicme.bio'},
+en:{title:'CRISPRoff in 3D — the domains, KRAB, and what methylation triggers',
+ lede:'Three scenes you can rotate with the mouse. First, the whole complex on DNA and what each domain is responsible for. Second, what KRAB actually does and how one small domain grows into heterochromatin. Third, what the mark left by DNMT sets off.',
+ play:'▶ Play',pause:'❚❚ Pause',replay:'↻ Replay',spin:'⟳ Spin',spinoff:'⟳ Stop',
+ 'a-h':'1. The whole complex on DNA: who does what',
+ 'a-sub':'One protein, four parts, four different jobs. Rotate the scene and you can see the domains hang off flexible linkers and swing around dCas9 rather than sitting in a fixed geometry.',
+ 'b-h':'2. What KRAB does, and how',
+ 'b-sub':'KRAB is not an enzyme and binds no DNA. It does exactly one thing: it holds KAP1. Everything else assembles on KAP1, and from there a self-sustaining loop starts and spreads along the chromatin.',
+ 'c-h':'3. What the mark left by DNMT sets off',
+ 'c-sub':'Methylation on its own switches nothing off. It works through three consequences: it blocks some transcription factors from binding, it attracts reader proteins that bring deacetylases, and it enters the maintenance loop that copies it at every division.',
+ 'c-note-h':'The link to our CD55 work',
+ 'c-note':'CTCF and NRF1 are in this scene for a reason: they are the only two factors confirmed in K562 by ENCODE over our window for which there is direct experimental evidence that methylating the motif interferes with binding. Both sit inside the significant CpG cluster. It remains a hypothesis: the ENCODE data come from an unsorted K562 population, not from our HIGH and LOW fractions. The test is CUT&RUN for CTCF and NRF1 in the sorted fractions.',
+ hint:'Drag with the mouse or a finger to rotate. Scroll to zoom.',
+ foot:'Protein shapes are schematic — these are spheres, not structures. Only the relative sizes of the domains are meaningful. CD55 · epicme.bio'}};
+
+/* ====================== playback wiring ====================== */
+const SCN={1:SC1,2:SC2,3:SC3};
+const ST={};
+let LANG='ru';
+const STEP_MS=2700;
+
+function cap(id){
+  const i=clamp(Math.round(ST[id].p),0,CAPS[id].length-1);
+  const c=CAPS[id][i][LANG];
+  document.getElementById('t'+id).textContent=c[0];
+  document.getElementById('d'+id).textContent=c[1];
+  document.getElementById('n'+id).textContent=(i+1)+' / '+CAPS[id].length;
+  document.getElementById('f'+id).style.width=(ST[id].p/(SCN[id].n-1)*100)+'%';
+}
+function btn(id){
+  const b=document.querySelector('[data-play="'+id+'"]');
+  b.textContent=ST[id].playing?T[LANG].pause
+    :(ST[id].p>=SCN[id].n-1?T[LANG].replay:T[LANG].play);
+}
+function frame(id,ts){
+  const s=ST[id];
+  if(!s.playing&&!s.spin) return;
+  if(!s.last) s.last=ts;
+  const dt=ts-s.last; s.last=ts;
+  if(s.spin) SCN[id].S.yaw+=dt*.00028;
+  if(s.playing){
+    s.p+=dt/STEP_MS;
+    if(s.p>=SCN[id].n-1){s.p=SCN[id].n-1;s.playing=false;btn(id);}
+    cap(id);
+  }
+  SCN[id].set(s.p);
+  requestAnimationFrame(t=>frame(id,t));
+}
+Object.keys(SCN).forEach(id=>{
+  ST[id]={p:0,playing:false,spin:false,last:0};
+  SCN[id].set(0); cap(id); btn(id);
+  document.querySelector('[data-play="'+id+'"]').addEventListener('click',()=>{
+    const s=ST[id];
+    if(s.p>=SCN[id].n-1&&!s.playing) s.p=0;
+    s.playing=!s.playing; s.last=0; btn(id);
+    if(s.playing||s.spin) requestAnimationFrame(t=>frame(id,t));
+  });
+  document.querySelector('[data-spin="'+id+'"]').addEventListener('click',e=>{
+    const s=ST[id]; s.spin=!s.spin; s.last=0;
+    e.currentTarget.textContent=s.spin?T[LANG].spinoff:T[LANG].spin;
+    if(s.spin) requestAnimationFrame(t=>frame(id,t));
+  });
+  const tr=document.querySelector('[data-track="'+id+'"]');
+  tr.addEventListener('click',e=>{
+    const r=tr.getBoundingClientRect();
+    ST[id].p=clamp((e.clientX-r.left)/r.width,0,1)*(SCN[id].n-1);
+    ST[id].playing=false; btn(id); cap(id); SCN[id].set(ST[id].p);
+  });
+});
+
+function applyLang(l){
+  LANG=l; document.documentElement.setAttribute('lang',l);
+  document.querySelectorAll('[data-i18n]').forEach(e=>{
+    const k=e.getAttribute('data-i18n');
+    if(k in T[l]) (e.tagName==='TITLE')?document.title=T[l][k]:e.textContent=T[l][k];
+  });
+  document.querySelectorAll('.lang button').forEach(b=>
+    b.setAttribute('aria-pressed',String(b.dataset.lang===l)));
+  Object.keys(SCN).forEach(id=>{
+    cap(id); btn(id);
+    document.querySelector('[data-spin="'+id+'"]').textContent=
+      ST[id].spin?T[l].spinoff:T[l].spin;
+  });
+  try{localStorage.setItem('epicme_lang',l);}catch(e){}
+}
+
+/* ---------------- zoom controls: buttons, slider, keys, pinch ---------------- */
+(function(){
+  const MIN=70, MAX=340;                       // camera distance limits
+  function wire(cv, getS){
+    const bar=cv.parentElement.querySelector('.bar'); if(!bar) return;
+    const box=document.createElement('div'); box.className='zoom';
+    const out=document.createElement('button'); out.type='button'; out.textContent='\u2212';
+    const inn=document.createElement('button'); inn.type='button'; inn.textContent='+';
+    const sl=document.createElement('input'); sl.type='range'; sl.min='0'; sl.max='100';
+    const lab=document.createElement('label');
+    out.setAttribute('aria-label','Zoom out'); inn.setAttribute('aria-label','Zoom in');
+    sl.setAttribute('aria-label','Zoom');
+    box.appendChild(out); box.appendChild(sl); box.appendChild(inn); box.appendChild(lab);
+    bar.appendChild(box);
+    function redraw(){const S=getS(); if(S.build)S.build(); S.draw();}
+    function sync(){const S=getS();
+      sl.value=String(Math.round((MAX-S.dist)/(MAX-MIN)*100));
+      lab.textContent='\u00d7'+(180/S.dist).toFixed(1);}
+    function setDist(d){const S=getS(); S.dist=Math.max(MIN,Math.min(MAX,d)); sync(); redraw();}
+    out.addEventListener('click',()=>setDist(getS().dist*1.18));
+    inn.addEventListener('click',()=>setDist(getS().dist/1.18));
+    sl.addEventListener('input',()=>setDist(MAX-(sl.value/100)*(MAX-MIN)));
+    cv.addEventListener('wheel',()=>{sync();},{passive:true});
+    cv.addEventListener('keydown',e=>{
+      if(e.key==='+'||e.key==='='){e.preventDefault();setDist(getS().dist/1.18);}
+      if(e.key==='-'||e.key==='_'){e.preventDefault();setDist(getS().dist*1.18);}
+    });
+    // pinch to zoom
+    const pts=new Map(); let base=0, baseDist=0;
+    cv.addEventListener('pointerdown',e=>{pts.set(e.pointerId,[e.clientX,e.clientY]);
+      if(pts.size===2){const v=[...pts.values()];
+        base=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]); baseDist=getS().dist;}});
+    cv.addEventListener('pointermove',e=>{
+      if(!pts.has(e.pointerId))return; pts.set(e.pointerId,[e.clientX,e.clientY]);
+      if(pts.size===2){const v=[...pts.values()];
+        const d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);
+        if(base>4) setDist(baseDist*base/d);}});
+    ['pointerup','pointercancel','pointerleave'].forEach(t=>
+      cv.addEventListener(t,e=>pts.delete(e.pointerId)));
+    sync();
+  }
+  window.__wireZoom=wire;
+})();
+[['c1',1],['c2',2],['c3',3]].forEach(([id,k])=>
+  window.__wireZoom(document.getElementById(id),()=>SCN[k].S));
+
+document.querySelectorAll('.lang button').forEach(b=>
+  b.addEventListener('click',()=>applyLang(b.dataset.lang)));
+try{ if(localStorage.getItem('epicme_lang')==='en') applyLang('en'); }catch(e){}
+</script>
+</body>
+</html>

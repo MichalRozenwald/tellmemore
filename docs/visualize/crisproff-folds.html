@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">CRISPRoff как белковые укладки</title>
+<style>
+  :root{--ink:#0E2033;--ink2:#152C43;--line:#2A4560;--text:#E8EEF4;--dim:#9FB4C7;
+    --faint:#6B8299;--sky:#56B4E9;--verm:#D55E00}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text);line-height:1.55;
+    font-family:'Space Grotesk','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 26px 90px}
+  .top{display:flex;justify-content:space-between;gap:24px;padding:44px 0 6px;flex-wrap:wrap}
+  h1{font-size:clamp(27px,3.5vw,40px);line-height:1.1;margin:0 0 15px;font-weight:600;
+    letter-spacing:-.015em;max-width:20ch}
+  .lede{font-size:16.5px;color:var(--dim);max-width:72ch;margin:0}
+  .lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;
+    background:var(--ink2);height:fit-content}
+  .lang button{border:0;background:transparent;color:var(--dim);cursor:pointer;
+    font:600 14px/1 inherit;padding:9px 17px;border-radius:999px}
+  .lang button[aria-pressed="true"]{background:var(--sky);color:#06182A}
+  section{margin-top:44px;border-top:1px solid var(--line);padding-top:24px}
+  h2{font-size:22px;margin:0 0 8px;font-weight:600;letter-spacing:-.01em}
+  .sub{color:var(--dim);font-size:15px;margin:0 0 16px;max-width:80ch}
+  .stage{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:12px}
+  canvas{display:block;width:100%;border-radius:9px;cursor:grab;touch-action:none;background:#0A1928}
+  canvas:active{cursor:grabbing}
+  canvas:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .bar{display:flex;align-items:center;gap:11px;margin-top:12px;flex-wrap:wrap}
+  button.ctl{border:0;border-radius:9px;background:var(--sky);color:#06182A;cursor:pointer;
+    font:600 14px/1 inherit;padding:10px 17px}
+  button.ghost{background:var(--ink);color:var(--dim);border:1px solid var(--line)}
+  .legend{display:flex;gap:15px;flex-wrap:wrap;margin-top:11px;font-size:13px;color:var(--dim)}
+  .legend i{display:inline-block;width:13px;height:13px;border-radius:3px;margin-right:6px;
+    vertical-align:-2px;font-style:normal}
+  .hint{color:var(--faint);font-size:12.5px;margin-top:9px}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--faint);font-size:12.5px;font-weight:600}
+  td.pdb{white-space:nowrap}
+  td.pdb a{color:var(--sky)}
+  .note{margin-top:22px;border-left:3px solid var(--verm);background:var(--ink2);
+    padding:15px 19px;border-radius:0 9px 9px 0}
+  .note h3{margin:0 0 6px;font-size:15.5px;color:var(--verm);font-weight:600}
+  .note p{margin:0;color:var(--dim);font-size:14.5px;max-width:82ch}
+  footer{margin-top:42px;border-top:1px solid var(--line);padding-top:18px;
+    color:var(--faint);font-size:13px}
+
+  .zoom{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto}
+  .zoom button{width:38px;height:38px;padding:0;border:1px solid var(--line);
+    background:var(--ink);color:var(--text);border-radius:9px;cursor:pointer;
+    font:600 19px/1 inherit}
+  .zoom button:hover{border-color:var(--sky);color:var(--sky)}
+  .zoom button:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .zoom input[type=range]{width:132px;accent-color:var(--sky);cursor:pointer}
+  .zoom label{font-size:12.5px;color:var(--faint)}
+  @media (max-width:720px){.wrap{padding:0 14px 60px}}
+</style>
+<style>.back-home{position:fixed;left:14px;top:12px;z-index:200;font:600 13px/1 'Space Grotesk',Arial,sans-serif;text-decoration:none;color:#9FB4C7;background:rgba(14,32,51,.82);border:1px solid #2A4560;border-radius:999px;padding:8px 13px;backdrop-filter:blur(6px)}.back-home:hover{color:#56B4E9;border-color:#56B4E9}</style></head>
+<body>
+<a href="../index.html" target="_top" class="back-home" aria-label="epicme.bio">← epicme.bio</a>
+<div class="wrap">
+
+<div class="top">
+  <div>
+    <h1 data-i18n="title">CRISPRoff как белковые укладки</h1>
+    <p class="lede" data-i18n="lede">Здесь домены нарисованы не шариками, а вторичной структурой: спирали спиралями, листы стрелками, петли нитями. Состав и топология каждой укладки взяты из литературы. Это не экспериментальные координаты — в таблице внизу указаны PDB, где можно посмотреть настоящие.</p>
+  </div>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+</div>
+
+<section>
+  <h2 data-i18n="s1h">dCas9 на ДНК: две доли и R-петля</h2>
+  <p class="sub" data-i18n="s1s">Cas9 устроен как двулопастная клешня. Доля узнавания почти целиком спиральная, нуклеазная доля смешанная α/β и содержит оба каталитических центра — в dCas9 они выключены точечными мутациями. Между долями зажаты гибрид sgRNA с ДНК и вытесненная цепь.</p>
+  <div class="stage">
+    <canvas id="cA" tabindex="0" aria-label="dCas9 fold with sgRNA and DNA"></canvas>
+    <div class="bar">
+      <button class="ctl ghost" data-spin="A" data-i18n="spin">⟳ Вращение</button>
+      <button class="ctl ghost" data-view="A" data-i18n="view">↺ Исходный вид</button>
+    </div>
+    <div class="legend" id="legA"></div>
+    <p class="hint" data-i18n="hint">Тяните, чтобы повернуть. Колесо — приблизить.</p>
+  </div>
+</section>
+
+<section>
+  <h2 data-i18n="s2h">Четыре домена рядом, в своих укладках</h2>
+  <p class="sub" data-i18n="s2s">У каждой части свой узнаваемый тип складки, и по ней сразу видно назначение. Метилтрансферазная укладка построена вокруг центрального β-листа, который держит кофактор. BFP — классическая β-бочка с хромофором внутри. KRAB — всего две амфипатические спирали, минимум, которого хватает, чтобы зацепить KAP1.</p>
+  <div class="stage">
+    <canvas id="cB" tabindex="0" aria-label="The four CRISPRoff domains as folds"></canvas>
+    <div class="bar">
+      <button class="ctl ghost" data-spin="B" data-i18n="spin">⟳ Вращение</button>
+      <button class="ctl ghost" data-view="B" data-i18n="view">↺ Исходный вид</button>
+    </div>
+    <div class="legend" id="legB"></div>
+  </div>
+</section>
+
+<section>
+  <h2 data-i18n="s3h">Нуклеосома, KAP1 и HP1 в укладках</h2>
+  <p class="sub" data-i18n="s3s">Здесь единственная геометрия, взятая из реальных чисел: ДНК намотана на октамер в виде левозакрученной суперспирали радиусом около 42 Å, чуть меньше двух витков на 147 пар оснований. KAP1 показан длинной суперспиралью, HP1 — хромодоменом из трёх β-нитей с замыкающей спиралью.</p>
+  <div class="stage">
+    <canvas id="cC" tabindex="0" aria-label="Nucleosome with KAP1 coiled coil and HP1 chromodomain"></canvas>
+    <div class="bar">
+      <button class="ctl ghost" data-spin="C" data-i18n="spin">⟳ Вращение</button>
+      <button class="ctl ghost" data-view="C" data-i18n="view">↺ Исходный вид</button>
+    </div>
+    <div class="legend" id="legC"></div>
+  </div>
+</section>
+
+<section>
+  <h2 data-i18n="th">Что здесь откуда</h2>
+  <p class="sub" data-i18n="ts">Тип укладки и состав вторичной структуры для каждого белка, и запись в PDB, где лежит настоящая структура.</p>
+  <table>
+    <thead><tr>
+      <th data-i18n="c1">Белок</th><th data-i18n="c2">Тип укладки</th>
+      <th data-i18n="c3">Что нарисовано</th><th data-i18n="c4">Настоящая структура</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div class="note">
+    <h3 data-i18n="nh">Честно про то, что это такое</h3>
+    <p data-i18n="np">Это схематические укладки, а не экспериментальные координаты. Верны тип складки, состав вторичной структуры и общая топология — сколько спиралей, сколько нитей в листе, как доли расположены друг относительно друга. Неверны точные положения атомов, длины отдельных элементов и конформации петель. Для реальной геометрии откройте PDB по ссылкам в таблице. Из настоящих чисел здесь только суперспираль нуклеосомной ДНК.</p>
+  </div>
+</section>
+
+<footer data-i18n="foot">CD55 · epicme.bio · схематические укладки, PDB для сравнения указаны в таблице</footer>
+</div>
+
+<script>
+/* ================= 3D engine with cartoon primitives ================= */
+function Scene(cv){
+  const S={cv:cv,ctx:cv.getContext('2d'),yaw:.6,pitch:-.22,dist:170,foc:800,oy:.5,
+    objs:[],spin:false,dpr:Math.min(devicePixelRatio||1,2),home:null};
+  function resize(){const w=cv.clientWidth||900,h=Math.round(w*0.50);
+    cv.width=w*S.dpr;cv.height=h*S.dpr;cv.style.height=h+'px';S.w=w;S.h=h;}
+  S.resize=resize;resize();
+  new ResizeObserver(()=>{resize();S.draw();}).observe(cv);
+
+  S.proj=function(p){
+    const cp=Math.cos(S.pitch),sp=Math.sin(S.pitch);
+    const y1=p[1]*cp-p[2]*sp, z1=p[1]*sp+p[2]*cp;
+    const cy=Math.cos(S.yaw),sy=Math.sin(S.yaw);
+    const x2=p[0]*cy+z1*sy, z2=-p[0]*sy+z1*cy;
+    const zc=z2+S.dist, k=S.foc/Math.max(zc,12);
+    return {x:S.w/2+x2*k,y:S.h*S.oy-y1*k,z:zc,k:k};
+  };
+  function shade(hex,zc,lift){
+    const t=Math.max(0,Math.min(1,(zc-S.dist+80)/190));
+    let h=String(hex||'#8FA3B8').replace('#','');
+    if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    if(h.length!==6||/[^0-9a-fA-F]/.test(h))h='8FA3B8';
+    let r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+    if(lift){r=r+(255-r)*lift;g=g+(255-g)*lift;b=b+(255-b)*lift;}
+    return 'rgb('+Math.round(r+(10-r)*t*.7)+','+Math.round(g+(25-g)*t*.7)+','
+                 +Math.round(b+(40-b)*t*.7)+')';
+  }
+  S.shade=shade;
+  S.clear=()=>{S.objs.length=0;};
+  S.ball =(p,r,c,l,lc)=>S.objs.push({t:'b',p,r,c,l,lc:lc||c});
+  S.tube =(a,b,r,c)=>S.objs.push({t:'t',a,b,r,c});
+  S.quad =(pts,c,lift)=>S.objs.push({t:'q',pts,c,lift:lift||0});
+  S.label=(p,txt,c)=>S.objs.push({t:'L',p,l:txt,lc:c});
+
+  S.draw=function(){
+    const x=S.ctx;x.setTransform(S.dpr,0,0,S.dpr,0,0);
+    x.fillStyle='#0A1928';x.fillRect(0,0,S.w,S.h);
+    const prims=[];
+    for(const o of S.objs){
+      if(o.t==='t'){const A=S.proj(o.a),B=S.proj(o.b);prims.push({z:(A.z+B.z)/2,o,A,B});}
+      else if(o.t==='q'){const P=o.pts.map(S.proj);
+        prims.push({z:P.reduce((s,q)=>s+q.z,0)/P.length,o,P});}
+      else {const q=S.proj(o.p);prims.push({z:q.z,o,q});}
+    }
+    prims.sort((a,b)=>b.z-a.z);
+    const labels=[];
+    for(const pr of prims){
+      const o=pr.o;
+      if(o.t==='t'){
+        x.strokeStyle=shade(o.c,pr.z);x.lineCap='round';
+        x.lineWidth=Math.max(.8,o.r*(pr.A.k+pr.B.k));
+        x.beginPath();x.moveTo(pr.A.x,pr.A.y);x.lineTo(pr.B.x,pr.B.y);x.stroke();
+      } else if(o.t==='q'){
+        x.fillStyle=shade(o.c,pr.z,o.lift);
+        x.beginPath();x.moveTo(pr.P[0].x,pr.P[0].y);
+        for(let i=1;i<pr.P.length;i++)x.lineTo(pr.P[i].x,pr.P[i].y);
+        x.closePath();x.fill();
+        x.strokeStyle=shade(o.c,pr.z+60);x.lineWidth=.8;x.stroke();
+      } else if(o.t==='L'){
+        labels.push({x:pr.q.x,y:pr.q.y,t:o.l,c:o.lc,s:13});
+      } else {
+        const R=Math.max(.5,o.r*pr.q.k),base=shade(o.c,pr.z);
+        const g=x.createRadialGradient(pr.q.x-R*.35,pr.q.y-R*.4,R*.1,pr.q.x,pr.q.y,R);
+        g.addColorStop(0,'rgba(255,255,255,.4)');g.addColorStop(.45,base);
+        g.addColorStop(1,shade(o.c,pr.z+80));
+        x.fillStyle=g;x.beginPath();x.arc(pr.q.x,pr.q.y,R,0,Math.PI*2);x.fill();
+        if(o.l)labels.push({x:pr.q.x,y:pr.q.y-R-7,t:o.l,c:o.lc,s:12});
+      }
+    }
+    x.textAlign='center';
+    for(const L of labels){
+      x.font='600 '+L.s+"px 'Space Grotesk',Arial,sans-serif";
+      x.lineWidth=3.6;x.strokeStyle='rgba(10,25,40,.88)';
+      const yy=Math.max(15,Math.min(S.h-6,L.y));
+      x.strokeText(L.t,L.x,yy);x.fillStyle=L.c;x.fillText(L.t,L.x,yy);
+    }
+  };
+
+  let drag=false,px=0,py=0;
+  cv.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;
+    try{cv.setPointerCapture(e.pointerId);}catch(_){}} );
+  cv.addEventListener('pointermove',e=>{if(!drag)return;
+    S.yaw+=(e.clientX-px)*.008;
+    S.pitch=Math.max(-1.35,Math.min(1.35,S.pitch-(e.clientY-py)*.006));
+    px=e.clientX;py=e.clientY;S.draw();});
+  cv.addEventListener('pointerup',()=>drag=false);
+  cv.addEventListener('pointercancel',()=>drag=false);
+  cv.addEventListener('wheel',e=>{e.preventDefault();
+    S.dist=Math.max(70,Math.min(360,S.dist+e.deltaY*.22));S.draw();},{passive:false});
+  cv.addEventListener('keydown',e=>{
+    const k={ArrowLeft:[-.12,0],ArrowRight:[.12,0],ArrowUp:[0,-.09],ArrowDown:[0,.09]}[e.key];
+    if(!k)return;e.preventDefault();S.yaw+=k[0];
+    S.pitch=Math.max(-1.35,Math.min(1.35,S.pitch+k[1]));S.draw();});
+  return S;
+}
+
+/* ---------------- vector helpers ---------------- */
+const V={
+  add:(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],
+  sub:(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],
+  mul:(a,s)=>[a[0]*s,a[1]*s,a[2]*s],
+  len:a=>Math.hypot(a[0],a[1],a[2]),
+  norm:a=>{const l=V.len(a)||1;return [a[0]/l,a[1]/l,a[2]/l];},
+  cross:(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]
+};
+function basis(d){
+  d=V.norm(d);
+  let up=Math.abs(d[1])>.9?[1,0,0]:[0,1,0];
+  const u=V.norm(V.cross(d,up)), v=V.cross(d,u);
+  return [u,v];
+}
+/* deterministic pseudo-random so the layout never changes between reloads */
+function rnd(i){const x=Math.sin(i*127.1+11.7)*43758.5453;return x-Math.floor(x);}
+
+/* ---------------- cartoon secondary structure ---------------- */
+const SCALE=0.42;                       // ångström -> scene units
+/* alpha helix: 3.6 residues per turn, 1.5 Å rise, 2.3 Å radius */
+function alphaHelix(S,start,dir,nRes,col){
+  const [u,v]=basis(dir); const d=V.norm(dir);
+  const R=3.6*SCALE, rise=1.5*SCALE;   // cartoon radius, wider than the real 2.3 A
+  let prev=null;
+  for(let i=0;i<=nRes*4;i++){
+    const t=i/4, th=t*2*Math.PI/3.6;
+    const p=V.add(V.add(start,V.mul(d,rise*t)),
+             V.add(V.mul(u,R*Math.cos(th)),V.mul(v,R*Math.sin(th))));
+    if(prev)S.tube(prev,p,0.52,col);
+    prev=p;
+  }
+  return V.add(start,V.mul(d,rise*nRes));
+}
+/* beta strand drawn as a flat ribbon ending in an arrowhead */
+function betaStrand(S,start,dir,nRes,col,wid){
+  const [u,v]=basis(dir); const d=V.norm(dir);
+  const rise=3.3*SCALE, W=(wid||2.4)*SCALE;
+  const L=rise*nRes;
+  const body=L*0.78;
+  const q=(t,w)=>V.add(start,V.add(V.mul(d,t),V.mul(u,w)));
+  const steps=6;
+  for(let i=0;i<steps;i++){
+    const t0=body*i/steps,t1=body*(i+1)/steps;
+    const tw=Math.sin((i/steps)*1.1)*0.35*SCALE;     // gentle twist
+    S.quad([q(t0,-W+tw),q(t0,W+tw),q(t1,W-tw),q(t1,-W-tw)],col,0.06);
+  }
+  S.quad([q(body,-W*1.9),q(body,W*1.9),q(L,0)],col,0.14); // arrowhead
+  return V.add(start,V.mul(d,L));
+}
+function coil(S,pts,col,r){
+  for(let i=1;i<pts.length;i++)S.tube(pts[i-1],pts[i],r||0.55,col);
+}
+/* B-DNA duplex along an arbitrary path */
+function dnaPath(S,pathFn,n,col1,col2,rad){
+  const R=(rad||10)*SCALE;
+  let a0=null,b0=null;
+  for(let i=0;i<=n;i++){
+    const t=i/n, c=pathFn(t), d=V.norm(V.sub(pathFn(Math.min(1,t+1e-3)),c));
+    const [u,v]=basis(d);
+    const th=t*n*0.62;
+    const a=V.add(c,V.add(V.mul(u,R*Math.cos(th)),V.mul(v,R*Math.sin(th))));
+    const b=V.add(c,V.add(V.mul(u,R*Math.cos(th+Math.PI)),V.mul(v,R*Math.sin(th+Math.PI))));
+    if(a0){S.tube(a0,a,0.85,col1);S.tube(b0,b,0.85,col2);}
+    if(i%3===0)S.tube(a,b,0.3,'#4E6A85');
+    a0=a;b0=b;
+  }
+}
+/* a globular alpha/beta lobe: helices and strands packed into an ellipsoid */
+function lobe(S,c,rx,ry,rz,nH,nS,colH,colS,seed){
+  for(let i=0;i<nH;i++){
+    const s=seed+i*3.7;
+    const th=rnd(s)*Math.PI*2, ph=Math.acos(2*rnd(s+1)-1), rr=0.35+0.5*rnd(s+2);
+    const p=[c[0]+rx*rr*Math.sin(ph)*Math.cos(th),
+             c[1]+ry*rr*Math.cos(ph),
+             c[2]+rz*rr*Math.sin(ph)*Math.sin(th)];
+    const d=[Math.cos(rnd(s+3)*6.28),Math.sin(rnd(s+4)*6.28)*.7,Math.sin(rnd(s+5)*6.28)];
+    alphaHelix(S,p,d,13+Math.round(rnd(s+6)*10),colH);
+  }
+  for(let i=0;i<nS;i++){
+    const s=seed+100+i*5.1;
+    const th=rnd(s)*Math.PI*2, rr=0.15+0.35*rnd(s+1);
+    const p=[c[0]+rx*rr*Math.cos(th),c[1]+ry*(rnd(s+2)-.5)*.7,c[2]+rz*rr*Math.sin(th)];
+    const d=[Math.cos(rnd(s+3)*6.28)*.4,0.25+rnd(s+4)*.4,Math.sin(rnd(s+5)*6.28)*.4];
+    betaStrand(S,p,d,6+Math.round(rnd(s+6)*3),colS);
+  }
+}
+
+const C={helix:'#0072B2',helix2:'#3D96CE',sheet:'#E69F00',coil:'#6B8299',
+  d3a:'#CC79A7',d3aS:'#E8A9CB',d3l:'#9C5686',bfp:'#D55E00',bfpS:'#F08A3C',
+  krab:'#E69F00',dna:'#8FA3B8',dna2:'#6E8398',rna:'#009E73',
+  kap1:'#56B4E9',hp1:'#F0E442',hist:'#CC79A7',me:'#009E73'};
+
+/* ============================ SCENE A: dCas9 ============================ */
+const SA=(function(){
+  const S=Scene(document.getElementById('cA'));
+  S.dist=150;S.oy=.50;S.yaw=.55;S.pitch=-.2;
+  S.home={yaw:.55,pitch:-.2,dist:150};
+  S.build=function(){
+    S.clear();
+    // REC lobe — almost entirely alpha-helical
+    lobe(S,[-24,8,0],23,20,20,17,0,C.helix,C.sheet,3);
+    S.label([-26,36,0],'REC lobe','#7FC4E8');
+    // NUC lobe — mixed alpha/beta, holds both nuclease centres
+    lobe(S,[22,-2,0],21,18,18,9,7,C.helix2,C.sheet,41);
+    S.label([24,30,0],'NUC lobe','#F0BE5E');
+    // the two catalytic centres, switched off in dCas9
+    S.ball([14,-12,9],2.6,'#D55E00','RuvC D10A','#F2A472');
+    S.ball([31,6,-8],2.6,'#D55E00','HNH H840A','#F2A472');
+    // target DNA passing between the lobes, with the R-loop bubble
+    dnaPath(S,t=>[-58+116*t,-24+Math.sin(t*3.1)*4,-4+Math.cos(t*2.2)*3],66,C.dna,C.dna2,10);
+    // sgRNA threading into the cleft and pairing with the target strand
+    coil(S,[[-40,30,16],[-28,21,12],[-16,11,7],[-4,1,2],[6,-9,-1],[13,-17,-3]],C.rna,1.1);
+    S.label([-52,20,16],'sgRNA','#4FD3AC');
+    // displaced non-target strand looping out of the bubble
+    coil(S,[[-8,-20,6],[0,-11,13],[9,-12,14],[16,-21,7]],'#B9C7D3',0.85);
+    S.label([8,4,16],'displaced strand','#C9D6E2');
+    S.label([-58,-33,0],'target DNA','#AFC0CF');
+  };
+  S.build();S.draw();
+  return S;
+})();
+
+/* ====================== SCENE B: the four domains ====================== */
+const SB=(function(){
+  const S=Scene(document.getElementById('cB'));
+  S.dist=118;S.oy=.52;S.yaw=.35;S.pitch=-.16;
+  S.home={yaw:.35,pitch:-.16,dist:118};
+  /* AdoMet-dependent methyltransferase fold: a central mixed beta sheet
+     of seven strands with helices packed on both faces */
+  function mtaseFold(S,c,colH,colS,seed,lab,lc){
+    const order=[3,2,1,0,4,5,6];
+    for(let i=0;i<7;i++){
+      const x=(order[i]-3)*3.1;
+      const p=[c[0]+x,c[1]-8,c[2]-5+Math.sin(i*.7)*1.6];
+      betaStrand(S,p,[0.1,1,0.12],8,colS,3.0);
+    }
+    for(let i=0;i<6;i++){
+      const side=i%2?1:-1, j=Math.floor(i/2);
+      alphaHelix(S,[c[0]-7+j*7,c[1]-7+j*1.6,c[2]+side*10],[0.15,1,side*0.12],14,colH);
+    }
+    if(lab)S.label([c[0],c[1]+15,c[2]],lab,lc);
+  }
+  S.build=function(){
+    S.clear();
+    // DNMT3A catalytic domain
+    mtaseFold(S,[-56,0,0],C.d3a,C.d3aS,7,'DNMT3A','#F0C6E0');
+    S.ball([-56,5,6],3.0,'#009E73','SAM','#7FE0C4');
+    S.label([-56,-24,0],'MTase fold','#C9D6E2');
+    // DNMT3L: same fold, no catalytic motifs
+    mtaseFold(S,[-19,-2,0],C.d3l,'#C08AAE',23,'DNMT3L','#E0AECB');
+    S.label([-19,-24,0],'no active site','#C9D6E2');
+    // BFP: eleven-stranded beta barrel with a central helix carrying the chromophore
+    const bc=[19,0,0], R=8.0;
+    for(let i=0;i<11;i++){
+      const th=i*2*Math.PI/11;
+      betaStrand(S,[bc[0]+R*Math.cos(th),bc[1]-9,bc[2]+R*Math.sin(th)],
+                 [Math.cos(th)*0.1,1,Math.sin(th)*0.1],11,C.bfpS,2.6);
+    }
+    alphaHelix(S,[bc[0],bc[1]-9,bc[2]],[0.05,1,0],14,C.bfp);
+    S.ball([bc[0],bc[1]+1,bc[2]],3.2,'#7FB2FF','chromophore','#BFD6FF');
+    S.label([bc[0],bc[1]+15,bc[2]],'BFP','#F5A96A');
+    S.label([bc[0],bc[1]-24,bc[2]],'beta barrel','#C9D6E2');
+    // KRAB: two amphipathic helices, and that is the whole domain
+    alphaHelix(S,[52,-10,-3],[0.2,1,0.1],18,C.krab);
+    alphaHelix(S,[61,-9,4],[-0.15,1,-0.1],15,C.krab);
+    coil(S,[[53,4,-2],[57,8,1],[61,5,4]],C.coil,0.7);
+    S.label([57,15,0],'KRAB','#F7D79A');
+    S.label([57,-24,0],'two helices','#C9D6E2');
+  };
+  S.build();S.draw();
+  return S;
+})();
+
+/* =================== SCENE C: nucleosome, KAP1, HP1 =================== */
+const SC=(function(){
+  const S=Scene(document.getElementById('cC'));
+  S.dist=132;S.oy=.50;S.yaw=.7;S.pitch=-.3;
+  S.home={yaw:.7,pitch:-.3,dist:132};
+  S.build=function(){
+    S.clear();
+    // nucleosomal DNA: left-handed superhelix, r = 41.8 A, pitch 25.9 A, 1.65 turns
+    const Rs=41.8*SCALE, pitch=25.9*SCALE, turns=1.65;
+    dnaPath(S,t=>{
+      const th=-t*turns*2*Math.PI;
+      return [Rs*Math.cos(th), pitch*(t-0.5)*turns, Rs*Math.sin(th)];
+    },110,C.dna,C.dna2,3.4);
+    S.label([0,-19,0],'147 bp, ~1.65 turns','#AFC0CF');
+    // histone octamer: four histone-fold pairs, each a long helix flanked by two short
+    for(let i=0;i<8;i++){
+      const th=i*Math.PI/4+0.3;
+      const c=[Rs*0.44*Math.cos(th),(i%2?3:-3),Rs*0.44*Math.sin(th)];
+      const d=[-Math.sin(th),0.25,Math.cos(th)];
+      alphaHelix(S,c,d,11,C.hist);
+      alphaHelix(S,V.add(c,[0,-4.5,0]),d,5,'#B0679B');
+      alphaHelix(S,V.add(c,[0,4.5,0]),d,5,'#B0679B');
+    }
+    S.label([0,11,0],'histone octamer','#F0C6E0');
+    // an H3 tail carrying H3K9me3, reaching out of the core
+    coil(S,[[7,6,10],[11,10,14],[14,14,17],[16,18,19]],'#D8A7C6',0.6);
+    S.ball([16,19,19],2.2,C.me,'H3K9me3','#7FE0C4');
+    // KAP1: RBCC with a long antiparallel coiled coil
+    alphaHelix(S,[-40,26,6],[1,0.16,0],30,C.kap1);
+    alphaHelix(S,[-40,30,4],[1,0.16,0],30,'#8FCDEC');
+    S.label([-26,40,5],'KAP1 coiled coil','#BFE3F7');
+    lobe(S,[-46,22,4],5,5,5,3,1,C.kap1,'#8FCDEC',77);
+    S.label([-50,32,4],'RING','#BFE3F7');
+    // HP1 chromodomain: three-stranded sheet closed by a C-terminal helix
+    const hc=[24,26,14];
+    for(let i=0;i<3;i++)
+      betaStrand(S,[hc[0]+i*2.3,hc[1]-4,hc[2]],[0.1,1,0.1],5,C.hp1,2.2);
+    alphaHelix(S,[hc[0]+6,hc[1]-3,hc[2]+3],[-0.7,0.7,0],8,'#D6C93A');
+    S.label([hc[0]+2,hc[1]+12,hc[2]],'HP1 chromodomain','#F5EFA0');
+    coil(S,[[18,22,18],[17,20,18.5],[16.5,19.4,19]],C.coil,0.5);
+  };
+  S.build();S.draw();
+  return S;
+})();
+
+/* ========================= legends, table, i18n ========================= */
+const LEG={
+A:[['#0072B2','ru:α-спираль|en:alpha helix'],['#E69F00','ru:β-нить|en:beta strand'],
+   ['#8FA3B8','ru:ДНК|en:DNA'],['#009E73','ru:sgRNA|en:sgRNA'],
+   ['#D55E00','ru:выключенные центры|en:inactivated sites']],
+B:[['#CC79A7','ru:DNMT3A|en:DNMT3A'],['#9C5686','ru:DNMT3L|en:DNMT3L'],
+   ['#D55E00','ru:BFP|en:BFP'],['#E69F00','ru:KRAB|en:KRAB'],
+   ['#009E73','ru:кофактор SAM|en:SAM cofactor']],
+C:[['#8FA3B8','ru:ДНК нуклеосомы|en:nucleosomal DNA'],['#CC79A7','ru:гистоны|en:histones'],
+   ['#56B4E9','ru:KAP1|en:KAP1'],['#F0E442','ru:HP1|en:HP1'],
+   ['#009E73','ru:H3K9me3|en:H3K9me3']]
+};
+const ROWS=[
+ {p:'dCas9 (SpCas9)',
+  f:{ru:'двулопастная: спиральная доля узнавания и смешанная α/β нуклеазная доля',
+     en:'bilobed: an alpha-helical recognition lobe and a mixed alpha/beta nuclease lobe'},
+  d:{ru:'две доли, гибрид sgRNA с ДНК между ними, вытесненная цепь, положения RuvC и HNH',
+     en:'the two lobes, the sgRNA–DNA hybrid between them, the displaced strand, and where RuvC and HNH sit'},
+  id:'4OO8',u:'https://www.rcsb.org/structure/4OO8'},
+ {p:'DNMT3A + DNMT3L',
+  f:{ru:'укладка AdoMet-зависимой метилтрансферазы: центральный β-лист из семи нитей, спирали с обеих сторон',
+     en:'AdoMet-dependent methyltransferase fold: a central seven-stranded beta sheet with helices on both faces'},
+  d:{ru:'лист с порядком нитей, спирали по обе стороны, место посадки кофактора',
+     en:'the sheet with its strand order, the flanking helices, and where the cofactor binds'},
+  id:'2QRV',u:'https://www.rcsb.org/structure/2QRV'},
+ {p:'BFP (GFP-подобный)',
+  f:{ru:'β-бочка из одиннадцати нитей с центральной спиралью',
+     en:'an eleven-stranded beta barrel with a central helix'},
+  d:{ru:'одиннадцать нитей по окружности, спираль внутри, хромофор на ней',
+     en:'eleven strands around the circumference, the helix inside, and the chromophore on it'},
+  id:'3M24',u:'https://www.rcsb.org/structure/3M24'},
+ {p:'KRAB (ZNF10)',
+  f:{ru:'две амфипатические спирали, без β-структуры',
+     en:'two amphipathic helices and no beta structure'},
+  d:{ru:'обе спирали и петля между ними',
+     en:'both helices and the loop between them'},
+  id:'—',u:''},
+ {p:'KAP1 / TRIM28',
+  f:{ru:'мотив RBCC: RING, два B-box и длинная суперспираль',
+     en:'the RBCC motif: a RING, two B-boxes and a long coiled coil'},
+  d:{ru:'суперспираль из двух длинных спиралей и глобулярный RING на конце',
+     en:'the coiled coil as two long helices with the globular RING at one end'},
+  id:'6QAJ',u:'https://www.rcsb.org/structure/6QAJ'},
+ {p:'HP1, хромодомен',
+  f:{ru:'три β-нити, замкнутые C-концевой спиралью',
+     en:'three beta strands closed by a C-terminal helix'},
+  d:{ru:'лист из трёх нитей и спираль поверх него',
+     en:'the three-stranded sheet with the helix packed across it'},
+  id:'1KNE',u:'https://www.rcsb.org/structure/1KNE'},
+ {p:'Нуклеосома',
+  f:{ru:'октамер гистонов, ДНК левозакрученной суперспиралью',
+     en:'a histone octamer with the DNA in a left-handed superhelix'},
+  d:{ru:'суперспираль радиусом 41.8 Å с шагом 25.9 Å, 1.65 витка на 147 bp — единственная реальная геометрия на странице',
+     en:'the superhelix at 41.8 A radius and 25.9 A pitch, 1.65 turns over 147 bp — the only real geometry on this page'},
+  id:'1KX5',u:'https://www.rcsb.org/structure/1KX5'}
+];
+const T={
+ru:{title:'CRISPRoff как белковые укладки',
+ lede:'Здесь домены нарисованы не шариками, а вторичной структурой: спирали спиралями, листы стрелками, петли нитями. Состав и топология каждой укладки взяты из литературы. Это не экспериментальные координаты — в таблице внизу указаны PDB, где можно посмотреть настоящие.',
+ spin:'⟳ Вращение',spinoff:'⟳ Стоп',view:'↺ Исходный вид',
+ hint:'Тяните, чтобы повернуть. Колесо — приблизить.',
+ s1h:'dCas9 на ДНК: две доли и R-петля',
+ s1s:'Cas9 устроен как двулопастная клешня. Доля узнавания почти целиком спиральная, нуклеазная доля смешанная α/β и содержит оба каталитических центра — в dCas9 они выключены точечными мутациями. Между долями зажаты гибрид sgRNA с ДНК и вытесненная цепь.',
+ s2h:'Четыре домена рядом, в своих укладках',
+ s2s:'У каждой части свой узнаваемый тип складки, и по ней сразу видно назначение. Метилтрансферазная укладка построена вокруг центрального β-листа, который держит кофактор. BFP — классическая β-бочка с хромофором внутри. KRAB — всего две амфипатические спирали, минимум, которого хватает, чтобы зацепить KAP1.',
+ s3h:'Нуклеосома, KAP1 и HP1 в укладках',
+ s3s:'Здесь единственная геометрия, взятая из реальных чисел: ДНК намотана на октамер в виде левозакрученной суперспирали радиусом около 42 Å, чуть меньше двух витков на 147 пар оснований. KAP1 показан длинной суперспиралью, HP1 — хромодоменом из трёх β-нитей с замыкающей спиралью.',
+ th:'Что здесь откуда',
+ ts:'Тип укладки и состав вторичной структуры для каждого белка, и запись в PDB, где лежит настоящая структура.',
+ c1:'Белок',c2:'Тип укладки',c3:'Что нарисовано',c4:'Настоящая структура',
+ nh:'Честно про то, что это такое',
+ np:'Это схематические укладки, а не экспериментальные координаты. Верны тип складки, состав вторичной структуры и общая топология — сколько спиралей, сколько нитей в листе, как доли расположены друг относительно друга. Неверны точные положения атомов, длины отдельных элементов и конформации петель. Для реальной геометрии откройте PDB по ссылкам в таблице. Из настоящих чисел здесь только суперспираль нуклеосомной ДНК.',
+ foot:'CD55 · epicme.bio · схематические укладки, PDB для сравнения указаны в таблице'},
+en:{title:'CRISPRoff drawn as protein folds',
+ lede:'Here the domains are drawn as secondary structure rather than spheres: helices as helices, sheets as arrows, loops as threads. The composition and topology of each fold come from the literature. These are not experimental coordinates — the table below gives the PDB entries where the real ones live.',
+ spin:'⟳ Spin',spinoff:'⟳ Stop',view:'↺ Reset view',
+ hint:'Drag to rotate. Scroll to zoom.',
+ s1h:'dCas9 on DNA: two lobes and the R-loop',
+ s1s:'Cas9 is built like a two-lobed clamp. The recognition lobe is almost entirely helical; the nuclease lobe is mixed alpha/beta and holds both catalytic centres — in dCas9 they are switched off by point mutations. The sgRNA–DNA hybrid and the displaced strand sit clamped between the lobes.',
+ s2h:'The four domains side by side, each in its own fold',
+ s2s:'Each part has a recognisable fold type, and the fold alone tells you the job. The methyltransferase fold is built around a central beta sheet that holds the cofactor. BFP is the classic beta barrel with the chromophore inside. KRAB is just two amphipathic helices — the minimum needed to grab KAP1.',
+ s3h:'Nucleosome, KAP1 and HP1 as folds',
+ s3s:'This is the one geometry taken from real numbers: the DNA wraps the octamer as a left-handed superhelix about 42 A in radius, a little under two turns across 147 base pairs. KAP1 is shown as its long coiled coil, HP1 as the chromodomain — three beta strands closed by a helix.',
+ th:'Where all of this comes from',
+ ts:'The fold type and secondary-structure composition for each protein, and the PDB entry holding the real structure.',
+ c1:'Protein',c2:'Fold type',c3:'What is drawn',c4:'Real structure',
+ nh:'Being clear about what this is',
+ np:'These are schematic folds, not experimental coordinates. What is correct: the fold type, the secondary-structure composition and the overall topology — how many helices, how many strands in the sheet, how the lobes sit relative to each other. What is not: exact atomic positions, the length of individual elements and loop conformations. For real geometry open the PDB links in the table. The only real numbers here are the nucleosomal DNA superhelix.',
+ foot:'CD55 · epicme.bio · schematic folds, PDB entries for comparison are in the table'}};
+
+const SCN={A:SA,B:SB,C:SC};
+let LANG='ru';
+function pick(s){const m=s.split('|');return (LANG==='ru'?m[0]:m[1]).split(':').slice(1).join(':');}
+function fill(){
+  for(const k in LEG){
+    const box=document.getElementById('leg'+k);box.innerHTML='';
+    LEG[k].forEach(([c,t])=>{
+      const s=document.createElement('span');
+      s.innerHTML='<i style="background:'+c+'"></i>'+pick(t);box.appendChild(s);});
+  }
+  const tb=document.getElementById('rows');tb.innerHTML='';
+  ROWS.forEach(r=>{
+    const tr=document.createElement('tr');
+    const c1=document.createElement('td');c1.textContent=r.p;
+    c1.style.fontWeight='600';c1.style.color='#E8EEF4';
+    const c2=document.createElement('td');c2.textContent=r.f[LANG];
+    const c3=document.createElement('td');c3.textContent=r.d[LANG];c3.style.color='#9FB4C7';
+    const c4=document.createElement('td');c4.className='pdb';
+    if(r.u){const a=document.createElement('a');a.href=r.u;a.target='_blank';
+      a.rel='noopener';a.textContent='PDB '+r.id;c4.appendChild(a);}
+    else c4.textContent='—';
+    [c1,c2,c3,c4].forEach(c=>tr.appendChild(c));tb.appendChild(tr);
+  });
+}
+function applyLang(l){
+  LANG=l;document.documentElement.setAttribute('lang',l);
+  document.querySelectorAll('[data-i18n]').forEach(e=>{
+    const k=e.getAttribute('data-i18n');
+    if(k in T[l])(e.tagName==='TITLE')?document.title=T[l][k]:e.textContent=T[l][k];});
+  document.querySelectorAll('.lang button').forEach(b=>
+    b.setAttribute('aria-pressed',String(b.dataset.lang===l)));
+  document.querySelectorAll('[data-spin]').forEach(b=>{
+    const S=SCN[b.dataset.spin];b.textContent=S.spin?T[l].spinoff:T[l].spin;});
+  document.querySelectorAll('[data-view]').forEach(b=>b.textContent=T[l].view);
+  fill();
+  try{localStorage.setItem('epicme_lang',l);}catch(e){}
+}
+function loop(k,ts){
+  const S=SCN[k];if(!S.spin)return;
+  if(!S._last)S._last=ts;const dt=ts-S._last;S._last=ts;
+  S.yaw+=dt*.00026;S.draw();requestAnimationFrame(t=>loop(k,t));
+}
+document.querySelectorAll('[data-spin]').forEach(b=>b.addEventListener('click',()=>{
+  const k=b.dataset.spin,S=SCN[k];S.spin=!S.spin;S._last=0;
+  b.textContent=S.spin?T[LANG].spinoff:T[LANG].spin;
+  if(S.spin)requestAnimationFrame(t=>loop(k,t));
+}));
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{
+  const S=SCN[b.dataset.view];
+  if(S.home){S.yaw=S.home.yaw;S.pitch=S.home.pitch;S.dist=S.home.dist;S.draw();}
+}));
+
+/* ---------------- zoom controls: buttons, slider, keys, pinch ---------------- */
+(function(){
+  const MIN=70, MAX=340;                       // camera distance limits
+  function wire(cv, getS){
+    const bar=cv.parentElement.querySelector('.bar'); if(!bar) return;
+    const box=document.createElement('div'); box.className='zoom';
+    const out=document.createElement('button'); out.type='button'; out.textContent='\u2212';
+    const inn=document.createElement('button'); inn.type='button'; inn.textContent='+';
+    const sl=document.createElement('input'); sl.type='range'; sl.min='0'; sl.max='100';
+    const lab=document.createElement('label');
+    out.setAttribute('aria-label','Zoom out'); inn.setAttribute('aria-label','Zoom in');
+    sl.setAttribute('aria-label','Zoom');
+    box.appendChild(out); box.appendChild(sl); box.appendChild(inn); box.appendChild(lab);
+    bar.appendChild(box);
+    function redraw(){const S=getS(); if(S.build)S.build(); S.draw();}
+    function sync(){const S=getS();
+      sl.value=String(Math.round((MAX-S.dist)/(MAX-MIN)*100));
+      lab.textContent='\u00d7'+(180/S.dist).toFixed(1);}
+    function setDist(d){const S=getS(); S.dist=Math.max(MIN,Math.min(MAX,d)); sync(); redraw();}
+    out.addEventListener('click',()=>setDist(getS().dist*1.18));
+    inn.addEventListener('click',()=>setDist(getS().dist/1.18));
+    sl.addEventListener('input',()=>setDist(MAX-(sl.value/100)*(MAX-MIN)));
+    cv.addEventListener('wheel',()=>{sync();},{passive:true});
+    cv.addEventListener('keydown',e=>{
+      if(e.key==='+'||e.key==='='){e.preventDefault();setDist(getS().dist/1.18);}
+      if(e.key==='-'||e.key==='_'){e.preventDefault();setDist(getS().dist*1.18);}
+    });
+    // pinch to zoom
+    const pts=new Map(); let base=0, baseDist=0;
+    cv.addEventListener('pointerdown',e=>{pts.set(e.pointerId,[e.clientX,e.clientY]);
+      if(pts.size===2){const v=[...pts.values()];
+        base=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]); baseDist=getS().dist;}});
+    cv.addEventListener('pointermove',e=>{
+      if(!pts.has(e.pointerId))return; pts.set(e.pointerId,[e.clientX,e.clientY]);
+      if(pts.size===2){const v=[...pts.values()];
+        const d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);
+        if(base>4) setDist(baseDist*base/d);}});
+    ['pointerup','pointercancel','pointerleave'].forEach(t=>
+      cv.addEventListener(t,e=>pts.delete(e.pointerId)));
+    sync();
+  }
+  window.__wireZoom=wire;
+})();
+[['cA','A'],['cB','B'],['cC','C']].forEach(([id,k])=>
+  window.__wireZoom(document.getElementById(id),()=>SCN[k]));
+
+document.querySelectorAll('.lang button').forEach(b=>
+  b.addEventListener('click',()=>applyLang(b.dataset.lang)));
+fill();
+try{if(localStorage.getItem('epicme_lang')==='en')applyLang('en');}catch(e){}
+</script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">CRISPRoff — фильм о работе метилирования</title>
+<style>
+  :root{--berkeley:#003262;--gold:#FDB515;--pacific:#3B7EA1;--founders:#EEF2FA;
+    --ink:#16202B;--dim:#4A5A6B;--faint:#7C8B9B;--line:#D6DEE9;--paper:#FBFAF7}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);line-height:1.55;
+    font-family:'Public Sans','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 26px 80px}
+  .top{display:flex;justify-content:space-between;gap:24px;padding:46px 0 8px;flex-wrap:wrap}
+  .rule{width:170px;height:4px;background:var(--gold);margin:0 0 20px}
+  h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(28px,3.6vw,42px);
+    line-height:1.14;margin:0 0 14px;font-weight:700;color:var(--berkeley);max-width:21ch}
+  .lede{font-size:16.5px;color:var(--dim);max-width:74ch;margin:0}
+  .lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;
+    background:#fff;height:fit-content}
+  .lang button{border:0;background:transparent;color:var(--dim);cursor:pointer;
+    font:600 14px/1 inherit;padding:9px 17px;border-radius:999px}
+  .lang button[aria-pressed="true"]{background:var(--berkeley);color:#fff}
+  .stage{margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:6px;
+    overflow:hidden;box-shadow:0 1px 3px rgba(0,50,98,.06)}
+  canvas{display:block;width:100%;background:#F7F5F0}
+  .bar{display:flex;align-items:center;gap:12px;padding:12px 14px;flex-wrap:wrap;
+    border-top:1px solid var(--line)}
+  button.ctl{border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--berkeley);
+    cursor:pointer;font:600 14px/1 inherit;padding:10px 16px}
+  button.primary{background:var(--berkeley);color:#fff;border-color:var(--berkeley)}
+  button.ctl:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .track{flex:1 1 240px;height:8px;border-radius:99px;background:#E4E9F1;position:relative;
+    cursor:pointer;min-width:170px}
+  .fill{position:absolute;inset:0 auto 0 0;width:0;border-radius:99px;background:var(--berkeley)}
+  .tc{font-size:13px;color:var(--faint);font-variant-numeric:tabular-nums;min-width:82px}
+  .chapters{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+  .chapters button{border:1px solid var(--line);background:#fff;color:var(--dim);cursor:pointer;
+    font:600 12.5px/1 inherit;padding:8px 11px;border-radius:4px}
+  .chapters button:hover{border-color:var(--pacific);color:var(--berkeley)}
+  .chapters button[aria-current="true"]{background:var(--founders);border-color:var(--berkeley);
+    color:var(--berkeley)}
+  .note{margin-top:26px;border-left:4px solid var(--gold);background:var(--founders);padding:15px 19px}
+  .note h3{margin:0 0 6px;font-size:15.5px;color:var(--berkeley);font-weight:700}
+  .note p{margin:0;color:var(--dim);font-size:14.5px;max-width:82ch}
+  footer{margin-top:40px;border-top:1px solid var(--line);padding-top:18px;color:var(--faint);font-size:13px}
+  @media (max-width:720px){.wrap{padding:0 14px 60px}}
+</style>
+<style>.back-home{position:fixed;left:14px;top:12px;z-index:200;font:600 13px/1 'Public Sans',Arial,sans-serif;text-decoration:none;color:#4A5A6B;background:rgba(255,255,255,.9);border:1px solid #D6DEE9;border-radius:999px;padding:8px 13px;backdrop-filter:blur(6px)}.back-home:hover{color:#003262;border-color:#003262}</style></head>
+<body>
+<a href="../index.html" target="_top" class="back-home" aria-label="epicme.bio">← epicme.bio</a>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="rule"></div>
+      <h1 data-i18n="title">CRISPRoff — фильм о работе метилирования</h1>
+      <p class="lede" data-i18n="lede">Весь процесс одним непрерывным дублем: комплекс подходит к мишени, расплетает ДНК, метилтрансфераза выворачивает цитозины по сторонам от сайта и ставит метки, а те CpG, что физически накрыты белком, остаются чистыми. В конце белок уходит, метка остаётся.</p>
+    </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <canvas id="mv" width="1600" height="900" aria-label="CRISPRoff methylation process"></canvas>
+    <div class="bar">
+      <button class="ctl primary" id="play" data-i18n="play">▶ Смотреть</button>
+      <div class="track" id="tr"><div class="fill" id="fl"></div></div>
+      <span class="tc" id="tc">0:00 / 0:24</span>
+      <button class="ctl" id="save" data-i18n="save">↓ Кадр в PNG</button>
+    </div>
+  </div>
+  <div class="chapters" id="ch"></div>
+
+  <div class="note">
+    <h3 data-i18n="nh">Что в этом кадре правда</h3>
+    <p data-i18n="np">Верны последовательность событий, положение футпринта и то, что метки ложатся по сторонам, а не под белком — это ровно то, что мы измерили на CD55. Объёмы доменов посчитаны из молекулярных масс, шаг ДНК из параметров B-формы. Форма поверхностей — приближение, не экспериментальные координаты, и скорости событий условны: реальное метилирование идёт часами, а не секундами.</p>
+  </div>
+  <footer data-i18n="foot">CD55 · epicme.bio · оформление по шаблону UC Berkeley и Innovative Genomics Institute</footer>
+</div>
+
+<script>
+/* ===================== renderer ===================== */
+const BK={berkeley:'#2E6EA6',gold:'#E8A317',pacific:'#7FB2D9',green:'#127C56',
+  rose:'#C4362F',rose2:'#9C2A24',steel:'#B9CBDE',bone:'#FBFAF6',boneDk:'#DED9CE',
+  me:'#1E8F63',navy:'#003262'};
+const hex2rgb=h=>{h=h.replace('#','');
+  return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];};
+const rgbs=a=>'rgb('+a.map(v=>Math.round(Math.max(0,Math.min(255,v)))).join(',')+')';
+const rnd=i=>{const x=Math.sin(i*127.1+11.7)*43758.5453;return x-Math.floor(x);};
+const Vn=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l];};
+const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lp=(a,b,t)=>a+(b-a)*cl(t,0,1);
+const ez=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+/* progress of a segment [a,b] of the timeline */
+const sg=(t,a,b)=>cl((t-a)/(b-a),0,1);
+
+const cv=document.getElementById('mv'), ctx=cv.getContext('2d');
+const W=1600,H=900;
+const CAM={yaw:.62,pitch:-.10,dist:200,foc:1150,oy:.47};
+let ATOMS=[],TAGS=[];
+const LIGHT=Vn([-.45,.72,.55]);
+
+function proj(p){
+  const cp=Math.cos(CAM.pitch),sp=Math.sin(CAM.pitch);
+  const y1=p[1]*cp-p[2]*sp,z1=p[1]*sp+p[2]*cp;
+  const cy=Math.cos(CAM.yaw),sy=Math.sin(CAM.yaw);
+  const x2=p[0]*cy+z1*sy,z2=-p[0]*sy+z1*cy;
+  const zc=z2+CAM.dist,k=CAM.foc/Math.max(zc,14);
+  return {x:W/2+x2*k,y:H*CAM.oy-y1*k,z:zc,k:k};
+}
+function rotN(n){
+  const cp=Math.cos(CAM.pitch),sp=Math.sin(CAM.pitch);
+  const y1=n[1]*cp-n[2]*sp,z1=n[1]*sp+n[2]*cp;
+  const cy=Math.cos(CAM.yaw),sy=Math.sin(CAM.yaw);
+  return [n[0]*cy+z1*sy,y1,-n[0]*sy+z1*cy];
+}
+const atom=(p,r,c,n)=>ATOMS.push({p,r,c,n:n||Vn(p)});
+const tag=(p,t,c)=>TAGS.push({p,t,c});
+
+function lobe(c,rad,nRes,col,seed,sq){
+  sq=sq||[1,1,1];
+  const N=Math.max(30,nRes),ga=Math.PI*(3-Math.sqrt(5));
+  for(let i=0;i<N;i++){
+    const y=1-(i/(N-1))*2,r=Math.sqrt(Math.max(0,1-y*y)),th=ga*i;
+    const n=[Math.cos(th)*r,y,Math.sin(th)*r];
+    const bump=1+.13*Math.sin(n[0]*3.1+seed)+.10*Math.sin(n[1]*4.3+seed*1.7)
+                +.08*Math.sin(n[2]*5.2+seed*2.3)+.05*(rnd(seed*97+i)-.5);
+    const R=rad*bump;
+    atom([c[0]+n[0]*R*sq[0],c[1]+n[1]*R*sq[1],c[2]+n[2]*R*sq[2]],
+         rad*.155+rad*.02*rnd(seed+i),col,Vn(n));
+  }
+}
+function duplex(x0,x1,y,z,nbp,open){
+  const R=4.2;
+  for(let i=0;i<=nbp;i++){
+    const t=i/nbp, x=lp(x0,x1,t);
+    // local unwinding where the complex has opened the duplex
+    const o=open?cl(1-Math.abs(x-open.x)/open.w,0,1)*open.amt:0;
+    const th=i*(2*Math.PI/10.5);
+    for(const [ph,col,sgn] of [[0,BK.pacific,1],[Math.PI,BK.steel,-1]]){
+      for(let k=0;k<3;k++){
+        const a=th+ph+k*.22, rr=R*(1-k*.06);
+        const n=[0,Math.cos(a),Math.sin(a)];
+        atom([x,y+n[1]*rr+sgn*o,z+n[2]*rr],1.5,col,n);
+      }
+    }
+    if(o<.35) for(let k=-1;k<=1;k++){
+      const a=th,rr=R*.34*k;
+      atom([x,y+Math.cos(a)*rr,z+Math.sin(a)*rr],1.25,BK.berkeley,[0,Math.cos(a),Math.sin(a)]);
+    }
+  }
+}
+function strand(pts,col,rad,per){
+  for(let i=0;i<pts.length-1;i++)
+    for(let k=0;k<(per||8);k++){
+      const t=k/(per||8);
+      atom([lp(pts[i][0],pts[i+1][0],t),lp(pts[i][1],pts[i+1][1],t),lp(pts[i][2],pts[i+1][2],t)],
+           rad,col,Vn([0,.6,1]));
+    }
+}
+function draw(){
+  ctx.setTransform(1,0,0,1,0,0);
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#FDFDFB');bg.addColorStop(.62,'#F4F2ED');bg.addColorStop(1,'#E7E0D4');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const sh=ctx.createRadialGradient(W/2,H*.80,4,W/2,H*.80,W*.28);
+  sh.addColorStop(0,'rgba(60,45,30,.19)');sh.addColorStop(1,'rgba(60,45,30,0)');
+  ctx.fillStyle=sh;ctx.beginPath();ctx.ellipse(W/2,H*.80,W*.28,H*.05,0,0,Math.PI*2);ctx.fill();
+
+  const P=ATOMS.map(a=>({q:proj(a.p),a})).sort((m,n)=>n.q.z-m.q.z);
+  for(const it of P){
+    const a=it.a,q=it.q,R=Math.max(.45,a.r*q.k);
+    if(q.x<-R||q.x>W+R||q.y<-R||q.y>H+R)continue;
+    const n=rotN(a.n);
+    const dif=Math.max(0,n[0]*LIGHT[0]+n[1]*LIGHT[1]+n[2]*LIGHT[2]);
+    const fog=cl((q.z-CAM.dist+90)/230,0,1);
+    const base=hex2rgb(a.c);
+    const lit=base.map(v=>v*(.70+.42*dif)+42*Math.pow(dif,3.2));
+    const far=lit.map((v,i)=>v+([243,241,236][i]-v)*fog*.55);
+    const g=ctx.createRadialGradient(q.x-R*.34,q.y-R*.40,R*.06,q.x,q.y,R*1.02);
+    g.addColorStop(0,rgbs(far.map(v=>v+(255-v)*.55)));
+    g.addColorStop(.55,rgbs(far));
+    g.addColorStop(1,rgbs(far.map(v=>v*.74)));
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(q.x,q.y,R,0,Math.PI*2);ctx.fill();
+  }
+  ctx.textAlign='center';
+  for(const l of TAGS){
+    const q=proj(l.p);
+    ctx.font="700 22px 'Public Sans',Arial,sans-serif";
+    ctx.lineWidth=6;ctx.strokeStyle='rgba(255,255,255,.92)';
+    const yy=Math.max(30,Math.min(H-16,q.y));
+    ctx.strokeText(l.t,q.x,yy);ctx.fillStyle=l.c;ctx.fillText(l.t,q.x,yy);
+  }
+}
+
+/* ===================== storyboard ===================== */
+const DUR=24;                                   // seconds
+const CH=[
+ {t:0.00,ru:['Мишень','Участок промотора CD55. Метилирования пока нет ни на одном CpG.'],
+          en:['The target','A stretch of the CD55 promoter. No CpG carries a methyl mark yet.']},
+ {t:0.09,ru:['Комплекс подходит','CRISPRoff сканирует ДНК, проверяя короткие последовательности рядом с PAM.'],
+          en:['The complex arrives','CRISPRoff scans the DNA, checking short sequences next to a PAM.']},
+ {t:0.19,ru:['Посадка и расплетание','Узнав PAM, белок локально расплетает спираль. Направляющая РНК спаривается с целевой цепью, вторая вытесняется.'],
+          en:['Docking and unwinding','On recognising the PAM the protein unwinds the duplex locally. The guide RNA pairs with the target strand and the other is displaced.']},
+ {t:0.31,ru:['Фермент тянется в сторону','DNMT3A на гибком линкере дотягивается до CpG сбоку от сайта посадки — под сам белок ему не попасть.'],
+          en:['The enzyme reaches sideways','DNMT3A on its flexible linker reaches a CpG beside the landing site — it cannot get underneath the protein itself.']},
+ {t:0.41,ru:['Основание выворачивается','Чтобы дотянуться до пятого атома углерода, фермент полностью вытаскивает цитозин из спирали в свой карман.'],
+          en:['The base flips out','To reach carbon 5 the enzyme pulls the cytosine completely out of the helix into its pocket.']},
+ {t:0.51,ru:['Перенос метила','Кофактор SAM отдаёт метильную группу на пятый углерод и уходит как SAH. Цитозин становится 5-метилцитозином.'],
+          en:['Methyl transfer','The SAM cofactor donates its methyl group to carbon 5 and leaves as SAH. The cytosine becomes 5-methylcytosine.']},
+ {t:0.60,ru:['Метки ложатся по сторонам','Фермент переходит от CpG к CpG по обе стороны. Каждый обработанный сайт получает метку.'],
+          en:['Marks land on both sides','The enzyme moves from CpG to CpG on either side. Every site it reaches gets a mark.']},
+ {t:0.75,ru:['А под белком — пусто','Три CpG, физически накрытые комплексом, остаются нетронутыми. Это футпринт, который мы и увидели в данных по CD55.'],
+          en:['But under the protein, nothing','The three CpGs physically covered by the complex stay untouched. This is the footprint we saw in the CD55 data.']},
+ {t:0.86,ru:['Белок уходит','CRISPRoff доставляют транзиентно: через несколько дней его уже нет.'],
+          en:['The protein leaves','CRISPRoff is delivered transiently: within days it is gone.']},
+ {t:0.94,ru:['Метка остаётся','Последовательность не изменилась ни на одну букву, но профиль метилирования — другой, и он копируется при делениях.'],
+          en:['The mark stays','Not one letter of sequence has changed, but the methylation profile is different — and it is copied at every division.']}
+];
+/* CpG sites along the duplex; three of them sit under the complex */
+const SITES=[-64,-50,-36,-22,-8,4,16,30,44,58,72];
+const UNDER=[-8,4,16];
+const ORDER=[-22,-36,30,-50,44,-64,58,72];     // order in which flanking sites get marked
+const CX=4;                                     // where the complex settles
+
+let LANG='ru';
+function renderAt(t){
+  ATOMS=[];TAGS=[];
+  const a=sg(t,0,.09), dock=sg(t,.09,.19), open=sg(t,.19,.30);
+  const reach=sg(t,.30,.41), flip=sg(t,.41,.50), meth=sg(t,.50,.58);
+  const back=sg(t,.56,.62), sweep=sg(t,.60,.76), foot=sg(t,.75,.84);
+  const leave=sg(t,.86,.95);
+
+  // slow orbit and a gentle push-in, easing off at the end
+  CAM.yaw=.50+t*0.46;
+  CAM.pitch=-.10-Math.sin(t*Math.PI)*.10;
+  CAM.dist=lp(232,186,ez(cl(t*1.6,0,1)))+ez(leave)*36;
+
+  const cx=lp(-150,CX,ez(dock));                 // complex slides in
+  const lift=ez(leave)*190;                      // and lifts clear of frame at the end
+  const opened=open>0&&leave<1;
+
+  duplex(-86,86,-16,0,50,opened?{x:CX,w:16,amt:5.2*ez(open)*(1-ez(leave))}:null);
+
+  // the complex itself
+  if((a>0||dock>0)&&leave<.92){
+    const bx=cx, by=14+lift;
+    lobe([bx-17,by,1],19,300,BK.bone,3,[1.05,.95,1]);
+    lobe([bx+15,by-4,-2],17,270,BK.bone,17);
+    lobe([bx-1,by-3,0],9,80,BK.boneDk,29);
+    // BFP and KRAB ride along
+    lobe([bx+40,by+9,-9],8.5,110,BK.green,67);
+    lobe([bx+57,by+14,3],5.6,50,BK.gold,79);
+    strand([[bx+30,by+2,-5],[bx+37,by+7,-8]],BK.boneDk,1.4,5);
+    strand([[bx+46,by+11,-6],[bx+53,by+13,-1]],BK.boneDk,1.4,5);
+    if(t>.12&&t<.30)tag([bx-17,by+36,1],'dCas9',BK.navy);
+
+    // guide RNA out of the cleft, and the displaced strand
+    if(open>0&&leave<1){
+      const o=ez(open)*(1-ez(leave));
+      strand([[bx+2,by+9,4],[bx-6,by+17,8],[bx-17,by+25,12],[bx-30,by+31,15]],BK.gold,2.1,9);
+      strand([[bx+2,-12+lift*.2,9],[bx+11,-5,18],[bx+22,-6,22],[bx+30,-15,17]],BK.rose,1.9,9);
+      if(t>.20&&t<.31)tag([bx-38,by+36,15],'sgRNA','#8a6200');
+    }
+
+    // DNMT3A / DNMT3L swinging to whichever CpG is being worked on
+    let target=-22;
+    if(sweep>0){const i=Math.min(ORDER.length-1,Math.floor(sweep*ORDER.length));target=ORDER[i];}
+    const tx=lp(bx-30,target,ez(reach));
+    const ty=lp(by+16,3,ez(reach))+lift;
+    const near=target<0?-1:1;            // which side faces the camera at this yaw
+    const tz=lp(4,20*near,ez(reach));
+    lobe([tx,ty+7,tz],11,150,BK.rose,41);
+    lobe([tx-19*near,ty+3,tz-6*near],9.5,110,BK.rose2,53);
+    strand([[bx-14,by+4,4],[tx+7*near,ty+8,tz-4*near]],BK.boneDk,1.4,7);
+    if(t>.30&&t<.46)tag([tx,ty+24,tz],'DNMT3A','#A32B23');
+
+    // the flipped base: out of the duplex, methylated, then back
+    if(reach>.9&&leave<.2){
+      const up=ez(flip)-ez(back);
+      const col=meth>.55?BK.me:BK.gold;
+      for(let i=0;i<8;i++){
+        const f=i/7;
+        atom([target+f*1.2,-13+up*12*(0.3+f*0.7),4*near+up*10*f*near],1.8,col,Vn([.2,.5,1]));
+      }
+      if(t>.42&&t<.52)
+        tag([target,6+up*11,16*near],LANG==='ru'?'цитозин':'cytosine','#8a6200');
+      // cofactor beside the active site: SAM turns into SAH
+      if(flip>.3){
+        lobe([tx+11*near,ty+15,tz+5*near],3.4,22,meth>.6?'#8FA3B8':BK.green,91);
+        if(t>.46&&t<.60)tag([tx+20*near,ty+24,tz+5*near],meth>.6?'SAH':'SAM',meth>.6?'#5B6B7B':'#0E6446');
+      }
+    }
+  }
+
+  // methyl marks accumulating on the flanking CpGs
+  const done=Math.floor(sweep*ORDER.length+ (back>.6?1:0));
+  for(const x of SITES){
+    if(UNDER.indexOf(x)>=0) continue;
+    const idx=ORDER.indexOf(x);
+    const on=(x===-22&&back>.6)||(idx>=0&&idx<done);
+    if(!on) continue;
+    for(let k=0;k<3;k++)
+      atom([x+k*.5,-9.5+k*1.5,(x<0?-1:1)*(3.5+k*.6)],1.7,BK.me,Vn([0,1,.4]));
+  }
+  // the footprint call-out: the three covered sites stay bare
+  if(foot>.15&&leave<.5){
+    for(const x of UNDER)
+      for(let k=0;k<2;k++)
+        atom([x,-11+k*1.4,7+k*.8],1.5,'#C9C2B4',Vn([0,1,.5]));
+    if(t>.77&&t<.88) tag([CX,-32,9],LANG==='ru'?'футпринт: 3 CpG чистые':'footprint: 3 CpGs bare','#8a6200');
+  }
+  draw();
+  caption(t);
+}
+/* on-canvas caption block, part of the exported video */
+function caption(t){
+  let i=0; for(let k=0;k<CH.length;k++) if(t>=CH[k].t) i=k;
+  const c=CH[i][LANG];
+  const pad=54, y=H-142;
+  ctx.fillStyle='rgba(255,255,255,.82)';
+  ctx.fillRect(0,y-30,W,172);
+  ctx.fillStyle='#FDB515';ctx.fillRect(pad,y-6,74,4);
+  ctx.textAlign='left';
+  ctx.fillStyle='#003262';
+  ctx.font="700 34px Georgia,'Times New Roman',serif";
+  ctx.fillText(c[0],pad,y+34);
+  ctx.fillStyle='#4A5A6B';
+  ctx.font="400 21px 'Public Sans',Arial,sans-serif";
+  wrap(c[1],pad,y+70,W-pad*2-360,27);
+  // progress ticks
+  ctx.fillStyle='#D6DEE9';ctx.fillRect(pad,H-30,W-pad*2,3);
+  ctx.fillStyle='#003262';ctx.fillRect(pad,H-30,(W-pad*2)*t,3);
+  ctx.textAlign='right';
+  ctx.fillStyle='#7C8B9B';ctx.font="600 17px 'Public Sans',Arial,sans-serif";
+  ctx.fillText('epicme.bio · CD55',W-pad,y+34);
+}
+function wrap(txt,x,y,maxw,lh){
+  const words=txt.split(' ');let line='',yy=y;
+  for(const w of words){
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxw&&line){ctx.fillText(line,x,yy);line=w;yy+=lh;}
+    else line=test;
+  }
+  if(line)ctx.fillText(line,x,yy);
+}
+window.renderAt=renderAt;
+window.setLang=l=>{LANG=l;};
+
+/* ===================== player ===================== */
+let T=0,playing=false,last=0;
+const fl=document.getElementById('fl'),tcEl=document.getElementById('tc');
+const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+function ui(){
+  fl.style.width=(T*100)+'%';
+  tcEl.textContent=fmt(T*DUR)+' / '+fmt(DUR);
+  const btns=document.querySelectorAll('#ch button');
+  let cur=0;for(let k=0;k<CH.length;k++)if(T>=CH[k].t)cur=k;
+  btns.forEach((b,i)=>b.setAttribute('aria-current',String(i===cur)));
+}
+function frame(ts){
+  if(!playing)return;
+  if(!last)last=ts;
+  T+=(ts-last)/1000/DUR;last=ts;
+  if(T>=1){T=1;playing=false;btn();}
+  renderAt(T);ui();
+  if(playing)requestAnimationFrame(frame);
+}
+function btn(){
+  document.getElementById('play').textContent =
+    playing?TX[LANG].pause:(T>=1?TX[LANG].replay:TX[LANG].play);
+}
+document.getElementById('play').addEventListener('click',()=>{
+  if(T>=1&&!playing)T=0;
+  playing=!playing;last=0;btn();
+  if(playing)requestAnimationFrame(frame);
+});
+const tr=document.getElementById('tr');
+tr.addEventListener('click',e=>{
+  const r=tr.getBoundingClientRect();
+  T=cl((e.clientX-r.left)/r.width,0,1);playing=false;btn();renderAt(T);ui();
+});
+document.getElementById('save').addEventListener('click',()=>{
+  const a=document.createElement('a');
+  a.download='crisproff-frame.png';a.href=cv.toDataURL('image/png');a.click();
+});
+
+const TX={
+ru:{title:'CRISPRoff — фильм о работе метилирования',
+ lede:'Весь процесс одним непрерывным дублем: комплекс подходит к мишени, расплетает ДНК, метилтрансфераза выворачивает цитозины по сторонам от сайта и ставит метки, а те CpG, что физически накрыты белком, остаются чистыми. В конце белок уходит, метка остаётся.',
+ play:'▶ Смотреть',pause:'❚❚ Пауза',replay:'↻ Заново',save:'↓ Кадр в PNG',
+ nh:'Что в этом кадре правда',
+ np:'Верны последовательность событий, положение футпринта и то, что метки ложатся по сторонам, а не под белком — это ровно то, что мы измерили на CD55. Объёмы доменов посчитаны из молекулярных масс, шаг ДНК из параметров B-формы. Форма поверхностей — приближение, не экспериментальные координаты, и скорости событий условны: реальное метилирование идёт часами, а не секундами.',
+ foot:'CD55 · epicme.bio · оформление по шаблону UC Berkeley и Innovative Genomics Institute'},
+en:{title:'CRISPRoff — a film of methylation at work',
+ lede:'The whole process in one continuous take: the complex approaches its target, unwinds the DNA, the methyltransferase flips cytosines out on either side of the site and marks them, while the CpGs physically covered by the protein stay clean. At the end the protein leaves and the mark remains.',
+ play:'▶ Play',pause:'❚❚ Pause',replay:'↻ Replay',save:'↓ Frame as PNG',
+ nh:'What is true in this film',
+ np:'The order of events, the position of the footprint and the fact that marks land beside rather than under the protein are all correct — that is exactly what we measured at CD55. Domain volumes are computed from molecular masses and the DNA rise from B-form parameters. The surface shapes are approximations rather than experimental coordinates, and the pacing is arbitrary: real methylation takes hours, not seconds.',
+ foot:'CD55 · epicme.bio · styled after the UC Berkeley and Innovative Genomics Institute template'}};
+
+function buildChapters(){
+  const box=document.getElementById('ch');box.innerHTML='';
+  CH.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.textContent=(i+1)+'. '+c[LANG][0];
+    b.addEventListener('click',()=>{T=c.t+0.005;playing=false;btn();renderAt(T);ui();});
+    box.appendChild(b);
+  });
+}
+function applyLang(l){
+  LANG=l;document.documentElement.setAttribute('lang',l);
+  document.querySelectorAll('[data-i18n]').forEach(e=>{
+    const k=e.getAttribute('data-i18n');
+    if(k in TX[l])(e.tagName==='TITLE')?document.title=TX[l][k]:e.textContent=TX[l][k];});
+  document.querySelectorAll('.lang button').forEach(b=>
+    b.setAttribute('aria-pressed',String(b.dataset.lang===l)));
+  document.getElementById('save').textContent=TX[l].save;
+  buildChapters();btn();renderAt(T);ui();
+  try{localStorage.setItem('epicme_lang',l);}catch(e){}
+}
+document.querySelectorAll('.lang button').forEach(b=>
+  b.addEventListener('click',()=>applyLang(b.dataset.lang)));
+buildChapters();renderAt(0);ui();btn();
+try{if(localStorage.getItem('epicme_lang')==='en')applyLang('en');}catch(e){}
+</script>
+</body>
+</html>

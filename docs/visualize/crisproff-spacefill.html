@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">CRISPRoff — объёмные модели белков</title>
+<style>
+  :root{
+    --berkeley:#003262; --gold:#FDB515; --pacific:#3B7EA1; --founders:#EEF2FA;
+    --ink:#16202B; --dim:#4A5A6B; --faint:#7C8B9B; --line:#D6DEE9; --paper:#FBFAF7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);line-height:1.55;
+    font-family:'Public Sans','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 26px 90px}
+  .top{display:flex;justify-content:space-between;gap:24px;padding:48px 0 8px;flex-wrap:wrap}
+  .rule{width:170px;height:4px;background:var(--gold);margin:0 0 22px}
+  h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(28px,3.6vw,42px);
+    line-height:1.14;margin:0 0 16px;font-weight:700;color:var(--berkeley);max-width:010ch;max-width:20ch}
+  .lede{font-size:16.5px;color:var(--dim);max-width:72ch;margin:0}
+  .lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;
+    background:#fff;height:fit-content}
+  .lang button{border:0;background:transparent;color:var(--dim);cursor:pointer;
+    font:600 14px/1 inherit;padding:9px 17px;border-radius:999px}
+  .lang button[aria-pressed="true"]{background:var(--berkeley);color:#fff}
+  section{margin-top:48px;border-top:1px solid var(--line);padding-top:26px}
+  h2{font-family:Georgia,serif;font-size:24px;margin:0 0 8px;font-weight:700;color:var(--berkeley)}
+  .sub{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:80ch}
+  .stage{background:#fff;border:1px solid var(--line);border-radius:6px;padding:0;overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,50,98,.06)}
+  canvas{display:block;width:100%;cursor:grab;touch-action:none}
+  canvas:active{cursor:grabbing}
+  canvas:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+  .bar{display:flex;align-items:center;gap:11px;padding:12px 14px;flex-wrap:wrap;
+    border-top:1px solid var(--line);background:#fff}
+  button.ctl{border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--berkeley);
+    cursor:pointer;font:600 14px/1 inherit;padding:10px 15px}
+  button.ctl:hover{border-color:var(--pacific)}
+  button.ctl:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  button.primary{background:var(--berkeley);color:#fff;border-color:var(--berkeley)}
+  .zoom{display:inline-flex;align-items:center;gap:8px}
+  .zoom button{width:36px;height:36px;padding:0;border:1px solid var(--line);background:#fff;
+    color:var(--berkeley);border-radius:5px;cursor:pointer;font:600 18px/1 inherit}
+  .zoom button:hover{border-color:var(--pacific)}
+  .zoom input[type=range]{width:130px;accent-color:var(--berkeley);cursor:pointer}
+  .zoom label{font-size:12.5px;color:var(--faint);min-width:34px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13.5px;color:var(--dim)}
+  .legend i{display:inline-block;width:13px;height:13px;border-radius:50%;margin-right:7px;
+    vertical-align:-2px;font-style:normal;border:1px solid rgba(0,0,0,.12)}
+  .hint{color:var(--faint);font-size:12.5px;margin-top:10px}
+  .note{margin-top:24px;border-left:4px solid var(--gold);background:var(--founders);
+    padding:15px 19px}
+  .note h3{margin:0 0 6px;font-size:15.5px;color:var(--berkeley);font-weight:700}
+  .note p{margin:0;color:var(--dim);font-size:14.5px;max-width:82ch}
+  footer{margin-top:46px;border-top:1px solid var(--line);padding-top:18px;
+    color:var(--faint);font-size:13px}
+  @media (max-width:720px){.wrap{padding:0 14px 60px}}
+</style>
+<style>.back-home{position:fixed;left:14px;top:12px;z-index:200;font:600 13px/1 'Public Sans',Arial,sans-serif;text-decoration:none;color:#4A5A6B;background:rgba(255,255,255,.9);border:1px solid #D6DEE9;border-radius:999px;padding:8px 13px;backdrop-filter:blur(6px)}.back-home:hover{color:#003262;border-color:#003262}</style></head>
+<body>
+<a href="../index.html" target="_top" class="back-home" aria-label="epicme.bio">← epicme.bio</a>
+<div class="wrap">
+
+<div class="top">
+  <div>
+    <div class="rule"></div>
+    <h1 data-i18n="title">CRISPRoff — объёмные модели белков</h1>
+    <p class="lede" data-i18n="lede">Те же молекулы, но нарисованные объёмом: каждая сфера — один аминокислотный остаток или нуклеотид, как в space-filling представлении. Оформление под шаблон Berkeley и IGI, чтобы кадры ложились прямо в презентацию. Каждую сцену можно повернуть, приблизить и сохранить в PNG.</p>
+  </div>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+</div>
+
+<section>
+  <h2 data-i18n="h1">dCas9 с направляющей РНК на ДНК-мишени</h2>
+  <p class="sub" data-i18n="s1">Белок держит расплетённый участок: направляющая РНК спарена с целевой цепью, вторая цепь вытеснена наружу. Это тот же кадр, что на титульном слайде шаблона, только здесь его можно покрутить.</p>
+  <div class="stage">
+    <canvas id="k1" tabindex="0" aria-label="Space-filling model of dCas9 with sgRNA on DNA"></canvas>
+    <div class="bar" data-bar="1">
+      <button class="ctl" data-spin="1" data-i18n="spin">⟳ Вращение</button>
+      <button class="ctl" data-view="1" data-i18n="reset">↺ Исходный вид</button>
+      <button class="ctl primary" data-save="1" data-i18n="save">↓ Сохранить PNG</button>
+    </div>
+  </div>
+  <div class="legend" id="lg1"></div>
+  <p class="hint" data-i18n="hint">Тяните, чтобы повернуть. Колесо, ползунок, кнопки или клавиши + и − — чтобы приблизить.</p>
+</section>
+
+<section>
+  <h2 data-i18n="h2">Весь конструкт CRISPRoff на ДНК</h2>
+  <p class="sub" data-i18n="s2">Четыре части одной молекулы, каждая своим цветом, на гибких линкерах вокруг dCas9. Относительные объёмы соответствуют молекулярным массам доменов.</p>
+  <div class="stage">
+    <canvas id="k2" tabindex="0" aria-label="Space-filling model of the whole CRISPRoff fusion"></canvas>
+    <div class="bar" data-bar="2">
+      <button class="ctl" data-spin="2" data-i18n="spin">⟳ Вращение</button>
+      <button class="ctl" data-view="2" data-i18n="reset">↺ Исходный вид</button>
+      <button class="ctl primary" data-save="2" data-i18n="save">↓ Сохранить PNG</button>
+    </div>
+  </div>
+  <div class="legend" id="lg2"></div>
+</section>
+
+<section>
+  <h2 data-i18n="h3">DNMT3A и DNMT3L у вывернутого цитозина</h2>
+  <p class="sub" data-i18n="s3">Момент реакции: целевое основание вышло из спирали в карман фермента, рядом кофактор. DNMT3L каталитически неактивен, но держится за DNMT3A и повышает его активность.</p>
+  <div class="stage">
+    <canvas id="k3" tabindex="0" aria-label="Space-filling model of DNMT3A and DNMT3L at a flipped cytosine"></canvas>
+    <div class="bar" data-bar="3">
+      <button class="ctl" data-spin="3" data-i18n="spin">⟳ Вращение</button>
+      <button class="ctl" data-view="3" data-i18n="reset">↺ Исходный вид</button>
+      <button class="ctl primary" data-save="3" data-i18n="save">↓ Сохранить PNG</button>
+    </div>
+  </div>
+  <div class="legend" id="lg3"></div>
+  <div class="note">
+    <h3 data-i18n="nh">Что здесь настоящее, а что нет</h3>
+    <p data-i18n="np">Объёмы доменов посчитаны из молекулярных масс, шаг и диаметр ДНК взяты из параметров B-формы, число сфер отвечает числу остатков. Форма поверхности — приближение: это не свёрнутая по-настоящему цепь и не экспериментальные координаты. Для настоящей геометрии смотрите PDB 4OO8 для Cas9 и 2QRV для DNMT3A с DNMT3L.</p>
+  </div>
+</section>
+
+<footer data-i18n="foot">CD55 · epicme.bio · оформление по шаблону UC Berkeley и Innovative Genomics Institute</footer>
+</div>
+
+<script>
+/* ===================== space-filling renderer ===================== */
+const BK={berkeley:'#2E6EA6',gold:'#E8A317',pacific:'#7FB2D9',green:'#127C56',
+  rose:'#C4362F',steel:'#B9CBDE',bone:'#FBFAF6',boneDk:'#DED9CE'};
+
+function hex2rgb(h){h=h.replace('#','');
+  return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
+function rgb(a){return 'rgb('+a.map(v=>Math.round(Math.max(0,Math.min(255,v)))).join(',')+')';}
+function rnd(i){const x=Math.sin(i*127.1+11.7)*43758.5453;return x-Math.floor(x);}
+const Vn=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l];};
+
+function Mol(cv,opts){
+  const S={cv:cv,ctx:cv.getContext('2d'),yaw:.6,pitch:-.14,dist:210,foc:900,oy:.52,
+    atoms:[],spin:false,dpr:Math.min(devicePixelRatio||1,2),home:null,
+    light:Vn([-.45,.72,.55])};
+  Object.assign(S,opts||{});
+  function resize(){const w=cv.clientWidth||900,h=Math.round(w*(S.ratio||0.52));
+    cv.width=w*S.dpr;cv.height=h*S.dpr;cv.style.height=h+'px';S.w=w;S.h=h;}
+  S.resize=resize;resize();
+  new ResizeObserver(()=>{resize();S.draw();}).observe(cv);
+
+  S.proj=function(p){
+    const cp=Math.cos(S.pitch),sp=Math.sin(S.pitch);
+    const y1=p[1]*cp-p[2]*sp,z1=p[1]*sp+p[2]*cp;
+    const cy=Math.cos(S.yaw),sy=Math.sin(S.yaw);
+    const x2=p[0]*cy+z1*sy,z2=-p[0]*sy+z1*cy;
+    const zc=z2+S.dist,k=S.foc/Math.max(zc,14);
+    return {x:S.w/2+x2*k,y:S.h*S.oy-y1*k,z:zc,k:k};
+  };
+  S.rotN=function(n){
+    const cp=Math.cos(S.pitch),sp=Math.sin(S.pitch);
+    const y1=n[1]*cp-n[2]*sp,z1=n[1]*sp+n[2]*cp;
+    const cy=Math.cos(S.yaw),sy=Math.sin(S.yaw);
+    return [n[0]*cy+z1*sy,y1,-n[0]*sy+z1*cy];
+  };
+  S.clear=()=>{S.atoms.length=0;S.labels=[];};
+  S.labels=[];
+  /* one pseudo-atom: position, radius, colour, outward normal */
+  S.atom=(p,r,c,n)=>S.atoms.push({p,r,c,n:n||Vn(p)});
+  S.tag=(p,t,c)=>S.labels.push({p,t,c});
+
+  S.draw=function(){
+    const x=S.ctx;x.setTransform(S.dpr,0,0,S.dpr,0,0);
+    // paper background with a soft warm floor, matching the template
+    const bg=x.createLinearGradient(0,0,0,S.h);
+    bg.addColorStop(0,'#FDFDFB');bg.addColorStop(.62,'#F4F2ED');bg.addColorStop(1,'#E7E0D4');
+    x.fillStyle=bg;x.fillRect(0,0,S.w,S.h);
+    // contact shadow
+    const sh=x.createRadialGradient(S.w/2,S.h*.80,4,S.w/2,S.h*.80,S.w*.26);
+    sh.addColorStop(0,'rgba(60,45,30,.20)');sh.addColorStop(1,'rgba(60,45,30,0)');
+    x.fillStyle=sh;x.beginPath();
+    x.ellipse(S.w/2,S.h*.80,S.w*.26,S.h*.055,0,0,Math.PI*2);x.fill();
+
+    const P=[];
+    for(const a of S.atoms){const q=S.proj(a.p);P.push({q,a,z:q.z});}
+    P.sort((m,n)=>n.z-m.z);
+    const L=S.light;
+    for(const it of P){
+      const a=it.a,q=it.q,R=Math.max(.45,a.r*q.k);
+      if(q.x<-R||q.x>S.w+R||q.y<-R||q.y>S.h+R) continue;
+      const n=S.rotN(a.n);
+      const dif=Math.max(0,n[0]*L[0]+n[1]*L[1]+n[2]*L[2]);
+      const fog=Math.max(0,Math.min(1,(it.z-S.dist+90)/230));
+      const base=hex2rgb(a.c);
+      const lit=base.map(v=>v*(0.70+0.42*dif)+42*Math.pow(dif,3.2));
+      const far=lit.map((v,i)=>v+([243,241,236][i]-v)*fog*0.55);
+      const g=x.createRadialGradient(q.x-R*.34,q.y-R*.40,R*.06,q.x,q.y,R*1.02);
+      g.addColorStop(0,rgb(far.map(v=>v+(255-v)*.55)));
+      g.addColorStop(.55,rgb(far));
+      g.addColorStop(1,rgb(far.map(v=>v*.74)));
+      x.fillStyle=g;x.beginPath();x.arc(q.x,q.y,R,0,Math.PI*2);x.fill();
+    }
+    x.textAlign='center';
+    for(const l of S.labels){
+      const q=S.proj(l.p);
+      x.font="700 14px 'Public Sans',Arial,sans-serif";
+      x.lineWidth=4;x.strokeStyle='rgba(255,255,255,.9)';
+      const yy=Math.max(18,Math.min(S.h-8,q.y));
+      x.strokeText(l.t,q.x,yy);x.fillStyle=l.c;x.fillText(l.t,q.x,yy);
+    }
+  };
+
+  let drag=false,px=0,py=0;
+  cv.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;
+    try{cv.setPointerCapture(e.pointerId);}catch(_){}}); 
+  cv.addEventListener('pointermove',e=>{if(!drag)return;
+    S.yaw+=(e.clientX-px)*.008;
+    S.pitch=Math.max(-1.3,Math.min(1.3,S.pitch-(e.clientY-py)*.006));
+    px=e.clientX;py=e.clientY;S.draw();});
+  cv.addEventListener('pointerup',()=>drag=false);
+  cv.addEventListener('pointercancel',()=>drag=false);
+  cv.addEventListener('wheel',e=>{e.preventDefault();
+    S.dist=Math.max(90,Math.min(430,S.dist+e.deltaY*.26));S.draw();},{passive:false});
+  cv.addEventListener('keydown',e=>{
+    const k={ArrowLeft:[-.12,0],ArrowRight:[.12,0],ArrowUp:[0,-.09],ArrowDown:[0,.09]}[e.key];
+    if(k){e.preventDefault();S.yaw+=k[0];
+      S.pitch=Math.max(-1.3,Math.min(1.3,S.pitch+k[1]));S.draw();}
+  });
+  return S;
+}
+
+/* ---- fill a lumpy ellipsoidal lobe with surface pseudo-atoms ---- */
+function lobeAtoms(S,c,rad,nRes,col,seed,squash){
+  squash=squash||[1,1,1];
+  const N=Math.max(40,nRes);
+  const ga=Math.PI*(3-Math.sqrt(5));
+  for(let i=0;i<N;i++){
+    const y=1-(i/(N-1))*2, r=Math.sqrt(Math.max(0,1-y*y)), th=ga*i;
+    let n=[Math.cos(th)*r,y,Math.sin(th)*r];
+    // lumpiness so the surface reads as a protein, not a billiard ball
+    const bump=1+0.13*Math.sin(n[0]*3.1+seed)+0.10*Math.sin(n[1]*4.3+seed*1.7)
+                 +0.08*Math.sin(n[2]*5.2+seed*2.3)+0.05*(rnd(seed*97+i)-.5);
+    const R=rad*bump;
+    const p=[c[0]+n[0]*R*squash[0],c[1]+n[1]*R*squash[1],c[2]+n[2]*R*squash[2]];
+    S.atom(p,rad*0.155+rad*0.02*rnd(seed+i),col,Vn(n));
+  }
+}
+/* ---- B-DNA duplex rendered space-filling along an arbitrary path ---- */
+function dnaAtoms(S,pathFn,nbp,c1,c2,cBase,radA){
+  const SC=0.42, R=(radA||10)*SC;
+  for(let i=0;i<=nbp;i++){
+    const t=i/nbp,c=pathFn(t);
+    const d=Vn([pathFn(Math.min(1,t+1e-3))[0]-c[0],
+                pathFn(Math.min(1,t+1e-3))[1]-c[1],
+                pathFn(Math.min(1,t+1e-3))[2]-c[2]]);
+    let up=Math.abs(d[1])>.9?[1,0,0]:[0,1,0];
+    const u=Vn([d[1]*up[2]-d[2]*up[1],d[2]*up[0]-d[0]*up[2],d[0]*up[1]-d[1]*up[0]]);
+    const v=[d[1]*u[2]-d[2]*u[1],d[2]*u[0]-d[0]*u[2],d[0]*u[1]-d[1]*u[0]];
+    const th=i*(2*Math.PI/10.5);
+    for(const [ph,col] of [[0,c1],[Math.PI,c2]]){
+      for(let k=0;k<3;k++){
+        const a=th+ph+k*0.22, rr=R*(1-k*0.06);
+        const n=[u[0]*Math.cos(a)+v[0]*Math.sin(a),
+                 u[1]*Math.cos(a)+v[1]*Math.sin(a),
+                 u[2]*Math.cos(a)+v[2]*Math.sin(a)];
+        S.atom([c[0]+n[0]*rr,c[1]+n[1]*rr,c[2]+n[2]*rr],1.5,col,n);
+      }
+    }
+    // base pairs filling the core
+    for(let k=-1;k<=1;k++){
+      const a=th, rr=R*0.34*k;
+      const n=[u[0]*Math.cos(a)+v[0]*Math.sin(a),
+               u[1]*Math.cos(a)+v[1]*Math.sin(a),
+               u[2]*Math.cos(a)+v[2]*Math.sin(a)];
+      S.atom([c[0]+n[0]*rr,c[1]+n[1]*rr,c[2]+n[2]*rr],1.25,cBase,n);
+    }
+  }
+}
+function chainAtoms(S,pts,col,rad,per){
+  for(let i=0;i<pts.length-1;i++){
+    for(let k=0;k<(per||5);k++){
+      const t=k/(per||5);
+      const p=[pts[i][0]+(pts[i+1][0]-pts[i][0])*t,
+               pts[i][1]+(pts[i+1][1]-pts[i][1])*t,
+               pts[i][2]+(pts[i+1][2]-pts[i][2])*t];
+      S.atom(p,rad,col,Vn([p[0]-pts[0][0],p[1]-pts[0][1]+8,p[2]-pts[0][2]]));
+    }
+  }
+}
+
+/* ========================= SCENE 1: dCas9 ========================= */
+const M1=(function(){
+  const S=Mol(document.getElementById('k1'),{ratio:.54,dist:196,yaw:.62,pitch:-.10,oy:.46});
+  S.home={yaw:.62,pitch:-.10,dist:196};
+  S.build=function(){
+    S.clear();
+    // recognition lobe and nuclease lobe, sized from residue counts
+    lobeAtoms(S,[-17,13,1],20,620,BK.bone,3,[1.05,.95,1.0]);
+    lobeAtoms(S,[16,8,-2],18,560,BK.bone,17,[1.0,1.0,1.05]);
+    lobeAtoms(S,[0,10,0],10,150,BK.boneDk,29);          // bridge between the lobes
+    // target duplex running beneath the protein, clear of both lobes
+    dnaAtoms(S,t=>[-70+140*t,-17+Math.sin(t*3.14)*5,3],42,
+             BK.pacific,BK.steel,BK.berkeley,10);
+    // guide RNA rising out of the cleft, above the lobes
+    chainAtoms(S,[[2,22,5],[-6,30,9],[-17,38,13],[-30,44,17],[-43,46,20]],BK.gold,2.3,11);
+    // displaced strand looping out on the near side
+    chainAtoms(S,[[3,-9,10],[12,-2,20],[24,-4,25],[32,-14,19]],BK.rose,2.1,11);
+    S.tag([-17,40,1],'dCas9','#003262');
+    S.tag([-52,50,20],'sgRNA','#8a6200');
+    S.tag([22,4,27],'вытесненная цепь','#A32B23');
+    S.tag([-70,-27,3],'ДНК-мишень','#2E6EA6');
+  };
+  S.build();S.draw();return S;
+})();
+
+/* ===================== SCENE 2: whole fusion ===================== */
+const M2=(function(){
+  const S=Mol(document.getElementById('k2'),{ratio:.50,dist:240,yaw:.5,pitch:-.16,oy:.54});
+  S.home={yaw:.5,pitch:-.16,dist:240};
+  S.build=function(){
+    S.clear();
+    dnaAtoms(S,t=>[-84+168*t,-22,14],48,BK.pacific,BK.steel,BK.berkeley,10);
+    // dCas9 body
+    lobeAtoms(S,[-6,4,0],19,560,BK.bone,3,[1.1,.95,1]);
+    lobeAtoms(S,[14,-2,0],16,440,BK.bone,17);
+    S.tag([2,28,0],'dCas9',BK.berkeley);
+    // DNMT3A and DNMT3L: volumes follow their molecular masses
+    lobeAtoms(S,[-42,22,8],11,300,BK.rose,41);
+    S.tag([-42,38,8],'DNMT3A',BK.rose);
+    lobeAtoms(S,[-62,16,-4],10,240,'#9C2A24',53);
+    S.tag([-64,30,-4],'DNMT3L','#9C2A24');
+    // BFP
+    lobeAtoms(S,[34,20,-10],9.5,236,BK.green,67);
+    S.tag([34,34,-10],'BFP',BK.green);
+    // KRAB, the smallest part
+    lobeAtoms(S,[54,26,4],6.2,75,BK.gold,79);
+    S.tag([54,36,4],'KRAB','#8a6200');
+    // flexible linkers
+    chainAtoms(S,[[-20,10,3],[-30,17,6],[-38,21,8]],BK.boneDk,1.5,7);
+    chainAtoms(S,[[-50,20,4],[-57,18,0]],BK.boneDk,1.5,6);
+    chainAtoms(S,[[24,8,-4],[29,15,-8]],BK.boneDk,1.5,6);
+    chainAtoms(S,[[38,25,-6],[46,26,-1]],BK.boneDk,1.5,6);
+  };
+  S.build();S.draw();return S;
+})();
+
+/* ================== SCENE 3: DNMT3A at the base ================== */
+const M3=(function(){
+  const S=Mol(document.getElementById('k3'),{ratio:.54,dist:158,yaw:.66,pitch:-.12,oy:.46});
+  S.home={yaw:.66,pitch:-.12,dist:158};
+  S.build=function(){
+    S.clear();
+    dnaAtoms(S,t=>[-56+112*t,-15,2],34,BK.pacific,BK.steel,BK.berkeley,10);
+    // the enzyme pair sitting on the duplex
+    lobeAtoms(S,[-2,11,-2],15,300,BK.rose,11,[1.05,1,1]);
+    lobeAtoms(S,[-29,6,-9],13,240,'#9C2A24',23);
+    chainAtoms(S,[[-16,9,-5],[-22,8,-7]],BK.boneDk,1.4,6);
+    // the target base swung out of the duplex into the pocket, on the near side
+    for(let i=0;i<10;i++){
+      const t=i/9;
+      S.atom([-2+t*1.5,-11+t*13,10+t*5],1.9,BK.gold,Vn([0.15,0.4,1]));
+    }
+    // the cofactor, docked on the outside of the catalytic lobe
+    lobeAtoms(S,[9,20,10],4.0,30,BK.green,91);
+    S.tag([-2,32,-2],'DNMT3A','#A32B23');
+    S.tag([-34,24,-9],'DNMT3L','#7E211C');
+    S.tag([2,-2,20],'вывернутый цитозин','#8a6200');
+    S.tag([20,26,12],'SAM','#0E6446');
+  };
+  S.build();S.draw();return S;
+})();
+
+/* ========================= i18n and controls ========================= */
+const SCN={1:M1,2:M2,3:M3};
+const TAGS={
+1:{ru:['dCas9','sgRNA','вытесненная цепь','ДНК-мишень'],
+   en:['dCas9','sgRNA','displaced strand','target DNA']},
+2:{ru:['dCas9','DNMT3A','DNMT3L','BFP','KRAB'],
+   en:['dCas9','DNMT3A','DNMT3L','BFP','KRAB']},
+3:{ru:['DNMT3A','DNMT3L','вывернутый цитозин','SAM'],
+   en:['DNMT3A','DNMT3L','flipped cytosine','SAM']}};
+const LEG={
+1:[[BK.bone,'ru:белок dCas9|en:dCas9 protein'],[BK.pacific,'ru:целевая цепь ДНК|en:target DNA strand'],
+   [BK.steel,'ru:комплементарная цепь|en:complementary strand'],
+   [BK.gold,'ru:направляющая РНК|en:guide RNA'],[BK.rose,'ru:вытесненная цепь|en:displaced strand']],
+2:[[BK.bone,'ru:dCas9|en:dCas9'],[BK.rose,'ru:DNMT3A|en:DNMT3A'],['#9C2A24','ru:DNMT3L|en:DNMT3L'],
+   [BK.green,'ru:BFP|en:BFP'],[BK.gold,'ru:KRAB|en:KRAB']],
+3:[[BK.rose,'ru:DNMT3A|en:DNMT3A'],['#9C2A24','ru:DNMT3L|en:DNMT3L'],
+   [BK.gold,'ru:вывернутое основание|en:flipped base'],[BK.green,'ru:кофактор SAM|en:SAM cofactor'],
+   [BK.pacific,'ru:ДНК|en:DNA']]};
+const T={
+ru:{title:'CRISPRoff — объёмные модели белков',
+ lede:'Те же молекулы, но нарисованные объёмом: каждая сфера — один аминокислотный остаток или нуклеотид, как в space-filling представлении. Оформление под шаблон Berkeley и IGI, чтобы кадры ложились прямо в презентацию. Каждую сцену можно повернуть, приблизить и сохранить в PNG.',
+ spin:'⟳ Вращение',spinoff:'⟳ Стоп',reset:'↺ Исходный вид',save:'↓ Сохранить PNG',
+ hint:'Тяните, чтобы повернуть. Колесо, ползунок, кнопки или клавиши + и − — чтобы приблизить.',
+ h1:'dCas9 с направляющей РНК на ДНК-мишени',
+ s1:'Белок держит расплетённый участок: направляющая РНК спарена с целевой цепью, вторая цепь вытеснена наружу. Это тот же кадр, что на титульном слайде шаблона, только здесь его можно покрутить.',
+ h2:'Весь конструкт CRISPRoff на ДНК',
+ s2:'Четыре части одной молекулы, каждая своим цветом, на гибких линкерах вокруг dCas9. Относительные объёмы соответствуют молекулярным массам доменов.',
+ h3:'DNMT3A и DNMT3L у вывернутого цитозина',
+ s3:'Момент реакции: целевое основание вышло из спирали в карман фермента, рядом кофактор. DNMT3L каталитически неактивен, но держится за DNMT3A и повышает его активность.',
+ nh:'Что здесь настоящее, а что нет',
+ np:'Объёмы доменов посчитаны из молекулярных масс, шаг и диаметр ДНК взяты из параметров B-формы, число сфер отвечает числу остатков. Форма поверхности — приближение: это не свёрнутая по-настоящему цепь и не экспериментальные координаты. Для настоящей геометрии смотрите PDB 4OO8 для Cas9 и 2QRV для DNMT3A с DNMT3L.',
+ foot:'CD55 · epicme.bio · оформление по шаблону UC Berkeley и Innovative Genomics Institute'},
+en:{title:'CRISPRoff as space-filling models',
+ lede:'The same molecules drawn as volume: every sphere is one amino-acid residue or nucleotide, in the space-filling convention. Styled to the Berkeley and IGI template so the frames drop straight into a deck. Each scene can be rotated, zoomed and saved as a PNG.',
+ spin:'⟳ Spin',spinoff:'⟳ Stop',reset:'↺ Reset view',save:'↓ Save PNG',
+ hint:'Drag to rotate. Wheel, slider, buttons or the + and − keys to zoom.',
+ h1:'dCas9 with its guide RNA on target DNA',
+ s1:'The protein holds the unwound stretch open: the guide RNA is paired with the target strand and the other strand is pushed out. This is the same view as the template title slide, except here you can turn it around.',
+ h2:'The whole CRISPRoff construct on DNA',
+ s2:'Four parts of one molecule, each in its own colour, hanging off flexible linkers around dCas9. The relative volumes follow the molecular masses of the domains.',
+ h3:'DNMT3A and DNMT3L at the flipped cytosine',
+ s3:'The moment of the reaction: the target base has left the helix for the enzyme pocket, with the cofactor alongside. DNMT3L is catalytically inactive but holds DNMT3A and raises its activity.',
+ nh:'What is real here and what is not',
+ np:'Domain volumes are computed from molecular masses, the DNA rise and diameter come from B-form parameters, and the number of spheres matches the number of residues. The surface shape is an approximation: this is not a genuinely folded chain and not experimental coordinates. For real geometry see PDB 4OO8 for Cas9 and 2QRV for DNMT3A with DNMT3L.',
+ foot:'CD55 · epicme.bio · styled after the UC Berkeley and Innovative Genomics Institute template'}};
+
+let LANG='ru';
+function pick(s){const m=s.split('|');return (LANG==='ru'?m[0]:m[1]).split(':').slice(1).join(':');}
+function relabel(){
+  for(const id in SCN){
+    const S=SCN[id];S.build();
+    const names=TAGS[id][LANG];
+    S.labels.forEach((l,i)=>{if(names[i])l.t=names[i];});
+    S.draw();
+  }
+  for(const id in LEG){
+    const box=document.getElementById('lg'+id);box.innerHTML='';
+    LEG[id].forEach(([c,t])=>{const s=document.createElement('span');
+      s.innerHTML='<i style="background:'+c+'"></i>'+pick(t);box.appendChild(s);});
+  }
+}
+function applyLang(l){
+  LANG=l;document.documentElement.setAttribute('lang',l);
+  document.querySelectorAll('[data-i18n]').forEach(e=>{
+    const k=e.getAttribute('data-i18n');
+    if(k in T[l])(e.tagName==='TITLE')?document.title=T[l][k]:e.textContent=T[l][k];});
+  document.querySelectorAll('.lang button').forEach(b=>
+    b.setAttribute('aria-pressed',String(b.dataset.lang===l)));
+  document.querySelectorAll('[data-spin]').forEach(b=>{
+    b.textContent=SCN[b.dataset.spin].spin?T[l].spinoff:T[l].spin;});
+  document.querySelectorAll('[data-view]').forEach(b=>b.textContent=T[l].reset);
+  document.querySelectorAll('[data-save]').forEach(b=>b.textContent=T[l].save);
+  relabel();
+  try{localStorage.setItem('epicme_lang',l);}catch(e){}
+}
+function loop(k,ts){
+  const S=SCN[k];if(!S.spin)return;
+  if(!S._last)S._last=ts;const dt=ts-S._last;S._last=ts;
+  S.yaw+=dt*.00024;S.draw();requestAnimationFrame(t=>loop(k,t));
+}
+document.querySelectorAll('[data-spin]').forEach(b=>b.addEventListener('click',()=>{
+  const k=b.dataset.spin,S=SCN[k];S.spin=!S.spin;S._last=0;
+  b.textContent=S.spin?T[LANG].spinoff:T[LANG].spin;
+  if(S.spin)requestAnimationFrame(t=>loop(k,t));}));
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{
+  const S=SCN[b.dataset.view];
+  if(S.home){S.yaw=S.home.yaw;S.pitch=S.home.pitch;S.dist=S.home.dist;S.draw();}}));
+document.querySelectorAll('[data-save]').forEach(b=>b.addEventListener('click',()=>{
+  const k=b.dataset.save,S=SCN[k];
+  const a=document.createElement('a');
+  a.download='crisproff-scene-'+k+'.png';
+  a.href=S.cv.toDataURL('image/png');a.click();}));
+
+/* zoom: buttons, slider, keys, pinch */
+(function(){
+  const MIN=90,MAX=430;
+  for(const id in SCN){
+    const S=SCN[id],cv=S.cv;
+    const bar=document.querySelector('[data-bar="'+id+'"]');
+    const box=document.createElement('div');box.className='zoom';
+    const out=document.createElement('button');out.type='button';out.textContent='\u2212';
+    const inn=document.createElement('button');inn.type='button';inn.textContent='+';
+    const sl=document.createElement('input');sl.type='range';sl.min='0';sl.max='100';
+    const lab=document.createElement('label');
+    out.setAttribute('aria-label','Zoom out');inn.setAttribute('aria-label','Zoom in');
+    sl.setAttribute('aria-label','Zoom');
+    box.appendChild(out);box.appendChild(sl);box.appendChild(inn);box.appendChild(lab);
+    bar.appendChild(box);
+    const sync=()=>{sl.value=String(Math.round((MAX-S.dist)/(MAX-MIN)*100));
+      lab.textContent='\u00d7'+(220/S.dist).toFixed(1);};
+    const set=d=>{S.dist=Math.max(MIN,Math.min(MAX,d));sync();S.draw();};
+    out.addEventListener('click',()=>set(S.dist*1.18));
+    inn.addEventListener('click',()=>set(S.dist/1.18));
+    sl.addEventListener('input',()=>set(MAX-(sl.value/100)*(MAX-MIN)));
+    cv.addEventListener('wheel',()=>sync(),{passive:true});
+    cv.addEventListener('keydown',e=>{
+      if(e.key==='+'||e.key==='='){e.preventDefault();set(S.dist/1.18);}
+      if(e.key==='-'||e.key==='_'){e.preventDefault();set(S.dist*1.18);}});
+    const pts=new Map();let base=0,bd=0;
+    cv.addEventListener('pointerdown',e=>{pts.set(e.pointerId,[e.clientX,e.clientY]);
+      if(pts.size===2){const v=[...pts.values()];
+        base=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);bd=S.dist;}});
+    cv.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;
+      pts.set(e.pointerId,[e.clientX,e.clientY]);
+      if(pts.size===2){const v=[...pts.values()];
+        const d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);
+        if(base>4)set(bd*base/d);}});
+    ['pointerup','pointercancel','pointerleave'].forEach(t=>
+      cv.addEventListener(t,e=>pts.delete(e.pointerId)));
+    sync();
+  }
+})();
+
+document.querySelectorAll('.lang button').forEach(b=>
+  b.addEventListener('click',()=>applyLang(b.dataset.lang)));
+relabel();
+try{if(localStorage.getItem('epicme_lang')==='en')applyLang('en');}catch(e){}
+</script>
+</body>
+</html>

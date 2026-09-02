@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">Механизм CRISPRoff — что происходит с метилированием</title>
+<style>
+  :root{
+    --ink:#0E2033; --ink2:#152C43; --ink3:#1B3853; --line:#2A4560;
+    --text:#E8EEF4; --dim:#9FB4C7; --faint:#6B8299;
+    --dna:#8FA3B8; --blue:#0072B2; --sky:#56B4E9; --green:#009E73;
+    --orange:#E69F00; --verm:#D55E00; --purple:#CC79A7; --yellow:#F0E442;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text);line-height:1.55;
+    font-family:'Space Grotesk','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .mono{font-family:ui-monospace,'SF Mono','IBM Plex Mono',Menlo,Consolas,monospace;
+    font-variant-numeric:tabular-nums}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 26px 90px}
+  .top{display:flex;justify-content:space-between;gap:24px;padding:44px 0 6px;flex-wrap:wrap}
+  h1{font-size:clamp(27px,3.6vw,42px);line-height:1.1;margin:0 0 16px;font-weight:600;
+    letter-spacing:-0.015em;max-width:010ch;max-width:21ch}
+  .lede{font-size:16.5px;color:var(--dim);max-width:70ch;margin:0}
+  .lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;
+    gap:2px;background:var(--ink2);flex:0 0 auto;height:fit-content}
+  .lang button{border:0;background:transparent;color:var(--dim);cursor:pointer;
+    font:600 14px/1 inherit;padding:9px 17px;border-radius:999px}
+  .lang button[aria-pressed="true"]{background:var(--sky);color:#06182A}
+  .lang button:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+
+  section{margin-top:46px;border-top:1px solid var(--line);padding-top:26px}
+  h2{font-size:23px;margin:0 0 8px;font-weight:600;letter-spacing:-0.01em}
+  .sub{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:76ch}
+
+  .stage{background:var(--ink2);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px 10px;margin-top:8px}
+  .stage svg{display:block;width:100%;height:auto;overflow:visible}
+  .bar{display:flex;align-items:center;gap:14px;margin-top:12px;flex-wrap:wrap}
+  .play{border:0;border-radius:9px;background:var(--sky);color:#06182A;cursor:pointer;
+    font:600 14.5px/1 inherit;padding:11px 20px;min-width:112px}
+  .play:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+  .track{flex:1 1 260px;height:7px;border-radius:99px;background:var(--ink3);
+    position:relative;cursor:pointer;min-width:180px}
+  .fill{position:absolute;inset:0 auto 0 0;width:0;border-radius:99px;background:var(--sky)}
+  .stepno{color:var(--faint);font-size:13px;white-space:nowrap}
+  .cap{margin-top:12px;min-height:70px;border-left:3px solid var(--sky);padding:4px 0 4px 15px}
+  .cap b{display:block;font-size:16.5px;margin-bottom:4px}
+  .cap span{color:var(--dim);font-size:14.5px}
+
+  .keyrow{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--dim)}
+  .keyrow i{display:inline-block;width:13px;height:13px;border-radius:3px;
+    margin-right:6px;vertical-align:-2px;font-style:normal}
+
+  .note{margin-top:22px;border-left:3px solid var(--verm);background:var(--ink2);
+    padding:15px 19px;border-radius:0 9px 9px 0}
+  .note h3{margin:0 0 6px;font-size:15.5px;color:var(--verm);font-weight:600}
+  .note p{margin:0;color:var(--dim);font-size:14.5px;max-width:80ch}
+
+  ol.refs{padding-left:22px;margin:12px 0 0;color:var(--dim);font-size:14px}
+  ol.refs li{margin-bottom:9px}
+  ol.refs a{color:var(--sky)}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--faint);font-size:12.5px;font-weight:600}
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:18px;
+    color:var(--faint);font-size:13px}
+  @media (max-width:720px){.wrap{padding:0 14px 60px}}
+  @media (prefers-reduced-motion:reduce){.fill{transition:none}}
+</style>
+<style>.back-home{position:fixed;left:14px;top:12px;z-index:200;font:600 13px/1 'Space Grotesk',Arial,sans-serif;text-decoration:none;color:#9FB4C7;background:rgba(14,32,51,.82);border:1px solid #2A4560;border-radius:999px;padding:8px 13px;backdrop-filter:blur(6px)}.back-home:hover{color:#56B4E9;border-color:#56B4E9}</style></head>
+<body>
+<a href="../index.html" target="_top" class="back-home" aria-label="epicme.bio">← epicme.bio</a>
+<div class="wrap">
+
+<div class="top">
+  <div>
+    <h1 data-i18n="title">Механизм CRISPRoff — что происходит с метилированием</h1>
+    <p class="lede" data-i18n="lede">Четыре анимации: как метка ставится, как переживает деление клетки, как метилирование теряется в клетках вообще и что известно про его потерю после CRISPRoff. Каждый шаг подписан, источники — внизу страницы.</p>
+  </div>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+</div>
+
+<section id="construct">
+  <h2 data-i18n="c-h">Конструкт CRISPRoff</h2>
+  <p class="sub" data-i18n="c-sub">Порядок доменов по вашей схеме. Ширина блоков примерно пропорциональна длине в аминокислотах — точные границы конструкта зависят от плазмиды, так что это приближение.</p>
+  <div class="stage"><svg id="svg-construct" viewBox="0 0 1200 250" role="img" aria-label="CRISPRoff domain map"></svg></div>
+  <div class="keyrow" id="key-construct"></div>
+</section>
+
+<section id="s1">
+  <h2 data-i18n="s1-h">1. Как CRISPRoff ставит метилирование</h2>
+  <p class="sub" data-i18n="s1-sub">От посадки на ДНК до появления 5-метилцитозина. Химия реакции показана по шагам — именно так работают все C5-метилтрансферазы.</p>
+  <div class="stage">
+    <svg id="svg-1" viewBox="0 0 1200 520" role="img" aria-label="CRISPRoff writing methylation"></svg>
+    <div class="bar">
+      <button class="play" data-scene="1" data-i18n="play">▶ Запустить</button>
+      <div class="track" data-scene="1"><div class="fill" id="fill-1"></div></div>
+      <span class="stepno" id="step-1"></span>
+    </div>
+    <div class="cap"><b id="capt-1"></b><span id="capd-1"></span></div>
+  </div>
+</section>
+
+<section id="s2">
+  <h2 data-i18n="s2-h">2. Деление клетки: как метка передаётся дочерним клеткам</h2>
+  <p class="sub" data-i18n="s2-sub">Репликация делает из симметрично метилированного CpG полуметилированный. Дальше его должна распознать система поддержания.</p>
+  <div class="stage">
+    <svg id="svg-2" viewBox="0 0 1200 600" role="img" aria-label="Maintenance methylation through cell division"></svg>
+    <div class="bar">
+      <button class="play" data-scene="2" data-i18n="play">▶ Запустить</button>
+      <div class="track" data-scene="2"><div class="fill" id="fill-2"></div></div>
+      <span class="stepno" id="step-2"></span>
+    </div>
+    <div class="cap"><b id="capt-2"></b><span id="capd-2"></span></div>
+  </div>
+</section>
+
+<section id="s3">
+  <h2 data-i18n="s3-h">3. Как метилирование теряется в клетках вообще</h2>
+  <p class="sub" data-i18n="s3-sub">Два пути. Пассивный — разбавление при делениях. Активный — окисление TET и вырезание через репарацию. В большинстве соматических контекстов преобладает пассивный.</p>
+  <div class="stage">
+    <svg id="svg-3" viewBox="0 0 1200 600" role="img" aria-label="Passive and active DNA demethylation"></svg>
+    <div class="bar">
+      <button class="play" data-scene="3" data-i18n="play">▶ Запустить</button>
+      <div class="track" data-scene="3"><div class="fill" id="fill-3"></div></div>
+      <span class="stepno" id="step-3"></span>
+    </div>
+    <div class="cap"><b id="capt-3"></b><span id="capd-3"></span></div>
+  </div>
+</section>
+
+<section id="s4">
+  <h2 data-i18n="s4-h">4. Потеря метилирования после CRISPRoff</h2>
+  <p class="sub" data-i18n="s4-sub">Редактор транзиентный: через несколько дней его уже нет, и дальше судьбу метки решает только точность поддержания. Последний кадр — наши собственные данные, и они показывают обратное потере.</p>
+  <div class="stage">
+    <svg id="svg-4" viewBox="0 0 1200 580" role="img" aria-label="Loss of methylation after CRISPRoff"></svg>
+    <div class="bar">
+      <button class="play" data-scene="4" data-i18n="play">▶ Запустить</button>
+      <div class="track" data-scene="4"><div class="fill" id="fill-4"></div></div>
+      <span class="stepno" id="step-4"></span>
+    </div>
+    <div class="cap"><b id="capt-4"></b><span id="capd-4"></span></div>
+  </div>
+  <div class="note">
+    <h3 data-i18n="s4-note-h">Важно не перепутать модель и наши данные</h3>
+    <p data-i18n="s4-note">Разбавление метки — это общая модель того, как эпигенетическая память может теряться. В нашем эксперименте на CD55 в T-клетках между Day 6 и Day 35 метилирование не падало, а росло: средняя Δ выросла на 133 из 137 CpG, профили коррелируют r = 0.943. То есть за этот промежуток мы наблюдали закрепление, а не потерю. Оговорка прежняя: Day 6 и Day 35 — разные доноры, поэтому строго это две точки, а не кинетика.</p>
+  </div>
+</section>
+
+<section id="krab">
+  <h2 data-i18n="k-h">Что ещё привлекает KRAB</h2>
+  <p class="sub" data-i18n="k-sub">Сам KRAB — маленький домен без ферментативной активности. Он работает как посадочная площадка: связывает KAP1 (он же TRIM28), а тот уже собирает на себе всю репрессивную машину.</p>
+  <table>
+    <thead><tr>
+      <th data-i18n="k-t1">Партнёр</th><th data-i18n="k-t2">Что делает</th><th data-i18n="k-t3">Как попадает в комплекс</th>
+    </tr></thead>
+    <tbody id="krab-rows"></tbody>
+  </table>
+</section>
+
+<section id="refs">
+  <h2 data-i18n="r-h">Источники</h2>
+  <p class="sub" data-i18n="r-sub">Всё, на чём построены схемы выше. Анимации — это упрощённые модели по этим работам, а не воспроизведение конкретных рисунков.</p>
+  <ol class="refs" id="ref-list"></ol>
+</section>
+
+<footer data-i18n="foot">CD55 · epicme.bio · схемы упрощены: размеры белков и ДНК здесь не в масштабе, масштабная версия — на отдельной странице</footer>
+</div>
+
+<script>
+/* ============================ i18n ============================ */
+const T = {
+ru:{
+ title:'Механизм CRISPRoff — что происходит с метилированием',
+ lede:'Четыре анимации: как метка ставится, как переживает деление клетки, как метилирование теряется в клетках вообще и что известно про его потерю после CRISPRoff. Каждый шаг подписан, источники — внизу страницы.',
+ play:'▶ Запустить', pause:'❚❚ Пауза', replay:'↻ Заново',
+ 'c-h':'Конструкт CRISPRoff',
+ 'c-sub':'Порядок доменов по вашей схеме. Ширина блоков примерно пропорциональна длине в аминокислотах — точные границы конструкта зависят от плазмиды, так что это приближение.',
+ 's1-h':'1. Как CRISPRoff ставит метилирование',
+ 's1-sub':'От посадки на ДНК до появления 5-метилцитозина. Химия реакции показана по шагам — именно так работают все C5-метилтрансферазы.',
+ 's2-h':'2. Деление клетки: как метка передаётся дочерним клеткам',
+ 's2-sub':'Репликация делает из симметрично метилированного CpG полуметилированный. Дальше его должна распознать система поддержания.',
+ 's3-h':'3. Как метилирование теряется в клетках вообще',
+ 's3-sub':'Два пути. Пассивный — разбавление при делениях. Активный — окисление TET и вырезание через репарацию. В большинстве соматических контекстов преобладает пассивный.',
+ 's4-h':'4. Потеря метилирования после CRISPRoff',
+ 's4-sub':'Редактор транзиентный: через несколько дней его уже нет, и дальше судьбу метки решает только точность поддержания. Последний кадр — наши собственные данные, и они показывают обратное потере.',
+ 's4-note-h':'Важно не перепутать модель и наши данные',
+ 's4-note':'Разбавление метки — это общая модель того, как эпигенетическая память может теряться. В нашем эксперименте на CD55 в T-клетках между Day 6 и Day 35 метилирование не падало, а росло: средняя Δ выросла на 133 из 137 CpG, профили коррелируют r = 0.943. То есть за этот промежуток мы наблюдали закрепление, а не потерю. Оговорка прежняя: Day 6 и Day 35 — разные доноры, поэтому строго это две точки, а не кинетика.',
+ 'k-h':'Что ещё привлекает KRAB',
+ 'k-sub':'Сам KRAB — маленький домен без ферментативной активности. Он работает как посадочная площадка: связывает KAP1 (он же TRIM28), а тот уже собирает на себе всю репрессивную машину.',
+ 'k-t1':'Партнёр','k-t2':'Что делает','k-t3':'Как попадает в комплекс',
+ 'r-h':'Источники',
+ 'r-sub':'Всё, на чём построены схемы выше. Анимации — это упрощённые модели по этим работам, а не воспроизведение конкретных рисунков.',
+ foot:'CD55 · epicme.bio · схемы упрощены: размеры белков и ДНК здесь не в масштабе, масштабная версия — на отдельной странице'
+},
+en:{
+ title:'The CRISPRoff mechanism — what happens to methylation',
+ lede:'Four animations: how the mark is written, how it survives cell division, how methylation is lost in cells generally, and what is known about its loss after CRISPRoff. Every step is captioned and the sources are listed at the bottom.',
+ play:'▶ Play', pause:'❚❚ Pause', replay:'↻ Replay',
+ 'c-h':'The CRISPRoff construct',
+ 'c-sub':'Domain order follows your diagram. Block widths are roughly proportional to length in amino acids — exact construct boundaries depend on the plasmid, so this is an approximation.',
+ 's1-h':'1. How CRISPRoff writes methylation',
+ 's1-sub':'From landing on DNA to a finished 5-methylcytosine. The chemistry is shown step by step — this is how every C5 methyltransferase works.',
+ 's2-h':'2. Cell division: how the mark reaches the daughter cells',
+ 's2-sub':'Replication turns a symmetrically methylated CpG into a hemimethylated one. Something then has to recognise it.',
+ 's3-h':'3. How methylation is lost in cells generally',
+ 's3-sub':'Two routes. Passive: dilution across divisions. Active: TET oxidation followed by excision through repair. In most somatic settings the passive route dominates.',
+ 's4-h':'4. Loss of methylation after CRISPRoff',
+ 's4-sub':'The editor is transient: within days it is gone, and from then on the fate of the mark rests entirely on maintenance fidelity. The last frame is our own data, and it shows the opposite of loss.',
+ 's4-note-h':'Do not confuse the model with our data',
+ 's4-note':'Dilution of the mark is a general model for how epigenetic memory can be lost. In our CD55 experiment in T cells, methylation between Day 6 and Day 35 did not fall — it rose: mean Δ increased at 133 of 137 CpGs and the profiles correlate at r = 0.943. Over that interval we observed consolidation, not loss. The usual caveat holds: Day 6 and Day 35 come from different donors, so strictly these are two points, not a time course.',
+ 'k-h':'What else KRAB recruits',
+ 'k-sub':'KRAB itself is a small domain with no enzymatic activity. It works as a landing pad: it binds KAP1 (also called TRIM28), and KAP1 assembles the repressive machinery.',
+ 'k-t1':'Partner','k-t2':'What it does','k-t3':'How it joins the complex',
+ 'r-h':'Sources',
+ 'r-sub':'Everything the diagrams above are built on. The animations are simplified models based on this work, not reproductions of any particular figure.',
+ foot:'CD55 · epicme.bio · these diagrams are simplified: protein and DNA sizes here are not to scale, the true-scale version is on a separate page'
+}};
+
+/* ===================== captions per scene ===================== */
+const CAPS = {
+1:[
+ {ru:['sgRNA ведёт комплекс к мишени','dCas9 не режет ДНК: каталитические остатки выключены мутациями. Он сканирует геном, проверяя короткие последовательности рядом с PAM.'],
+  en:['The sgRNA guides the complex to the target','dCas9 does not cut: its catalytic residues are mutated off. It scans the genome, checking short sequences next to a PAM.']},
+ {ru:['PAM найден, ДНК расплетается','Узнав PAM (здесь CGG), белок локально расплетает двойную спираль. sgRNA спаривается с одной цепью, вторая вытесняется — это R-петля.'],
+  en:['PAM found, the DNA is unwound','On recognising the PAM (CGG here) the protein locally unwinds the duplex. The sgRNA pairs with one strand and displaces the other — an R-loop.']},
+ {ru:['KRAB сажает на себя KAP1','KRAB сам ничего не катализирует. Он связывает KAP1/TRIM28, а тот служит платформой: после SUMO-модификации собирает SETDB1, комплекс NuRD и HP1.'],
+  en:['KRAB docks KAP1','KRAB catalyses nothing itself. It binds KAP1/TRIM28, which acts as a platform: once SUMOylated it assembles SETDB1, the NuRD complex and HP1.']},
+ {ru:['На гистонах появляется H3K9me3','SETDB1 метилирует лизин 9 гистона H3. HP1 читает эту метку и связывается с KAP1, стабилизируя комплекс, — хроматин уплотняется.'],
+  en:['H3K9me3 appears on the histones','SETDB1 methylates lysine 9 of histone H3. HP1 reads that mark and also binds KAP1, stabilising the complex — the chromatin compacts.']},
+ {ru:['DNMT3A выворачивает цитозин из спирали','Чтобы дотянуться до пятого атома углерода, фермент полностью выворачивает целевое основание наружу и сажает его в карман активного центра. DNMT3L каталитически мёртв, но резко повышает активность DNMT3A.'],
+  en:['DNMT3A flips the cytosine out of the helix','To reach carbon 5 the enzyme flips the target base fully out of the duplex into its active-site pocket. DNMT3L is catalytically dead but sharply stimulates DNMT3A.']},
+ {ru:['Цистеин атакует, SAM отдаёт метил','Каталитический цистеин атакует шестой атом углерода цитозина — образуется ковалентный аддукт. Это активирует пятый атом, и он забирает метильную группу с SAM. Кофактор превращается в SAH.'],
+  en:['A cysteine attacks, SAM donates the methyl','The catalytic cysteine attacks carbon 6 of the cytosine, forming a covalent adduct. That activates carbon 5, which takes the methyl group from SAM. The cofactor leaves as SAH.']},
+ {ru:['Основание возвращается — это уже 5mC','Отщепление протона с пятого углерода разрывает связь с ферментом и восстанавливает ароматичность. Основание встаёт обратно в спираль, уже неся метильную группу.'],
+  en:['The base returns — now as 5mC','Removing the proton from carbon 5 breaks the bond to the enzyme and restores aromaticity. The base swings back into the helix carrying its methyl group.']},
+ {ru:['Соседние CpG метилируются, а под белком — нет','Фермент обрабатывает CpG вокруг сайта. Те, что физически накрыты комплексом, остаются нетронутыми — это и есть футпринт, который мы измеряли на CD55.'],
+  en:['Neighbouring CpGs get methylated, those under the protein do not','The enzyme works through the surrounding CpGs. Those physically covered by the complex stay untouched — that is the footprint we measured at CD55.']}
+],
+2:[
+ {ru:['Исходное состояние: метка на обеих цепях','В зрелом CpG метилированы оба цитозина — на прямой и на обратной цепи. Такая симметрия и есть то, что можно скопировать.'],
+  en:['Starting state: the mark sits on both strands','In a mature CpG both cytosines are methylated, on the forward and the reverse strand. That symmetry is what makes it copyable.']},
+ {ru:['Приходит репликационная вилка','Цепи расходятся, на каждой синтезируется новая. Новая цепь синтезируется без каких-либо модификаций — она чистая.'],
+  en:['The replication fork arrives','The strands separate and a new one is synthesised on each. The new strand is made with no modifications at all — it is blank.']},
+ {ru:['Получился полуметилированный CpG','Метка осталась только на родительской цепи. Если ничего не произойдёт, при следующем делении она разбавится ещё вдвое.'],
+  en:['The result is a hemimethylated CpG','The mark survives only on the parental strand. If nothing acts, the next division halves it again.']},
+ {ru:['UHRF1 узнаёт полуметилированный сайт','Домен SRA выворачивает 5mC наружу — так UHRF1 отличает полуметилированный CpG от неметилированного. Одновременно он читает H3K9me2/3 на соседнем гистоне.'],
+  en:['UHRF1 recognises the hemimethylated site','Its SRA domain flips the 5mC out — that is how UHRF1 tells a hemimethylated CpG from an unmethylated one. At the same time it reads H3K9me2/3 on the adjacent histone.']},
+ {ru:['UHRF1 ставит убиквитин и зовёт DNMT1','Как E3-лигаза UHRF1 моноубиквитинирует хвост H3. DNMT1 узнаёт этот убиквитин своим доменом RFTS и приходит к вилке, где его дополнительно удерживает PCNA.'],
+  en:['UHRF1 adds ubiquitin and calls DNMT1','As an E3 ligase UHRF1 mono-ubiquitinates the H3 tail. DNMT1 recognises that ubiquitin through its RFTS domain and arrives at the fork, held there additionally by PCNA.']},
+ {ru:['DNMT1 достраивает метку на новой цепи','DNMT1 сильно предпочитает полуметилированный субстрат. Он переносит метил с SAM на цитозин новой цепи — симметрия восстановлена.'],
+  en:['DNMT1 completes the mark on the new strand','DNMT1 strongly prefers a hemimethylated substrate. It transfers a methyl from SAM onto the cytosine of the new strand — symmetry restored.']},
+ {ru:['Обе дочерние клетки несут тот же профиль','Каждая получила полный симметричный CpG. Профиль метилирования сохранён, и цикл может повторяться делением за делением.'],
+  en:['Both daughter cells carry the same profile','Each ends up with a full symmetric CpG. The methylation profile is preserved and the cycle can repeat division after division.']}
+],
+3:[
+ {ru:['Два разных способа потерять метку','Слева — пассивный путь: ничего не вырезается, метка просто не копируется. Справа — активный: цитозин химически переделывают и заменяют через репарацию.'],
+  en:['Two different ways to lose the mark','On the left, the passive route: nothing is excised, the mark simply is not copied. On the right, the active route: the cytosine is chemically converted and then replaced through repair.']},
+ {ru:['Пассивный путь: поддержание не сработало','Если DNMT1 или UHRF1 не отработали на этом сайте, полуметилированный CpG уходит в деление как есть. Одна из двух дочерних молекул остаётся без метки.'],
+  en:['Passive route: maintenance failed','If DNMT1 or UHRF1 did not act at this site, the hemimethylated CpG goes into division as it is. One of the two daughter molecules ends up bare.']},
+ {ru:['Каждое деление уполовинивает долю','Доля метилированных молекул падает как 1/2 на деление: 100 % → 50 % → 25 %. Никакого фермента-стирателя для этого не нужно, достаточно бездействия.'],
+  en:['Each division halves the fraction','The methylated fraction falls by half per division: 100 % → 50 % → 25 %. No eraser enzyme is needed for this, inaction is enough.']},
+ {ru:['Активный путь: TET окисляет метку','Ферменты TET1/2/3 последовательно окисляют 5mC до 5hmC, затем до 5fC и 5caC. Уже на первом шаге DNMT1 перестаёт узнавать сайт как субстрат.'],
+  en:['Active route: TET oxidises the mark','TET1/2/3 successively oxidise 5mC to 5hmC, then to 5fC and 5caC. Already at the first step DNMT1 stops recognising the site as a substrate.']},
+ {ru:['TDG вырезает основание','Гликозилаза TDG узнаёт 5fC и 5caC и вырезает основание целиком, оставляя в цепи брешь без основания.'],
+  en:['TDG excises the base','The glycosylase TDG recognises 5fC and 5caC and cuts the base out entirely, leaving an abasic gap in the strand.']},
+ {ru:['Репарация ставит чистый цитозин','Система эксцизионной репарации оснований застраивает брешь обычным немодифицированным цитозином. Метка стёрта, последовательность не изменилась.'],
+  en:['Repair installs a clean cytosine','Base excision repair fills the gap with an ordinary unmodified cytosine. The mark is erased and the sequence is unchanged.']},
+ {ru:['В большинстве клеток преобладает пассивный путь','Работы на первичных T-клетках показывают, что деметилирование идёт в основном через разбавление окисленных форм при делениях, а вклад TDG пренебрежимо мал.'],
+  en:['In most cells the passive route dominates','Work in primary T cells shows demethylation runs mainly through replication-dependent dilution of the oxidised forms, with a negligible contribution from TDG.']}
+],
+4:[
+ {ru:['Редактор исчезает через несколько дней','CRISPRoff доставляют транзиентно. Белок деградирует, и дальше никто метку не дописывает — остаётся только то, что успели поставить.'],
+  en:['The editor is gone within days','CRISPRoff is delivered transiently. The protein degrades and nothing tops the mark up afterwards — only what was already written remains.']},
+ {ru:['Дальше всё решает точность поддержания','На каждое деление у каждого сайта есть вероятность быть скопированным. Если она равна единице, метка вечная. Если чуть меньше — начинается медленная утечка.'],
+  en:['From here everything rests on maintenance fidelity','At every division each site has some probability of being copied. If it is one, the mark is permanent. If slightly less, a slow leak begins.']},
+ {ru:['Утечка накапливается по молекулам','Потеря стохастическая: отдельные молекулы теряют отдельные CpG. Популяция расходится в веер состояний, а не переключается разом.'],
+  en:['The leak accumulates across molecules','Loss is stochastic: individual molecules lose individual CpGs. The population fans out into a spread of states rather than switching at once.']},
+ {ru:['Что показал Nuñez и соавторы','Для многих генов молчание держалось сотни делений и переживало дифференцировку iPSC в нейроны. Это верхняя граница того, насколько прочной бывает память.'],
+  en:['What Nuñez and colleagues showed','For many genes silencing held for hundreds of divisions and survived differentiation of iPSCs into neurons. That is the upper end of how durable this memory can be.']},
+ {ru:['А в наших данных потери нет','На CD55 в T-клетках между Day 6 и Day 35 метилирование выросло, а не упало: прирост на 133 из 137 CpG, корреляция профилей r = 0.943. Внутри сайта прирост вдвое медленнее, чем на фланге.'],
+  en:['And in our data there is no loss','At CD55 in T cells, methylation between Day 6 and Day 35 rose rather than fell: gains at 133 of 137 CpGs and profile correlation r = 0.943. Inside the site the gain is about half as fast as on the flank.']},
+ {ru:['Обратный инструмент существует','Та же работа описывает CRISPRon — dCas9 с TET1 и активаторным доменом. Он снимает метилирование и возвращает экспрессию, то есть память стирается направленно.'],
+  en:['A reverse tool exists','The same work describes CRISPRon — dCas9 with TET1 and an activation domain. It removes the methylation and restores expression, so the memory can be erased on purpose.']}
+]};
+
+/* ===================== KRAB partner table ===================== */
+const KRAB=[
+ {ru:['KAP1 / TRIM28','Главный посредник. Сам ДНК не связывает и ничего не метилирует — служит каркасом, на который садится всё остальное.','Связывается напрямую с доменом KRAB через свой N-концевой участок RBCC. Описана стехиометрия три KAP1 на один KRAB.'],
+  en:['KAP1 / TRIM28','The central mediator. It binds no DNA and methylates nothing — it is the scaffold everything else sits on.','Binds the KRAB domain directly through its N-terminal RBCC region. A stoichiometry of three KAP1 per KRAB has been reported.']},
+ {ru:['SETDB1','Гистоновая метилтрансфераза. Ставит H3K9me3 — метку конститутивного гетерохроматина.','Привлекается KAP1 после его SUMO-модификации по бромодомену.'],
+  en:['SETDB1','A histone methyltransferase. It deposits H3K9me3, the mark of constitutive heterochromatin.','Recruited by KAP1 once its bromodomain has been SUMOylated.']},
+ {ru:['Комплекс NuRD','Несёт гистондеацетилазу и ремоделирующую активность: снимает ацетилирование и сдвигает нуклеосомы, уплотняя участок.','Тоже привлекается SUMO-модифицированным KAP1.'],
+  en:['The NuRD complex','Carries histone deacetylase and remodelling activity: it strips acetylation and repositions nucleosomes, compacting the region.','Also recruited by SUMOylated KAP1.']},
+ {ru:['HP1 (α/β/γ)','Читатель метки H3K9me3. Связываясь и с меткой, и с KAP1, замыкает петлю положительной обратной связи и стабилизирует комплекс.','Садится на мотив PxVxL в центральной части KAP1 и одновременно на H3K9me3.'],
+  en:['HP1 (α/β/γ)','The reader of H3K9me3. By binding both the mark and KAP1 it closes a positive feedback loop and stabilises the complex.','Docks on the PxVxL motif in the central part of KAP1 and on H3K9me3 at the same time.']},
+ {ru:['HDAC-активность','Деацетилирование гистонов убирает метки открытого хроматина и делает участок недоступным для транскрипции.','Входит в состав NuRD; описано и прямое взаимодействие KAP1 с гистондеацетилазами.'],
+  en:['HDAC activity','Deacetylating histones removes the marks of open chromatin and makes the region inaccessible to transcription.','Part of NuRD; direct interaction of KAP1 with histone deacetylases has also been described.']},
+ {ru:['Распространение по хроматину','Репрессия не ограничена точкой посадки: H3K9me3 и HP1β расползаются от сайта связывания к промотору на заметное расстояние.','Следствие обратной связи «SETDB1 ставит метку → HP1 её читает → комплекс удерживается → метка ставится дальше».'],
+  en:['Spreading along the chromatin','Repression is not confined to the landing site: H3K9me3 and HP1β spread from the binding site toward the promoter over a substantial distance.','A consequence of the feedback loop: SETDB1 writes, HP1 reads, the complex is retained, and the mark extends further.']}
+];
+
+/* ========================= references ========================= */
+const REFS=[
+ {t:'Nuñez JK, Chen J, Pommier GC, et al. Genome-wide programmable transcriptional memory by CRISPR-based epigenome editing. Cell 184:2503–2519 (2021).',
+  n:{ru:'Исходная работа по CRISPRoff: состав конструкта (ZNF10 KRAB, Dnmt3A, Dnmt3L на dCas9), стойкость молчания через сотни делений и через дифференцировку iPSC в нейроны, а также обратный инструмент CRISPRon на основе TET1.',
+     en:'The original CRISPRoff paper: construct composition (ZNF10 KRAB, Dnmt3A, Dnmt3L on dCas9), silencing that persists through hundreds of divisions and through iPSC-to-neuron differentiation, plus the reverse tool CRISPRon built on TET1.'},
+  u:'https://www.cell.com/cell/fulltext/S0092-8674(21)00353-6'},
+ {t:'Here to stay: writing lasting epigenetic memories. Cell 184 (2021).',
+  n:{ru:'Короткий разбор устройства CRISPRoff и его свойств.',en:'A short walkthrough of how CRISPRoff is built and what it does.'},
+  u:'https://pubmed.ncbi.nlm.nih.gov/33930295/'},
+ {t:'Fonti G, et al. Structure of the KAP1 tripartite motif identifies molecular interfaces required for retroelement silencing.',
+  n:{ru:'Откуда взято: KRAB связывает KAP1 через RBCC; PxVxL в центральной части сажает HP1; SUMO-модификация бромодомена нужна для привлечения SETDB1 и NuRD; стехиометрия 3 KAP1 на 1 KRAB.',
+     en:'Source for: KRAB binds KAP1 via RBCC; the central PxVxL docks HP1; bromodomain SUMOylation is required to recruit SETDB1 and NuRD; a 3:1 KAP1:KRAB stoichiometry.'},
+  u:'https://www.biorxiv.org/content/10.1101/505677.full.pdf'},
+ {t:'Frietze S, O’Geen H, Blahnik KR, Jin VX, Farnham PJ. ZNF274 recruits the histone methyltransferase SETDB1 to the 3′ ends of ZNF genes. PLoS ONE 5:e15082 (2010).',
+  n:{ru:'Подтверждение модели KRAB-ZNF → KAP1 → SETDB1 → H3K9me3 на эндогенных сайтах.',
+     en:'Support for the KRAB-ZNF → KAP1 → SETDB1 → H3K9me3 model at endogenous sites.'},
+  u:'https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0015082'},
+ {t:'Groner AC, et al. KRAB–zinc finger proteins and KAP1 can mediate long-range transcriptional repression through heterochromatin spreading. PLoS Genetics 6:e1000869 (2010).',
+  n:{ru:'Откуда взято утверждение про распространение H3K9me3 и HP1β от сайта посадки к промотору.',
+     en:'Source for the claim that H3K9me3 and HP1β spread from the binding site toward the promoter.'},
+  u:'https://journals.plos.org/plosgenetics/article?id=10.1371%2Fjournal.pgen.1000869'},
+ {t:'TRIM28 and interacting KRAB-ZNFs control self-renewal of human pluripotent stem cells. Stem Cell Reports (2017).',
+  n:{ru:'Сводка партнёров KAP1: NuRD с деацетилазной и ремоделирующей активностью, SETDB1, HP1 как читатель метки.',
+     en:'A summary of KAP1 partners: NuRD with deacetylase and remodelling activity, SETDB1, and HP1 as the mark reader.'},
+  u:'https://www.cell.com/stem-cell-reports/fulltext/S2213-6711(17)30486-1'},
+ {t:'Reither S, Li F, Gowher H, Jeltsch A. Catalytic mechanism of DNA-(cytosine-C5)-methyltransferases revisited. J Mol Biol (2003). See also Gowher H, Jeltsch A, J Mol Biol (2006).',
+  n:{ru:'Химия из сцены 1: полное выворачивание основания, атака каталитического цистеина по C6, ковалентный аддукт, перенос метила с SAM на C5, разрешение через отщепление протона и восстановление ароматичности.',
+     en:'The chemistry in scene 1: complete base flipping, catalytic cysteine attack at C6, the covalent adduct, methyl transfer from SAM to C5, and resolution by deprotonation restoring aromaticity.'},
+  u:'https://www.sciencedirect.com/science/article/abs/pii/S0022283603005096'},
+ {t:'Rajavelu A, et al. Conserved motif VIII of murine DNA methyltransferase Dnmt3a. BMC Biochemistry (2012).',
+  n:{ru:'Роль консервативных мотивов в позиционировании вывернутого основания и в катализе.',
+     en:'The role of the conserved motifs in positioning the flipped base and in catalysis.'},
+  u:'https://pmc.ncbi.nlm.nih.gov/articles/PMC4802922/'},
+ {t:'Liu X, et al. UHRF1 targets DNMT1 for DNA methylation through cooperative binding of hemi-methylated DNA and methylated H3K9. Nature Communications 4:1563 (2013).',
+  n:{ru:'Основа сцены 2: UHRF1 узнаёт полуметилированный CpG и H3K9me2/3, и оба считывания вместе обеспечивают точность поддержания.',
+     en:'The basis of scene 2: UHRF1 reads the hemimethylated CpG and H3K9me2/3, and the two readouts together give maintenance its fidelity.'},
+  u:'https://www.nature.com/articles/ncomms2562'},
+ {t:'Bashtrykov P, et al. The UHRF1 protein stimulates the activity and specificity of the nuclear DNA methyltransferase DNMT1. J Biol Chem (2014).',
+  n:{ru:'DNMT1 предпочитает полуметилированный субстрат, но собственной избирательности ему не хватает — UHRF1 повышает и активность, и специфичность.',
+     en:'DNMT1 prefers a hemimethylated substrate but its intrinsic selectivity is insufficient — UHRF1 raises both activity and specificity.'},
+  u:'https://www.jbc.org/article/S0021-9258(20)44195-X/fulltext'},
+ {t:'Nishiyama A, et al. Two distinct modes of DNMT1 recruitment ensure stable maintenance DNA methylation. Nature Communications 11:1222 (2020).',
+  n:{ru:'Убиквитинирование как сигнал: UHRF1 моноубиквитинирует H3 и PAF15, DNMT1 читает убиквитин доменом RFTS.',
+     en:'Ubiquitin as the signal: UHRF1 mono-ubiquitinates H3 and PAF15, and DNMT1 reads the ubiquitin through its RFTS domain.'},
+  u:'https://www.nature.com/articles/s41467-020-15006-4'},
+ {t:'Onodera A, et al. Roles of TET and TDG in DNA demethylation in proliferating and non-proliferating immune cells. Genome Biology 22:186 (2021).',
+  n:{ru:'Основа сцены 3: окисленные формы не узнаются DNMT1 и разбавляются при делениях; в первичных T-клетках вклад TDG оказался пренебрежимо мал.',
+     en:'The basis of scene 3: the oxidised forms are not recognised by DNMT1 and dilute across divisions; in primary T cells the TDG contribution proved negligible.'},
+  u:'https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02384-1'},
+ {t:'The TET-TDG axis in T cells and biological processes. International Immunology (2025).',
+  n:{ru:'Разделение на пассивный и активный пути деметилирования, вырезание 5fC и 5caC гликозилазой TDG и достройка через эксцизионную репарацию.',
+     en:'The split between passive and active demethylation, excision of 5fC and 5caC by TDG, and completion through base excision repair.'},
+  u:'https://academic.oup.com/intimm/article/37/6/299/8005827'}
+];
+
+/* ======================= svg helpers ========================== */
+const NS='http://www.w3.org/2000/svg';
+function el(tag,at={},parent=null){const e=document.createElementNS(NS,tag);
+  for(const k in at) e.setAttribute(k,at[k]); if(parent) parent.appendChild(e); return e;}
+function txt(p,x,y,s,at={}){const e=el('text',Object.assign({x:x,y:y,fill:'#9FB4C7',
+  'font-size':14,'font-family':"'Space Grotesk',Arial,sans-serif"},at),p); e.textContent=s; return e;}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*clamp(t,0,1);
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+/* segment progress: returns 0..1 for stage i given global step position */
+function seg(p,i){return clamp(p-i+1,0,1);}
+
+/* ================== construct domain map ====================== */
+(function(){
+  const svg=document.getElementById('svg-construct');
+  // approximate residue counts; widths proportional to these
+  const doms=[
+    {k:'d3al',lab:'Dnmt3A/L',aa:900,c:'#CC79A7',n:{ru:'де-ново метилтрансфераза + её стимулятор',en:'de novo methyltransferase plus its stimulator'}},
+    {k:'dcas9',lab:'dCas9',aa:1368,c:'#0072B2',n:{ru:'ищет мишень, сам не режет',en:'finds the target, cuts nothing'}},
+    {k:'bfp',lab:'BFP',aa:236,c:'#D55E00',n:{ru:'флуоресцентная метка для сортировки',en:'fluorescent tag for sorting'}},
+    {k:'krab',lab:'KRAB',aa:75,c:'#E69F00',n:{ru:'посадочная площадка для KAP1',en:'landing pad for KAP1'}}
+  ];
+  const total=doms.reduce((s,d)=>s+d.aa,0), W=1080, X=60, Y=58, H=64;
+  let x=X, narrow=0;
+  el('line',{x1:X-22,y1:Y+H/2,x2:X,y2:Y+H/2,stroke:'#6B8299','stroke-width':3},svg);
+  txt(svg,X-26,Y+H/2-12,'N',{'text-anchor':'end','font-size':15,fill:'#E8EEF4','font-weight':600});
+  doms.forEach(d=>{
+    const w=W*d.aa/total;
+    el('rect',{x:x,y:Y,width:w,height:H,rx:7,fill:d.c,opacity:.92,stroke:'#0E2033','stroke-width':2},svg);
+    const t=txt(svg,x+w/2,Y+H/2+6,d.lab,{'text-anchor':'middle','font-size':d.aa<300?15:19,
+      'font-weight':600,fill:'#0E2033'});
+    if(d.aa<300){t.setAttribute('y',Y-12); t.setAttribute('fill',d.c);}
+    txt(svg,x+w/2,Y+H+24,'~'+d.aa+' aa',{'text-anchor':'middle','font-size':12.5,
+      fill:'#6B8299','font-family':'ui-monospace,monospace'});
+    // narrow domains get their own stacked row so the notes never collide
+    let ny=Y+H+46, anch='middle', nx=x+w/2;
+    if(w<170){ narrow++; ny=Y+H+50+narrow*24; anch='end'; nx=x+w/2-18;
+      el('line',{x1:x+w/2,y1:Y+H+32,x2:x+w/2,y2:ny-9,stroke:'#2A4560','stroke-width':1.5},svg);
+      el('line',{x1:x+w/2,y1:ny-9,x2:nx+6,y2:ny-9,stroke:'#2A4560','stroke-width':1.5},svg); }
+    const nt=txt(svg,nx,ny,'',{'text-anchor':anch,'font-size':12.5,fill:'#9FB4C7'});
+    nt.setAttribute('data-dom',d.k);
+    x+=w;
+  });
+  el('line',{x1:x,y1:Y+H/2,x2:x+22,y2:Y+H/2,stroke:'#6B8299','stroke-width':3},svg);
+  txt(svg,x+26,Y+H/2-12,'C',{'font-size':15,fill:'#E8EEF4','font-weight':600});
+  window.__doms=doms;
+})();
+
+/* ====================== generic DNA ========================== */
+function ladder(p,x0,x1,y,opts={}){
+  const g=el('g',{},p), gap=opts.gap||26, r=opts.r||16;
+  el('line',{x1:x0,y1:y-r,x2:x1,y2:y-r,stroke:'#8FA3B8','stroke-width':opts.sw||7,
+    'stroke-linecap':'round',opacity:opts.op||1},g);
+  el('line',{x1:x0,y1:y+r,x2:x1,y2:y+r,stroke:'#8FA3B8','stroke-width':opts.sw||7,
+    'stroke-linecap':'round',opacity:(opts.op||1)*.8},g);
+  for(let x=x0+gap/2;x<x1;x+=gap)
+    el('line',{x1:x,y1:y-r,x2:x,y2:y+r,stroke:'#8FA3B8','stroke-width':2,opacity:.3},g);
+  return g;
+}
+function methyl(p,x,y,c='#009E73',rr=11){
+  const g=el('g',{},p);
+  el('line',{x1:x,y1:y,x2:x,y2:y-26,stroke:c,'stroke-width':3},g);
+  el('circle',{cx:x,cy:y-34,r:rr,fill:c},g);
+  return g;
+}
+
+/* ===================== SCENE 1: writing ====================== */
+const S1=(function(){
+  const svg=document.getElementById('svg-1'); const Y=300;
+  ladder(svg,60,1140,Y,{gap:30});
+  // CpG positions along the DNA
+  const cpg=[150,240,330,470,560,650,760,850,940,1030];
+  const under=[470,560,650];           // covered by the complex
+  const g={};
+  g.proto=el('rect',{x:440,y:Y-90,width:250,height:180,fill:'#F0E442',opacity:0,rx:6},svg);
+  g.pam=el('rect',{x:690,y:Y-90,width:34,height:180,fill:'#D55E00',opacity:0,rx:4},svg);
+  txt(svg,707,Y+112,'PAM',{'text-anchor':'middle','font-size':13,fill:'#D55E00','font-weight':600});
+  // R-loop bubble
+  g.loop=el('path',{d:'',fill:'none',stroke:'#56B4E9','stroke-width':6,opacity:0},svg);
+  // complex
+  g.cx=el('g',{opacity:0},svg);
+  el('ellipse',{cx:565,cy:Y-6,rx:130,ry:74,fill:'#0072B2',opacity:.85},g.cx);
+  txt(g.cx,565,Y-2,'dCas9',{'text-anchor':'middle','font-size':22,'font-weight':600,fill:'#fff'});
+  txt(g.cx,565,Y+22,'+ sgRNA',{'text-anchor':'middle','font-size':13.5,fill:'#CFE6F5'});
+  // domains
+  g.krab=el('g',{opacity:0},svg);
+  el('circle',{cx:760,cy:120,r:34,fill:'#E69F00'},g.krab);
+  txt(g.krab,760,126,'KRAB',{'text-anchor':'middle','font-size':13.5,'font-weight':600,fill:'#2B1900'});
+  g.d3=el('g',{opacity:0},svg);
+  el('circle',{cx:240,cy:104,r:46,fill:'#CC79A7'},g.d3);
+  el('line',{x1:286,y1:118,x2:452,y2:250,stroke:'#6B8299','stroke-width':3,opacity:.5},g.d3);
+  txt(g.d3,240,102,'DNMT3A',{'text-anchor':'middle','font-size':13.5,'font-weight':600,fill:'#2B1030'});
+  txt(g.d3,240,120,'/3L',{'text-anchor':'middle','font-size':12,fill:'#2B1030'});
+  // KAP1 stack
+  g.kap=el('g',{opacity:0},svg);
+  el('circle',{cx:880,cy:96,r:38,fill:'#56B4E9'},g.kap);
+  txt(g.kap,880,102,'KAP1',{'text-anchor':'middle','font-size':14,'font-weight':600,fill:'#06182A'});
+  g.set=el('g',{opacity:0},svg);
+  [['SETDB1',995,58,'#009E73'],['NuRD',1075,110,'#CC79A7'],['HP1',995,158,'#F0E442']]
+    .forEach(([l,cx,cy,c])=>{
+      el('circle',{cx:cx,cy:cy,r:30,fill:c},g.set);
+      txt(g.set,cx,cy+5,l,{'text-anchor':'middle','font-size':12.5,'font-weight':600,fill:'#0E2033'});
+    });
+  // nucleosomes + H3K9me3
+  g.nuc=el('g',{},svg);
+  [[900,Y+120],[1010,Y+120]].forEach(([cx,cy])=>{
+    el('circle',{cx:cx,cy:cy,r:30,fill:'#2A4560',stroke:'#6B8299','stroke-width':2},g.nuc);});
+  g.h3=el('g',{opacity:0},svg);
+  [[900,Y+120],[1010,Y+120]].forEach(([cx,cy])=>{
+    el('circle',{cx:cx,cy:cy-42,r:11,fill:'#009E73'},g.h3);
+    el('line',{x1:cx,y1:cy-30,x2:cx,y2:cy-53,stroke:'#009E73','stroke-width':3},g.h3);});
+  txt(svg,955,Y+186,'H3K9me3',{'text-anchor':'middle','font-size':13,fill:'#009E73','font-weight':600});
+  // flipped base + chemistry
+  g.flip=el('g',{opacity:0},svg);
+  el('line',{x1:240,y1:Y-16,x2:240,y2:206,stroke:'#F0E442','stroke-width':3,'stroke-dasharray':'5 4'},g.flip);
+  g.base=el('rect',{x:222,y:266,width:36,height:36,rx:6,fill:'#F0E442',opacity:0},svg);
+  g.sam=el('g',{opacity:0},svg);
+  el('circle',{cx:372,cy:200,r:26,fill:'#009E73'},g.sam);
+  txt(g.sam,372,205,'SAM',{'text-anchor':'middle','font-size':12.5,'font-weight':600,fill:'#04231A'});
+  g.cys=el('g',{opacity:0},svg);
+  el('line',{x1:222,y1:150,x2:238,y2:186,stroke:'#CC79A7','stroke-width':4},g.cys);
+  txt(g.cys,150,150,'Cys',{'font-size':13,fill:'#CC79A7','font-weight':600});
+  g.sah=el('g',{opacity:0},svg);
+  el('circle',{cx:372,cy:200,r:26,fill:'#6B8299'},g.sah);
+  txt(g.sah,372,205,'SAH',{'text-anchor':'middle','font-size':12.5,'font-weight':600,fill:'#0E2033'});
+  // methyl marks on CpGs
+  g.marks=cpg.map(x=>{const m=methyl(svg,x,Y-18); m.setAttribute('opacity',0); return {x:x,g:m};});
+  // labels for protected CpGs
+  g.shield=el('g',{opacity:0},svg);
+  under.forEach(x=>el('rect',{x:x-13,y:Y-31,width:26,height:26,fill:'none',
+    stroke:'#56B4E9','stroke-width':3},g.shield));
+
+  return {svg:svg,n:8,render(p){
+    const o=(e,v)=>e.setAttribute('opacity',v);
+    // 0 scan  1 R-loop  2 KAP1  3 H3K9me3  4 flip  5 chemistry  6 back  7 spread
+    const s0=clamp(p,0,1),s1=seg(p,1),s2=seg(p,2),s3=seg(p,3),
+          s4=seg(p,4),s5=seg(p,5),s6=seg(p,6),s7=seg(p,7);
+    const scanX=lerp(180,565,ease(s0));
+    g.cx.setAttribute('transform','translate('+(scanX-565)+',0)');
+    o(g.cx,clamp(p*3,0,1));
+    o(g.proto,.16*s1); o(g.pam,.5*s1);
+    o(g.loop,s1);
+    g.loop.setAttribute('d','M440 '+(Y-16)+' Q 565 '+(Y-16-46*ease(s1))+' 690 '+(Y-16));
+    o(g.krab,s1); o(g.d3,s1);
+    o(g.kap,s2); o(g.set,clamp(s2*1.4-.3,0,1));
+    o(g.h3,s3);
+    o(g.flip,s4);
+    o(g.base,s4);
+    g.base.setAttribute('transform','translate(0,'+lerp(0,-84,ease(s4))+')');
+    o(g.sam,s5<.55?s4*(1-s5/.55):0);
+    o(g.cys,clamp(s5*2.2,0,1)*(1-clamp((s5-.75)*4,0,1)));
+    o(g.sah,clamp((s5-.55)*2.2,0,1));
+    // methyl appears on the flipped base then rides back up
+    const fm=clamp((s5-.6)*2.5,0,1);
+    g.base.setAttribute('fill',fm>.5?'#009E73':'#F0E442');
+    g.base.setAttribute('transform','translate(0,'+lerp(-84,0,ease(s6))+')');
+    o(g.flip,Math.max(s4-s6,0));
+    // first CpG mark lands after step 6
+    g.marks.forEach((m,i)=>{
+      const isUnder=under.indexOf(m.x)>=0;
+      let v=0;
+      if(i===1) v=s6;                                  // the one we followed
+      else if(!isUnder) v=clamp((s7-Math.abs(i-1)*0.06)*1.6,0,1);
+      o(m.g,v);
+    });
+    o(g.shield,s7);
+  }};
+})();
+
+/* ================= SCENE 2: inheritance ====================== */
+const S2=(function(){
+  const svg=document.getElementById('svg-2'); const Y=190;
+  const g={};
+  g.top=ladder(svg,120,1080,Y,{gap:34});
+  el('circle',{cx:520,cy:Y-16,r:11,fill:'#009E73'},svg);
+  el('circle',{cx:520,cy:Y+16,r:11,fill:'#009E73'},svg);
+  txt(svg,520,Y-46,'5mC',{'text-anchor':'middle','font-size':13,fill:'#009E73','font-weight':600});
+  txt(svg,520,Y+64,'5mC',{'text-anchor':'middle','font-size':13,fill:'#009E73','font-weight':600});
+  // fork
+  g.fork=el('g',{opacity:0},svg);
+  el('path',{d:'M600 '+(Y-16)+' L 820 '+(Y-90),stroke:'#8FA3B8','stroke-width':7,
+    'stroke-linecap':'round'},g.fork);
+  el('path',{d:'M600 '+(Y+16)+' L 820 '+(Y+90),stroke:'#8FA3B8','stroke-width':7,
+    'stroke-linecap':'round'},g.fork);
+  g.pol=el('circle',{cx:600,cy:Y,r:26,fill:'#6B8299',opacity:0},svg);
+  // daughters
+  const DY1=Y+170, DY2=Y+330;
+  g.d1=el('g',{opacity:0},svg); ladder(g.d1,180,1020,DY1,{gap:34});
+  g.d2=el('g',{opacity:0},svg); ladder(g.d2,180,1020,DY2,{gap:34});
+  // hemimethylated states
+  g.hemi1=el('circle',{cx:560,cy:DY1-16,r:11,fill:'#009E73',opacity:0},svg);
+  g.hemi2=el('circle',{cx:560,cy:DY2+16,r:11,fill:'#009E73',opacity:0},svg);
+  g.blank1=el('circle',{cx:560,cy:DY1+16,r:11,fill:'none',stroke:'#6B8299',
+    'stroke-width':2.5,opacity:0},svg);
+  g.blank2=el('circle',{cx:560,cy:DY2-16,r:11,fill:'none',stroke:'#6B8299',
+    'stroke-width':2.5,opacity:0},svg);
+  g.hemiLab=txt(svg,700,DY1-6,'',{'font-size':14,fill:'#E69F00','font-weight':600,opacity:0});
+  // UHRF1
+  g.u1=el('g',{opacity:0},svg);
+  el('circle',{cx:560,cy:DY1-92,r:36,fill:'#E69F00'},g.u1);
+  txt(g.u1,560,DY1-86,'UHRF1',{'text-anchor':'middle','font-size':13,'font-weight':600,fill:'#2B1900'});
+  el('line',{x1:560,y1:DY1-56,x2:560,y2:DY1-30,stroke:'#E69F00','stroke-width':3},g.u1);
+  // ubiquitin
+  g.ub=el('g',{opacity:0},svg);
+  el('circle',{cx:640,cy:DY1-108,r:16,fill:'#CC79A7'},g.ub);
+  txt(g.ub,640,DY1-103,'Ub',{'text-anchor':'middle','font-size':11.5,'font-weight':600,fill:'#2B1030'});
+  // DNMT1
+  g.dn=el('g',{opacity:0},svg);
+  el('circle',{cx:720,cy:DY1-92,r:40,fill:'#0072B2'},g.dn);
+  txt(g.dn,720,DY1-86,'DNMT1',{'text-anchor':'middle','font-size':13,'font-weight':600,fill:'#fff'});
+  // restored marks
+  g.fix1=el('circle',{cx:560,cy:DY1+16,r:11,fill:'#009E73',opacity:0},svg);
+  g.fix2=el('circle',{cx:560,cy:DY2-16,r:11,fill:'#009E73',opacity:0},svg);
+  g.ok=txt(svg,700,DY2-34,'',{'font-size':15,fill:'#009E73','font-weight':600,opacity:0});
+
+  return {svg:svg,n:7,render(p){
+    const o=(e,v)=>e.setAttribute('opacity',v);
+    const s1=seg(p,1),s2=seg(p,2),s3=seg(p,3),s4=seg(p,4),s5=seg(p,5),s6=seg(p,6);
+    g.pol.setAttribute('cx',lerp(600,880,ease(s1)));
+    o(g.d1,s1); o(g.d2,s1);
+    o(g.hemi1,s2); o(g.hemi2,s2);
+    o(g.blank1,s2*(1-s5)); o(g.blank2,s2*(1-s5));
+    g.hemiLab.textContent=LANG==='ru'?'полуметилированный CpG':'hemimethylated CpG';
+    const done=1-s6;                       // stage 6 clears the transient machinery
+    o(g.u1,s3*done);
+    g.u1.setAttribute('transform','translate(0,'+lerp(-40,0,ease(s3))+')');
+    o(g.ub,s4*done); o(g.dn,s4*done);
+    g.dn.setAttribute('transform','translate('+lerp(180,0,ease(s4))+',0)');
+    o(g.fork,s1*done); o(g.pol,s1*done);
+    o(g.hemiLab,s2*done);
+    o(g.fix1,s5); o(g.fix2,s5);
+    o(g.ok,s6);
+    g.ok.textContent=LANG==='ru'?'профиль сохранён':'profile preserved';
+  }};
+})();
+
+/* ============== SCENE 3: demethylation routes ================ */
+const S3=(function(){
+  const svg=document.getElementById('svg-3');
+  const g={};
+  txt(svg,300,40,'',{'text-anchor':'middle','font-size':17,fill:'#E69F00','font-weight':600})
+    .setAttribute('id','s3-lt');
+  txt(svg,900,40,'',{'text-anchor':'middle','font-size':17,fill:'#CC79A7','font-weight':600})
+    .setAttribute('id','s3-rt');
+  el('line',{x1:600,y1:60,x2:600,y2:560,stroke:'#2A4560','stroke-width':2},svg);
+
+  // ---- passive: three generations of molecules
+  const rows=[[110,4,4],[210,4,2],[310,4,1]];
+  g.pass=[];
+  rows.forEach(([y,tot,meth],ri)=>{
+    const gg=el('g',{opacity:0},svg);
+    for(let i=0;i<tot;i++){
+      const x=140+i*90;
+      el('rect',{x:x,y:y,width:64,height:26,rx:5,fill:'#2A4560'},gg);
+      if(i<meth) el('circle',{cx:x+32,cy:y+13,r:9,fill:'#009E73'},gg);
+    }
+    txt(gg,500,y+19,(meth/tot*100)+'%',{'font-size':15,fill:'#009E73','font-weight':600});
+    txt(gg,110,y+19,(ri===0?'0':ri)+'',{'font-size':13,fill:'#6B8299','text-anchor':'end'});
+    g.pass.push(gg);
+  });
+  g.passLab=txt(svg,140,378,'',{'font-size':13.5,fill:'#9FB4C7'});
+
+  // ---- active: chemical chain
+  const chain=[['5mC','#009E73',700],['5hmC','#56B4E9',700],['5fC','#E69F00',700],
+               ['5caC','#D55E00',700]];
+  g.chain=chain.map((c,i)=>{
+    const gg=el('g',{opacity:0},svg);
+    const y=110+i*78;
+    el('circle',{cx:720,cy:y,r:24,fill:c[1]},gg);
+    txt(gg,720,y+5,c[0],{'text-anchor':'middle','font-size':12.5,'font-weight':600,fill:'#0E2033'});
+    if(i>0){
+      el('line',{x1:720,y1:y-52,x2:720,y2:y-28,stroke:'#6B8299','stroke-width':3,
+        'marker-end':''},gg);
+      txt(gg,742,y-36,'TET',{'font-size':12.5,fill:'#6B8299'});
+    }
+    return gg;
+  });
+  g.tdg=el('g',{opacity:0},svg);
+  el('circle',{cx:900,cy:344,r:34,fill:'#CC79A7'},g.tdg);
+  txt(g.tdg,900,349,'TDG',{'text-anchor':'middle','font-size':13,'font-weight':600,fill:'#2B1030'});
+  el('line',{x1:866,y1:344,x2:748,y2:344,stroke:'#CC79A7','stroke-width':3},g.tdg);
+  g.gap=el('g',{opacity:0},svg);
+  el('circle',{cx:720,cy:344,r:24,fill:'none',stroke:'#D55E00','stroke-width':3,
+    'stroke-dasharray':'6 5'},g.gap);
+  g.ber=el('g',{opacity:0},svg);
+  el('circle',{cx:720,cy:436,r:24,fill:'#6B8299'},g.ber);
+  txt(g.ber,720,441,'C',{'text-anchor':'middle','font-size':14,'font-weight':600,fill:'#0E2033'});
+  el('line',{x1:720,y1:378,x2:720,y2:406,stroke:'#6B8299','stroke-width':3},g.ber);
+  txt(g.ber,742,396,'BER',{'font-size':12.5,fill:'#6B8299'});
+  g.dom=txt(svg,120,520,'',{'font-size':14.5,fill:'#56B4E9','font-weight':600,opacity:0});
+
+  return {svg:svg,n:7,render(p){
+    const o=(e,v)=>e.setAttribute('opacity',v);
+    document.getElementById('s3-lt').textContent=LANG==='ru'?'Пассивный путь — разбавление':'Passive route — dilution';
+    document.getElementById('s3-rt').textContent=LANG==='ru'?'Активный путь — окисление и репарация':'Active route — oxidation and repair';
+    g.passLab.textContent=LANG==='ru'?'доля молекул с меткой, по делениям':'fraction of molecules carrying the mark, per division';
+    o(g.pass[0],clamp(p*2,0,1));
+    o(g.pass[1],seg(p,2)); o(g.pass[2],clamp(p-1.4,0,1));
+    o(g.chain[0],clamp(p*2,0,1));
+    o(g.chain[1],seg(p,3)); o(g.chain[2],clamp(seg(p,3)*1.6-.3,0,1));
+    o(g.chain[3],clamp(seg(p,3)*1.9-.6,0,1)*(1-clamp(seg(p,5)*1.4,0,1)));
+    o(g.tdg,seg(p,4)); o(g.gap,clamp(seg(p,4)*1.8-.6,0,1));
+    o(g.ber,seg(p,5));
+    o(g.dom,seg(p,6));
+    g.dom.textContent=LANG==='ru'
+      ?'в первичных T-клетках вклад TDG оказался пренебрежимо мал'
+      :'in primary T cells the TDG contribution proved negligible';
+  }};
+})();
+
+/* ============= SCENE 4: loss after CRISPRoff ================= */
+const S4=(function(){
+  const svg=document.getElementById('svg-4');
+  const g={};
+  // editor fading
+  g.ed=el('g',{},svg);
+  el('ellipse',{cx:170,cy:110,rx:96,ry:52,fill:'#0072B2'},g.ed);
+  txt(g.ed,170,116,'CRISPRoff',{'text-anchor':'middle','font-size':17,'font-weight':600,fill:'#fff'});
+  g.edLab=txt(svg,170,190,'',{'text-anchor':'middle','font-size':13.5,fill:'#6B8299'});
+
+  // molecules grid: 8 columns x 5 rows, each a molecule with 6 CpGs
+  const GX=380,GY=70,CW=14,CH=13,COLS=9,ROWS=4,SITES=6;
+  g.cells=[];
+  for(let r=0;r<ROWS;r++){
+    const row=[];
+    for(let c=0;c<COLS;c++){
+      const cg=el('g',{},svg);
+      for(let s=0;s<SITES;s++){
+        row.push(el('rect',{x:GX+c*84+s*(CW+2),y:GY+r*46,width:CW,height:CH,rx:2,
+          fill:'#009E73'},cg));
+      }
+    }
+    g.cells.push(row);
+  }
+  g.gridLab=txt(svg,GX,GY-16,'',{'font-size':13,fill:'#9FB4C7'});
+  g.divLab=txt(svg,GX,GY+ROWS*46+22,'',{'font-size':13,fill:'#6B8299'});
+
+  // deterministic pseudo-random so playback is reproducible
+  function rnd(i){const x=Math.sin(i*127.1)*43758.5453; return x-Math.floor(x);}
+
+  g.nunez=el('g',{opacity:0},svg);
+  el('rect',{x:80,y:300,width:250,height:150,rx:10,fill:'#152C43',
+    stroke:'#56B4E9','stroke-width':2},g.nunez);
+  g.nz1=txt(g.nunez,205,352,'',{'text-anchor':'middle','font-size':26,'font-weight':600,fill:'#56B4E9'});
+  g.nz2=txt(g.nunez,205,384,'',{'text-anchor':'middle','font-size':13,fill:'#9FB4C7'});
+  g.nz3=txt(g.nunez,205,412,'',{'text-anchor':'middle','font-size':13,fill:'#9FB4C7'});
+
+  g.ours=el('g',{opacity:0},svg);
+  el('rect',{x:380,y:300,width:740,height:190,rx:10,fill:'#152C43',
+    stroke:'#009E73','stroke-width':2},g.ours);
+  g.oh=txt(g.ours,410,336,'',{'font-size':16,'font-weight':600,fill:'#009E73'});
+  // small bar pair: D6 vs D35 flank and site
+  const bars=[['D6 site',0.102,470,'#0072B2'],['D6 flank',0.451,560,'#56B4E9'],
+              ['D35 site',0.202,700,'#0072B2'],['D35 flank',0.639,790,'#56B4E9']];
+  bars.forEach(([l,v,x,c])=>{
+    const h=v*170;
+    el('rect',{x:x,y:470-h,width:56,height:h,rx:4,fill:c},g.ours);
+    txt(g.ours,x+28,470-h-8,v.toFixed(3),{'text-anchor':'middle','font-size':12,
+      fill:c,'font-weight':600,'font-family':'ui-monospace,monospace'});
+    txt(g.ours,x+28,486,l,{'text-anchor':'middle','font-size':11.5,fill:'#9FB4C7'});
+  });
+  g.or2=txt(g.ours,880,400,'',{'font-size':13.5,fill:'#9FB4C7'});
+  g.or3=txt(g.ours,880,424,'',{'font-size':13.5,fill:'#9FB4C7'});
+
+  g.crispron=el('g',{opacity:0},svg);
+  el('ellipse',{cx:170,cy:530,rx:96,ry:40,fill:'#CC79A7'},g.crispron);
+  txt(g.crispron,170,536,'CRISPRon',{'text-anchor':'middle','font-size':16,
+    'font-weight':600,fill:'#2B1030'});
+
+  return {svg:svg,n:6,render(p){
+    const o=(e,v)=>e.setAttribute('opacity',v);
+    const s1=seg(p,1),s2=seg(p,2),s3=seg(p,3),s4=seg(p,4),s5=seg(p,5);
+    o(g.ed,1-clamp(p*1.1,0,1)*0.9);
+    g.edLab.textContent=LANG==='ru'?'белок деградирует за несколько дней'
+                                   :'the protein degrades within days';
+    g.gridLab.textContent=LANG==='ru'?'36 молекул × 6 CpG в сайте'
+                                     :'36 molecules × 6 CpGs at the site';
+    g.divLab.textContent=LANG==='ru'
+      ?'зелёный — CpG сохранил метку, серый — потерял'
+      :'green — the CpG kept its mark, grey — it was lost';
+    // stochastic loss grows with s2/s3
+    const lossP=lerp(0,0.34,clamp(s2*0.5+s3,0,1));
+    g.cells.forEach((row,ri)=>row.forEach((c,ci)=>{
+      const lost=rnd(ri*97+ci*13)<lossP;
+      c.setAttribute('fill',lost?'#2A4560':'#009E73');
+    }));
+    o(g.nunez,s4?0:0);
+    o(g.nunez,seg(p,3));
+    g.nz1.textContent=LANG==='ru'?'сотни':'hundreds';
+    g.nz2.textContent=LANG==='ru'?'делений с сохранением молчания':'of divisions with silencing retained';
+    g.nz3.textContent=LANG==='ru'?'для многих генов (Nuñez 2021)':'for many genes (Nuñez 2021)';
+    o(g.ours,s4);
+    g.oh.textContent=LANG==='ru'?'Наши данные: CD55 в T-клетках, Δ метилирования'
+                                :'Our data: CD55 in T cells, Δ methylation';
+    g.or2.textContent=LANG==='ru'?'прирост на 133 из 137 CpG':'gains at 133 of 137 CpGs';
+    g.or3.textContent=LANG==='ru'?'корреляция профилей r = 0.943':'profile correlation r = 0.943';
+    o(g.crispron,s5);
+  }};
+})();
+
+/* ====================== timeline engine ====================== */
+const SCENES={1:S1,2:S2,3:S3,4:S4};
+const STATE={};
+let LANG='ru';
+const STEP_MS=2600;
+
+function setCaption(id,i){
+  const c=CAPS[id][clamp(i,0,CAPS[id].length-1)][LANG];
+  document.getElementById('capt-'+id).textContent=c[0];
+  document.getElementById('capd-'+id).textContent=c[1];
+  document.getElementById('step-'+id).textContent=(i+1)+' / '+CAPS[id].length;
+}
+function draw(id){
+  const st=STATE[id], sc=SCENES[id];
+  sc.render(st.p);
+  const frac=st.p/(sc.n-1);
+  document.getElementById('fill-'+id).style.width=(frac*100)+'%';
+  setCaption(id,Math.round(st.p));
+}
+function tick(id,ts){
+  const st=STATE[id];
+  if(!st.playing) return;
+  if(!st.last) st.last=ts;
+  const dt=ts-st.last; st.last=ts;
+  st.p+=dt/STEP_MS;
+  if(st.p>=SCENES[id].n-1){ st.p=SCENES[id].n-1; st.playing=false; setBtn(id); }
+  draw(id);
+  if(st.playing) requestAnimationFrame(t=>tick(id,t));
+}
+function setBtn(id){
+  const b=document.querySelector('.play[data-scene="'+id+'"]'), st=STATE[id];
+  b.textContent = st.playing ? T[LANG].pause
+    : (st.p>=SCENES[id].n-1 ? T[LANG].replay : T[LANG].play);
+}
+Object.keys(SCENES).forEach(id=>{
+  STATE[id]={p:0,playing:false,last:0};
+  draw(id); setBtn(id);
+  document.querySelector('.play[data-scene="'+id+'"]').addEventListener('click',()=>{
+    const st=STATE[id];
+    if(st.p>=SCENES[id].n-1 && !st.playing) st.p=0;
+    st.playing=!st.playing; st.last=0; setBtn(id);
+    if(st.playing) requestAnimationFrame(t=>tick(id,t));
+  });
+  const tr=document.querySelector('.track[data-scene="'+id+'"]');
+  tr.addEventListener('click',e=>{
+    const r=tr.getBoundingClientRect();
+    STATE[id].p=clamp((e.clientX-r.left)/r.width,0,1)*(SCENES[id].n-1);
+    STATE[id].playing=false; setBtn(id); draw(id);
+  });
+});
+
+/* ================== tables, refs, language =================== */
+function fillTables(){
+  const tb=document.getElementById('krab-rows'); tb.innerHTML='';
+  KRAB.forEach(r=>{
+    const tr=document.createElement('tr');
+    r[LANG].forEach((c,i)=>{
+      const td=document.createElement('td');
+      td.textContent=c;
+      if(i===0){td.style.fontWeight='600';td.style.color='#E8EEF4';td.style.whiteSpace='nowrap';}
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  const ol=document.getElementById('ref-list'); ol.innerHTML='';
+  REFS.forEach(r=>{
+    const li=document.createElement('li');
+    const a=document.createElement('a');
+    a.href=r.u; a.target='_blank'; a.rel='noopener'; a.textContent=r.t;
+    li.appendChild(a);
+    const d=document.createElement('div');
+    d.style.color='#6B8299'; d.style.fontSize='13px'; d.style.marginTop='3px';
+    d.textContent=r.n[LANG];
+    li.appendChild(d);
+    ol.appendChild(li);
+  });
+  document.querySelectorAll('[data-dom]').forEach(t=>{
+    const d=window.__doms.find(x=>x.k===t.getAttribute('data-dom'));
+    if(d) t.textContent=d.n[LANG];
+  });
+  const kc=document.getElementById('key-construct');
+  kc.innerHTML='';
+  window.__doms.forEach(d=>{
+    const s=document.createElement('span');
+    s.innerHTML='<i style="background:'+d.c+'"></i>'+d.lab;
+    kc.appendChild(s);
+  });
+}
+function applyLang(l){
+  LANG=l;
+  document.documentElement.setAttribute('lang',l);
+  document.querySelectorAll('[data-i18n]').forEach(e=>{
+    const k=e.getAttribute('data-i18n');
+    if(!(k in T[l])) return;
+    if(e.tagName==='TITLE') document.title=T[l][k];
+    else if(!e.classList.contains('play')) e.textContent=T[l][k];
+  });
+  document.querySelectorAll('.lang button').forEach(b=>
+    b.setAttribute('aria-pressed',String(b.dataset.lang===l)));
+  fillTables();
+  Object.keys(SCENES).forEach(id=>{setBtn(id);draw(id);});
+  try{localStorage.setItem('epicme_lang',l);}catch(e){}
+}
+document.querySelectorAll('.lang button').forEach(b=>
+  b.addEventListener('click',()=>applyLang(b.dataset.lang)));
+fillTables();
+try{ if(localStorage.getItem('epicme_lang')==='en') applyLang('en'); }catch(e){}
+</script>
+</body>
+</html>
