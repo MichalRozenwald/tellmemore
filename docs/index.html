@@ -19,13 +19,50 @@
   }
   .eyebrow::before{ content:''; width:22px; height:1px; background:var(--blue-deep); }
   h1.display{
-    font-size:clamp(34px, 6vw, 56px);
-    font-weight:600; line-height:1.06; letter-spacing:-0.01em;
-    margin:0 0 20px;
+    font-size:clamp(26px, 4vw, 40px);
+    font-weight:600; line-height:1.2; letter-spacing:-0.01em;
+    margin:0 0 20px; max-width:840px;
   }
   h1.display em{ font-style:normal; color:var(--blue); }
   .hero-sub{ font-size:18px; color:var(--ink-dim); max-width:640px; margin:0 0 28px; }
   .hero-cta{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+
+  /* ---------- epiCme logo: nav wordmark + larger hero lockup ----------
+     The mark is a stylized 5-methylcytosine: a hexagonal base with "C"
+     inside, plus a small branched methyl group hanging off it — so the
+     shape itself (hexagon + branched appendage), not just its color,
+     carries the "cytosine + added methylation" idea. */
+  .brand-logo{ display:flex; align-items:center; gap:9px; }
+  .logo-mark{ flex:0 0 auto; display:block; }
+  .brand-stack{ display:flex; flex-direction:column; line-height:1.2; }
+  .brand-word{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px;
+    letter-spacing:-0.01em; color:var(--ink);
+  }
+  .brand-word .accent-c{ color:var(--orange); }
+
+  .hero-logo{ display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+  .hero-logo .logo-mark{ width:52px; height:52px; }
+  .hero-logo .brand-word{ font-size:30px; }
+  .logo-caption{ font-size:13px; color:var(--ink-faint); margin:4px 0 0; }
+  .logo-caption b{ color:var(--ink-dim); font-weight:600; }
+
+  .hero-byline{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    font-size:14.5px; color:var(--ink-dim); margin:0 0 26px;
+  }
+  .hero-byline strong{ color:var(--ink); font-weight:600; }
+  .linkedin-link{
+    display:inline-flex; align-items:center; gap:6px;
+    border:1.5px solid var(--line); border-radius:999px; padding:5px 13px 5px 10px;
+    color:var(--ink-dim); text-decoration:none; font-size:13px; font-weight:600;
+    font-family:'Space Grotesk',sans-serif;
+    transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .linkedin-link:hover, .linkedin-link:focus-visible{
+    border-color:var(--blue); color:var(--ink); background:var(--surface);
+  }
+  .linkedin-link svg{ flex:0 0 auto; }
 
   /* ---------- language switch, top-left of nav — deliberately large:
      this is the one control on the page that changes everything else,
@@ -280,9 +317,20 @@
       <button type="button" data-lang="ru" class="active">RU</button>
       <button type="button" data-lang="en">EN</button>
     </div>
-    <a href="index.html" class="brand" style="text-decoration:none;">
-      <span class="brand-mark">epicme</span>
-      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    <a href="index.html" class="brand brand-logo" style="text-decoration:none;">
+      <svg class="logo-mark" viewBox="0 0 40 40" width="26" height="26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <polygon points="16,7 25,12.5 25,27.5 16,33 7,27.5 7,12.5" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="2"/>
+        <text x="16" y="24" font-family="'IBM Plex Mono', monospace" font-size="13" font-weight="700" fill="var(--ink)" text-anchor="middle">C</text>
+        <line x1="22" y1="11" x2="28" y2="7" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="30" cy="8" r="3.4" fill="var(--orange)"/>
+        <line x1="30" y1="4.6" x2="30" y2="1.8" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="27.3" y1="9.7" x2="24.8" y2="11.3" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="32.7" y1="9.7" x2="35.2" y2="11.3" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-stack">
+        <span class="brand-word">epi<span class="accent-c">C</span>me</span>
+        <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+      </span>
     </a>
     <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav-links">
       <span data-i18n="nav-toggle-label">Меню</span>
@@ -320,8 +368,34 @@
 
   <section class="hero">
     <div class="eyebrow" data-i18n="eyebrow">epicme.bio · открытый научный проект и PhD-капстон</div>
-    <h1 class="display" data-i18n="h1">Один ген, одна молекула,<br><em>весь путь целиком.</em></h1>
-    <p class="hero-sub" data-i18n="hero-sub">epi (редактирование эпигенома) + C (цитозин) + me (метилирование). Эта страница — карта проекта: отсюда можно попасть в любой раздел — контекст исследования, разбор гена CD55, сырые данные метилирования по временным точкам и более широкие заметки о том, куда всё это ведёт.</p>
+
+    <div class="hero-logo">
+      <svg class="logo-mark" viewBox="0 0 40 40" width="52" height="52" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <polygon points="16,7 25,12.5 25,27.5 16,33 7,27.5 7,12.5" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="2"/>
+        <text x="16" y="24" font-family="'IBM Plex Mono', monospace" font-size="13" font-weight="700" fill="var(--ink)" text-anchor="middle">C</text>
+        <line x1="22" y1="11" x2="28" y2="7" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="30" cy="8" r="3.4" fill="var(--orange)"/>
+        <line x1="30" y1="4.6" x2="30" y2="1.8" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="27.3" y1="9.7" x2="24.8" y2="11.3" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="32.7" y1="9.7" x2="35.2" y2="11.3" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-stack">
+        <span class="brand-word">epi<span class="accent-c">C</span>me</span>
+        <p class="logo-caption" data-i18n="logo-caption"><b>epi</b> — редактирование эпигенома · <b>C</b> — цитозин · <b>me</b> — через присоединение метильной группы</p>
+      </span>
+    </div>
+
+    <h1 class="display" data-i18n="h1">Фреймворк <em>Write–Read–Learn</em>: глубокое погружение в причинно-следственные связи между метилированием ДНК и экспрессией гена иммунного поверхностного маркера — <em>CD55</em></h1>
+    <p class="hero-sub" data-i18n="hero-sub">Эта страница — карта проекта: отсюда можно попасть в любой раздел — контекст исследования, разбор гена CD55, сырые данные метилирования по временным точкам и более широкие заметки о том, куда всё это ведёт.</p>
+
+    <div class="hero-byline">
+      <span data-i18n="byline"><strong>Михаль (Миша) Розенвальд</strong> — PhD-кандидат по вычислительной биологии, UC Berkeley, лаборатории Aaron Streets и Fyodor Urnov</span>
+      <a class="linkedin-link" href="https://www.linkedin.com/in/michal-rozenwald" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+        <span data-i18n="linkedin-label">LinkedIn</span>
+      </a>
+    </div>
+
     <div class="hero-cta">
       <a class="btn" href="about.html" data-i18n="cta-context">Начать с контекста →</a>
       <a class="btn ghost" href="about-cd55.html" data-i18n="cta-cd55">Сразу к биологии CD55 →</a>
@@ -721,8 +795,11 @@ const I18N = {
     'beyond-overlap': '<strong>Где они пересекаются:</strong> FKBP5 и NR3C1 встречаются на обеих страницах, но отвечают на разные вопросы. На странице про память — осталась ли метка у самого человека, пережившего стресс. На странице про травму — появилась ли она у его ребёнка. Это единственное место, где темы соприкасаются, и оно помечено на обеих страницах перекрёстными ссылками.',
     'nav-about': 'О проекте',
     'eyebrow': 'epicme.bio · открытый научный проект и PhD-капстон',
-    'h1': 'Один ген, одна молекула,<br><em>весь путь целиком.</em>',
-    'hero-sub': 'epi (редактирование эпигенома) + C (цитозин) + me (метилирование). Эта страница — карта проекта: отсюда можно попасть в любой раздел — контекст исследования, разбор гена CD55, сырые данные метилирования по временным точкам и более широкие заметки о том, куда всё это ведёт.',
+    'h1': 'Фреймворк <em>Write–Read–Learn</em>: глубокое погружение в причинно-следственные связи между метилированием ДНК и экспрессией гена иммунного поверхностного маркера — <em>CD55</em>',
+    'hero-sub': 'Эта страница — карта проекта: отсюда можно попасть в любой раздел — контекст исследования, разбор гена CD55, сырые данные метилирования по временным точкам и более широкие заметки о том, куда всё это ведёт.',
+    'logo-caption': '<b>epi</b> — редактирование эпигенома · <b>C</b> — цитозин · <b>me</b> — через присоединение метильной группы',
+    'byline': '<strong>Михаль (Миша) Розенвальд</strong> — PhD-кандидат по вычислительной биологии, UC Berkeley, лаборатории Aaron Streets и Fyodor Urnov',
+    'linkedin-label': 'LinkedIn',
     'cta-context': 'Начать с контекста →',
     'cta-cd55': 'Сразу к биологии CD55 →',
     'start-h3': 'О проекте',
@@ -886,8 +963,11 @@ const I18N = {
     'beyond-overlap': '<strong>Where they overlap:</strong> FKBP5 and NR3C1 appear on both pages, but they answer different questions. On the memory page: did a mark persist in the person who lived through the stress. On the trauma page: did it appear in their child. That is the only place the topics touch, and both pages cross-link at that point.',
     'nav-about': 'About',
     'eyebrow': 'epicme.bio · an open science project and PhD capstone',
-    'h1': 'One gene, one molecule,<br><em>the whole path end to end.</em>',
-    'hero-sub': 'epi (epigenome editing) + C (cytosine) + me (methylation). This page is the project map — from here you can reach every section: the research context, a deep dive into the CD55 gene, raw methylation data by timepoint, and broader notes on where this all leads.',
+    'h1': '<em>Write–Read–Learn</em> framework: a deep dive into causal relationships between DNA methylation and gene expression of an immune surface marker gene — <em>CD55</em>',
+    'hero-sub': 'This page is the project map — from here you can reach every section: the research context, a deep dive into the CD55 gene, raw methylation data by timepoint, and broader notes on where this all leads.',
+    'logo-caption': '<b>epi</b> — epigenome editing · <b>C</b> — of cytosine · <b>me</b> — via addition of a methyl group',
+    'byline': '<strong>Michal (Misha) Rozenwald</strong> — a UC Berkeley Computational Biology PhD Candidate from the Streets &amp; Urnov Labs',
+    'linkedin-label': 'LinkedIn',
     'cta-context': 'Start with the context →',
     'cta-cd55': 'Jump straight to CD55 biology →',
     'start-h3': 'About the project',
