@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-i18n="title">epicme.bio — эпигеном · цитозин · метилирование</title>
+<title data-i18n="title">epicme.bio — эпигеном · CRISPRoff · метилирование</title>
 <link rel="stylesheet" href="assets/theme.css">
 <style>
   /* Page-specific styles for the home / anchor page only.
@@ -49,20 +49,27 @@
 
   .hero-byline{
     display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-    font-size:14.5px; color:var(--ink-dim); margin:0 0 26px;
+    font-size:14.5px; color:var(--ink-dim); margin:0 0 18px;
   }
   .hero-byline strong{ color:var(--ink); font-weight:600; }
-  .linkedin-link{
+  .byline-name{
+    color:var(--ink); text-decoration:none; border-bottom:1.5px solid var(--line);
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .byline-name:hover, .byline-name:focus-visible{ color:var(--blue); border-color:var(--blue); }
+
+  .social-links{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 26px; }
+  .social-link{
     display:inline-flex; align-items:center; gap:6px;
     border:1.5px solid var(--line); border-radius:999px; padding:5px 13px 5px 10px;
     color:var(--ink-dim); text-decoration:none; font-size:13px; font-weight:600;
     font-family:'Space Grotesk',sans-serif;
     transition:border-color .15s ease, color .15s ease, background .15s ease;
   }
-  .linkedin-link:hover, .linkedin-link:focus-visible{
+  .social-link:hover, .social-link:focus-visible{
     border-color:var(--blue); color:var(--ink); background:var(--surface);
   }
-  .linkedin-link svg{ flex:0 0 auto; }
+  .social-link svg{ flex:0 0 auto; }
 
   /* ---------- language switch, top-left of nav — deliberately large:
      this is the one control on the page that changes everything else,
@@ -329,7 +336,7 @@
       </svg>
       <span class="brand-stack">
         <span class="brand-word">epi<span class="accent-c">C</span>me</span>
-        <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+        <span class="brand-sub" data-i18n="brand-sub">эпигеном · CRISPRoff · метилирование</span>
       </span>
     </a>
     <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav-links">
@@ -381,7 +388,7 @@
       </svg>
       <span class="brand-stack">
         <span class="brand-word">epi<span class="accent-c">C</span>me</span>
-        <p class="logo-caption" data-i18n="logo-caption"><b>epi</b> — редактирование эпигенома · <b>C</b> — цитозин · <b>me</b> — через присоединение метильной группы</p>
+        <p class="logo-caption" data-i18n="logo-caption"><b>epi</b> — редактирование эпигенома · <b>C</b> — CRISPRoff · <b>me</b> — через присоединение метильной группы</p>
       </span>
     </div>
 
@@ -389,10 +396,25 @@
     <p class="hero-sub" data-i18n="hero-sub">Эта страница — карта проекта: отсюда можно попасть в любой раздел — контекст исследования, разбор гена CD55, сырые данные метилирования по временным точкам и более широкие заметки о том, куда всё это ведёт.</p>
 
     <div class="hero-byline">
-      <span data-i18n="byline"><strong>Михаль (Миша) Розенвальд</strong> — PhD-кандидат по вычислительной биологии, UC Berkeley, лаборатории Aaron Streets и Fyodor Urnov</span>
-      <a class="linkedin-link" href="https://www.linkedin.com/in/michal-rozenwald" target="_blank" rel="noopener">
+      <span data-i18n="byline"><a class="byline-name" href="https://www.linkedin.com/in/michal-rozenwald" target="_blank" rel="noopener"><strong>Михаль (Миша) Розенвальд</strong></a> — PhD-кандидат по вычислительной биологии, UC Berkeley, лаборатории Aaron Streets и Fyodor Urnov</span>
+    </div>
+
+    <div class="social-links">
+      <a class="social-link" href="https://www.linkedin.com/in/michal-rozenwald" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
         <span data-i18n="linkedin-label">LinkedIn</span>
+      </a>
+      <a class="social-link" href="https://www.instagram.com/michalush.roz/" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/></svg>
+        <span data-i18n="instagram-label">Instagram</span>
+      </a>
+      <a class="social-link" href="https://m.facebook.com/michal.rozenwald/" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h-3a4 4 0 0 0-4 4v3H6v4h3v7h4v-7h3.2l.8-4H13V7a1 1 0 0 1 1-1h2z"/></svg>
+        <span data-i18n="facebook-label">Facebook</span>
+      </a>
+      <a class="social-link" href="https://t.me/michalula" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 14 21l-3-7-7-3 17-8z"/><line x1="21" y1="3" x2="10" y2="14"/></svg>
+        <span data-i18n="telegram-label">Telegram</span>
       </a>
     </div>
 
@@ -769,8 +791,8 @@ const I18N = {
     'pub-why-h3': 'Зачем это в проекте',
     'pub-why-p': 'Три вещи, которых своими данными не получить. <strong>Базовая линия:</strong> где промотор CD55 неметилирован по умолчанию, а где несёт метку и безо всякого редактирования. <strong>Проверка платформы:</strong> наши вызовы нанопоровые и модельно-зависимые, и совпадение с бисульфитом на тех же координатах говорит больше, чем любая внутренняя метрика. <strong>Контекст типа клеток:</strong> если базовая линия в Т-клетках и в K562 разная, то часть разницы между нашими наборами — это клетка, а не редактор.',
     'pub-note': '<strong>Честно про статус:</strong> страница пока каталог, а не переанализ. Ни одно значение метилирования там не нарисовано, потому что ни один файл ещё не скачан и не посчитан на нашем окне — вместо цифр лежит скрипт, который вырезает срез из удалённых bigWig range-запросами, и раздел «Загруженные треки», который заполнится ровно тогда, когда скрипт отработает. Вторая оговорка: публичные Т-клетки — это разные доноры, субпопуляции и состояния активации, а K562 из ENCODE несортированный, так что всё это фон для локуса, а не компаратор для наших групп.',
-    'title': 'epicme.bio — эпигеном · цитозин · метилирование',
-    'brand-sub': 'эпигеном · цитозин · метилирование',
+    'title': 'epicme.bio — эпигеном · CRISPRoff · метилирование',
+    'brand-sub': 'эпигеном · CRISPRoff · метилирование',
     'nav-home': 'Главная',
     'beyond-kicker': 'Additionally, about methylation — за пределами CD55',
     'beyond-h2': 'Две заметки: одна про память, одна про поколения',
@@ -797,9 +819,12 @@ const I18N = {
     'eyebrow': 'epicme.bio · открытый научный проект и PhD-капстон',
     'h1': 'Фреймворк <em>Write–Read–Learn</em>: глубокое погружение в причинно-следственные связи между метилированием ДНК и экспрессией гена иммунного поверхностного маркера — <em>CD55</em>',
     'hero-sub': 'Эта страница — карта проекта: отсюда можно попасть в любой раздел — контекст исследования, разбор гена CD55, сырые данные метилирования по временным точкам и более широкие заметки о том, куда всё это ведёт.',
-    'logo-caption': '<b>epi</b> — редактирование эпигенома · <b>C</b> — цитозин · <b>me</b> — через присоединение метильной группы',
-    'byline': '<strong>Михаль (Миша) Розенвальд</strong> — PhD-кандидат по вычислительной биологии, UC Berkeley, лаборатории Aaron Streets и Fyodor Urnov',
+    'logo-caption': '<b>epi</b> — редактирование эпигенома · <b>C</b> — CRISPRoff · <b>me</b> — через присоединение метильной группы',
+    'byline': '<a class="byline-name" href="https://www.linkedin.com/in/michal-rozenwald" target="_blank" rel="noopener"><strong>Михаль (Миша) Розенвальд</strong></a> — PhD-кандидат по вычислительной биологии, UC Berkeley, лаборатории Aaron Streets и Fyodor Urnov',
     'linkedin-label': 'LinkedIn',
+    'instagram-label': 'Instagram',
+    'facebook-label': 'Facebook',
+    'telegram-label': 'Telegram',
     'cta-context': 'Начать с контекста →',
     'cta-cd55': 'Сразу к биологии CD55 →',
     'start-h3': 'О проекте',
@@ -937,8 +962,8 @@ const I18N = {
     'pub-why-h3': 'Why the project needs it',
     'pub-why-p': 'Three things our own data cannot give. <strong>A baseline:</strong> where the CD55 promoter is unmethylated by default and where it carries the mark with no editing at all. <strong>A platform check:</strong> our calls are nanopore and model-dependent, and agreement with bisulfite at the same coordinates says more than any internal metric. <strong>Cell-type context:</strong> if the baseline differs between T cells and K562, part of the difference between our datasets is the cell, not the editor.',
     'pub-note': '<strong>Status, stated plainly:</strong> the page is a catalogue, not a re-analysis. Not one methylation value is drawn there, because no file has been downloaded and quantified over our window yet — in place of numbers there is a script that pulls the slice out of remote bigWigs by range request, and a “Loaded tracks” section that fills in exactly when that script has run. A second caveat: public T cells span different donors, subsets and activation states, and the ENCODE K562 is unsorted — so all of it is background for the locus, not a comparator for our groups.',
-    'title': 'epicme.bio — epigenome · cytosine · methylation',
-    'brand-sub': 'epigenome · cytosine · methylation',
+    'title': 'epicme.bio — epigenome · CRISPRoff · methylation',
+    'brand-sub': 'epigenome · CRISPRoff · methylation',
     'nav-home': 'Home',
     'beyond-kicker': 'Additionally, about methylation — beyond CD55',
     'beyond-h2': 'Two notes: one on memory, one on generations',
@@ -965,9 +990,12 @@ const I18N = {
     'eyebrow': 'epicme.bio · an open science project and PhD capstone',
     'h1': '<em>Write–Read–Learn</em> framework: a deep dive into causal relationships between DNA methylation and gene expression of an immune surface marker gene — <em>CD55</em>',
     'hero-sub': 'This page is the project map — from here you can reach every section: the research context, a deep dive into the CD55 gene, raw methylation data by timepoint, and broader notes on where this all leads.',
-    'logo-caption': '<b>epi</b> — epigenome editing · <b>C</b> — of cytosine · <b>me</b> — via addition of a methyl group',
-    'byline': '<strong>Michal (Misha) Rozenwald</strong> — a UC Berkeley Computational Biology PhD Candidate from the Streets &amp; Urnov Labs',
+    'logo-caption': '<b>epi</b> — epigenome editing · <b>C</b> — CRISPRoff · <b>me</b> — via addition of a methyl group',
+    'byline': '<a class="byline-name" href="https://www.linkedin.com/in/michal-rozenwald" target="_blank" rel="noopener"><strong>Michal (Misha) Rozenwald</strong></a> — a UC Berkeley Computational Biology PhD Candidate from the Streets &amp; Urnov Labs',
     'linkedin-label': 'LinkedIn',
+    'instagram-label': 'Instagram',
+    'facebook-label': 'Facebook',
+    'telegram-label': 'Telegram',
     'cta-context': 'Start with the context →',
     'cta-cd55': 'Jump straight to CD55 biology →',
     'start-h3': 'About the project',
