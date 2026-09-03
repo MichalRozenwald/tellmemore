@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">epiCme — геномный браузер CD55</title>
+<link rel="stylesheet" href="../assets/theme.css">
+<style>
+/* ---------------------------------------------------------------
+   Utility shim for the genome browser app.
+   The app was prototyped with Tailwind utility classes; rather than
+   pull the Tailwind CDN into a static site, only the ~99 utilities it
+   actually uses are defined here, and every colour resolves to a
+   theme.css custom property. No new palette hues are introduced.
+   --------------------------------------------------------------- */
+#browser-root{ font-family:'Space Grotesk',sans-serif; }
+#browser-root *{ box-sizing:border-box; }
+
+/* layout */
+#browser-root .block{ display:block; }
+#browser-root .flex{ display:flex; }
+#browser-root .grid{ display:grid; }
+#browser-root .hidden{ display:none; }
+#browser-root .flex-col{ flex-direction:column; }
+#browser-root .flex-wrap{ flex-wrap:wrap; }
+#browser-root .items-center{ align-items:center; }
+#browser-root .items-start{ align-items:flex-start; }
+#browser-root .items-baseline{ align-items:baseline; }
+#browser-root .justify-between{ justify-content:space-between; }
+#browser-root .grid-cols-1{ grid-template-columns:repeat(1,minmax(0,1fr)); }
+@media (min-width:768px){ #browser-root .md\:grid-cols-2{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (min-width:1024px){ #browser-root .lg\:grid-cols-2{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+#browser-root .w-full{ width:100%; }
+#browser-root .min-h-screen{ min-height:0; }
+#browser-root .max-w-6xl{ max-width:100%; }
+#browser-root .max-w-3xl{ max-width:60ch; }
+#browser-root .mx-auto{ margin-left:auto; margin-right:auto; }
+#browser-root .overflow-x-auto{ overflow-x:auto; }
+#browser-root .overflow-y-auto{ overflow-y:auto; }
+#browser-root .select-none{ user-select:none; }
+#browser-root .text-left{ text-align:left; }
+#browser-root .cursor-pointer{ cursor:pointer; }
+
+/* spacing */
+#browser-root .gap-1{ gap:4px; }   #browser-root .gap-1\.5{ gap:6px; }
+#browser-root .gap-2{ gap:8px; }   #browser-root .gap-3{ gap:12px; }
+#browser-root .gap-4{ gap:16px; }
+#browser-root .gap-x-3{ column-gap:12px; } #browser-root .gap-x-6{ column-gap:24px; }
+#browser-root .gap-y-1{ row-gap:4px; }     #browser-root .gap-y-1\.5{ row-gap:6px; }
+#browser-root .p-2{ padding:8px; } #browser-root .p-3{ padding:12px; } #browser-root .p-4{ padding:16px; }
+#browser-root .pb-1{ padding-bottom:4px; } #browser-root .pl-3{ padding-left:12px; }
+#browser-root .px-1{ padding:0 4px; }   #browser-root .px-2{ padding-left:8px; padding-right:8px; }
+#browser-root .px-2\.5{ padding-left:10px; padding-right:10px; }
+#browser-root .px-3{ padding-left:12px; padding-right:12px; }
+#browser-root .py-0\.5{ padding-top:2px; padding-bottom:2px; }
+#browser-root .py-1{ padding-top:4px; padding-bottom:4px; }
+#browser-root .py-1\.5{ padding-top:6px; padding-bottom:6px; }
+#browser-root .mb-1{ margin-bottom:4px; } #browser-root .mb-2{ margin-bottom:8px; }
+#browser-root .mb-3{ margin-bottom:12px; } #browser-root .mb-4{ margin-bottom:16px; }
+#browser-root .mt-0\.5{ margin-top:2px; } #browser-root .mt-1{ margin-top:4px; }
+#browser-root .mt-2{ margin-top:8px; } #browser-root .mt-3{ margin-top:12px; }
+#browser-root .mt-4{ margin-top:16px; }
+#browser-root .ml-1{ margin-left:4px; } #browser-root .ml-1\.5{ margin-left:6px; }
+
+/* type */
+#browser-root .text-xl{ font-size:20px; line-height:1.3; }
+#browser-root .text-sm{ font-size:13.5px; }
+#browser-root .text-xs{ font-size:12px; }
+#browser-root .text-\[11px\]{ font-size:11px; }
+#browser-root .text-\[10px\]{ font-size:10px; }
+#browser-root .font-semibold{ font-weight:600; }
+#browser-root .font-normal{ font-weight:400; }
+#browser-root .leading-relaxed{ line-height:1.6; }
+#browser-root .leading-snug{ line-height:1.4; }
+
+/* surfaces, borders, radius */
+#browser-root .rounded{ border-radius:8px; }
+#browser-root .rounded-lg{ border-radius:var(--radius); }
+#browser-root .border{ border:1px solid var(--line); }
+#browser-root .bg-slate-950{ background:transparent; }
+#browser-root .bg-slate-900{ background:var(--surface); }
+#browser-root .border-slate-800{ border-color:var(--line); }
+#browser-root .border-slate-700{ border-color:var(--line); }
+#browser-root .border-slate-600{ border-color:var(--ink-faint); }
+
+/* accents — blue = primary, orange = flagged, yellow = highlight.
+   Colour never carries meaning alone here: every one of these is paired
+   with the control's own text label. */
+#browser-root .bg-sky-300{ background:var(--blue); }
+#browser-root .bg-sky-950{ background:var(--blue-dim); }
+#browser-root .border-sky-500{ border-color:var(--blue); }
+#browser-root .text-sky-200{ color:var(--blue); }
+#browser-root .text-slate-900{ color:#06182A; }
+#browser-root .border-emerald-700{ border-color:var(--green); }
+#browser-root .text-emerald-400{ color:var(--green); }
+#browser-root .border-amber-900,
+#browser-root .border-orange-600,
+#browser-root .border-orange-700{ border-color:var(--orange); }
+#browser-root .text-amber-400,
+#browser-root .text-amber-500,
+#browser-root .text-orange-300{ color:var(--orange); }
+#browser-root .border-pink-600{ border-color:var(--orange); }
+#browser-root .text-pink-300,
+#browser-root .text-pink-400{ color:var(--orange); }
+#browser-root .text-purple-400{ color:#CC79A7; }
+
+/* ink ramp */
+#browser-root .text-slate-100{ color:var(--ink); }
+#browser-root .text-slate-200{ color:var(--ink); }
+#browser-root .text-slate-300{ color:var(--ink-dim); }
+#browser-root .text-slate-400{ color:var(--ink-dim); }
+#browser-root .text-slate-500{ color:var(--ink-faint); }
+#browser-root .text-slate-600{ color:var(--ink-faint); }
+
+/* native controls */
+#browser-root select, #browser-root textarea, #browser-root input[type=text]{
+  background:var(--surface-2); border:1px solid var(--line); color:var(--ink);
+  border-radius:8px; padding:6px 8px; font-family:'IBM Plex Mono',monospace; font-size:12px;
+}
+#browser-root button{ font-family:'Space Grotesk',sans-serif; background:transparent; color:inherit; cursor:pointer; }
+#browser-root input[type=range]{ accent-color:var(--blue); }
+#browser-root input[type=checkbox]{ accent-color:var(--blue); }
+#browser-root table{ border-collapse:collapse; }
+#browser-root dt{ font-weight:400; }
+#browser-root dd{ margin:0; }
+#browser-root canvas{ display:block; width:100%; }
+
+  .hero{ padding:44px 0 20px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--blue); font-weight:600; margin-bottom:14px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--blue-deep); }
+  h1.display{ font-size:clamp(26px,4vw,38px); font-weight:600; line-height:1.18; margin:0 0 16px; }
+  .hero-sub{ font-size:17px; color:var(--ink-dim); max-width:64ch; margin:0 0 18px; }
+  .lang-switch{
+    display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:999px; padding:4px; gap:3px; flex-shrink:0;
+  }
+  .lang-switch button{
+    border:none; background:transparent; color:var(--ink-dim); font-size:14px; font-weight:700;
+    padding:7px 16px; border-radius:999px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; letter-spacing:0.03em;
+  }
+  .lang-switch button.active{ background:var(--blue); color:#06182A; }
+  .nav-inner{ flex-wrap:wrap; row-gap:10px; }
+  .nav-links{ display:flex; flex-wrap:wrap; gap:8px; }
+  .nav-links a{
+    display:inline-flex; align-items:center; padding:8px 14px; border-radius:999px;
+    border:1.5px solid var(--line); background:var(--surface-2); color:var(--ink-dim);
+    font-size:13.5px; font-weight:600; text-decoration:none;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{ border-color:var(--blue); color:var(--ink); }
+  .nav-links a.active{ background:var(--orange); border-color:var(--orange); color:#2B1900; }
+  .browser-shell{ max-width:1180px; margin:0 auto; padding:0 24px 40px; }
+  .lang-note{
+    background:var(--blue-dim); border:1px solid var(--blue-deep); border-radius:10px;
+    padding:12px 15px; font-size:13px; color:var(--ink-dim); margin:0 0 22px;
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="../index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">epicme</span>
+      <span class="brand-sub" data-i18n="brand-sub">эпигеном · цитозин · метилирование</span>
+    </a>
+    <nav class="nav-links">
+      <a href="../index.html" data-i18n="nav-home">Главная</a>
+      <a href="../about-cd55.html">CD55 explorer</a>
+      <a href="../day6.html">Day 6</a>
+      <a href="../day35.html">Day 35</a>
+      <a href="../k562.html">K562</a>
+      <a href="epicme-genome-browser.html" data-i18n="nav-browser" class="active">Геномный браузер</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" style="border-top:none;">
+    <div class="eyebrow" data-i18n="eyebrow">Read · одномолекулярные данные</div>
+    <h1 class="display" data-i18n="h1">Геномный браузер по области интереса CD55</h1>
+    <p class="hero-sub" data-i18n="hero-sub">6 500 п.н. вокруг CD55, 137 CpG. Мишени CRISPRoff и ZFPoff, транскрипционные факторы из ENCODE, профили метилирования по всем молекулам и сами одномолекулярные прочтения — на одной оси, с масштабированием и включаемыми треками.</p>
+    <p class="lang-note" data-i18n="lang-note"><strong>Интерфейс браузера пока только на русском.</strong> Шапка и описание переключаются, сам виджет — нет; двуязычие для него в работе.</p>
+  </section>
+</main>
+
+<div class="browser-shell">
+  <div id="browser-root"></div>
+</div>
+
+<footer>
+  <div class="wrap" data-i18n="footer">epiCme — геномный браузер CD55. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="../index.html">← Назад на главную</a></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.4/babel.min.js" crossorigin></script>
+
+<script>
+const I18N = {
+  ru: {
+    'title':'epiCme — геномный браузер CD55',
+    'brand-sub':'эпигеном · цитозин · метилирование',
+    'nav-home':'Главная',
+    'nav-browser':'Геномный браузер',
+    'eyebrow':'Read · одномолекулярные данные',
+    'h1':'Геномный браузер по области интереса CD55',
+    'hero-sub':'6 500 п.н. вокруг CD55, 137 CpG. Мишени CRISPRoff и ZFPoff, транскрипционные факторы из ENCODE, профили метилирования по всем молекулам и сами одномолекулярные прочтения — на одной оси, с масштабированием и включаемыми треками.',
+    'lang-note':'<strong>Интерфейс браузера пока только на русском.</strong> Шапка и описание переключаются, сам виджет — нет; двуязычие для него в работе.',
+    'footer':'epiCme — геномный браузер CD55. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="../index.html">← Назад на главную</a>'
+  },
+  en: {
+    'title':'epiCme — CD55 genome browser',
+    'brand-sub':'epigenome · cytosine · methylation',
+    'nav-home':'Home',
+    'nav-browser':'Genome browser',
+    'eyebrow':'Read · single-molecule data',
+    'h1':'Genome browser over the CD55 region of interest',
+    'hero-sub':'6,500 bp around CD55, 137 CpGs. CRISPRoff and ZFPoff target sites, ENCODE transcription factors, methylation profiles across all molecules, and the single-molecule reads themselves — on one axis, with zoom and toggleable tracks.',
+    'lang-note':'<strong>The browser interface is Russian-only for now.</strong> The header and description switch languages; the widget itself does not yet.',
+    'footer':'epiCme — CD55 genome browser. Part of the PhD project of Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. <a href="../index.html">← Back to home</a>'
+  }
+};
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n'), dict = I18N[lang];
+    if(!dict || !(key in dict)) return;
+    if(el.tagName === 'TITLE'){ document.title = dict[key]; } else { el.innerHTML = dict[key]; }
+  });
+  document.querySelectorAll('#lang-switch button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  try{ localStorage.setItem('epicme_lang', lang); }catch(e){}
+}
+document.querySelectorAll('#lang-switch button').forEach(b => b.addEventListener('click', () => applyLang(b.dataset.lang)));
+(function(){ let s='ru'; try{ s=localStorage.getItem('epicme_lang')||'ru'; }catch(e){} if(s==='en') applyLang('en'); })();
+</script>
+
+<script type="text/babel" data-type="module">
+const { useState, useMemo, useRef } = React;
+
+/* =============================================================================
+   CD55 ROI browser — 6,500 bp, 137 CpGs
+   hg38 chr1:207,318,058–207,324,558   |   T2Tv2 chr1:206,583,354–206,589,854
+
+   PROVENANCE — read before trusting anything on screen
+   -----------------------------------------------------------------------------
+   MEASURED (hard coordinates, drawn solid):
+     TSS                hg38 207,321,620  = T2T 206,586,916  (offset 734,704)
+     CRISPRoff spacer   hg38 207,321,713–207,321,732  = +93 .. +112
+                        GCTGCGACTCGGCGGAGTCC ; T2T 206,587,009–206,587,028
+     ZFPoff target      hg38 207,321,707–207,321,726  = +87 .. +106
+                        GGCGTAGCTGCGACTCGGcg  (ZFP_CD55 clone B4)
+     TF peak positions, ENCODE K562 experiment counts (UCSC TFrPeakClusters)
+     KLF4 CACCC-boxes   -667/-652, -310/-302, -106/-95 (PMC10884306)
+     significant block  #20–132 = -1,077 .. +1,935
+     peak cluster       #78–83  = +58 .. +84
+
+   INFERRED (drawn hatched, labelled as inference on the track):
+     (PAM was inferred in the previous revision; it is now VERIFIED — the three
+      bases 3' of the spacer in the supplied sequence are CGG, a canonical NGG
+      on the plus strand. The spacer therefore lies on the plus strand.)
+     Complex footprints — user-adjustable padding, default 25 bp. This is NOT a
+       measured value. Stepper 2017 measured dCas9-Dnmt3a3L on other promoters;
+       transferring that geometry to CD55/CRISPRoff is an analogy.
+
+   INTERPOLATED (dashed, excluded from every quantitative claim):
+     bp position of 130 of 137 CpGs — piecewise linear between the 7 anchors.
+
+   EMPTY BY DESIGN (rendered as an explicit blank, never as a curve):
+     every methylation / ATAC / DNase track. No per-CpG values were supplied to
+     this artifact — only aggregates (K562 LOW 9.2 / HIGH 29.4 / BASE 7.4 %;
+     Day 35 unedited 4.9 / CRISPRoff 62.7 / ZFPoff 66.0 %). Drawing a profile from an
+     aggregate would be fabrication. Load real values via the panel below.
+
+   KNOWN CAVEATS carried into the display:
+     - the ONT unedited baseline is inflated by NoFullyUnmeth (19.7 % vs
+       EM-seq 4.9 %). Flagged on those tracks.
+     - EM-seq <-> ONT coordinate crosswalk is unresolved; EM-seq tracks warn
+       that their coordinates need the amplicon primer/reference first.
+     - NaN in the matrices does not distinguish no-coverage from unmethylated.
+   ============================================================================= */
+
+const TSS_HG38 = 207321620;
+const HG38_MINUS_T2T = 734704;
+const ROI = { lo: -3562, hi: 2938 }; // hg38 207,318,058 .. 207,324,558
+
+const toHg38 = (rel) => TSS_HG38 + rel;
+const fmtRel = (v) => (v > 0 ? `+${Math.round(v)}` : `${Math.round(v)}`);
+const fmtHg38 = (v) => toHg38(v).toLocaleString("en-US");
+
+/* ---------- targets: measured ---------- */
+const TARGETS = [
+  {
+    id: "crisproff",
+    name: "CRISPRoff protospacer",
+    seq: "GCTGCGACTCGGCGGAGTCC",
+    lo: 93, hi: 112,
+    hg38: "chr1:207,321,713–207,321,732",
+    t2t: "chr1:206,587,009–206,587,028",
+    color: "#E69F00",
+    status: "measured",
+  },
+  {
+    id: "zfpoff",
+    name: "ZFPoff target (clone B4)",
+    seq: "GGCGTAGCTGCGACTCGGcg",
+    lo: 87, hi: 106,
+    hg38: "chr1:207,321,707–207,321,726",
+    t2t: "—",
+    color: "#CC79A7",
+    status: "measured",
+  },
+];
+const OVERLAP = { lo: 93, hi: 106, seq: "GCTGCGACTCGGcg" };
+const PAM = { lo: 113, hi: 115, seq: "CGG" }; // verified in the ROI sequence
+
+/* ---------- TFs: measured positions ---------- */
+const CATS = {
+  meth:  { color: "#009E73", glyph: "triangle",     label: "Чувствителен к метилированию" },
+  polII: { color: "#F0E442", glyph: "circle",       label: "Машинерия Pol II" },
+  cof:   { color: "#E9EEEA", glyph: "square",       label: "Коактиватор / прочие" },
+  out:   { color: "#4A5A54", glyph: "diamond",      label: "Вне значимого блока" },
+  lit:   { color: "#A9B8B0", glyph: "triangleOpen", label: "Только литература, нет ChIP-seq" },
+};
+const TFS = [
+  { id: "CTCF",   pos: -565,  cat: "meth",  exp: 180, cpg: "#43–86", src: "ENCODE/UCSC K562; методчувствительность инсулятора — классическая литература" },
+  { id: "NRF1",   pos: -740,  cat: "meth",  exp: 3,   cpg: "#13–43", src: "ENCODE/UCSC K562; Domcke 2016 Nature 16462" },
+  { id: "POLR2A", pos: -117,  cat: "polII", exp: 90,  src: "ENCODE/UCSC K562" },
+  { id: "POLR2A-pS5", pos: -70, cat: "polII", exp: 40, src: "ENCODE/UCSC K562" },
+  { id: "POLR2G", pos: 10,    cat: "polII", exp: 2,   src: "ENCODE/UCSC K562" },
+  { id: "EP300",  pos: -236,  cat: "cof",   exp: 19,  src: "ENCODE/UCSC K562" },
+  { id: "ATF1",   pos: -239,  cat: "cof",   exp: 2,   src: "ENCODE/UCSC K562" },
+  { id: "NR2C2",  pos: -371,  cat: "cof",   exp: 2,   src: "ENCODE/UCSC K562" },
+  { id: "MAZ",    pos: -3432, cat: "out",   exp: 1,   src: "ENCODE/UCSC K562" },
+  { id: "GATA1",  pos: -3458, cat: "out",   exp: 1,   src: "ENCODE/UCSC K562" },
+  { id: "NFE2",   pos: -3424, cat: "out",   exp: 2,   src: "ENCODE/UCSC K562" },
+  { id: "KLF4-A", pos: -100,  cat: "lit",   exp: 0, cpg: "≈#65", src: "PMC10884306, CACCC −106/−95" },
+  { id: "KLF4-B", pos: -306,  cat: "lit",   exp: 0, cpg: "≈#54", src: "PMC10884306, CACCC −310/−302" },
+  { id: "KLF4-C", pos: -660,  cat: "lit",   exp: 0, cpg: "≈#35", src: "PMC10884306, CACCC −667/−652" },
+];
+const NOT_FOUND = ["TFCP2", "RELA", "NFKB1", "SP1", "CREB1", "KLF1"];
+
+/* ---------- CpG positions: DERIVED FROM THE T2T ROI SEQUENCE ----------
+   Not interpolated any more. Every CG dinucleotide in the supplied 6,500 bp
+   T2T v2.0 sequence, position = the C, expressed as bp from TSS 207,321,620.
+   Two independent checks passed:
+     - exactly 137 CG dinucleotides, matching the stated CpG count
+     - CpG #1 = hg38 207,318,092 and CpG #137 = hg38 207,324,450, which are
+       precisely the bounds of the K562 coordinate CSV window. The pipeline's
+       window is first-CpG to last-CpG, so this indexing lines up with it.            */
+const CPG_REL=[-3528,-3208,-3149,-2811,-2778,-2764,-2739,-2737,-2714,-2688,-2643,-2611,-2520,-2508,-2504,-1969,-1681,-1536,-1118,-1019,-895,-795,-752,-747,-742,-740,-738,-736,-734,-732,-730,-728,-688,-629,-612,-588,-493,-462,-421,-419,-407,-405,-397,-379,-369,-337,-335,-324,-316,-308,-304,-288,-260,-249,-237,-232,-197,-146,-113,-98,-93,-86,-83,-69,-35,-9,13,42,50,73,78,82,89,97,102,105,113,116,119,121,137,140,142,151,154,156,158,162,166,172,174,177,190,203,234,238,259,262,266,301,315,326,329,355,357,361,370,373,395,398,429,458,461,482,494,518,590,597,610,624,637,815,829,846,883,947,1047,1080,1173,1258,1789,1993,2075,2243,2297,2521,2830];
+const CPGS = CPG_REL.map((p, k) => ({ idx: k + 1, pos: p, anchor: true }));
+
+/* ---------- data track registry ----------
+   PRELOADED holds per-CpG profiles computed from the seven uploaded .npy
+   matrices. Encoding confirmed by inspection: the ONLY non-NaN value in every
+   matrix is 1.0 — there are no zeros anywhere. So NaN carries both
+   "unmethylated" and "no coverage", and the pipeline treats it as unmethylated.
+   The plotted value is therefore  (count of 1) / (n molecules) * 100.
+   Validated against two published figures: Day 35 unedited comes out at 19.7 % and
+   K562 BASE at 14.8 %, both exact matches to the recorded values.
+   All seven files are the mC 0.7 threshold. The 0.995 tracks stay empty.        */
+const PRELOADED={"d35_unedited":[62.4,81.2,78.7,84.7,82.2,90.6,96.0,89.6,81.2,92.1,89.6,89.1,94.1,91.6,83.7,77.7,77.7,83.2,53.0,84.2,33.2,19.3,24.8,7.4,13.9,19.8,24.8,26.7,27.7,23.3,14.9,7.9,22.8,22.8,5.9,6.4,1.0,0.0,2.0,6.4,4.0,1.5,4.5,5.0,0.5,3.5,5.0,3.5,1.0,1.0,1.0,0.0,3.5,3.0,0.0,2.0,2.0,4.5,2.5,4.5,0.0,1.5,4.0,0.5,1.0,3.0,2.5,0.0,3.5,1.5,3.5,3.0,2.0,0.5,2.5,1.5,1.5,1.0,1.0,0.5,4.0,2.0,3.0,0.5,2.5,1.5,0.5,1.5,2.5,1.0,1.5,2.0,4.0,5.0,1.0,1.0,2.0,1.0,3.0,2.0,1.0,2.0,2.5,3.0,2.0,2.0,2.5,1.5,1.5,1.5,5.4,2.5,0.5,5.9,2.5,3.0,3.5,1.0,3.5,2.0,0.0,0.5,4.0,2.0,6.4,3.5,11.9,14.4,5.0,60.4,42.1,52.0,65.3,61.9,61.4,82.2,74.8],"d35_croff":[63.2,85.0,73.0,79.8,85.0,89.0,90.2,87.7,85.6,86.2,81.9,88.3,91.4,89.3,83.7,70.6,67.8,74.8,62.3,81.0,57.1,27.0,67.5,25.5,58.0,58.3,67.5,73.9,79.1,75.5,49.4,31.3,76.7,63.2,26.7,57.1,58.0,18.7,52.8,51.2,60.4,64.7,69.6,44.2,44.2,51.8,44.2,66.6,41.1,66.6,49.4,51.5,58.9,60.7,81.3,79.1,49.1,50.6,50.6,54.0,80.7,77.3,73.3,73.3,73.0,53.7,58.0,77.9,68.7,79.8,70.6,79.8,84.7,22.4,17.8,24.8,27.6,36.5,58.6,70.2,83.7,87.4,86.5,68.1,70.6,70.6,75.5,66.6,74.5,37.1,35.3,46.6,16.9,40.8,16.9,33.1,30.4,23.9,33.1,55.8,71.8,59.8,69.6,29.8,39.6,40.5,45.7,39.9,51.8,59.8,56.4,36.8,30.7,43.3,65.0,18.7,42.0,46.9,38.0,47.5,30.1,46.6,27.3,58.6,53.7,73.3,50.6,72.4,31.3,77.9,60.4,69.9,74.2,66.9,73.6,80.7,71.2],"d35_d_croff":[0.8,3.8,-5.7,-4.9,2.8,-1.6,-5.9,-1.9,4.4,-5.9,-7.7,-0.8,-2.6,-2.3,0.1,-7.2,-9.9,-8.3,9.3,-3.2,23.9,7.7,42.7,18.0,44.1,38.5,42.7,47.2,51.4,52.2,34.5,23.4,53.9,40.4,20.7,50.6,57.0,18.7,50.8,44.8,56.5,63.2,65.2,39.2,43.7,48.4,39.2,63.1,40.1,65.6,48.4,51.5,55.4,57.8,81.3,77.2,47.1,46.2,48.1,49.5,80.7,75.8,69.4,72.8,72.0,50.7,55.5,77.9,65.2,78.3,67.1,76.8,82.7,21.9,15.3,23.4,26.1,35.5,57.6,69.8,79.8,85.4,83.5,67.6,68.1,69.1,75.0,65.1,72.1,36.1,33.8,44.6,12.9,35.8,15.9,32.1,28.4,22.9,30.2,53.8,70.8,57.8,67.2,26.8,37.6,38.5,43.2,38.4,50.4,58.3,51.0,34.3,30.2,37.3,62.6,15.7,38.6,45.9,34.6,45.6,30.1,46.1,23.3,56.6,47.2,69.8,38.7,58.0,26.3,17.5,18.4,18.0,8.9,5.0,12.2,-1.5,-3.6],"d6_un":[50.0,73.6,63.0,68.5,79.5,80.6,86.0,82.7,78.7,81.8,82.1,85.5,87.0,87.9,79.5,64.2,58.4,63.0,41.4,75.4,32.1,14.7,22.6,13.2,13.8,13.2,17.4,21.4,24.6,24.6,19.9,17.5,16.8,10.0,4.9,4.7,1.8,2.6,2.4,5.7,3.8,2.1,4.9,5.0,2.3,4.3,4.3,4.3,0.6,6.3,1.7,3.5,5.6,2.7,1.1,2.9,1.8,3.8,4.9,4.7,1.9,3.9,5.4,1.0,3.8,3.4,3.6,1.9,6.6,1.0,4.3,4.1,2.2,1.3,2.5,2.6,4.9,3.2,1.5,1.3,3.2,2.5,2.1,1.9,1.8,3.0,1.9,1.8,4.8,2.2,2.1,2.3,3.5,4.9,2.2,3.3,4.5,1.5,3.4,2.1,2.2,2.1,1.1,3.2,2.4,4.7,4.8,2.1,1.6,1.8,7.1,3.4,2.0,3.3,3.6,2.6,3.7,3.0,2.6,4.1,3.2,8.3,7.3,12.6,18.0,24.5,27.9,31.5,17.6,52.0,47.2,51.9,54.7,50.4,60.6,65.7,50.5],"d6_croff":[44.0,61.7,49.7,55.2,77.3,72.7,81.3,78.4,77.1,77.3,78.7,81.8,83.2,83.5,76.9,50.3,47.3,50.7,39.4,70.7,37.5,21.5,41.0,26.3,31.0,33.0,40.6,47.5,51.3,47.6,41.8,37.0,47.3,33.5,14.7,34.2,35.8,11.8,33.5,33.6,43.8,48.7,49.3,27.9,28.4,33.6,23.8,38.3,15.2,41.7,25.7,34.6,54.0,45.8,61.5,55.3,31.0,26.8,35.3,34.5,62.7,63.6,56.7,58.0,52.6,32.5,31.8,49.6,49.0,60.6,57.9,65.3,64.4,12.4,10.5,14.2,14.8,17.7,36.9,55.1,61.9,67.1,69.4,53.7,48.9,51.1,55.9,50.3,60.6,26.5,26.6,32.5,9.8,17.3,12.0,19.7,20.1,21.1,27.1,37.3,54.8,40.0,47.8,15.4,20.9,21.3,25.2,20.5,29.5,36.9,40.7,25.4,49.0,29.6,41.9,9.9,23.7,31.0,25.7,36.3,25.3,33.0,17.8,35.9,35.8,42.6,35.2,46.2,20.5,50.9,42.1,42.5,46.8,43.2,50.5,53.3,38.4],"d6_delta":[-6.0,-11.9,-13.2,-13.3,-2.2,-7.9,-4.7,-4.3,-1.6,-4.5,-3.4,-3.7,-3.9,-4.4,-2.6,-13.9,-11.1,-12.3,-2.0,-4.7,5.4,6.8,18.4,13.1,17.2,19.7,23.3,26.1,26.7,23.0,21.8,19.4,30.5,23.5,9.7,29.5,34.0,9.2,31.1,27.8,40.0,46.6,44.4,22.9,26.1,29.2,19.5,33.9,14.6,35.3,24.0,31.1,48.3,43.1,60.3,52.4,29.2,23.0,30.5,29.8,60.7,59.7,51.3,57.0,48.8,29.0,28.2,47.7,42.4,59.6,53.6,61.1,62.2,11.0,8.0,11.5,9.9,14.5,35.4,53.8,58.7,64.6,67.3,51.7,47.1,48.1,54.1,48.5,55.9,24.3,24.5,30.2,6.2,12.4,9.8,16.4,15.6,19.6,23.7,35.2,52.6,37.9,46.8,12.3,18.6,16.7,20.4,18.4,27.9,35.1,33.5,22.0,47.0,26.3,38.3,7.3,20.0,28.0,23.0,32.3,22.2,24.7,10.5,23.3,17.9,18.0,7.4,14.7,2.9,-1.2,-5.1,-9.3,-7.9,-7.2,-10.1,-12.4,-12.1],"k562_low_07":[6.4,5.1,14.9,59.1,72.0,79.7,89.8,85.1,83.7,77.6,77.9,80.1,71.3,78.8,60.0,54.5,50.9,57.7,38.8,49.8,15.2,6.4,9.3,4.3,4.6,4.4,6.0,8.4,10.5,8.5,6.0,5.4,8.3,5.4,5.8,8.6,5.1,3.2,4.3,7.9,4.6,3.8,5.3,5.7,2.8,7.5,6.9,8.7,3.1,8.3,5.8,6.9,7.3,6.3,5.3,6.6,3.3,6.5,7.6,7.1,6.0,7.3,9.2,4.9,7.3,6.6,8.5,6.6,8.4,5.9,7.9,6.2,5.5,3.0,4.6,5.7,8.8,7.6,6.5,7.1,10.6,7.8,8.0,7.4,6.2,7.1,5.8,6.6,7.8,4.3,4.3,5.6,5.5,10.4,5.2,6.5,8.2,5.4,7.6,6.9,7.2,5.9,5.2,4.7,5.4,6.9,6.6,5.8,5.8,6.2,9.1,4.7,5.1,6.9,8.3,5.1,5.3,5.2,4.0,5.5,3.4,3.5,5.0,3.7,5.3,4.1,8.5,9.9,1.9,14.1,23.7,33.0,55.6,53.9,64.2,65.8,66.8],"k562_high_07":[9.7,8.1,20.7,55.3,73.1,79.9,89.3,86.7,85.4,80.0,78.9,82.9,73.4,81.7,61.4,52.8,50.8,56.9,43.3,62.6,26.9,17.4,39.6,17.0,28.4,28.2,36.1,45.2,49.1,41.1,30.8,25.2,40.5,45.5,23.3,42.9,53.1,24.0,36.9,33.7,39.4,35.8,35.7,30.1,29.5,50.6,43.0,65.2,40.1,69.7,60.9,51.6,47.8,34.6,68.2,64.0,25.6,57.9,51.6,44.1,68.2,63.4,58.5,58.8,51.0,61.7,66.6,63.1,62.6,71.5,67.4,52.4,64.0,30.7,36.5,42.8,68.2,78.7,75.6,77.4,73.3,78.3,78.2,69.5,68.5,70.5,67.1,70.7,71.3,39.0,43.6,55.0,20.1,61.7,42.9,55.7,49.5,58.5,55.9,57.7,68.4,48.4,52.5,26.2,32.2,42.6,60.4,51.6,57.9,67.5,59.2,35.3,42.7,38.1,54.7,20.1,38.3,44.7,32.2,43.1,25.2,36.3,16.2,33.3,37.6,40.6,29.7,53.2,9.8,48.4,31.6,41.5,56.9,56.8,67.2,70.0,63.7],"k562_base_07":[6.3,8.7,17.5,53.9,64.6,83.0,91.7,89.8,88.8,72.8,78.6,77.2,70.4,74.8,58.7,59.7,51.0,62.6,34.0,49.0,16.0,5.8,8.3,4.4,5.8,2.9,3.4,7.8,13.1,8.3,3.4,2.9,3.4,2.4,3.9,9.2,1.5,1.0,4.9,5.8,2.4,3.4,3.4,4.4,3.9,5.3,4.4,6.3,0.5,6.3,2.4,5.3,6.3,6.3,1.5,2.4,1.5,4.4,6.3,5.8,1.9,3.4,4.9,1.0,3.9,1.9,6.8,2.4,3.4,0.0,6.3,3.9,2.9,1.5,1.0,1.9,5.8,4.4,2.9,3.9,7.3,4.9,4.4,2.4,3.4,5.8,3.4,1.9,2.9,2.4,0.5,2.4,5.8,7.8,2.4,3.4,6.8,3.4,3.9,1.9,3.9,3.4,1.9,5.3,2.9,4.9,5.8,2.9,1.5,1.5,5.8,3.9,2.9,5.3,5.8,3.4,2.9,1.9,1.9,4.4,4.9,1.9,6.3,2.4,1.5,1.9,7.3,6.8,2.4,12.1,27.7,33.0,56.8,56.8,67.5,68.0,67.0],"k562_d_07":[3.3,3.0,5.8,-3.8,1.1,0.3,-0.5,1.6,1.7,2.4,1.0,2.7,2.0,2.8,1.4,-1.8,-0.1,-0.8,4.5,12.8,11.7,10.9,30.3,12.7,23.8,23.8,30.1,36.8,38.6,32.6,24.8,19.8,32.1,40.1,17.5,34.4,48.0,20.8,32.6,25.8,34.8,32.0,30.5,24.4,26.7,43.1,36.1,56.5,37.1,61.4,55.1,44.7,40.5,28.3,62.9,57.4,22.3,51.4,44.0,37.1,62.1,56.1,49.4,53.9,43.7,55.1,58.1,56.5,54.3,65.6,59.5,46.2,58.4,27.7,31.9,37.1,59.4,71.1,69.1,70.3,62.7,70.5,70.2,62.1,62.3,63.4,61.3,64.0,63.5,34.7,39.2,49.4,14.7,51.3,37.6,49.2,41.4,53.0,48.3,50.8,61.2,42.5,47.3,21.5,26.8,35.8,53.8,45.8,52.1,61.3,50.1,30.7,37.6,31.2,46.4,15.0,33.0,39.5,28.2,37.7,21.8,32.8,11.2,29.6,32.3,36.4,21.2,43.3,7.9,34.3,7.8,8.5,1.4,2.9,3.0,4.2,-3.1]};
+const NMOL = { d35_unedited: 202, d35_croff: 326, d6_un: 1134, d6_croff: 2282,
+               k562_low_07: 2170, k562_high_07: 1435, k562_base_07: 206 };
+
+const DATA_TRACKS = [
+  { id: "d35_d_croff", group: "T-клетки · CRISPRoff · День 35 · ONT 0.7",
+    name: "Δ метилирования: CRISPRoff − unedited (T-клетки, День 35)",
+    l1: "Δ  CRISPRoff − unedited", l2: "T-клетки · День 35 · 0.7", kind: "delta",
+    note: "Прирост метилирования после сайленсинга. Глобально 58,7 % против 19,7 %. Провал на +97…+113 — след dCas9." },
+  { id: "d35_croff", group: "T-клетки · CRISPRoff · День 35 · ONT 0.7",
+    name: "Метилирование: CRISPRoff (T-клетки, День 35, n=326)",
+    l1: "CRISPRoff", l2: "T-клетки · День 35 · n=326", kind: "level", note: "Глобально 58,7 %." },
+  { id: "d35_unedited", group: "T-клетки · CRISPRoff · День 35 · ONT 0.7",
+    name: "Метилирование: unedited, без редактирования (T-клетки, День 35, n=202)",
+    l1: "unedited", l2: "T-клетки · День 35 · n=202", kind: "level",
+    note: "Контроль. Глобально 19,7 % — завышено фильтром NoFullyUnmeth; EM-seq на том же материале даёт 4,9 %." },
+
+  { id: "d6_delta", group: "T-клетки · CRISPRoff · День 6 · ONT 0.7",
+    name: "Δ метилирования: CRISPRoff − unedited (T-клетки, День 6)",
+    l1: "Δ  CRISPRoff − unedited", l2: "T-клетки · День 6 · 0.7", kind: "delta",
+    note: "Тот же провал на +97…+113 в независимом наборе. r с Днём 35 = 0,943." },
+  { id: "d6_croff", group: "T-клетки · CRISPRoff · День 6 · ONT 0.7",
+    name: "Метилирование: CRISPRoff (T-клетки, День 6, n=2 282)",
+    l1: "CRISPRoff", l2: "T-клетки · День 6 · n=2 282", kind: "level", note: "Глобально 41,7 %." },
+  { id: "d6_un", group: "T-клетки · CRISPRoff · День 6 · ONT 0.7",
+    name: "Метилирование: unedited, без редактирования (T-клетки, День 6, n=1 134)",
+    l1: "unedited", l2: "T-клетки · День 6 · n=1 134", kind: "level", note: "Контроль. Глобально 18,9 %." },
+
+  { id: "k562_d_07", group: "K562 · ZFPoff · День 16 · ONT 0.7",
+    name: "Δ метилирования: ZFPoff CD55-HIGH − CD55-LOW (K562, День 16)",
+    l1: "Δ  ZFPoff HIGH − LOW", l2: "K562 · День 16 · 0.7", kind: "delta",
+    note: "Обе фракции ZFPoff-редактированы и разделены сортировкой. Провал в той же точке заметно мельче, чем у CRISPRoff." },
+  { id: "k562_high_07", group: "K562 · ZFPoff · День 16 · ONT 0.7",
+    name: "Метилирование: ZFPoff, фракция CD55-HIGH (K562, День 16, n=1 435)",
+    l1: "ZFPoff · CD55-HIGH", l2: "K562 · День 16 · n=1 435", kind: "level",
+    note: "HIGH = высокое метилирование. Глобально 50,4 %." },
+  { id: "k562_low_07", group: "K562 · ZFPoff · День 16 · ONT 0.7",
+    name: "Метилирование: ZFPoff, фракция CD55-LOW (K562, День 16, n=2 170)",
+    l1: "ZFPoff · CD55-LOW", l2: "K562 · День 16 · n=2 170", kind: "level",
+    note: "LOW = низкое метилирование. Глобально 16,5 %." },
+  { id: "k562_base_07", group: "K562 · ZFPoff · День 16 · ONT 0.7",
+    name: "Метилирование: mock, без ZFPoff (K562, День 2, n=206)",
+    l1: "mock · без ZFPoff", l2: "K562 · День 2 · n=206", kind: "level",
+    note: "Глобально 14,8 %. Внимание: другой день и mock-процедура, поэтому сравнение с ним смешивает эффект редактирования с эффектом времени." },
+
+  { id: "k562_d_0995", group: "Порог 0.995 — файлы не загружены",
+    name: "Δ метилирования: ZFPoff HIGH − LOW (K562, День 16, порог 0.995)",
+    l1: "Δ  ZFPoff HIGH − LOW", l2: "K562 · День 16 · 0.995", kind: "delta",
+    note: "Все семь присланных матриц — порог 0.7. Числа 0.995 из заметок (LOW 9,2 / HIGH 29,4 / BASE 7,4) сюда не переносятся." },
+  { id: "k562_low_0995", group: "Порог 0.995 — файлы не загружены",
+    name: "Метилирование: ZFPoff CD55-LOW (K562, День 16, порог 0.995)",
+    l1: "ZFPoff · CD55-LOW", l2: "K562 · День 16 · 0.995", kind: "level" },
+  { id: "k562_high_0995", group: "Порог 0.995 — файлы не загружены",
+    name: "Метилирование: ZFPoff CD55-HIGH (K562, День 16, порог 0.995)",
+    l1: "ZFPoff · CD55-HIGH", l2: "K562 · День 16 · 0.995", kind: "level" },
+
+  { id: "d35_zfp", group: "Данных нет",
+    name: "Δ метилирования: ZFPoff − unedited (T-клетки, День 35)",
+    l1: "Δ  ZFPoff − unedited", l2: "T-клетки · День 35 · нет файла", kind: "delta",
+    note: "Матрица не присылалась. K562 выше — тоже ZFPoff, но другой тип клеток и другой день." },
+  { id: "atac", group: "Данных нет", name: "ATAC-seq — доступность хроматина",
+    l1: "ATAC-seq", l2: "нет данных", kind: "signal", note: "В проекте нет." },
+  { id: "dnase", group: "Данных нет", name: "DNase-seq — доступность хроматина",
+    l1: "DNase-seq", l2: "нет данных", kind: "signal", note: "В проекте нет." },
+];
+
+const GROUPS = [...new Set(DATA_TRACKS.map((t) => t.group))];
+
+/* ---------- series colours: family by hue, timepoint by shade ----------
+   theme.css authorises three accent hues. They are used here as three
+   semantic families, and days/fractions are shades WITHIN a hue — no fourth
+   hue is introduced. Shade alone is a weak cue for colour-vision deficiency,
+   so every series also carries a glyph: circle = unedited, triangle =
+   CRISPRoff, square = ZFPoff. The row label names it in words as well.
+   The four shades below are not yet in theme.css; if this goes to the site,
+   add them as --blue-pale, --orange-deep, --yellow-deep next to their hue.  */
+const FAMILY = {
+  unedited:  { glyph: "circle",   color: "#56B4E9", label: "не редактировано" },
+  crisproff: { glyph: "triangle", color: "#E69F00", label: "заглушено CRISPRoff" },
+  zfpoff:    { glyph: "square",   color: "#CC79A7", label: "заглушено ZFPoff" },
+};
+/* One hue per family, one shade per timepoint. A Δ track takes a desaturated
+   tint of the SAME day plus an outline in that day's full colour, so it can
+   never be read as the other day or the other family. Checked under simulated
+   protanopia, deuteranopia and tritanopia: across the seven level colours the
+   smallest pairwise ΔE is 12.0, and a Δ of one day sits 31.9 from the level of
+   the other. A Δ and its own level are deliberately close — the outline and the
+   "Δ" in the label separate them, not the hue.                                */
+const SERIES = {
+  d6_un:          { fam: "unedited",  color: "#0072B2" },
+  d35_unedited:   { fam: "unedited",  color: "#56B4E9" },
+  k562_base_07:   { fam: "unedited",  color: "#9BD4F2" },
+
+  d6_croff:       { fam: "crisproff", color: "#8E6000" },
+  d6_delta:       { fam: "crisproff", color: "#8E794E", edge: "#8E6000" },
+  d35_croff:      { fam: "crisproff", color: "#E69F00" },
+  d35_d_croff:    { fam: "crisproff", color: "#E6C67F", edge: "#E69F00" },
+
+  k562_low_07:    { fam: "zfpoff",    color: "#7B3F63" },
+  k562_high_07:   { fam: "zfpoff",    color: "#CC79A7" },
+  k562_d_07:      { fam: "zfpoff",    color: "#CCA7BB", edge: "#CC79A7" },
+  k562_low_0995:  { fam: "zfpoff",    color: "#7B3F63" },
+  k562_high_0995: { fam: "zfpoff",    color: "#CC79A7" },
+  k562_d_0995:    { fam: "zfpoff",    color: "#CCA7BB", edge: "#CC79A7" },
+  d35_zfp:        { fam: "zfpoff",    color: "#CCA7BB", edge: "#CC79A7" },
+};
+const seriesOf = (id) => SERIES[id] || { fam: null, color: "#A9B8B0" };
+
+const FEATURE_TRACKS = [
+  { id: "sig", name: "Значимые блоки (по координатам)" },
+  { id: "tf", name: "Транскрипционные факторы" },
+  { id: "cpg", name: "CpG × 137 (из последовательности)" },
+  { id: "targets", name: "Сайты CRISPRoff / ZFPoff" },
+  { id: "footprint", name: "Оценка следа комплексов" },
+];
+
+
+
+/* ---------- embedded single-molecule display sample ----------
+   Rows are packed as bits, 137 per molecule, base64. `f` is a parallel bitmask
+   marking forward-strand reads. Datasets with 220 molecules or fewer are
+   embedded whole; the larger ones are a seeded random sample (numpy default_rng
+   seed 0) purely so the panel has something to show without loading files.
+   NOTHING QUANTITATIVE USES THIS SAMPLE — every profile track above is computed
+   from all molecules in the matrix. Load the .npy to see every read.            */
+const MOL_SAMPLE={"k562_high_07":{"n":1435,"k":220,"full":false,"r":"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","f":"///////////////gAAAAAAAAAAAAAAAAAAAAAA=="},"k562_low_07":{"n":2170,"k":220,"full":false,"r":"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","f":"///////////////wAAAAAAAAAAAAAAAAAAAAAA=="},"k562_base_07":{"n":206,"k":206,"full":true,"r":"PLwQPkGFYoEQkO6ZTGAgBGyAN/FAAAIAAAAAAAAAAAAAAAWAH+rAAAAAAAAAAAAAAAAAADYAh42QAAAAAAAAAAgBADAAAAOAF/9QAAAAAAAAAAAAAAAAAA+AC+rQAAACAAAAAAAAAAAAAA+AbuoQABIAAAABAKACQAGAAASAB8bQAAUAAAAAAAAEAACAAC6AF/E4AIAAAAQAACQAoIEAAAWAH//AAEAAAAIAAAAAAAABAAeAX/tYAAAAAAgAAAAAAAAgAD+Amr9gAAEAABAgAAAAAEMAAJsAH/vgAAAAAAAAAAAAAAAAAAsAV/8QAAAAAAAAAAAAEAAAAAeAF+tAAAAAQAAAAAAAAAAAACEAP/vAAAEAAAAAAAAAAAAAAAuAnP2QAAAAAAAAAAAAAAAAAACALvVQAAAAAAAAAAAAAAAAAE+AD9tUAAMAAAAAAAAAAAABAA+Aj+fAAAAAAAAAAACAAAAAQD+At/bAAAAAAAACAAAAAAAAAB6AF/+AACAAAAAAAAAQAAAAAAMAH/XZ/AAAAAAAAAAoAAAAAAEAD//QAAAAAAAQAAAAgAAAAA6AJ/XAAAABAAAAAEQAAAAAAAOAO+5QCAEAAAAQAAAAAAAgABUAF7YEAAAAAAIQAACBAAAAAAuAB/3AAAEAAAAABAAIAAAAACMAHthCAAAAAAAAAAAAAAAIAA+AH/9QAAAAAAAAAAAAAAAAAAaAT+1QAAAAIEAACAAQDAAQCQCAH99QAAAAAAAAAAAAIAAAACOAJ/rQAAAAAQAAAAAAwAEAAAEAX+7YAAAAAAAAAAAAAAAAAAOAN79AAAAAAAAAAAAAIAAAAD+AP5zAAwAAQAABgGSAAAABAEIAj+jAAEIAAAAAAAAAAGAAABuAP//gAAAAABgAAAEACAAAABiAH+3gAAAAAAAAAAAAAAAAAAkAM+Q4AAAAAAAAAAAAIAAAABuAP/bIAAEAAAAAAAEAAAAAAAuAE+5gAAAAAAAAAAAEAAAAAAmAE/zQAAACAAIAAAAAAAAAAB+AK7zwAAAAAAAAAAAAAAAgAAeAA4kwAAAAAAAABAAEAAAAAAOAB86QAAAAAAABABAACAAQAAqAW7/AAAAAAAQAAAAAAIAAAAuAF+YwAAAAQgAAAACAEAABAAOAG71QAAAAAAAAAAAIAAABAAuAD+dAAAAAAAAAAAAAAQAEAASAL+SIgIAAAAAAAAAAAAAgAAEAH/YIAAAAAAAAgAAAABAAAACAD9HgAAIAAAAAAAAAAAAAAC+AD/kQAAAAEQAAAYAAAAAAEEWAN7QAAAIAAAAAAAAAAYAAAAqAN53QAAAAEAAAAAAAAAAgACaAJOzQAAAAAAAAAAAIAAAAABYAB/bwAAAAAAAAAAAAAAAAABcAH92AAAIAAAQAAAAAQAABABcAD/+IBAAAAAAgAAAAAAAAADOALPcwAAAAAAIAAAAAAAAAgA4ADPtAQAgAAAAAkCgACAAAAAAAPrZkAAAQAAAAAAAAAQAAACaAD/ZAAABEAAAAAAAAAAABAB+AH/1AAAAAAAAAAAAAAAAACOcAF/RIAAAAAAAAEAAIAAAAAD4AB/4QAAqACAAABAAAAAQBEAIAHW4YAAAAAAICAAAAAAAAAIIAF/UwAAEAAACAAAAAAUAAAA+AF70QAAACAAAAAAAAAAAAQL8ACuaAAAAAAAQAAAAAAAAAAC4ACv3gAAAAAAAAAAAIAEAAAA6AA/5AAAAAAAAAAAAAICQAAAMAJ+wwAAAAAAIABAAAAEGAAAoAB/mQAAACAAACAAAAAAAgADeAn6aYAAAEAAAAAACIAAAAAAmAP/SQAAAAAAAAAAAAAAAAAB8AP/wQAAAAAAAQgAIAAAAAACsAALHgAwAAAAAAQAAAIAAAAASAF/VQgAEAAAAAAAAAAAAAAF8AFveIAAABABBoIAAAAACAAC8AG76AAAAQAAAAAAAIAAAAAAGAD/0SAEAIAAQAAAAQAAAAAAAAO/woAAEAAAAAAAAAAAEAAIOAXv3wAAAAAAAAAAAIAEAAAAqAI/XAAAACAAAAAAAAAAAAAAIAD/6AAAAAJABAAAAAQAABAR+AF+AAAAECIAIAAAAAIAEAABKAF3dgABAAAAAAAAQAACAAAkaAD4hwABAAABAAAQhABAAIhA+AD/NSAIAGAAAgAAAAAAAgAAAAA5cgAAQAAAACAAAEAAAAAgsAB8YAAAhARQAABQAAAAAAAgAAD3kQABJAACAIAAAAAQAAAQuAB/fQACAAAAAACIAAAAAAAAKAD53gAAAAAAAAAAABAAAgAEEABr94oxAABAAAAAAAAAAAAB6AD/64BAAQAAAAAAAAAABAABMAD/1wAAAAVAAgAAgAAABAAgUAA8gCAAAAAEBAAwIAAAAAAAAAb+6UAAAAQABABgAAAgCAAAWAh/+AEAAAACYACPAAAAIiABiAV9/CACAIAFAAAAEAASIAIC+AG9oAAAAIAAAAAIAAAAAAAE+AF+DgABAAAEAAAAAAAAIAIAmAD/VgGAAIAAACAAIAgCAAAl+AC3e4CAAFEAAAAAACAQAAACeAB8/IAAAAQBAAABAAAABAAA0AD894/AABABAAAIAAEAAEAAUAH604AAAAQCAAABgEAAAAAA+AH/9AAAAAEBAAAABAiAAAAX+AD79QAAAAAAAgAAAAAAAAABCAB98gAAAAAAAAAAAAAAAQAAqAP//YAAAAACAAAAAEAAAAAAuAH6lIAAAAAAAAAEAAAAAAAB+AE9FQAAAgAAAAAAAAAAAIIQ8AD39yAAAIAEAAAAAABgAAAQeAFf5AABAABAAAABAAAAIAAD+AHzBQDAAAAAAAAAQAAAIAAQiAgxiAAABACAACBAAAgAAABCyAG96xgAAgAEAAAAAAAQBAACWAX7tSABAQAAAAAAAAAAACgAuAX/jQAgAAAAAABAAAAAAAAAIAXL26OAAAAAAAAAAAAIAgAAyAD+3gACAAAAAAAAAAgQIAAC+AB/80AAAAAAAKAAQAAAAAEH+Aj/DAAAAQAAAAAAAAAAAAAE2AH/3RAAABAAAAAkACAAAAID+AC3rADACAAACBAAQFAAAAAA2AH9oQACAAAAAAAAAEAAAAgA+AHfkQHAAACACAAAAGAAAQgB+AG+doAAAAAAAACABEAAFIABaAByiwAAAAAAAAQAAAAAAAACmAH05QAAAAAAACAAAAAAAAIAeAD7dRABAAAAAAAAAAAAAAAAOAX9fAMAAICAAgCAAAAAAAIB+AX9DgAAAAACAIAAAAgAAAAAOAH33AAAAABEAACAAAAAoAAS+AD/fQAAAQAAAAAAAAAAAAAjOAHfcAAAAAAAAAAAAAACIAAT2AH/EQCAAgAAAAAAAAAAgAABeAV3/wACAAAAAgAAAAAAAAAD+AD75ACAAECQAAAAAAAAAAAD0AP//AAIBBAAAACAYAAAAAASUAD7/wBAAAAAAAAAAAABAAAAAApf/wAAARAAAAAAAEAMAAAQ2AD/+QAAAAAAAJAAAAgCAAADOAD7+sEAAAAAAAAAAAAAAAAD8AH5eCAQCAEAAgAgAAAAAAADuAH5Z4ACAAAgAAAIAAAAAAAC+AC5fAAAAAAAAAAAAAAQAAAD+AF/4QAAAAAAAAAAAAAAAAAAAAH/+wGAAAAAAgAAAAAAAAAA4AFfZAAAAAAAAAAAAQABAiACoAJ43QAAAAEAAAAIgAAAIAAASAHxnAAAAAAAAAAAAAAAAIAEeAP79yAAAAQACAAAAAAAAAAB2AB/6EBEAFECAAAAAAAAAAIAMAL//imAAACAAAAAAAAAAAAD+AH/8gAIAAAAoCAIAAgAAIohuAH/zAgAAgAAAAAAAAAAAAAAmAH7/wgQAIAAAAAQQABAAAAiWAT3zgBAAAAECAAAAAAAAAAB6AB6z4AAAAGAABAEAAAAAAACEAH/nIAAAABACgCYAAiAAAAAaAL/8ACAACAAAAAAAAAAAUAE+AHx1QAAAQABAAAAAAAAAAgAuAH5nwAAAAACAAAAAAAAAAgDuAf//gGAAAAAAAAABAAAAAAl+ABzyGGhBHNICCAiAAAAAAkHwAM//AAQAQACAAAAAAAhAAAEeAD/dBHAAAAIAAAAAAACAAABeAD56AAAAAACAAgAAEAAAAAA2AG5sAAAAAAAAIQAAAAAAAATKAD/5kABAERAwAAEAACADAIBuAB/egwAAAAAAAAAAAAAAAAA+AD5gAAAAAAAAAAAAAAAACAAEAB/1wAAAAgAACAAAEYAwAAESAH7tYAAAEAAAACAAAAAAAACWAV8gABAAAACABAwAAAEAAAFYAGw/SAAAASACAAAAAEAAAAAgAC5UgAAAAAAAAIAAAAABAIQ8AD9ywChAgABAACAAAAAAAIhgAB57AABAoAAAICIIAAABAAnWAD/+qAABBEAAABQAABAAAAj4AG/hwDBAACCAACCAAAAAACB8AE+FxgACAABABAIFAAABQBDgAD77IACAAAAAAAAAAAAAAAAAAH/jACAAAACACAAAAAEAAAD4AH/nzCBAAAAAAAAAAgABQABWAC//AAAAAAAAAAIAAAgAAAAOAB//QAAAAAAEAAAAAgAAAAB2ABP5gAAAAAFAgAAAAAAAAAi0AHHbCCAAAAAAAAAADAAAAQEcAD6/SCAAADAAAAAAAQBAEEC+ADO90ABAhRQIAAEAIAABAAF8AHP8AAAAAAAAAAAABAAAAAAAAn38R/JAACAAAAAAABAAAAg+AF6ngAAAAACACAAAEAAIAIG6AAzZ4AAAAAAAAAOAAAIAAAAmAn250AAABCAAAAAQAAAAAwBsAF/gZXAAACAAAAAAEAQAAABiAH39AAAAABAAgEAAAACIAAC+AF/SUDBAEAAAgAAAEgAAAIB6AB5YAABIABAAAAAYAACAAAkuAH3/gAIAAAAAAAAAIAAAAAQsA","f":"//////////////8AAAAAAAAAAAAAAAAAAAA="},"d35_croff":{"n":326,"k":220,"full":false,"r":"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","f":"////////////8AAAAAAAAAAAAAAAAAAAAAAAAA=="},"d35_unedited":{"n":202,"k":202,"full":true,"r":"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","f":"//////////////4AAAAAAAAAAAAAAAAAAAA="},"d6_croff":{"n":2282,"k":220,"full":false,"r":"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","f":"///////////+AAAAAAAAAAAAAAAAAAAAAAAAAA=="},"d6_un":{"n":1134,"k":220,"full":false,"r":"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","f":"//////////////gAAAAAAAAAAAAAAAAAAAAAAA=="}};
+function unpackSample(o) {
+  const bytes = Uint8Array.from(atob(o.r), (c) => c.charCodeAt(0));
+  const fb = Uint8Array.from(atob(o.f), (c) => c.charCodeAt(0));
+  const perRow = Math.ceil(137 / 8);
+  const rows = [], fwd = [];
+  for (let r = 0; r < o.k; r++) {
+    const bits = new Uint8Array(137);
+    for (let c = 0; c < 137; c++)
+      bits[c] = (bytes[r * perRow + (c >> 3)] >> (7 - (c & 7))) & 1;
+    rows.push(bits);
+    fwd.push(((fb[r >> 3] >> (7 - (r & 7))) & 1) === 1);
+  }
+  return { rows, fwd, nRows: o.k, nTotal: o.n, isSample: !o.full, nCols: 137,
+           pctOnes: (rows.reduce((a, r) => a + r.reduce((x, y) => x + y, 0), 0) / (o.k * 137)) * 100 };
+}
+const SAMPLE_MOLS = Object.fromEntries(Object.entries(MOL_SAMPLE).map(([k, v]) => [k, unpackSample(v)]));
+
+/* ---------- .npy reader (runs entirely in the browser) ----------
+   NumPy format 1.0/2.0: magic \x93NUMPY, version, header length, then a Python
+   dict literal giving descr / fortran_order / shape, then raw data.
+   A cell counts as a methylated call when its value is > 0.5. NaN fails that
+   test, which is the intended behaviour: these matrices contain only 1.0 and
+   NaN, so NaN stands for "unmethylated OR uncovered" and cannot be split.     */
+function parseNpy(buf) {
+  const dv = new DataView(buf);
+  const u8 = new Uint8Array(buf);
+  if (u8[0] !== 0x93 || String.fromCharCode(u8[1], u8[2], u8[3], u8[4], u8[5]) !== "NUMPY")
+    throw new Error("не похоже на .npy");
+  const major = dv.getUint8(6);
+  const headLen = major === 1 ? dv.getUint16(8, true) : dv.getUint32(8, true);
+  const off = major === 1 ? 10 : 12;
+  const header = new TextDecoder("latin1").decode(new Uint8Array(buf, off, headLen));
+  const mD = /'descr':\s*'([^']+)'/.exec(header);
+  const mS = /'shape':\s*\(([^)]*)\)/.exec(header);
+  const mF = /'fortran_order':\s*(True|False)/.exec(header);
+  if (!mD || !mS) throw new Error("не разобран заголовок .npy");
+  if (mF && mF[1] === "True") throw new Error("fortran_order=True не поддержан");
+  const shape = mS[1].split(",").map((s) => s.trim()).filter(Boolean).map(Number);
+  if (shape.length !== 2) throw new Error(`ожидалась матрица 2D, получено ${shape.length}D`);
+  const dataOff = off + headLen;
+  const n = shape[0] * shape[1];
+  const d = mD[1];
+  let arr;
+  if (d === "<f8" || d === "=f8") arr = new Float64Array(buf, dataOff, n);
+  else if (d === "<f4" || d === "=f4") arr = new Float32Array(buf, dataOff, n);
+  else if (d === "|u1" || d === "<u1" || d === "|b1") arr = new Uint8Array(buf, dataOff, n);
+  else if (d === "<i4" || d === "=i4") arr = new Int32Array(buf, dataOff, n);
+  else throw new Error(`тип ${d} не поддержан`);
+  const rows = [];
+  let ones = 0;
+  for (let r = 0; r < shape[0]; r++) {
+    const bits = new Uint8Array(shape[1]);
+    for (let c = 0; c < shape[1]; c++) {
+      const v = arr[r * shape[1] + c];
+      if (v > 0.5) { bits[c] = 1; ones++; }
+    }
+    rows.push(bits);
+  }
+  return { rows, nCols: shape[1], nRows: shape[0], pctOnes: (ones / n) * 100 };
+}
+
+/* filename -> which dataset, and the FWD/RVS split recorded in the name */
+function guessKey(name) {
+  if (/PostSort_HIGH/i.test(name)) return "k562_high_07";
+  if (/PostSort_LOW/i.test(name)) return "k562_low_07";
+  if (/K562_unedited/i.test(name)) return "k562_base_07";
+  if (/CRISPRoff_Day35/i.test(name)) return "d35_croff";
+  if (/NT_Day35/i.test(name)) return "d35_unedited";
+  if (/day6_CRoff/i.test(name)) return "d6_croff";
+  if (/day6_unedited/i.test(name)) return "d6_un";
+  if (/ZFPoff.*Day35/i.test(name)) return "d35_zfp";
+  return null;
+}
+function guessStrands(name) {
+  const m = /numFWD(\d+)_numRVS(\d+)/i.exec(name);
+  return m ? { nf: +m[1], nr: +m[2] } : null;
+}
+
+/* ---------- component ---------- */
+function CD55Browser() {
+  const [view, setView] = useState({ lo: ROI.lo, hi: ROI.hi });
+  const [featureOn, setFeatureOn] = useState({ sig: true, tf: true, cpg: true, targets: true, footprint: true });
+  const [dataOn, setDataOn] = useState({ d35_d_croff: true, d6_delta: true, k562_d_07: true });
+  const [tfOn, setTfOn] = useState(() => Object.fromEntries(TFS.map((t) => [t.id, true])));
+  const [trackData, setTrackData] = useState(() => Object.fromEntries(
+    Object.entries(PRELOADED).map(([k, v]) => [k, v.map((val, i) => ({ pos: CPG_REL[i], value: val }))])));
+  const [cpgs, setCpgs] = useState(CPGS);
+  const [cpgLoaded, setCpgLoaded] = useState(false);
+  const [sel, setSel] = useState(null);
+  const [cas9Pad, setCas9Pad] = useState(25);
+  const [zfpPad, setZfpPad] = useState(10);
+  const [loadTarget, setLoadTarget] = useState("d35_d_croff");
+  const [coordSys, setCoordSys] = useState("rel");
+  const [paste, setPaste] = useState("");
+  const [msg, setMsg] = useState("");
+  const [openGroups, setOpenGroups] = useState({ [GROUPS[0]]: true });
+  const [molData, setMolData] = useState(SAMPLE_MOLS);
+  const [molOpen, setMolOpen] = useState({ d35_croff: true, d35_unedited: true });
+  const [molRows, setMolRows] = useState(40);
+  const [molOffset, setMolOffset] = useState({});
+  const [rowH, setRowH] = useState(2);
+  const [molSort, setMolSort] = useState("file");
+  const [molColor, setMolColor] = useState("series");
+  const [molMsg, setMolMsg] = useState("");
+
+  const W = 980, PAD_L = 186, PAD_R = 24;
+  const plotW = W - PAD_L - PAD_R;
+  const span = view.hi - view.lo;
+  const x = (bp) => PAD_L + ((bp - view.lo) / span) * plotW;
+  const bpAt = (px) => view.lo + ((px - PAD_L) / plotW) * span;
+
+  const drag = useRef(null);
+  const svgRef = useRef(null);
+
+  function clampView(lo, hi) {
+    let w = hi - lo;
+    if (w < 40) w = 40;
+    if (w > ROI.hi - ROI.lo) w = ROI.hi - ROI.lo;
+    let c = (lo + hi) / 2;
+    let nlo = c - w / 2, nhi = c + w / 2;
+    if (nlo < ROI.lo) { nlo = ROI.lo; nhi = ROI.lo + w; }
+    if (nhi > ROI.hi) { nhi = ROI.hi; nlo = ROI.hi - w; }
+    return { lo: nlo, hi: nhi };
+  }
+  const zoom = (f) => {
+    const c = (view.lo + view.hi) / 2, w = (view.hi - view.lo) * f;
+    setView(clampView(c - w / 2, c + w / 2));
+  };
+  const goto = (lo, hi) => setView(clampView(lo, hi));
+
+  function onDown(e) {
+    const r = svgRef.current.getBoundingClientRect();
+    drag.current = { px: ((e.clientX - r.left) / r.width) * W, lo: view.lo, hi: view.hi };
+  }
+  function onMove(e) {
+    if (!drag.current) return;
+    const r = svgRef.current.getBoundingClientRect();
+    const px = ((e.clientX - r.left) / r.width) * W;
+    const dbp = ((drag.current.px - px) / plotW) * (drag.current.hi - drag.current.lo);
+    setView(clampView(drag.current.lo + dbp, drag.current.hi + dbp));
+  }
+  const onUp = () => { drag.current = null; };
+
+  /* ---------- layout ---------- */
+  const rows = useMemo(() => {
+    const r = [];
+    let y = 44;
+    const push = (id, type, h, l1, l2) => { r.push({ id, type, y, h, l1, l2 }); y += h + 8; };
+    if (featureOn.sig) push("sig", "feature", 30, "Значимые зоны", "по координатам");
+    if (featureOn.tf) push("tf", "feature", 78, "Транскрипционные", "факторы · ChIP-seq K562");
+    if (featureOn.cpg) push("cpg", "feature", 34, "CpG × 137", "из последовательности");
+    if (featureOn.targets) push("targets", "feature", 52, "Сайты-мишени", "CRISPRoff / ZFPoff / PAM");
+    if (featureOn.footprint) push("footprint", "feature", 46, "След комплекса", "оценка, регулируется");
+    DATA_TRACKS.forEach((t) => {
+      if (dataOn[t.id]) push(t.id, "data", 46, t.l1, t.l2);
+      if (molOpen[t.id] && molData[t.id]) {
+        const d = molData[t.id];
+        const shown = Math.min(molRows, d.nRows);
+        push("mol:" + t.id, "mol", shown * rowH + 4, "молекулы", t.l1);
+      }
+    });
+    return { list: r, height: y + 34 };
+  }, [featureOn, dataOn, molOpen, molData, molRows, rowH]);
+
+  const H = rows.height;
+
+  /* ---------- ticks ---------- */
+  const ticks = useMemo(() => {
+    const raw = span / 8;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const step = [1, 2, 5, 10].map((m) => m * mag).find((s) => s >= raw) || mag * 10;
+    const out = [];
+    for (let t = Math.ceil(view.lo / step) * step; t <= view.hi; t += step) out.push(t);
+    return out;
+  }, [view, span]);
+
+  function glyph(shape, cx, cy, color, s = 6) {
+    if (shape === "circle") return <circle cx={cx} cy={cy} r={s - 1} fill={color} />;
+    if (shape === "square") return <rect x={cx - s + 1} y={cy - s + 1} width={2 * s - 2} height={2 * s - 2} fill={color} />;
+    if (shape === "diamond") return <path d={`M${cx} ${cy - s}L${cx + s} ${cy}L${cx} ${cy + s}L${cx - s} ${cy}Z`} fill={color} />;
+    if (shape === "triangleOpen") return <path d={`M${cx} ${cy - s}L${cx + s} ${cy + s * .8}L${cx - s} ${cy + s * .8}Z`} fill="none" stroke={color} strokeWidth="1.8" strokeDasharray="3 2" />;
+    return <path d={`M${cx} ${cy - s}L${cx + s} ${cy + s * .8}L${cx - s} ${cy + s * .8}Z`} fill={color} />;
+  }
+
+  /* ---------- data loading ---------- */
+  function relFrom(v) {
+    if (coordSys === "rel") return v;
+    if (coordSys === "hg38") return v - TSS_HG38;
+    if (coordSys === "t2t") return v + HG38_MINUS_T2T - TSS_HG38;
+    if (coordSys === "cpg") {
+      const hit = cpgs.find((c) => c.idx === Math.round(v));
+      return hit ? hit.pos : null;
+    }
+    return null;
+  }
+  function parsePairs(text) {
+    const out = [];
+    for (const line of text.trim().split(/\r?\n/)) {
+      const parts = line.split(/[,\t;\s]+/).filter(Boolean);
+      if (parts.length < 2) continue;
+      const a = parseFloat(parts[0]), b = parseFloat(parts[parts.length - 1]);
+      if (!Number.isFinite(a) || !Number.isFinite(b)) continue;
+      const pos = relFrom(a);
+      if (pos === null || !Number.isFinite(pos)) continue;
+      out.push({ pos, value: b });
+    }
+    return out;
+  }
+  function loadData() {
+    const pts = parsePairs(paste);
+    if (pts.length === 0) { setMsg("Ни одной пары не разобрано. Нужны две числовые колонки в строке."); return; }
+    setTrackData({ ...trackData, [loadTarget]: pts });
+    setDataOn({ ...dataOn, [loadTarget]: true });
+    setMsg(`В трек «${DATA_TRACKS.find((t) => t.id === loadTarget).name}» загружено ${pts.length} точек.`);
+    setPaste("");
+  }
+  function loadCpgs() {
+    const pts = [];
+    for (const line of paste.trim().split(/\r?\n/)) {
+      const p = line.split(/[,\t;\s]+/).filter(Boolean);
+      if (p.length < 2) continue;
+      const i = parseInt(p[0], 10), c = parseFloat(p[1]);
+      if (!Number.isFinite(i) || !Number.isFinite(c)) continue;
+      const pos = coordSys === "rel" ? c : coordSys === "hg38" ? c - TSS_HG38
+        : coordSys === "t2t" ? c + HG38_MINUS_T2T - TSS_HG38 : null;
+      if (pos === null) continue;
+      pts.push({ idx: i, pos, anchor: true });
+    }
+    if (pts.length === 0) { setMsg("Ожидались пары «индекс CpG, координата»."); return; }
+    setCpgs(pts.sort((a, b) => a.idx - b.idx));
+    setCpgLoaded(true);
+    setMsg(`Загружено ${pts.length} измеренных координат CpG. Интерполяция отключена.`);
+    setPaste("");
+  }
+
+  const visibleCpgs = cpgs.filter((c) => c.pos >= view.lo && c.pos <= view.hi);
+  const cpgInView = visibleCpgs.length;
+
+  /* ---------- single-molecule track renderer ----------
+     Drawn as plain SVG rects on the very same x() as every other track, so a
+     mark sits exactly under the CpG it belongs to. Only the visible page of
+     molecules is drawn, so the rect count stays in the low thousands.        */
+  function renderMol(row) {
+    const key = row.id.slice(4);
+    const d = molData[key];
+    if (!d) return null;
+    const order = molOrder[key] || [];
+    const off = Math.min(molOffset[key] || 0, Math.max(0, d.nRows - molRows));
+    const page = order.slice(off, off + molRows);
+    const inView = [];
+    for (let i = 0; i < CPG_REL.length; i++) {
+      const pos = CPG_REL[i];
+      if (pos >= view.lo && pos <= view.hi) inView.push([i, x(pos)]);
+    }
+    let w = 3;
+    if (inView.length > 1) {
+      const gaps = [];
+      for (let i = 1; i < inView.length; i++) gaps.push(Math.abs(inView[i][1] - inView[i - 1][1]));
+      gaps.sort((a, b) => a - b);
+      w = Math.max(1.4, Math.min(14, gaps[Math.floor(gaps.length / 2)] * 0.85));
+    }
+    const marks = [];
+    for (let yi = 0; yi < page.length; yi++) {
+      const r = d.rows[page[yi]];
+      const fwd = d.fwd ? d.fwd[page[yi]] : null;
+      const yy = row.y + 2 + yi * rowH;
+      for (const [ci, cx] of inView) {
+        if (!r[ci]) continue;
+        marks.push(<rect key={yi + "_" + ci} x={cx - w / 2} y={yy} width={w}
+          height={Math.max(rowH - (rowH > 2 ? 1 : 0), 1)}
+          fill={molColor === "strand"
+            ? (fwd === null ? "#A9B8B0" : fwd ? "#F0E442" : "#E9EEEA")
+            : molColor === "series" ? seriesOf(key).color : "#E9EEEA"} />);
+      }
+    }
+    return (
+      <g key={row.id}>
+        <rect x={PAD_L} y={row.y} width={plotW} height={row.h} fill="#16221D" rx="3" />
+        {marks}
+      </g>
+    );
+  }
+
+  /* ---------- data track renderer ---------- */
+  function renderData(row) {
+    const meta = DATA_TRACKS.find((t) => t.id === row.id);
+    const pts = trackData[row.id];
+    if (!pts || pts.length === 0) {
+      return (
+        <g key={row.id}>
+          <rect x={PAD_L} y={row.y} width={plotW} height={row.h} fill="none"
+            stroke="#24352E" strokeWidth="1" strokeDasharray="5 4" rx="3" />
+          <text x={PAD_L + plotW / 2} y={row.y + row.h / 2 + 4} fill="#6E8079" fontSize="10.5" textAnchor="middle">
+            нет загруженных значений — трек пуст
+          </text>
+        </g>
+      );
+    }
+    const vals = pts.map((p) => p.value);
+    const isDelta = meta.kind === "delta" || Math.min(...vals) < 0;
+    const top = Math.max(...vals, 0), bot = Math.min(...vals, 0);
+    const domHi = isDelta ? Math.max(Math.abs(top), Math.abs(bot)) : (top || 1);
+    const domLo = isDelta ? -domHi : 0;
+    const yv = (v) => row.y + row.h - ((v - domLo) / (domHi - domLo)) * row.h;
+    const zeroY = yv(0);
+    const bw = Math.max(1.5, Math.min(9, plotW / Math.max(cpgInView, 12) - 1));
+    return (
+      <g key={row.id}>
+        <rect x={PAD_L} y={row.y} width={plotW} height={row.h} fill="#16221D" rx="3" />
+        <line x1={PAD_L} y1={zeroY} x2={PAD_L + plotW} y2={zeroY} stroke="#24352E" strokeWidth="1" />
+        {pts.filter((p) => p.pos >= view.lo && p.pos <= view.hi).map((p, i) => {
+          const yTop = Math.min(yv(p.value), zeroY);
+          const hh = Math.max(1, Math.abs(zeroY - yv(p.value)));
+          const up = p.value >= 0;
+          return (
+            <rect key={i} x={x(p.pos) - bw / 2} y={yTop} width={bw} height={hh}
+              fill={up ? seriesOf(row.id).color : "none"}
+              stroke={seriesOf(row.id).edge || seriesOf(row.id).color}
+              strokeWidth={up ? (seriesOf(row.id).edge ? 1 : 0) : 1.2}
+              strokeDasharray={up ? "none" : "2 1.5"} />
+          );
+        })}
+        <text x={PAD_L + 4} y={row.y + 11} fill="#6E8079" fontSize="9">
+          {isDelta ? `±${domHi.toFixed(0)}` : `0–${domHi.toFixed(0)}`}
+        </text>
+      </g>
+    );
+  }
+
+  const label = (k) => (DATA_TRACKS.find((t) => t.id === k) || {}).name || k;
+
+  /* row order per dataset, recomputed only when the sort mode changes */
+  const molOrder = useMemo(() => {
+    const out = {};
+    for (const [k, d] of Object.entries(molData)) {
+      const idx = d.rows.map((_, i) => i);
+      if (molSort === "meth") {
+        const tot = d.rows.map((r) => r.reduce((a, b) => a + b, 0));
+        idx.sort((a, b) => tot[b] - tot[a]);
+      } else if (molSort === "strand" && d.fwd) {
+        idx.sort((a, b) => (d.fwd[a] ? 0 : 1) - (d.fwd[b] ? 0 : 1));
+      }
+      out[k] = idx;
+    }
+    return out;
+  }, [molData, molSort]);
+
+  const scrollMol = (k, dir) => {
+    const n = molData[k].nRows, cur = molOffset[k] || 0;
+    const next = Math.max(0, Math.min(n - molRows, cur + dir * molRows));
+    setMolOffset({ ...molOffset, [k]: next });
+  };
+
+  async function onNpy(fileList) {
+    const notes = [];
+    const next = { ...molData }, open = { ...molOpen }, td = { ...trackData };
+    for (const f of Array.from(fileList)) {
+      try {
+        const parsed = parseNpy(await f.arrayBuffer());
+        if (parsed.nCols !== 137)
+          notes.push(`${f.name}: ${parsed.nCols} колонок вместо 137 — не тот набор CpG, пропущен`);
+        else {
+          const key = guessKey(f.name) || `custom_${Object.keys(next).length}`;
+          const st = guessStrands(f.name);
+          if (st && st.nf + st.nr !== parsed.nRows)
+            notes.push(`${f.name}: numFWD+numRVS = ${st.nf + st.nr}, а строк ${parsed.nRows} — разделение по цепям не применено`);
+          const nfOk = st && st.nf + st.nr === parsed.nRows ? st.nf : null;
+          next[key] = { ...parsed, nf: nfOk, nr: st ? st.nr : null, fname: f.name,
+                        nTotal: parsed.nRows, isSample: false,
+                        fwd: nfOk == null ? null : parsed.rows.map((_, i) => i < nfOk) };
+          open[key] = true;
+          // aggregate profile straight from the molecules
+          const prof = [];
+          for (let c = 0; c < 137; c++) {
+            let s = 0;
+            for (const r of parsed.rows) s += r[c];
+            prof.push({ pos: CPG_REL[c], value: (s / parsed.nRows) * 100 });
+          }
+          if (DATA_TRACKS.some((t) => t.id === key)) td[key] = prof;
+          const emb = PRELOADED[key];
+          if (emb) {
+            const diff = Math.max(...emb.map((v, i) => Math.abs(v - prof[i].value)));
+            notes.push(`${label(key)}: ${parsed.nRows} молекул, ${parsed.pctOnes.toFixed(1)} % — сходится со встроенным профилем (макс. расхождение ${diff.toFixed(2)} п.п.)`);
+          } else {
+            notes.push(`${label(key)}: ${parsed.nRows} молекул, ${parsed.pctOnes.toFixed(1)} % метилированных вызовов`);
+          }
+        }
+      } catch (err) {
+        notes.push(`${f.name}: ${err.message}`);
+      }
+    }
+    setMolData(next); setMolOpen(open); setTrackData(td);
+    setMolMsg(notes.join(" · "));
+  }
+
+  const selInfo = sel && (TFS.find((t) => t.id === sel) || TARGETS.find((t) => t.id === sel));
+
+  return (
+    <div className="w-full min-h-screen bg-slate-950 text-slate-200 p-4"
+      style={{ fontFamily: "'Space Grotesk', system-ui, sans-serif" }}>
+      <div className="max-w-6xl mx-auto">
+
+        <h1 className="text-xl font-semibold text-slate-100">Геномный браузер CD55 ROI</h1>
+        <p className="text-xs text-slate-400 mb-4 leading-relaxed max-w-3xl">
+          6 500 п.н., 137 CpG. hg38 chr1:207,318,058–207,324,558 · T2Tv2 chr1:206,583,354–206,589,854.
+          Ось — расстояние от TSS (hg38 207,321,620). Тащите мышью, чтобы двигаться; кнопки ниже — масштаб.
+        </p>
+
+        {/* navigation */}
+        <div className="flex flex-wrap gap-2 items-center mb-3">
+          <button onClick={() => zoom(0.55)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">Приблизить</button>
+          <button onClick={() => zoom(1.8)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">Отдалить</button>
+          <button onClick={() => goto(ROI.lo, ROI.hi)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">Весь ROI</button>
+          <button onClick={() => goto(-1200, 400)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">Промотор</button>
+          <button onClick={() => goto(40, 170)} className="px-3 py-1.5 rounded border border-pink-600 text-xs text-pink-300">Сайты-мишени</button>
+          <button onClick={() => goto(30, 130)} className="px-3 py-1.5 rounded border border-orange-600 text-xs text-orange-300">Пик #78–83 → спейсер</button>
+          <span className="text-xs text-slate-500 ml-1" style={{ fontFamily: "ui-monospace, monospace" }}>
+            {fmtRel(view.lo)} … {fmtRel(view.hi)} · {Math.round(span)} п.н. · chr1:{fmtHg38(view.lo)}–{fmtHg38(view.hi)} · CpG в окне: {cpgInView}
+          </span>
+        </div>
+
+        {/* browser */}
+        <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-x-auto">
+          <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} className="w-full select-none"
+            style={{ minWidth: 720, cursor: drag.current ? "grabbing" : "grab" }}
+            onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp}>
+
+            <defs>
+              <clipPath id="plot"><rect x={PAD_L} y={0} width={plotW} height={H} /></clipPath>
+              <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#A9B8B0" strokeWidth="1.6" />
+              </pattern>
+              <pattern id="hatchPink" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#E69F00" strokeWidth="1.6" />
+              </pattern>
+              <pattern id="hatchPurple" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#CC79A7" strokeWidth="1.6" />
+              </pattern>
+            </defs>
+
+            {/* ruler */}
+            <g clipPath="url(#plot)">
+              {ticks.map((t) => (
+                <g key={t}>
+                  <line x1={x(t)} y1={26} x2={x(t)} y2={H - 26} stroke="#24352E" strokeWidth="1" />
+                  <text x={x(t)} y={20} fill="#6E8079" fontSize="9.5" textAnchor="middle">{fmtRel(t)}</text>
+                </g>
+              ))}
+              <line x1={x(0)} y1={22} x2={x(0)} y2={H - 26} stroke="#E9EEEA" strokeWidth="1.4" strokeDasharray="5 3" />
+            </g>
+            <text x={x(0)} y={12} fill="#E9EEEA" fontSize="10" textAnchor="middle" fontWeight="700">TSS</text>
+
+            {/* row labels */}
+            {rows.list.map((r) => (
+              <g key={"lb" + r.id}>
+                <text x={PAD_L - 8} y={r.y + 12} fill="#E9EEEA" fontSize="10.5" textAnchor="end">{r.l1}</text>
+                <text x={PAD_L - 8} y={r.y + 24} fill="#6E8079" fontSize="9" textAnchor="end">{r.l2}</text>
+              </g>
+            ))}
+
+            <g clipPath="url(#plot)">
+              {rows.list.map((row) => {
+                if (row.type === "mol") return renderMol(row);
+                if (row.type === "data") return renderData(row);
+
+                if (row.id === "sig") return (
+                  <g key="sig">
+                    <rect x={x(-1077)} y={row.y + 6} width={Math.max(x(1935) - x(-1077), 2)} height={16}
+                      fill="#56B4E9" opacity="0.14" stroke="#56B4E9" strokeOpacity="0.5" />
+                    <rect x={x(58)} y={row.y} width={Math.max(x(84) - x(58), 2)} height={28}
+                      fill="#F0E442" opacity="0.30" stroke="#F0E442" strokeWidth="1.2" />
+                    {span < 2500 && <text x={x(71)} y={row.y - 2} fill="#F0E442" fontSize="9" textAnchor="middle">пик +58…+84</text>}
+                  </g>
+                );
+
+                if (row.id === "tf") return (
+                  <g key="tf">
+                    {TFS.filter((t) => tfOn[t.id] && t.pos >= view.lo && t.pos <= view.hi).map((t, i) => {
+                      const c = CATS[t.cat], cy = row.y + 16 + (i % 3) * 21, on = sel === t.id;
+                      return (
+                        <g key={t.id} onClick={(e) => { e.stopPropagation(); setSel(on ? null : t.id); }} style={{ cursor: "pointer" }}>
+                          <line x1={x(t.pos)} y1={cy + 6} x2={x(t.pos)} y2={row.y + row.h}
+                            stroke={c.color} strokeOpacity={on ? .9 : .3} strokeWidth={on ? 1.8 : 1}
+                            strokeDasharray={t.cat === "lit" ? "3 3" : "none"} />
+                          {on && <circle cx={x(t.pos)} cy={cy} r="11" fill={c.color} opacity=".2" />}
+                          {glyph(c.glyph, x(t.pos), cy, c.color)}
+                          <text x={x(t.pos) + 9} y={cy + 3.5} fill={on ? "#E9EEEA" : "#A9B8B0"} fontSize="9.5">{t.id}</text>
+                        </g>
+                      );
+                    })}
+                  </g>
+                );
+
+                if (row.id === "cpg") return (
+                  <g key="cpg">
+                    {visibleCpgs.map((c) => (
+                      <line key={c.idx} x1={x(c.pos)} y1={row.y + 6} x2={x(c.pos)} y2={row.y + 24}
+                        stroke={c.anchor ? "#E9EEEA" : "#6E8079"} strokeWidth={c.anchor ? 1.8 : 1}
+                        strokeDasharray={c.anchor ? "none" : "2 2"} />
+                    ))}
+                    {span < 1500 && visibleCpgs.map((c) => (
+                      <text key={"t" + c.idx} x={x(c.pos)} y={row.y + 33} fill={c.anchor ? "#A9B8B0" : "#6E8079"}
+                        fontSize="8" textAnchor="middle">{c.idx}</text>
+                    ))}
+                  </g>
+                );
+
+                if (row.id === "targets") return (
+                  <g key="targets">
+                    <rect x={x(93)} y={row.y - 4} width={Math.max(x(116) - x(93), 2)} height={row.h + 8}
+                      fill="#E9EEEA" opacity="0.07" stroke="#A9B8B0" strokeOpacity="0.5" strokeDasharray="3 3" />
+                    {/* overlap shading behind both */}
+                    <rect x={x(OVERLAP.lo)} y={row.y} width={Math.max(x(OVERLAP.hi + 1) - x(OVERLAP.lo), 2)}
+                      height={row.h} fill="#E9EEEA" opacity="0.07" />
+                    {TARGETS.map((t, i) => {
+                      const on = sel === t.id;
+                      return (
+                        <g key={t.id} onClick={(e) => { e.stopPropagation(); setSel(on ? null : t.id); }} style={{ cursor: "pointer" }}>
+                          <rect x={x(t.lo)} y={row.y + i * 22 + 2} width={Math.max(x(t.hi + 1) - x(t.lo), 2.5)} height={15}
+                            fill={t.color} opacity={on ? 1 : .82} stroke={on ? "#E9EEEA" : "none"} strokeWidth="1.2" rx="2" />
+                          {span < 2000 && (
+                            <text x={x(t.hi + 1) + 6} y={row.y + i * 22 + 13} fill={t.color} fontSize="9.5" fontWeight="600">
+                              {t.id === "crisproff" ? "CRISPRoff spacer" : "ZFPoff target"}
+                            </text>
+                          )}
+                        </g>
+                      );
+                    })}
+                    {/* inferred PAM */}
+                    <rect x={x(PAM.lo)} y={row.y + 2} width={Math.max(x(PAM.hi + 1) - x(PAM.lo), 2)} height={15}
+                      fill="#E9EEEA" opacity="0.85" rx="1" />
+                    {span < 700 && <text x={x(PAM.lo) + 4} y={row.y - 2} fill="#E9EEEA" fontSize="8.5" textAnchor="middle">PAM CGG</text>}
+                  </g>
+                );
+
+                if (row.id === "footprint") {
+                  const c = TARGETS[0], z = TARGETS[1];
+                  return (
+                    <g key="fp">
+                      <rect x={x(c.lo - cas9Pad)} y={row.y + 2} width={Math.max(x(c.hi + 1 + cas9Pad) - x(c.lo - cas9Pad), 3)}
+                        height={17} fill="url(#hatchPink)" opacity=".5" stroke="#E69F00" strokeWidth="1" strokeDasharray="4 3" rx="3" />
+                      <rect x={x(z.lo - zfpPad)} y={row.y + 24} width={Math.max(x(z.hi + 1 + zfpPad) - x(z.lo - zfpPad), 3)}
+                        height={17} fill="url(#hatchPurple)" opacity=".5" stroke="#CC79A7" strokeWidth="1" strokeDasharray="4 3" rx="3" />
+                      {span < 2000 && (
+                        <>
+                          <text x={x(c.hi + 1 + cas9Pad) + 6} y={row.y + 14} fill="#E69F00" fontSize="9">
+                            dCas9 ≈ {c.hi - c.lo + 1 + 2 * cas9Pad} п.н. (оценка)
+                          </text>
+                          <text x={x(z.hi + 1 + zfpPad) + 6} y={row.y + 36} fill="#CC79A7" fontSize="9">
+                            ZFP ≈ {z.hi - z.lo + 1 + 2 * zfpPad} п.н. (оценка)
+                          </text>
+                        </>
+                      )}
+                    </g>
+                  );
+                }
+                return null;
+              })}
+            </g>
+
+            {/* baseline */}
+            <line x1={PAD_L} y1={H - 22} x2={PAD_L + plotW} y2={H - 22} stroke="#6E8079" strokeWidth="1.2" />
+            <text x={PAD_L - 8} y={H - 18} fill="#6E8079" fontSize="9.5" textAnchor="end">п.н. от TSS</text>
+          </svg>
+        </div>
+
+        {/* ---- single molecules: these are tracks in the browser above ---- */}
+        <div className="border border-slate-800 rounded-lg p-3 mt-3">
+          <div className="flex flex-wrap items-center gap-3 mb-2">
+            <h2 className="text-sm font-semibold text-slate-200">Отдельные молекулы</h2>
+            <label className="px-3 py-1.5 rounded bg-sky-300 text-slate-900 text-xs font-semibold cursor-pointer">
+              Открыть .npy
+              <input type="file" multiple accept=".npy" className="hidden"
+                onChange={(e) => { onNpy(e.target.files); e.target.value = ""; }} />
+            </label>
+            <select value={molSort} onChange={(e) => setMolSort(e.target.value)}
+              className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200">
+              <option value="file">порядок как в файле</option>
+              <option value="meth">сортировать по числу метилированных CpG</option>
+              <option value="strand">сгруппировать FWD / RVS</option>
+            </select>
+            <label className="text-xs text-slate-400 flex items-center gap-1.5">
+              строк на экран
+              <input type="range" min="10" max="120" step="10" value={molRows}
+                onChange={(e) => setMolRows(+e.target.value)} />{molRows}
+            </label>
+            <label className="text-xs text-slate-400 flex items-center gap-1.5">
+              высота строки
+              <input type="range" min="1" max="6" value={rowH} onChange={(e) => setRowH(+e.target.value)} />{rowH}px
+            </label>
+            <select value={molColor} onChange={(e) => setMolColor(e.target.value)}
+              className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200">
+              <option value="series">цвет по образцу</option>
+              <option value="strand">цвет по цепи FWD / RVS</option>
+              <option value="mono">без цвета</option>
+            </select>
+          </div>
+
+          <p className="text-xs text-slate-500 mb-2 leading-relaxed">
+            Каждый выбранный набор становится треком в самом браузере, сразу под своим профилем и на той же
+            оси — штрих стоит ровно под своим CpG и едет вместе с ним при зуме. Листать страницы молекул можно
+            стрелками ▲▼ слева от трека.
+          </p>
+
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {DATA_TRACKS.filter((t) => molData[t.id]).map((t) => (
+              <button key={t.id} onClick={() => setMolOpen({ ...molOpen, [t.id]: !molOpen[t.id] })}
+                className={`px-2.5 py-1 rounded text-xs border ${molOpen[t.id]
+                  ? "border-sky-500 text-sky-200 bg-sky-950" : "border-slate-800 text-slate-500"}`}>
+                {t.l1} · {t.l2} · {molData[t.id].isSample
+                  ? `${molData[t.id].nRows} из ${molData[t.id].nTotal}` : `все ${molData[t.id].nRows}`}
+              </button>
+            ))}
+          </div>
+
+          {molMsg && <p className="text-[11px] text-slate-400 mb-2 leading-relaxed">{molMsg}</p>}
+
+          <p className="text-[11px] text-slate-500 leading-relaxed">
+            Штрих = вызов «метилирован». Пустое место означает и «не метилирован», и «нет покрытия» — в этих
+            матрицах нулей нет, только 1 и NaN, поэтому на уровне молекулы эти два случая не различимы.
+            Наборы крупнее 220 молекул показаны случайной выборкой; чтобы увидеть все прочтения, откройте .npy.
+            Деление FWD/RVS взято из имени файла в предположении, что сначала идут все прямые прочтения.
+          </p>
+        </div>
+
+        {/* ---- series legend ---- */}
+        <div className="border border-slate-800 rounded-lg p-3 mt-3">
+          <h2 className="text-sm font-semibold text-slate-200 mb-1">Как читать цвет</h2>
+          <p className="text-xs text-slate-500 mb-3 leading-relaxed">
+            Тон говорит, что сделали с клетками; оттенок внутри тона — какой это день или какая фракция.
+            Оттенок сам по себе плохо различим при нарушениях цветовосприятия, поэтому у каждого трека
+            слева стоит ещё и значок семейства, а подпись называет образец словами.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {["unedited", "crisproff", "zfpoff"].map((fam) => (
+              <div key={fam}>
+                <div className="flex items-center gap-2 mb-1">
+                  <svg width="16" height="16" viewBox="0 0 16 16">
+                    {glyph(FAMILY[fam].glyph, 8, 8, FAMILY[fam].color, 6)}
+                  </svg>
+                  <span className="text-xs text-slate-200">{FAMILY[fam].label}</span>
+                </div>
+                <div className="flex flex-col gap-1 pl-1">
+                  {DATA_TRACKS.filter((t) => seriesOf(t.id).fam === fam && t.kind !== "delta").map((t) => (
+                    <span key={t.id} className="flex items-center gap-2 text-[11px] text-slate-500">
+                      <i style={{ background: seriesOf(t.id).color, width: 16, height: 9, borderRadius: 2,
+                                  display: "inline-block", flex: "0 0 auto" }} />
+                      {t.l1} · {t.l2}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <svg width="16" height="16" viewBox="0 0 16 16">
+                  <rect x="2" y="4" width="5" height="8" fill="#A9B8B0" />
+                  <rect x="9" y="4" width="5" height="8" fill="none" stroke="#A9B8B0" strokeWidth="1.2" strokeDasharray="2 1.5" />
+                </svg>
+                <span className="text-xs text-slate-200">знак значения</span>
+              </div>
+              <p className="text-[11px] text-slate-500 leading-snug pl-1">
+                Залитый столбик — положительное значение, контурный пунктирный — отрицательное.
+                Знак не меняет тон, поэтому по цвету всегда видно, о каком образце идёт речь.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* footprint sliders */}
+        {featureOn.footprint && (
+          <div className="mt-3 border border-slate-800 rounded-lg p-3">
+            <p className="text-xs text-slate-400 mb-2 leading-relaxed">
+              Ширина следа — <span className="text-slate-200">не измеренная величина</span>. Stepper 2017 измерял
+              dCas9-Dnmt3a3L на других промоторах; перенос геометрии на CD55 — аналогия. Подберите значение под
+              то, что собираетесь утверждать.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="text-xs text-slate-300 block">
+                dCas9 + KRAB + DNMT, поля по краям: <span className="text-pink-400">{cas9Pad} п.н.</span> → всего {112 - 93 + 1 + 2 * cas9Pad} п.н.
+                <input type="range" min="0" max="80" value={cas9Pad} onChange={(e) => setCas9Pad(+e.target.value)} className="w-full mt-1" />
+              </label>
+              <label className="text-xs text-slate-300 block">
+                ZFP + KRAB + DNMT, поля по краям: <span className="text-purple-400">{zfpPad} п.н.</span> → всего {106 - 87 + 1 + 2 * zfpPad} п.н.
+                <input type="range" min="0" max="80" value={zfpPad} onChange={(e) => setZfpPad(+e.target.value)} className="w-full mt-1" />
+              </label>
+            </div>
+          </div>
+        )}
+
+        {/* geometry summary */}
+        <div className="mt-3 border border-slate-800 rounded-lg p-3 text-xs leading-relaxed text-slate-300">
+          <p className="mb-1">
+            ZFPoff <span className="text-purple-400">+87…+106</span> и CRISPRoff <span className="text-pink-400">+93…+112</span> перекрываются
+            на 14 п.н. — общий фрагмент <span style={{ fontFamily: "ui-monospace, monospace" }}>{OVERLAP.seq}</span> (+93…+106).
+          </p>
+          <p className="mb-1 text-slate-300">
+            Четыре CpG попадают на протоспейсер и PAM: <span className="text-slate-100">№74 (+97), №75 (+102), №76 (+105), №77 (+113)</span>.
+            Именно на них прирост метилирования проваливается, тогда как соседи слева и справа набирают +50…+85 п.п.
+          </p>
+          <table className="w-full text-[11px] mt-2">
+            <thead><tr className="text-slate-500 text-left">
+              <th className="font-normal py-0.5">набор</th><th className="font-normal">Δ на +93…+115</th>
+              <th className="font-normal">Δ во фланге ±90 п.н.</th><th className="font-normal">отношение</th></tr></thead>
+            <tbody className="text-slate-300">
+              <tr><td className="py-0.5">Day 35 CRISPRoff</td><td>21,7</td><td>63,8</td><td className="text-amber-400">0,34</td></tr>
+              <tr><td className="py-0.5">Day 6 CRISPRoff</td><td>10,1</td><td>46,0</td><td className="text-amber-400">0,22</td></tr>
+              <tr><td className="py-0.5">K562 ZFPoff HIGH−LOW</td><td>39,0</td><td>57,7</td><td>0,68</td></tr>
+            </tbody>
+          </table>
+          <p className="text-slate-500 mt-2">
+            Главная альтернатива, которую эти матрицы исключить не могут: в них нет нулей, только 1 и NaN,
+            поэтому падение доли единиц на четырёх CpG в равной мере объясняется просадкой покрытия.
+            Развести это можно только матрицей с раздельным кодированием «не метилирован» и «нет покрытия».
+          </p>
+        </div>
+
+        {/* selection detail */}
+        {selInfo && (
+          <div className="mt-3 border rounded-lg p-3 text-xs"
+            style={{ borderColor: selInfo.color || CATS[selInfo.cat]?.color, background: "#111C18" }}>
+            <div className="font-semibold text-slate-100 text-sm mb-2">{selInfo.name || selInfo.id}</div>
+            {selInfo.seq && (
+              <p className="mb-1 text-slate-300" style={{ fontFamily: "ui-monospace, monospace" }}>{selInfo.seq}</p>
+            )}
+            {selInfo.hg38 && <p className="text-slate-400">hg38 {selInfo.hg38} · T2T {selInfo.t2t} · {fmtRel(selInfo.lo)}…{fmtRel(selInfo.hi)} от TSS</p>}
+            {selInfo.pos !== undefined && (
+              <p className="text-slate-400">
+                {fmtRel(selInfo.pos)} п.н. от TSS · chr1:{fmtHg38(selInfo.pos)} ·
+                {" "}{selInfo.exp === 0 ? "нет экспериментов ENCODE в K562" : `${selInfo.exp} экспериментов ENCODE в K562`}
+                {selInfo.cpg ? ` · перекрывает ${selInfo.cpg}` : ""}
+              </p>
+            )}
+            {selInfo.src && <p className="text-slate-500 mt-1">Источник: {selInfo.src}</p>}
+          </div>
+        )}
+
+        {/* ---- track manager ---- */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+          <div className="border border-slate-800 rounded-lg p-3">
+            <h2 className="text-sm font-semibold text-slate-200 mb-2">Треки</h2>
+
+            <p className="text-xs text-slate-500 mb-1">Аннотация</p>
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {FEATURE_TRACKS.map((f) => (
+                <button key={f.id} onClick={() => setFeatureOn({ ...featureOn, [f.id]: !featureOn[f.id] })}
+                  className={`px-2.5 py-1 rounded text-xs border ${featureOn[f.id]
+                    ? "border-sky-500 text-sky-200 bg-sky-950" : "border-slate-800 text-slate-600"}`}>
+                  {f.name}
+                </button>
+              ))}
+            </div>
+
+            {GROUPS.map((g) => {
+              const items = DATA_TRACKS.filter((t) => t.group === g);
+              const open = !!openGroups[g];
+              const nOn = items.filter((t) => dataOn[t.id]).length;
+              return (
+                <div key={g} className="mb-2">
+                  <button onClick={() => setOpenGroups({ ...openGroups, [g]: !open })}
+                    className="w-full flex items-center justify-between text-xs text-slate-300 py-1">
+                    <span>{open ? "▾" : "▸"} {g}</span>
+                    <span className="text-slate-600">{nOn}/{items.length}</span>
+                  </button>
+                  {open && (
+                    <div className="pl-3 flex flex-col gap-1 pb-1">
+                      {items.map((t) => {
+                        const has = trackData[t.id] && trackData[t.id].length > 0;
+                        return (
+                          <label key={t.id} className="flex items-start gap-2 text-xs text-slate-400 cursor-pointer">
+                            <input type="checkbox" checked={!!dataOn[t.id]} className="mt-0.5"
+                              onChange={() => setDataOn({ ...dataOn, [t.id]: !dataOn[t.id] })} />
+                            <span>
+                              <span className={has ? "text-slate-200" : "text-slate-400"}>{t.name}</span>
+                              <span className={`ml-1.5 px-1 rounded text-[10px] border ${has
+                                ? "border-emerald-700 text-emerald-400" : "border-slate-700 text-slate-600"}`}>
+                                {has ? `${trackData[t.id].length} точек` : "пусто"}
+                              </span>
+                              {t.note && <span className="block text-slate-600 text-[11px] leading-snug">{t.note}</span>}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="border border-slate-800 rounded-lg p-3">
+            <h2 className="text-sm font-semibold text-slate-200 mb-2">Факторы</h2>
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {TFS.map((t) => {
+                const c = CATS[t.cat];
+                return (
+                  <button key={t.id} onClick={() => setTfOn({ ...tfOn, [t.id]: !tfOn[t.id] })}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded border text-xs"
+                    style={{ borderColor: tfOn[t.id] ? c.color : "#24352E", color: tfOn[t.id] ? "#E9EEEA" : "#6E8079" }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14">{glyph(c.glyph, 7, 7, tfOn[t.id] ? c.color : "#24352E", 5)}</svg>
+                    {t.id}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex gap-2 mb-3">
+              <button onClick={() => setTfOn(Object.fromEntries(TFS.map((t) => [t.id, true])))}
+                className="px-2 py-1 rounded border border-slate-700 text-xs text-slate-400">Все</button>
+              <button onClick={() => setTfOn(Object.fromEntries(TFS.map((t) => [t.id, false])))}
+                className="px-2 py-1 rounded border border-slate-700 text-xs text-slate-400">Ни одного</button>
+              <button onClick={() => setTfOn(Object.fromEntries(TFS.map((t) => [t.id, t.cat === "meth"])))}
+                className="px-2 py-1 rounded border border-orange-700 text-xs text-orange-300">Только метилчувствительные</button>
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-1 mb-3">
+              {Object.entries(CATS).map(([k, c]) => (
+                <span key={k} className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                  <svg width="14" height="14" viewBox="0 0 14 14">{glyph(c.glyph, 7, 7, c.color, 5)}</svg>{c.label}
+                </span>
+              ))}
+            </div>
+            <p className="text-[11px] text-slate-500 leading-snug">
+              Проверены и не найдены в этом окне: {NOT_FOUND.join(", ")}. Отсутствие пика не опровергает связывание —
+              ChIP-seq ограничен по чувствительности.
+            </p>
+          </div>
+        </div>
+
+        {/* ---- data loader ---- */}
+        <div className="border border-slate-800 rounded-lg p-3 mt-4">
+          <h2 className="text-sm font-semibold text-slate-200 mb-1">Загрузить значения в трек</h2>
+          <p className="text-xs text-slate-500 mb-3 leading-relaxed">
+            Две числовые колонки в строке: координата и значение. Разделитель — запятая, таб или пробел.
+            Заголовки и нечисловые строки пропускаются. Для Δ-треков подавайте разность в процентных пунктах
+            со знаком; для уровней — процент метилирования.
+          </p>
+          <div className="flex flex-wrap gap-2 mb-2">
+            <select value={loadTarget} onChange={(e) => setLoadTarget(e.target.value)}
+              className="bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-xs text-slate-200">
+              {GROUPS.map((g) => (
+                <optgroup key={g} label={g}>
+                  {DATA_TRACKS.filter((t) => t.group === g).map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </optgroup>
+              ))}
+            </select>
+            <select value={coordSys} onChange={(e) => setCoordSys(e.target.value)}
+              className="bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-xs text-slate-200">
+              <option value="rel">координата = п.н. от TSS</option>
+              <option value="hg38">координата = hg38 абсолютная</option>
+              <option value="t2t">координата = T2Tv2 абсолютная</option>
+              <option value="cpg">координата = индекс CpG 1–137 (нумерация из последовательности)</option>
+            </select>
+          </div>
+          <textarea value={paste} onChange={(e) => setPaste(e.target.value)} rows={4}
+            placeholder={"207321660, 71.4\n207321678, 68.9\n207321701, 74.2"}
+            className="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-200"
+            style={{ fontFamily: "ui-monospace, monospace" }} />
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <button onClick={loadData} className="px-3 py-1.5 rounded bg-sky-300 text-slate-900 text-xs font-semibold">
+              В выбранный трек
+            </button>
+            <button onClick={loadCpgs} className="px-3 py-1.5 rounded border border-slate-600 text-slate-300 text-xs">
+              Это координаты CpG (индекс, координата)
+            </button>
+            {cpgLoaded && (
+              <button onClick={() => { setCpgs(CPGS); setCpgLoaded(false); setMsg("Возвращены позиции из последовательности."); }}
+                className="px-3 py-1.5 rounded border border-slate-700 text-slate-500 text-xs">Вернуть интерполяцию</button>
+            )}
+            {Object.keys(trackData).length > 0 && (
+              <button onClick={() => { setTrackData({}); setMsg("Все треки очищены, включая предзагруженные."); }}
+                className="px-3 py-1.5 rounded border border-slate-700 text-slate-500 text-xs">Очистить все треки</button>
+            )}
+            {msg && <span className="text-xs text-slate-400">{msg}</span>}
+          </div>
+        </div>
+
+        {/* provenance */}
+        <div className="border border-amber-900 rounded-lg p-3 mt-4 text-[11px] text-slate-400 leading-relaxed">
+          <p className="text-amber-500 font-semibold mb-1 text-xs">Что здесь измерено, а что нет</p>
+          <p className="mb-1"><span className="text-slate-200">Измерено:</span> TSS, обе последовательности-мишени и их координаты, позиции TF и счётчики ENCODE, сайты KLF4, границы блока #20–132 и пика #78–83.</p>
+          <p className="mb-1"><span className="text-slate-200">Проверено по последовательности:</span> в 6 500 п.н. ровно 137 CG; CpG №1 = 207 318 092 и CpG №137 = 207 324 450 — в точности границы координатного окна K562. Обе мишени найдены по заявленным координатам. PAM = CGG, плюс-цепь. Ширина следа комплекса — по-прежнему регулируемая оценка, не измерение.</p>
+          <p className="mb-1"><span className="text-amber-400">Расхождение:</span> подписи индексов CpG в прежних заметках не сходятся с последовательностью. Пик +58…+84 — это CpG №70–72, а не №78–83; сдвиг плавает (−1 … −11) вдоль локуса. Координаты пика при этом верны, и разрыв 9 п.н. до протоспейсера сохраняется. Разрешить может только координатный CSV.</p>
+          <p className="mb-1"><span className="text-slate-200">Терминология:</span> контрольные образцы без редактирования везде называются <span className="text-slate-100">unedited</span>. В именах исходных файлов Day 35 они помечены как NT (not treated) — это то же самое, отдельного типа контроля нет.</p><p><span className="text-slate-200">Пусто:</span> треки порога 0.995, ZFPoff в T-клетках, ATAC и DNase — соответствующих файлов не поступало. Базовая линия unedited в ONT завышена фильтром NoFullyUnmeth (19,7 % против 4,9 % по EM-seq); NaN в матрицах не различает отсутствие покрытия и неметилированность; кроссволк координат EM-seq ↔ ONT не решён.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("browser-root")).render(React.createElement(CD55Browser));
+
+</script>
+
+</body>
+</html>
