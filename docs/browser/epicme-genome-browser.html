@@ -154,10 +154,7 @@
   .nav-links a:hover, .nav-links a:focus-visible{ border-color:var(--blue); color:var(--ink); }
   .nav-links a.active{ background:var(--orange); border-color:var(--orange); color:#2B1900; }
   .browser-shell{ max-width:1180px; margin:0 auto; padding:0 24px 40px; }
-  .lang-note{
-    background:var(--blue-dim); border:1px solid var(--blue-deep); border-radius:10px;
-    padding:12px 15px; font-size:13px; color:var(--ink-dim); margin:0 0 22px;
-  }
+  
 </style>
 </head>
 <body>
@@ -188,7 +185,6 @@
     <div class="eyebrow" data-i18n="eyebrow">Read · одномолекулярные данные</div>
     <h1 class="display" data-i18n="h1">Геномный браузер по области интереса CD55</h1>
     <p class="hero-sub" data-i18n="hero-sub">6 500 п.н. вокруг CD55, 137 CpG. Мишени CRISPRoff и ZFPoff, транскрипционные факторы из ENCODE, профили метилирования по всем молекулам и сами одномолекулярные прочтения — на одной оси, с масштабированием и включаемыми треками.</p>
-    <p class="lang-note" data-i18n="lang-note"><strong>Интерфейс браузера пока только на русском.</strong> Шапка и описание переключаются, сам виджет — нет; двуязычие для него в работе.</p>
   </section>
 </main>
 
@@ -214,7 +210,6 @@ const I18N = {
     'eyebrow':'Read · одномолекулярные данные',
     'h1':'Геномный браузер по области интереса CD55',
     'hero-sub':'6 500 п.н. вокруг CD55, 137 CpG. Мишени CRISPRoff и ZFPoff, транскрипционные факторы из ENCODE, профили метилирования по всем молекулам и сами одномолекулярные прочтения — на одной оси, с масштабированием и включаемыми треками.',
-    'lang-note':'<strong>Интерфейс браузера пока только на русском.</strong> Шапка и описание переключаются, сам виджет — нет; двуязычие для него в работе.',
     'footer':'epiCme — геномный браузер CD55. Часть PhD-проекта Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. <a href="../index.html">← Назад на главную</a>'
   },
   en: {
@@ -225,7 +220,6 @@ const I18N = {
     'eyebrow':'Read · single-molecule data',
     'h1':'Genome browser over the CD55 region of interest',
     'hero-sub':'6,500 bp around CD55, 137 CpGs. CRISPRoff and ZFPoff target sites, ENCODE transcription factors, methylation profiles across all molecules, and the single-molecule reads themselves — on one axis, with zoom and toggleable tracks.',
-    'lang-note':'<strong>The browser interface is Russian-only for now.</strong> The header and description switch languages; the widget itself does not yet.',
     'footer':'epiCme — CD55 genome browser. Part of the PhD project of Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley. <a href="../index.html">← Back to home</a>'
   }
 };
@@ -238,6 +232,7 @@ function applyLang(lang){
   });
   document.querySelectorAll('#lang-switch button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
   try{ localStorage.setItem('epicme_lang', lang); }catch(e){}
+  window.dispatchEvent(new CustomEvent('epicme:lang'));
 }
 document.querySelectorAll('#lang-switch button').forEach(b => b.addEventListener('click', () => applyLang(b.dataset.lang)));
 (function(){ let s='ru'; try{ s=localStorage.getItem('epicme_lang')||'ru'; }catch(e){} if(s==='en') applyLang('en'); })();
@@ -324,15 +319,15 @@ const PAM = { lo: 113, hi: 115, seq: "CGG" }; // verified in the ROI sequence
 
 /* ---------- TFs: measured positions ---------- */
 const CATS = {
-  meth:  { color: "#009E73", glyph: "triangle",     label: "Чувствителен к метилированию" },
-  polII: { color: "#F0E442", glyph: "circle",       label: "Машинерия Pol II" },
-  cof:   { color: "#E9EEEA", glyph: "square",       label: "Коактиватор / прочие" },
-  out:   { color: "#4A5A54", glyph: "diamond",      label: "Вне значимого блока" },
-  lit:   { color: "#A9B8B0", glyph: "triangleOpen", label: "Только литература, нет ChIP-seq" },
+  meth:  { color: "#009E73", glyph: "triangle",     label: { ru: "Чувствителен к метилированию", en: "Methylation-sensitive" } },
+  polII: { color: "#F0E442", glyph: "circle",       label: { ru: "Машинерия Pol II", en: "Pol II machinery" } },
+  cof:   { color: "#E9EEEA", glyph: "square",       label: { ru: "Коактиватор / прочие", en: "Coactivator / other" } },
+  out:   { color: "#4A5A54", glyph: "diamond",      label: { ru: "Вне значимого блока", en: "Outside the significant block" } },
+  lit:   { color: "#A9B8B0", glyph: "triangleOpen", label: { ru: "Только литература, нет ChIP-seq", en: "Literature only, no ChIP-seq" } },
 };
 const TFS = [
-  { id: "CTCF",   pos: -565,  cat: "meth",  exp: 180, cpg: "#43–86", src: "ENCODE/UCSC K562; методчувствительность инсулятора — классическая литература" },
-  { id: "NRF1",   pos: -740,  cat: "meth",  exp: 3,   cpg: "#13–43", src: "ENCODE/UCSC K562; Domcke 2016 Nature 16462" },
+  { id: "CTCF",   pos: -565,  cat: "meth",  exp: 180, cpg: "#43–86", src: { ru: "ENCODE/UCSC K562; методчувствительность инсулятора — классическая литература", en: "ENCODE/UCSC K562; methylation-sensitive insulator binding — classic literature" } },
+  { id: "NRF1",   pos: -740,  cat: "meth",  exp: 3,   cpg: "#13–43", src: { ru: "ENCODE/UCSC K562; Domcke 2016 Nature 16462", en: "ENCODE/UCSC K562; Domcke 2016 Nature 16462" } },
   { id: "POLR2A", pos: -117,  cat: "polII", exp: 90,  src: "ENCODE/UCSC K562" },
   { id: "POLR2A-pS5", pos: -70, cat: "polII", exp: 40, src: "ENCODE/UCSC K562" },
   { id: "POLR2G", pos: 10,    cat: "polII", exp: 2,   src: "ENCODE/UCSC K562" },
@@ -434,6 +429,83 @@ const DATA_TRACKS = [
     l1: "DNase-seq", l2: "нет данных", kind: "signal", note: "В проекте нет." },
 ];
 
+/* English overrides for DATA_TRACKS text fields. Applied by trTrack() below.
+   Kept as a separate lookup rather than inline {ru,en} pairs on every field so
+   the DATA_TRACKS block above (which many other places pattern-match by id)
+   did not have to change shape.                                              */
+const DATA_TRACKS_EN = {
+  d35_d_croff: { group: "T cells · CRISPRoff · Day 35 · ONT 0.7",
+    name: "\u0394 methylation: CRISPRoff \u2212 unedited (T cells, Day 35)",
+    l1: "\u0394  CRISPRoff \u2212 unedited", l2: "T cells · Day 35 · 0.7",
+    note: "Methylation gain after silencing. 58.7% globally vs 19.7%. Dip at +97…+113 — the dCas9 footprint." },
+  d35_croff: { group: "T cells · CRISPRoff · Day 35 · ONT 0.7",
+    name: "Methylation: CRISPRoff (T cells, Day 35, n=326)",
+    l1: "CRISPRoff", l2: "T cells · Day 35 · n=326", note: "58.7% globally." },
+  d35_unedited: { group: "T cells · CRISPRoff · Day 35 · ONT 0.7",
+    name: "Methylation: unedited, no editing (T cells, Day 35, n=202)",
+    l1: "unedited", l2: "T cells · Day 35 · n=202",
+    note: "Control. 19.7% globally — inflated by the NoFullyUnmeth filter; EM-seq on the same material gives 4.9%." },
+
+  d6_delta: { group: "T cells · CRISPRoff · Day 6 · ONT 0.7",
+    name: "\u0394 methylation: CRISPRoff \u2212 unedited (T cells, Day 6)",
+    l1: "\u0394  CRISPRoff \u2212 unedited", l2: "T cells · Day 6 · 0.7",
+    note: "Same dip at +97…+113 in an independent dataset. r with Day 35 = 0.943." },
+  d6_croff: { group: "T cells · CRISPRoff · Day 6 · ONT 0.7",
+    name: "Methylation: CRISPRoff (T cells, Day 6, n=2,282)",
+    l1: "CRISPRoff", l2: "T cells · Day 6 · n=2,282", note: "41.7% globally." },
+  d6_un: { group: "T cells · CRISPRoff · Day 6 · ONT 0.7",
+    name: "Methylation: unedited, no editing (T cells, Day 6, n=1,134)",
+    l1: "unedited", l2: "T cells · Day 6 · n=1,134", note: "Control. 18.9% globally." },
+
+  k562_d_07: { group: "K562 · ZFPoff · Day 16 · ONT 0.7",
+    name: "\u0394 methylation: ZFPoff CD55-HIGH \u2212 CD55-LOW (K562, Day 16)",
+    l1: "\u0394  ZFPoff HIGH \u2212 LOW", l2: "K562 · Day 16 · 0.7",
+    note: "Both fractions are ZFPoff-edited and separated by sorting. The dip at the same position is noticeably shallower than for CRISPRoff." },
+  k562_high_07: { group: "K562 · ZFPoff · Day 16 · ONT 0.7",
+    name: "Methylation: ZFPoff, CD55-HIGH fraction (K562, Day 16, n=1,435)",
+    l1: "ZFPoff · CD55-HIGH", l2: "K562 · Day 16 · n=1,435",
+    note: "HIGH = high methylation. 50.4% globally." },
+  k562_low_07: { group: "K562 · ZFPoff · Day 16 · ONT 0.7",
+    name: "Methylation: ZFPoff, CD55-LOW fraction (K562, Day 16, n=2,170)",
+    l1: "ZFPoff · CD55-LOW", l2: "K562 · Day 16 · n=2,170",
+    note: "LOW = low methylation. 16.5% globally." },
+  k562_base_07: { group: "K562 · ZFPoff · Day 16 · ONT 0.7",
+    name: "Methylation: mock, no ZFPoff (K562, Day 2, n=206)",
+    l1: "mock · no ZFPoff", l2: "K562 · Day 2 · n=206",
+    note: "14.8% globally. Note: different day and mock procedure, so any comparison against it mixes the editing effect with a time effect." },
+
+  k562_d_0995: { group: "Threshold 0.995 — files not uploaded",
+    name: "\u0394 methylation: ZFPoff HIGH \u2212 LOW (K562, Day 16, threshold 0.995)",
+    l1: "\u0394  ZFPoff HIGH \u2212 LOW", l2: "K562 · Day 16 · 0.995",
+    note: "All seven uploaded matrices are threshold 0.7. The 0.995 figures from the notes (LOW 9.2 / HIGH 29.4 / BASE 7.4) are not carried over here." },
+  k562_low_0995: { group: "Threshold 0.995 — files not uploaded",
+    name: "Methylation: ZFPoff CD55-LOW (K562, Day 16, threshold 0.995)",
+    l1: "ZFPoff · CD55-LOW", l2: "K562 · Day 16 · 0.995" },
+  k562_high_0995: { group: "Threshold 0.995 — files not uploaded",
+    name: "Methylation: ZFPoff CD55-HIGH (K562, Day 16, threshold 0.995)",
+    l1: "ZFPoff · CD55-HIGH", l2: "K562 · Day 16 · 0.995" },
+
+  d35_zfp: { group: "No data",
+    name: "\u0394 methylation: ZFPoff \u2212 unedited (T cells, Day 35)",
+    l1: "\u0394  ZFPoff \u2212 unedited", l2: "T cells · Day 35 · no file",
+    note: "No matrix was ever sent. The K562 track above is ZFPoff too, but a different cell type and a different day." },
+  atac: { group: "No data", name: "ATAC-seq — chromatin accessibility",
+    l1: "ATAC-seq", l2: "no data", note: "Not in the project." },
+  dnase: { group: "No data", name: "DNase-seq — chromatin accessibility",
+    l1: "DNase-seq", l2: "no data", note: "Not in the project." },
+};
+const trTrack = (t, field, lang) => (lang === "en" && DATA_TRACKS_EN[t.id] && DATA_TRACKS_EN[t.id][field]) || t[field];
+const t2 = (lang, ru, en) => (lang === "en" ? en : ru);
+const GROUP_EN = {
+  "T-\u043a\u043b\u0435\u0442\u043a\u0438 \u00b7 CRISPRoff \u00b7 \u0414\u0435\u043d\u044c 35 \u00b7 ONT 0.7": "T cells · CRISPRoff · Day 35 · ONT 0.7",
+  "T-\u043a\u043b\u0435\u0442\u043a\u0438 \u00b7 CRISPRoff \u00b7 \u0414\u0435\u043d\u044c 6 \u00b7 ONT 0.7": "T cells · CRISPRoff · Day 6 · ONT 0.7",
+  "K562 \u00b7 ZFPoff \u00b7 \u0414\u0435\u043d\u044c 16 \u00b7 ONT 0.7": "K562 · ZFPoff · Day 16 · ONT 0.7",
+  "\u041f\u043e\u0440\u043e\u0433 0.995 \u2014 \u0444\u0430\u0439\u043b\u044b \u043d\u0435 \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043d\u044b": "Threshold 0.995 — files not uploaded",
+  "\u0414\u0430\u043d\u043d\u044b\u0445 \u043d\u0435\u0442": "No data",
+};
+const trGroup = (g, lang) => (lang === "en" && GROUP_EN[g]) || g;
+
+
 const GROUPS = [...new Set(DATA_TRACKS.map((t) => t.group))];
 
 /* ---------- series colours: family by hue, timepoint by shade ----------
@@ -445,9 +517,9 @@ const GROUPS = [...new Set(DATA_TRACKS.map((t) => t.group))];
    The four shades below are not yet in theme.css; if this goes to the site,
    add them as --blue-pale, --orange-deep, --yellow-deep next to their hue.  */
 const FAMILY = {
-  unedited:  { glyph: "circle",   color: "#56B4E9", label: "не редактировано" },
-  crisproff: { glyph: "triangle", color: "#E69F00", label: "заглушено CRISPRoff" },
-  zfpoff:    { glyph: "square",   color: "#CC79A7", label: "заглушено ZFPoff" },
+  unedited:  { glyph: "circle",   color: "#56B4E9", label: { ru: "не редактировано", en: "not edited" } },
+  crisproff: { glyph: "triangle", color: "#E69F00", label: { ru: "заглушено CRISPRoff", en: "silenced by CRISPRoff" } },
+  zfpoff:    { glyph: "square",   color: "#CC79A7", label: { ru: "заглушено ZFPoff", en: "silenced by ZFPoff" } },
 };
 /* One hue per family, one shade per timepoint. A Δ track takes a desaturated
    tint of the SAME day plus an outline in that day's full colour, so it can
@@ -477,11 +549,11 @@ const SERIES = {
 const seriesOf = (id) => SERIES[id] || { fam: null, color: "#A9B8B0" };
 
 const FEATURE_TRACKS = [
-  { id: "sig", name: "Значимые блоки (по координатам)" },
-  { id: "tf", name: "Транскрипционные факторы" },
-  { id: "cpg", name: "CpG × 137 (из последовательности)" },
-  { id: "targets", name: "Сайты CRISPRoff / ZFPoff" },
-  { id: "footprint", name: "Оценка следа комплексов" },
+  { id: "sig", name: { ru: "Значимые блоки (по координатам)", en: "Significant blocks (by coordinates)" } },
+  { id: "tf", name: { ru: "Транскрипционные факторы", en: "Transcription factors" } },
+  { id: "cpg", name: { ru: "CpG × 137 (из последовательности)", en: "CpG × 137 (from sequence)" } },
+  { id: "targets", name: { ru: "Сайты CRISPRoff / ZFPoff", en: "CRISPRoff / ZFPoff sites" } },
+  { id: "footprint", name: { ru: "Оценка следа комплексов", en: "Complex footprint estimate" } },
 ];
 
 
@@ -517,11 +589,11 @@ const SAMPLE_MOLS = Object.fromEntries(Object.entries(MOL_SAMPLE).map(([k, v]) =
    A cell counts as a methylated call when its value is > 0.5. NaN fails that
    test, which is the intended behaviour: these matrices contain only 1.0 and
    NaN, so NaN stands for "unmethylated OR uncovered" and cannot be split.     */
-function parseNpy(buf) {
+function parseNpy(buf, lang) {
   const dv = new DataView(buf);
   const u8 = new Uint8Array(buf);
   if (u8[0] !== 0x93 || String.fromCharCode(u8[1], u8[2], u8[3], u8[4], u8[5]) !== "NUMPY")
-    throw new Error("не похоже на .npy");
+    throw new Error(t2(lang, "не похоже на .npy", "does not look like a .npy file"));
   const major = dv.getUint8(6);
   const headLen = major === 1 ? dv.getUint16(8, true) : dv.getUint32(8, true);
   const off = major === 1 ? 10 : 12;
@@ -529,10 +601,10 @@ function parseNpy(buf) {
   const mD = /'descr':\s*'([^']+)'/.exec(header);
   const mS = /'shape':\s*\(([^)]*)\)/.exec(header);
   const mF = /'fortran_order':\s*(True|False)/.exec(header);
-  if (!mD || !mS) throw new Error("не разобран заголовок .npy");
-  if (mF && mF[1] === "True") throw new Error("fortran_order=True не поддержан");
+  if (!mD || !mS) throw new Error(t2(lang, "не разобран заголовок .npy", "could not parse the .npy header"));
+  if (mF && mF[1] === "True") throw new Error(t2(lang, "fortran_order=True не поддержан", "fortran_order=True is not supported"));
   const shape = mS[1].split(",").map((s) => s.trim()).filter(Boolean).map(Number);
-  if (shape.length !== 2) throw new Error(`ожидалась матрица 2D, получено ${shape.length}D`);
+  if (shape.length !== 2) throw new Error(t2(lang, `ожидалась матрица 2D, получено ${shape.length}D`, `expected a 2D matrix, got ${shape.length}D`));
   const dataOff = off + headLen;
   const n = shape[0] * shape[1];
   const d = mD[1];
@@ -541,7 +613,7 @@ function parseNpy(buf) {
   else if (d === "<f4" || d === "=f4") arr = new Float32Array(buf, dataOff, n);
   else if (d === "|u1" || d === "<u1" || d === "|b1") arr = new Uint8Array(buf, dataOff, n);
   else if (d === "<i4" || d === "=i4") arr = new Int32Array(buf, dataOff, n);
-  else throw new Error(`тип ${d} не поддержан`);
+  else throw new Error(t2(lang, `тип ${d} не поддержан`, `dtype ${d} is not supported`));
   const rows = [];
   let ones = 0;
   for (let r = 0; r < shape[0]; r++) {
@@ -573,7 +645,7 @@ function guessStrands(name) {
 }
 
 /* ---------- component ---------- */
-function CD55Browser() {
+function CD55Browser({ lang = "ru" }) {
   const [view, setView] = useState({ lo: ROI.lo, hi: ROI.hi });
   const [featureOn, setFeatureOn] = useState({ sig: true, tf: true, cpg: true, targets: true, footprint: true });
   const [dataOn, setDataOn] = useState({ d35_d_croff: true, d6_delta: true, k562_d_07: true });
@@ -642,17 +714,17 @@ function CD55Browser() {
     const r = [];
     let y = 44;
     const push = (id, type, h, l1, l2) => { r.push({ id, type, y, h, l1, l2 }); y += h + 8; };
-    if (featureOn.sig) push("sig", "feature", 30, "Значимые зоны", "по координатам");
-    if (featureOn.tf) push("tf", "feature", 78, "Транскрипционные", "факторы · ChIP-seq K562");
-    if (featureOn.cpg) push("cpg", "feature", 34, "CpG × 137", "из последовательности");
-    if (featureOn.targets) push("targets", "feature", 52, "Сайты-мишени", "CRISPRoff / ZFPoff / PAM");
-    if (featureOn.footprint) push("footprint", "feature", 46, "След комплекса", "оценка, регулируется");
+    if (featureOn.sig) push("sig", "feature", 30, t2(lang, "Значимые зоны", "Significant zones"), t2(lang, "по координатам", "by coordinates"));
+    if (featureOn.tf) push("tf", "feature", 78, t2(lang, "Транскрипционные", "Transcription"), t2(lang, "факторы · ChIP-seq K562", "factors · ChIP-seq K562"));
+    if (featureOn.cpg) push("cpg", "feature", 34, "CpG × 137", t2(lang, "из последовательности", "from sequence"));
+    if (featureOn.targets) push("targets", "feature", 52, t2(lang, "Сайты-мишени", "Target sites"), "CRISPRoff / ZFPoff / PAM");
+    if (featureOn.footprint) push("footprint", "feature", 46, t2(lang, "След комплекса", "Complex footprint"), t2(lang, "оценка, регулируется", "estimate, adjustable"));
     DATA_TRACKS.forEach((t) => {
-      if (dataOn[t.id]) push(t.id, "data", 46, t.l1, t.l2);
+      if (dataOn[t.id]) push(t.id, "data", 46, trTrack(t, "l1", lang), trTrack(t, "l2", lang));
       if (molOpen[t.id] && molData[t.id]) {
         const d = molData[t.id];
         const shown = Math.min(molRows, d.nRows);
-        push("mol:" + t.id, "mol", shown * rowH + 4, "молекулы", t.l1);
+        push("mol:" + t.id, "mol", shown * rowH + 4, t2(lang, "молекулы", "molecules"), trTrack(t, "l1", lang));
       }
     });
     return { list: r, height: y + 34 };
@@ -704,10 +776,12 @@ function CD55Browser() {
   }
   function loadData() {
     const pts = parsePairs(paste);
-    if (pts.length === 0) { setMsg("Ни одной пары не разобрано. Нужны две числовые колонки в строке."); return; }
+    if (pts.length === 0) { setMsg(t2(lang, "Ни одной пары не разобрано. Нужны две числовые колонки в строке.", "No pairs parsed. Each line needs two numeric columns.")); return; }
     setTrackData({ ...trackData, [loadTarget]: pts });
     setDataOn({ ...dataOn, [loadTarget]: true });
-    setMsg(`В трек «${DATA_TRACKS.find((t) => t.id === loadTarget).name}» загружено ${pts.length} точек.`);
+    setMsg(t2(lang,
+      `\u0412 \u0442\u0440\u0435\u043a «${trTrack(DATA_TRACKS.find((t) => t.id === loadTarget), "name", lang)}» \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043d\u043e ${pts.length} \u0442\u043e\u0447\u0435\u043a.`,
+      `Loaded ${pts.length} points into "${trTrack(DATA_TRACKS.find((t) => t.id === loadTarget), "name", lang)}".`));
     setPaste("");
   }
   function loadCpgs() {
@@ -722,10 +796,10 @@ function CD55Browser() {
       if (pos === null) continue;
       pts.push({ idx: i, pos, anchor: true });
     }
-    if (pts.length === 0) { setMsg("Ожидались пары «индекс CpG, координата»."); return; }
+    if (pts.length === 0) { setMsg(t2(lang, "Ожидались пары «индекс CpG, координата».", 'Expected pairs of "CpG index, coordinate".')); return; }
     setCpgs(pts.sort((a, b) => a.idx - b.idx));
     setCpgLoaded(true);
-    setMsg(`Загружено ${pts.length} измеренных координат CpG. Интерполяция отключена.`);
+    setMsg(t2(lang, `Загружено ${pts.length} измеренных координат CpG. Интерполяция отключена.`, `Loaded ${pts.length} measured CpG coordinates. Interpolation disabled.`));
     setPaste("");
   }
 
@@ -787,7 +861,7 @@ function CD55Browser() {
           <rect x={PAD_L} y={row.y} width={plotW} height={row.h} fill="none"
             stroke="#24352E" strokeWidth="1" strokeDasharray="5 4" rx="3" />
           <text x={PAD_L + plotW / 2} y={row.y + row.h / 2 + 4} fill="#6E8079" fontSize="10.5" textAnchor="middle">
-            нет загруженных значений — трек пуст
+            {t2(lang, "нет загруженных значений — трек пуст", "no values loaded — track is empty")}
           </text>
         </g>
       );
@@ -823,7 +897,7 @@ function CD55Browser() {
     );
   }
 
-  const label = (k) => (DATA_TRACKS.find((t) => t.id === k) || {}).name || k;
+  const label = (k) => { const tr = DATA_TRACKS.find((t) => t.id === k); return tr ? trTrack(tr, "name", lang) : k; };
 
   /* row order per dataset, recomputed only when the sort mode changes */
   const molOrder = useMemo(() => {
@@ -852,14 +926,14 @@ function CD55Browser() {
     const next = { ...molData }, open = { ...molOpen }, td = { ...trackData };
     for (const f of Array.from(fileList)) {
       try {
-        const parsed = parseNpy(await f.arrayBuffer());
+        const parsed = parseNpy(await f.arrayBuffer(), lang);
         if (parsed.nCols !== 137)
-          notes.push(`${f.name}: ${parsed.nCols} колонок вместо 137 — не тот набор CpG, пропущен`);
+          notes.push(t2(lang, `${f.name}: ${parsed.nCols} колонок вместо 137 — не тот набор CpG, пропущен`, `${f.name}: ${parsed.nCols} columns instead of 137 — wrong CpG set, skipped`));
         else {
           const key = guessKey(f.name) || `custom_${Object.keys(next).length}`;
           const st = guessStrands(f.name);
           if (st && st.nf + st.nr !== parsed.nRows)
-            notes.push(`${f.name}: numFWD+numRVS = ${st.nf + st.nr}, а строк ${parsed.nRows} — разделение по цепям не применено`);
+            notes.push(t2(lang, `${f.name}: numFWD+numRVS = ${st.nf + st.nr}, а строк ${parsed.nRows} — разделение по цепям не применено`, `${f.name}: numFWD+numRVS = ${st.nf + st.nr}, but rows = ${parsed.nRows} — strand split not applied`));
           const nfOk = st && st.nf + st.nr === parsed.nRows ? st.nf : null;
           next[key] = { ...parsed, nf: nfOk, nr: st ? st.nr : null, fname: f.name,
                         nTotal: parsed.nRows, isSample: false,
@@ -876,9 +950,13 @@ function CD55Browser() {
           const emb = PRELOADED[key];
           if (emb) {
             const diff = Math.max(...emb.map((v, i) => Math.abs(v - prof[i].value)));
-            notes.push(`${label(key)}: ${parsed.nRows} молекул, ${parsed.pctOnes.toFixed(1)} % — сходится со встроенным профилем (макс. расхождение ${diff.toFixed(2)} п.п.)`);
+            notes.push(t2(lang,
+              `${label(key)}: ${parsed.nRows} молекул, ${parsed.pctOnes.toFixed(1)} % — сходится со встроенным профилем (макс. расхождение ${diff.toFixed(2)} п.п.)`,
+              `${label(key)}: ${parsed.nRows} molecules, ${parsed.pctOnes.toFixed(1)}% — matches the embedded profile (max discrepancy ${diff.toFixed(2)} pp)`));
           } else {
-            notes.push(`${label(key)}: ${parsed.nRows} молекул, ${parsed.pctOnes.toFixed(1)} % метилированных вызовов`);
+            notes.push(t2(lang,
+              `${label(key)}: ${parsed.nRows} молекул, ${parsed.pctOnes.toFixed(1)} % метилированных вызовов`,
+              `${label(key)}: ${parsed.nRows} molecules, ${parsed.pctOnes.toFixed(1)}% methylated calls`));
           }
         }
       } catch (err) {
@@ -896,22 +974,23 @@ function CD55Browser() {
       style={{ fontFamily: "'Space Grotesk', system-ui, sans-serif" }}>
       <div className="max-w-6xl mx-auto">
 
-        <h1 className="text-xl font-semibold text-slate-100">Геномный браузер CD55 ROI</h1>
+        <h1 className="text-xl font-semibold text-slate-100">{t2(lang, "Геномный браузер CD55 ROI", "CD55 ROI genome browser")}</h1>
         <p className="text-xs text-slate-400 mb-4 leading-relaxed max-w-3xl">
-          6 500 п.н., 137 CpG. hg38 chr1:207,318,058–207,324,558 · T2Tv2 chr1:206,583,354–206,589,854.
-          Ось — расстояние от TSS (hg38 207,321,620). Тащите мышью, чтобы двигаться; кнопки ниже — масштаб.
+          {t2(lang,
+            "6 500 п.н., 137 CpG. hg38 chr1:207,318,058–207,324,558 · T2Tv2 chr1:206,583,354–206,589,854. Ось — расстояние от TSS (hg38 207,321,620). Тащите мышью, чтобы двигаться; кнопки ниже — масштаб.",
+            "6,500 bp, 137 CpGs. hg38 chr1:207,318,058–207,324,558 · T2Tv2 chr1:206,583,354–206,589,854. The axis is distance from the TSS (hg38 207,321,620). Drag to pan; the buttons below control zoom.")}
         </p>
 
         {/* navigation */}
         <div className="flex flex-wrap gap-2 items-center mb-3">
-          <button onClick={() => zoom(0.55)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">Приблизить</button>
-          <button onClick={() => zoom(1.8)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">Отдалить</button>
-          <button onClick={() => goto(ROI.lo, ROI.hi)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">Весь ROI</button>
-          <button onClick={() => goto(-1200, 400)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">Промотор</button>
-          <button onClick={() => goto(40, 170)} className="px-3 py-1.5 rounded border border-pink-600 text-xs text-pink-300">Сайты-мишени</button>
-          <button onClick={() => goto(30, 130)} className="px-3 py-1.5 rounded border border-orange-600 text-xs text-orange-300">Пик #78–83 → спейсер</button>
+          <button onClick={() => zoom(0.55)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">{t2(lang, "Приблизить", "Zoom in")}</button>
+          <button onClick={() => zoom(1.8)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">{t2(lang, "Отдалить", "Zoom out")}</button>
+          <button onClick={() => goto(ROI.lo, ROI.hi)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">{t2(lang, "Весь ROI", "Whole ROI")}</button>
+          <button onClick={() => goto(-1200, 400)} className="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300">{t2(lang, "Промотор", "Promoter")}</button>
+          <button onClick={() => goto(40, 170)} className="px-3 py-1.5 rounded border border-pink-600 text-xs text-pink-300">{t2(lang, "Сайты-мишени", "Target sites")}</button>
+          <button onClick={() => goto(30, 130)} className="px-3 py-1.5 rounded border border-orange-600 text-xs text-orange-300">{t2(lang, "Пик #78–83 → спейсер", "Peak #78–83 → spacer")}</button>
           <span className="text-xs text-slate-500 ml-1" style={{ fontFamily: "ui-monospace, monospace" }}>
-            {fmtRel(view.lo)} … {fmtRel(view.hi)} · {Math.round(span)} п.н. · chr1:{fmtHg38(view.lo)}–{fmtHg38(view.hi)} · CpG в окне: {cpgInView}
+            {fmtRel(view.lo)} … {fmtRel(view.hi)} · {Math.round(span)} {t2(lang, "п.н.", "bp")} · chr1:{fmtHg38(view.lo)}–{fmtHg38(view.hi)} · {t2(lang, "CpG в окне", "CpGs in view")}: {cpgInView}
           </span>
         </div>
 
@@ -965,7 +1044,7 @@ function CD55Browser() {
                       fill="#56B4E9" opacity="0.14" stroke="#56B4E9" strokeOpacity="0.5" />
                     <rect x={x(58)} y={row.y} width={Math.max(x(84) - x(58), 2)} height={28}
                       fill="#F0E442" opacity="0.30" stroke="#F0E442" strokeWidth="1.2" />
-                    {span < 2500 && <text x={x(71)} y={row.y - 2} fill="#F0E442" fontSize="9" textAnchor="middle">пик +58…+84</text>}
+                    {span < 2500 && <text x={x(71)} y={row.y - 2} fill="#F0E442" fontSize="9" textAnchor="middle">{t2(lang, "пик +58…+84", "peak +58…+84")}</text>}
                   </g>
                 );
 
@@ -1040,10 +1119,10 @@ function CD55Browser() {
                       {span < 2000 && (
                         <>
                           <text x={x(c.hi + 1 + cas9Pad) + 6} y={row.y + 14} fill="#E69F00" fontSize="9">
-                            dCas9 ≈ {c.hi - c.lo + 1 + 2 * cas9Pad} п.н. (оценка)
+                            dCas9 ≈ {c.hi - c.lo + 1 + 2 * cas9Pad} {t2(lang, "п.н. (оценка)", "bp (estimate)")}
                           </text>
                           <text x={x(z.hi + 1 + zfpPad) + 6} y={row.y + 36} fill="#CC79A7" fontSize="9">
-                            ZFP ≈ {z.hi - z.lo + 1 + 2 * zfpPad} п.н. (оценка)
+                            ZFP ≈ {z.hi - z.lo + 1 + 2 * zfpPad} {t2(lang, "п.н. (оценка)", "bp (estimate)")}
                           </text>
                         </>
                       )}
@@ -1056,46 +1135,46 @@ function CD55Browser() {
 
             {/* baseline */}
             <line x1={PAD_L} y1={H - 22} x2={PAD_L + plotW} y2={H - 22} stroke="#6E8079" strokeWidth="1.2" />
-            <text x={PAD_L - 8} y={H - 18} fill="#6E8079" fontSize="9.5" textAnchor="end">п.н. от TSS</text>
+            <text x={PAD_L - 8} y={H - 18} fill="#6E8079" fontSize="9.5" textAnchor="end">{t2(lang, "п.н. от TSS", "bp from TSS")}</text>
           </svg>
         </div>
 
         {/* ---- single molecules: these are tracks in the browser above ---- */}
         <div className="border border-slate-800 rounded-lg p-3 mt-3">
           <div className="flex flex-wrap items-center gap-3 mb-2">
-            <h2 className="text-sm font-semibold text-slate-200">Отдельные молекулы</h2>
+            <h2 className="text-sm font-semibold text-slate-200">{t2(lang, "Отдельные молекулы", "Individual molecules")}</h2>
             <label className="px-3 py-1.5 rounded bg-sky-300 text-slate-900 text-xs font-semibold cursor-pointer">
-              Открыть .npy
+              {t2(lang, "Открыть .npy", "Open .npy")}
               <input type="file" multiple accept=".npy" className="hidden"
                 onChange={(e) => { onNpy(e.target.files); e.target.value = ""; }} />
             </label>
             <select value={molSort} onChange={(e) => setMolSort(e.target.value)}
               className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200">
-              <option value="file">порядок как в файле</option>
-              <option value="meth">сортировать по числу метилированных CpG</option>
-              <option value="strand">сгруппировать FWD / RVS</option>
+              <option value="file">{t2(lang, "порядок как в файле", "order as in file")}</option>
+              <option value="meth">{t2(lang, "сортировать по числу метилированных CpG", "sort by number of methylated CpGs")}</option>
+              <option value="strand">{t2(lang, "сгруппировать FWD / RVS", "group by FWD / RVS")}</option>
             </select>
             <label className="text-xs text-slate-400 flex items-center gap-1.5">
-              строк на экран
+              {t2(lang, "строк на экран", "rows on screen")}
               <input type="range" min="10" max="120" step="10" value={molRows}
                 onChange={(e) => setMolRows(+e.target.value)} />{molRows}
             </label>
             <label className="text-xs text-slate-400 flex items-center gap-1.5">
-              высота строки
+              {t2(lang, "высота строки", "row height")}
               <input type="range" min="1" max="6" value={rowH} onChange={(e) => setRowH(+e.target.value)} />{rowH}px
             </label>
             <select value={molColor} onChange={(e) => setMolColor(e.target.value)}
               className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200">
-              <option value="series">цвет по образцу</option>
-              <option value="strand">цвет по цепи FWD / RVS</option>
-              <option value="mono">без цвета</option>
+              <option value="series">{t2(lang, "цвет по образцу", "colour by sample")}</option>
+              <option value="strand">{t2(lang, "цвет по цепи FWD / RVS", "colour by strand FWD / RVS")}</option>
+              <option value="mono">{t2(lang, "без цвета", "no colour")}</option>
             </select>
           </div>
 
           <p className="text-xs text-slate-500 mb-2 leading-relaxed">
-            Каждый выбранный набор становится треком в самом браузере, сразу под своим профилем и на той же
-            оси — штрих стоит ровно под своим CpG и едет вместе с ним при зуме. Листать страницы молекул можно
-            стрелками ▲▼ слева от трека.
+            {t2(lang,
+              "Каждый выбранный набор становится треком в самом браузере, сразу под своим профилем и на той же оси — штрих стоит ровно под своим CpG и едет вместе с ним при зуме. Листать страницы молекул можно стрелками ▲▼ слева от трека.",
+              "Each dataset you select becomes a track inside the browser itself, right under its own profile and on the same axis — a mark sits exactly under its own CpG and moves with it under zoom. Page through molecules with the ▲▼ arrows to the left of the track.")}
           </p>
 
           <div className="flex flex-wrap gap-1.5 mb-2">
@@ -1103,8 +1182,9 @@ function CD55Browser() {
               <button key={t.id} onClick={() => setMolOpen({ ...molOpen, [t.id]: !molOpen[t.id] })}
                 className={`px-2.5 py-1 rounded text-xs border ${molOpen[t.id]
                   ? "border-sky-500 text-sky-200 bg-sky-950" : "border-slate-800 text-slate-500"}`}>
-                {t.l1} · {t.l2} · {molData[t.id].isSample
-                  ? `${molData[t.id].nRows} из ${molData[t.id].nTotal}` : `все ${molData[t.id].nRows}`}
+                {trTrack(t, "l1", lang)} · {trTrack(t, "l2", lang)} · {molData[t.id].isSample
+                  ? t2(lang, `${molData[t.id].nRows} из ${molData[t.id].nTotal}`, `${molData[t.id].nRows} of ${molData[t.id].nTotal}`)
+                  : t2(lang, `все ${molData[t.id].nRows}`, `all ${molData[t.id].nRows}`)}
               </button>
             ))}
           </div>
@@ -1112,20 +1192,19 @@ function CD55Browser() {
           {molMsg && <p className="text-[11px] text-slate-400 mb-2 leading-relaxed">{molMsg}</p>}
 
           <p className="text-[11px] text-slate-500 leading-relaxed">
-            Штрих = вызов «метилирован». Пустое место означает и «не метилирован», и «нет покрытия» — в этих
-            матрицах нулей нет, только 1 и NaN, поэтому на уровне молекулы эти два случая не различимы.
-            Наборы крупнее 220 молекул показаны случайной выборкой; чтобы увидеть все прочтения, откройте .npy.
-            Деление FWD/RVS взято из имени файла в предположении, что сначала идут все прямые прочтения.
+            {t2(lang,
+              "Штрих = вызов «метилирован». Пустое место означает и «не метилирован», и «нет покрытия» — в этих матрицах нулей нет, только 1 и NaN, поэтому на уровне молекулы эти два случая не различимы. Наборы крупнее 220 молекул показаны случайной выборкой; чтобы увидеть все прочтения, откройте .npy. Деление FWD/RVS взято из имени файла в предположении, что сначала идут все прямые прочтения.",
+              "A mark = a \u201cmethylated\u201d call. Empty space means both \u201cunmethylated\u201d and \u201cno coverage\u201d \u2014 these matrices have no zeros, only 1 and NaN, so at the single-molecule level the two cases can\u2019t be told apart. Datasets larger than 220 molecules are shown as a random sample; open the .npy to see every read. The FWD/RVS split comes from the file name on the assumption that all forward reads are listed first.")}
           </p>
         </div>
 
         {/* ---- series legend ---- */}
         <div className="border border-slate-800 rounded-lg p-3 mt-3">
-          <h2 className="text-sm font-semibold text-slate-200 mb-1">Как читать цвет</h2>
+          <h2 className="text-sm font-semibold text-slate-200 mb-1">{t2(lang, "Как читать цвет", "How to read the colour")}</h2>
           <p className="text-xs text-slate-500 mb-3 leading-relaxed">
-            Тон говорит, что сделали с клетками; оттенок внутри тона — какой это день или какая фракция.
-            Оттенок сам по себе плохо различим при нарушениях цветовосприятия, поэтому у каждого трека
-            слева стоит ещё и значок семейства, а подпись называет образец словами.
+            {t2(lang,
+              "Тон говорит, что сделали с клетками; оттенок внутри тона — какой это день или какая фракция. Оттенок сам по себе плохо различим при нарушениях цветовосприятия, поэтому у каждого трека слева стоит ещё и значок семейства, а подпись называет образец словами.",
+              "Hue says what was done to the cells; the shade within a hue says which day or fraction. Shade alone is a weak cue for colour-vision deficiency, so every track also carries a family glyph on the left, and the label names the sample in words.")}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {["unedited", "crisproff", "zfpoff"].map((fam) => (
@@ -1134,14 +1213,14 @@ function CD55Browser() {
                   <svg width="16" height="16" viewBox="0 0 16 16">
                     {glyph(FAMILY[fam].glyph, 8, 8, FAMILY[fam].color, 6)}
                   </svg>
-                  <span className="text-xs text-slate-200">{FAMILY[fam].label}</span>
+                  <span className="text-xs text-slate-200">{FAMILY[fam].label[lang]}</span>
                 </div>
                 <div className="flex flex-col gap-1 pl-1">
                   {DATA_TRACKS.filter((t) => seriesOf(t.id).fam === fam && t.kind !== "delta").map((t) => (
                     <span key={t.id} className="flex items-center gap-2 text-[11px] text-slate-500">
                       <i style={{ background: seriesOf(t.id).color, width: 16, height: 9, borderRadius: 2,
                                   display: "inline-block", flex: "0 0 auto" }} />
-                      {t.l1} · {t.l2}
+                      {trTrack(t, "l1", lang)} · {trTrack(t, "l2", lang)}
                     </span>
                   ))}
                 </div>
@@ -1153,11 +1232,12 @@ function CD55Browser() {
                   <rect x="2" y="4" width="5" height="8" fill="#A9B8B0" />
                   <rect x="9" y="4" width="5" height="8" fill="none" stroke="#A9B8B0" strokeWidth="1.2" strokeDasharray="2 1.5" />
                 </svg>
-                <span className="text-xs text-slate-200">знак значения</span>
+                <span className="text-xs text-slate-200">{t2(lang, "знак значения", "sign of the value")}</span>
               </div>
               <p className="text-[11px] text-slate-500 leading-snug pl-1">
-                Залитый столбик — положительное значение, контурный пунктирный — отрицательное.
-                Знак не меняет тон, поэтому по цвету всегда видно, о каком образце идёт речь.
+                {t2(lang,
+                  "Залитый столбик — положительное значение, контурный пунктирный — отрицательное. Знак не меняет тон, поэтому по цвету всегда видно, о каком образце идёт речь.",
+                  "A filled bar is a positive value, a dashed outline is negative. The sign never changes the hue, so the colour always tells you which sample you\u2019re looking at.")}
               </p>
             </div>
           </div>
@@ -1167,17 +1247,17 @@ function CD55Browser() {
         {featureOn.footprint && (
           <div className="mt-3 border border-slate-800 rounded-lg p-3">
             <p className="text-xs text-slate-400 mb-2 leading-relaxed">
-              Ширина следа — <span className="text-slate-200">не измеренная величина</span>. Stepper 2017 измерял
-              dCas9-Dnmt3a3L на других промоторах; перенос геометрии на CD55 — аналогия. Подберите значение под
-              то, что собираетесь утверждать.
+              {t2(lang, "Ширина следа —", "Footprint width —")} <span className="text-slate-200">{t2(lang, "не измеренная величина", "not a measured quantity")}</span>{t2(lang,
+                ". Stepper 2017 измерял dCas9-Dnmt3a3L на других промоторах; перенос геометрии на CD55 — аналогия. Подберите значение под то, что собираетесь утверждать.",
+                ". Stepper 2017 measured dCas9-Dnmt3a3L on other promoters; carrying that geometry over to CD55 is an analogy. Set the value to match what you intend to claim.")}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className="text-xs text-slate-300 block">
-                dCas9 + KRAB + DNMT, поля по краям: <span className="text-pink-400">{cas9Pad} п.н.</span> → всего {112 - 93 + 1 + 2 * cas9Pad} п.н.
+                {t2(lang, "dCas9 + KRAB + DNMT, поля по краям", "dCas9 + KRAB + DNMT, edge padding")}: <span className="text-pink-400">{cas9Pad} {t2(lang, "п.н.", "bp")}</span> → {t2(lang, "всего", "total")} {112 - 93 + 1 + 2 * cas9Pad} {t2(lang, "п.н.", "bp")}
                 <input type="range" min="0" max="80" value={cas9Pad} onChange={(e) => setCas9Pad(+e.target.value)} className="w-full mt-1" />
               </label>
               <label className="text-xs text-slate-300 block">
-                ZFP + KRAB + DNMT, поля по краям: <span className="text-purple-400">{zfpPad} п.н.</span> → всего {106 - 87 + 1 + 2 * zfpPad} п.н.
+                {t2(lang, "ZFP + KRAB + DNMT, поля по краям", "ZFP + KRAB + DNMT, edge padding")}: <span className="text-purple-400">{zfpPad} {t2(lang, "п.н.", "bp")}</span> → {t2(lang, "всего", "total")} {106 - 87 + 1 + 2 * zfpPad} {t2(lang, "п.н.", "bp")}
                 <input type="range" min="0" max="80" value={zfpPad} onChange={(e) => setZfpPad(+e.target.value)} className="w-full mt-1" />
               </label>
             </div>
@@ -1187,17 +1267,18 @@ function CD55Browser() {
         {/* geometry summary */}
         <div className="mt-3 border border-slate-800 rounded-lg p-3 text-xs leading-relaxed text-slate-300">
           <p className="mb-1">
-            ZFPoff <span className="text-purple-400">+87…+106</span> и CRISPRoff <span className="text-pink-400">+93…+112</span> перекрываются
-            на 14 п.н. — общий фрагмент <span style={{ fontFamily: "ui-monospace, monospace" }}>{OVERLAP.seq}</span> (+93…+106).
+            ZFPoff <span className="text-purple-400">+87…+106</span> {t2(lang, "и", "and")} CRISPRoff <span className="text-pink-400">+93…+112</span> {t2(lang, "перекрываются на", "overlap by")} 14 {t2(lang, "п.н.", "bp")} — {t2(lang, "общий фрагмент", "shared fragment")} <span style={{ fontFamily: "ui-monospace, monospace" }}>{OVERLAP.seq}</span> (+93…+106).
           </p>
           <p className="mb-1 text-slate-300">
-            Четыре CpG попадают на протоспейсер и PAM: <span className="text-slate-100">№74 (+97), №75 (+102), №76 (+105), №77 (+113)</span>.
-            Именно на них прирост метилирования проваливается, тогда как соседи слева и справа набирают +50…+85 п.п.
+            {t2(lang, "Четыре CpG попадают на протоспейсер и PAM", "Four CpGs fall on the protospacer and PAM")}: <span className="text-slate-100">{t2(lang, "№", "#")}74 (+97), {t2(lang, "№", "#")}75 (+102), {t2(lang, "№", "#")}76 (+105), {t2(lang, "№", "#")}77 (+113)</span>.
+            {t2(lang,
+              "Именно на них прирост метилирования проваливается, тогда как соседи слева и справа набирают +50…+85 п.п.",
+              "That is exactly where the methylation gain dips, while neighbours on both sides pick up +50…+85 pp.")}
           </p>
           <table className="w-full text-[11px] mt-2">
             <thead><tr className="text-slate-500 text-left">
-              <th className="font-normal py-0.5">набор</th><th className="font-normal">Δ на +93…+115</th>
-              <th className="font-normal">Δ во фланге ±90 п.н.</th><th className="font-normal">отношение</th></tr></thead>
+              <th className="font-normal py-0.5">{t2(lang, "набор", "dataset")}</th><th className="font-normal">Δ {t2(lang, "на", "at")} +93…+115</th>
+              <th className="font-normal">Δ {t2(lang, "во фланге", "in flank")} ±90 {t2(lang, "п.н.", "bp")}</th><th className="font-normal">{t2(lang, "отношение", "ratio")}</th></tr></thead>
             <tbody className="text-slate-300">
               <tr><td className="py-0.5">Day 35 CRISPRoff</td><td>21,7</td><td>63,8</td><td className="text-amber-400">0,34</td></tr>
               <tr><td className="py-0.5">Day 6 CRISPRoff</td><td>10,1</td><td>46,0</td><td className="text-amber-400">0,22</td></tr>
@@ -1205,9 +1286,9 @@ function CD55Browser() {
             </tbody>
           </table>
           <p className="text-slate-500 mt-2">
-            Главная альтернатива, которую эти матрицы исключить не могут: в них нет нулей, только 1 и NaN,
-            поэтому падение доли единиц на четырёх CpG в равной мере объясняется просадкой покрытия.
-            Развести это можно только матрицей с раздельным кодированием «не метилирован» и «нет покрытия».
+            {t2(lang,
+              "Главная альтернатива, которую эти матрицы исключить не могут: в них нет нулей, только 1 и NaN, поэтому падение доли единиц на четырёх CpG в равной мере объясняется просадкой покрытия. Развести это можно только матрицей с раздельным кодированием «не метилирован» и «нет покрытия».",
+              "The main alternative these matrices cannot rule out: they have no zeros, only 1 and NaN, so the drop in the fraction of ones at the four CpGs is equally explained by a drop in coverage. Only a matrix with separate encoding for \u201cunmethylated\u201d and \u201cno coverage\u201d could tell the two apart.")}
           </p>
         </div>
 
@@ -1219,30 +1300,32 @@ function CD55Browser() {
             {selInfo.seq && (
               <p className="mb-1 text-slate-300" style={{ fontFamily: "ui-monospace, monospace" }}>{selInfo.seq}</p>
             )}
-            {selInfo.hg38 && <p className="text-slate-400">hg38 {selInfo.hg38} · T2T {selInfo.t2t} · {fmtRel(selInfo.lo)}…{fmtRel(selInfo.hi)} от TSS</p>}
+            {selInfo.hg38 && <p className="text-slate-400">hg38 {selInfo.hg38} · T2T {selInfo.t2t} · {fmtRel(selInfo.lo)}…{fmtRel(selInfo.hi)} {t2(lang, "от TSS", "from TSS")}</p>}
             {selInfo.pos !== undefined && (
               <p className="text-slate-400">
-                {fmtRel(selInfo.pos)} п.н. от TSS · chr1:{fmtHg38(selInfo.pos)} ·
-                {" "}{selInfo.exp === 0 ? "нет экспериментов ENCODE в K562" : `${selInfo.exp} экспериментов ENCODE в K562`}
-                {selInfo.cpg ? ` · перекрывает ${selInfo.cpg}` : ""}
+                {fmtRel(selInfo.pos)} {t2(lang, "п.н. от TSS", "bp from TSS")} · chr1:{fmtHg38(selInfo.pos)} ·
+                {" "}{selInfo.exp === 0
+                  ? t2(lang, "нет экспериментов ENCODE в K562", "no ENCODE experiments in K562")
+                  : t2(lang, `${selInfo.exp} экспериментов ENCODE в K562`, `${selInfo.exp} ENCODE experiments in K562`)}
+                {selInfo.cpg ? ` · ${t2(lang, "перекрывает", "overlaps")} ${selInfo.cpg}` : ""}
               </p>
             )}
-            {selInfo.src && <p className="text-slate-500 mt-1">Источник: {selInfo.src}</p>}
+            {selInfo.src && <p className="text-slate-500 mt-1">{t2(lang, "Источник", "Source")}: {typeof selInfo.src === "object" ? selInfo.src[lang] || selInfo.src.ru : selInfo.src}</p>}
           </div>
         )}
 
         {/* ---- track manager ---- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
           <div className="border border-slate-800 rounded-lg p-3">
-            <h2 className="text-sm font-semibold text-slate-200 mb-2">Треки</h2>
+            <h2 className="text-sm font-semibold text-slate-200 mb-2">{t2(lang, "Треки", "Tracks")}</h2>
 
-            <p className="text-xs text-slate-500 mb-1">Аннотация</p>
+            <p className="text-xs text-slate-500 mb-1">{t2(lang, "Аннотация", "Annotation")}</p>
             <div className="flex flex-wrap gap-1.5 mb-3">
               {FEATURE_TRACKS.map((f) => (
                 <button key={f.id} onClick={() => setFeatureOn({ ...featureOn, [f.id]: !featureOn[f.id] })}
                   className={`px-2.5 py-1 rounded text-xs border ${featureOn[f.id]
                     ? "border-sky-500 text-sky-200 bg-sky-950" : "border-slate-800 text-slate-600"}`}>
-                  {f.name}
+                  {f.name[lang]}
                 </button>
               ))}
             </div>
@@ -1255,7 +1338,7 @@ function CD55Browser() {
                 <div key={g} className="mb-2">
                   <button onClick={() => setOpenGroups({ ...openGroups, [g]: !open })}
                     className="w-full flex items-center justify-between text-xs text-slate-300 py-1">
-                    <span>{open ? "▾" : "▸"} {g}</span>
+                    <span>{open ? "▾" : "▸"} {trGroup(g, lang)}</span>
                     <span className="text-slate-600">{nOn}/{items.length}</span>
                   </button>
                   {open && (
@@ -1267,12 +1350,12 @@ function CD55Browser() {
                             <input type="checkbox" checked={!!dataOn[t.id]} className="mt-0.5"
                               onChange={() => setDataOn({ ...dataOn, [t.id]: !dataOn[t.id] })} />
                             <span>
-                              <span className={has ? "text-slate-200" : "text-slate-400"}>{t.name}</span>
+                              <span className={has ? "text-slate-200" : "text-slate-400"}>{trTrack(t, "name", lang)}</span>
                               <span className={`ml-1.5 px-1 rounded text-[10px] border ${has
                                 ? "border-emerald-700 text-emerald-400" : "border-slate-700 text-slate-600"}`}>
-                                {has ? `${trackData[t.id].length} точек` : "пусто"}
+                                {has ? t2(lang, `${trackData[t.id].length} точек`, `${trackData[t.id].length} points`) : t2(lang, "пусто", "empty")}
                               </span>
-                              {t.note && <span className="block text-slate-600 text-[11px] leading-snug">{t.note}</span>}
+                              {trTrack(t, "note", lang) && <span className="block text-slate-600 text-[11px] leading-snug">{trTrack(t, "note", lang)}</span>}
                             </span>
                           </label>
                         );
@@ -1285,7 +1368,7 @@ function CD55Browser() {
           </div>
 
           <div className="border border-slate-800 rounded-lg p-3">
-            <h2 className="text-sm font-semibold text-slate-200 mb-2">Факторы</h2>
+            <h2 className="text-sm font-semibold text-slate-200 mb-2">{t2(lang, "Факторы", "Factors")}</h2>
             <div className="flex flex-wrap gap-1.5 mb-2">
               {TFS.map((t) => {
                 const c = CATS[t.cat];
@@ -1301,49 +1384,50 @@ function CD55Browser() {
             </div>
             <div className="flex gap-2 mb-3">
               <button onClick={() => setTfOn(Object.fromEntries(TFS.map((t) => [t.id, true])))}
-                className="px-2 py-1 rounded border border-slate-700 text-xs text-slate-400">Все</button>
+                className="px-2 py-1 rounded border border-slate-700 text-xs text-slate-400">{t2(lang, "Все", "All")}</button>
               <button onClick={() => setTfOn(Object.fromEntries(TFS.map((t) => [t.id, false])))}
-                className="px-2 py-1 rounded border border-slate-700 text-xs text-slate-400">Ни одного</button>
+                className="px-2 py-1 rounded border border-slate-700 text-xs text-slate-400">{t2(lang, "Ни одного", "None")}</button>
               <button onClick={() => setTfOn(Object.fromEntries(TFS.map((t) => [t.id, t.cat === "meth"])))}
-                className="px-2 py-1 rounded border border-orange-700 text-xs text-orange-300">Только метилчувствительные</button>
+                className="px-2 py-1 rounded border border-orange-700 text-xs text-orange-300">{t2(lang, "Только метилчувствительные", "Methylation-sensitive only")}</button>
             </div>
             <div className="flex flex-wrap gap-x-3 gap-y-1 mb-3">
               {Object.entries(CATS).map(([k, c]) => (
                 <span key={k} className="flex items-center gap-1.5 text-[11px] text-slate-500">
-                  <svg width="14" height="14" viewBox="0 0 14 14">{glyph(c.glyph, 7, 7, c.color, 5)}</svg>{c.label}
+                  <svg width="14" height="14" viewBox="0 0 14 14">{glyph(c.glyph, 7, 7, c.color, 5)}</svg>{c.label[lang]}
                 </span>
               ))}
             </div>
             <p className="text-[11px] text-slate-500 leading-snug">
-              Проверены и не найдены в этом окне: {NOT_FOUND.join(", ")}. Отсутствие пика не опровергает связывание —
-              ChIP-seq ограничен по чувствительности.
+              {t2(lang, "Проверены и не найдены в этом окне", "Checked and not found in this window")}: {NOT_FOUND.join(", ")}. {t2(lang,
+                "Отсутствие пика не опровергает связывание — ChIP-seq ограничен по чувствительности.",
+                "The absence of a peak does not disprove binding — ChIP-seq is sensitivity-limited.")}
             </p>
           </div>
         </div>
 
         {/* ---- data loader ---- */}
         <div className="border border-slate-800 rounded-lg p-3 mt-4">
-          <h2 className="text-sm font-semibold text-slate-200 mb-1">Загрузить значения в трек</h2>
+          <h2 className="text-sm font-semibold text-slate-200 mb-1">{t2(lang, "Загрузить значения в трек", "Load values into a track")}</h2>
           <p className="text-xs text-slate-500 mb-3 leading-relaxed">
-            Две числовые колонки в строке: координата и значение. Разделитель — запятая, таб или пробел.
-            Заголовки и нечисловые строки пропускаются. Для Δ-треков подавайте разность в процентных пунктах
-            со знаком; для уровней — процент метилирования.
+            {t2(lang,
+              "Две числовые колонки в строке: координата и значение. Разделитель — запятая, таб или пробел. Заголовки и нечисловые строки пропускаются. Для Δ-треков подавайте разность в процентных пунктах со знаком; для уровней — процент метилирования.",
+              "Two numeric columns per line: coordinate and value. The separator is a comma, tab, or space. Headers and non-numeric lines are skipped. For Δ tracks, give the signed difference in percentage points; for levels, the methylation percentage.")}
           </p>
           <div className="flex flex-wrap gap-2 mb-2">
             <select value={loadTarget} onChange={(e) => setLoadTarget(e.target.value)}
               className="bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-xs text-slate-200">
               {GROUPS.map((g) => (
-                <optgroup key={g} label={g}>
-                  {DATA_TRACKS.filter((t) => t.group === g).map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                <optgroup key={g} label={trGroup(g, lang)}>
+                  {DATA_TRACKS.filter((t) => t.group === g).map((t) => <option key={t.id} value={t.id}>{trTrack(t, "name", lang)}</option>)}
                 </optgroup>
               ))}
             </select>
             <select value={coordSys} onChange={(e) => setCoordSys(e.target.value)}
               className="bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-xs text-slate-200">
-              <option value="rel">координата = п.н. от TSS</option>
-              <option value="hg38">координата = hg38 абсолютная</option>
-              <option value="t2t">координата = T2Tv2 абсолютная</option>
-              <option value="cpg">координата = индекс CpG 1–137 (нумерация из последовательности)</option>
+              <option value="rel">{t2(lang, "координата = п.н. от TSS", "coordinate = bp from TSS")}</option>
+              <option value="hg38">{t2(lang, "координата = hg38 абсолютная", "coordinate = hg38 absolute")}</option>
+              <option value="t2t">{t2(lang, "координата = T2Tv2 абсолютная", "coordinate = T2Tv2 absolute")}</option>
+              <option value="cpg">{t2(lang, "координата = индекс CpG 1–137 (нумерация из последовательности)", "coordinate = CpG index 1–137 (numbered from sequence)")}</option>
             </select>
           </div>
           <textarea value={paste} onChange={(e) => setPaste(e.target.value)} rows={4}
@@ -1352,18 +1436,18 @@ function CD55Browser() {
             style={{ fontFamily: "ui-monospace, monospace" }} />
           <div className="flex flex-wrap items-center gap-2 mt-2">
             <button onClick={loadData} className="px-3 py-1.5 rounded bg-sky-300 text-slate-900 text-xs font-semibold">
-              В выбранный трек
+              {t2(lang, "В выбранный трек", "Into the selected track")}
             </button>
             <button onClick={loadCpgs} className="px-3 py-1.5 rounded border border-slate-600 text-slate-300 text-xs">
-              Это координаты CpG (индекс, координата)
+              {t2(lang, "Это координаты CpG (индекс, координата)", "These are CpG coordinates (index, coordinate)")}
             </button>
             {cpgLoaded && (
-              <button onClick={() => { setCpgs(CPGS); setCpgLoaded(false); setMsg("Возвращены позиции из последовательности."); }}
-                className="px-3 py-1.5 rounded border border-slate-700 text-slate-500 text-xs">Вернуть интерполяцию</button>
+              <button onClick={() => { setCpgs(CPGS); setCpgLoaded(false); setMsg(t2(lang, "Возвращены позиции из последовательности.", "Reverted to positions from the sequence.")); }}
+                className="px-3 py-1.5 rounded border border-slate-700 text-slate-500 text-xs">{t2(lang, "Вернуть интерполяцию", "Revert to interpolation")}</button>
             )}
             {Object.keys(trackData).length > 0 && (
-              <button onClick={() => { setTrackData({}); setMsg("Все треки очищены, включая предзагруженные."); }}
-                className="px-3 py-1.5 rounded border border-slate-700 text-slate-500 text-xs">Очистить все треки</button>
+              <button onClick={() => { setTrackData({}); setMsg(t2(lang, "Все треки очищены, включая предзагруженные.", "All tracks cleared, including preloaded ones.")); }}
+                className="px-3 py-1.5 rounded border border-slate-700 text-slate-500 text-xs">{t2(lang, "Очистить все треки", "Clear all tracks")}</button>
             )}
             {msg && <span className="text-xs text-slate-400">{msg}</span>}
           </div>
@@ -1371,18 +1455,37 @@ function CD55Browser() {
 
         {/* provenance */}
         <div className="border border-amber-900 rounded-lg p-3 mt-4 text-[11px] text-slate-400 leading-relaxed">
-          <p className="text-amber-500 font-semibold mb-1 text-xs">Что здесь измерено, а что нет</p>
-          <p className="mb-1"><span className="text-slate-200">Измерено:</span> TSS, обе последовательности-мишени и их координаты, позиции TF и счётчики ENCODE, сайты KLF4, границы блока #20–132 и пика #78–83.</p>
-          <p className="mb-1"><span className="text-slate-200">Проверено по последовательности:</span> в 6 500 п.н. ровно 137 CG; CpG №1 = 207 318 092 и CpG №137 = 207 324 450 — в точности границы координатного окна K562. Обе мишени найдены по заявленным координатам. PAM = CGG, плюс-цепь. Ширина следа комплекса — по-прежнему регулируемая оценка, не измерение.</p>
-          <p className="mb-1"><span className="text-amber-400">Расхождение:</span> подписи индексов CpG в прежних заметках не сходятся с последовательностью. Пик +58…+84 — это CpG №70–72, а не №78–83; сдвиг плавает (−1 … −11) вдоль локуса. Координаты пика при этом верны, и разрыв 9 п.н. до протоспейсера сохраняется. Разрешить может только координатный CSV.</p>
-          <p className="mb-1"><span className="text-slate-200">Терминология:</span> контрольные образцы без редактирования везде называются <span className="text-slate-100">unedited</span>. В именах исходных файлов Day 35 они помечены как NT (not treated) — это то же самое, отдельного типа контроля нет.</p><p><span className="text-slate-200">Пусто:</span> треки порога 0.995, ZFPoff в T-клетках, ATAC и DNase — соответствующих файлов не поступало. Базовая линия unedited в ONT завышена фильтром NoFullyUnmeth (19,7 % против 4,9 % по EM-seq); NaN в матрицах не различает отсутствие покрытия и неметилированность; кроссволк координат EM-seq ↔ ONT не решён.</p>
+          <p className="text-amber-500 font-semibold mb-1 text-xs">{t2(lang, "Что здесь измерено, а что нет", "What is measured here, and what is not")}</p>
+          <p className="mb-1"><span className="text-slate-200">{t2(lang, "Измерено", "Measured")}:</span> {t2(lang,
+            "TSS, обе последовательности-мишени и их координаты, позиции TF и счётчики ENCODE, сайты KLF4, границы блока #20–132 и пика #78–83.",
+            "the TSS, both target sequences and their coordinates, TF positions and ENCODE experiment counts, the KLF4 sites, and the boundaries of the #20–132 block and the #78–83 peak.")}</p>
+          <p className="mb-1"><span className="text-slate-200">{t2(lang, "Проверено по последовательности", "Verified against the sequence")}:</span> {t2(lang,
+            "в 6 500 п.н. ровно 137 CG; CpG №1 = 207 318 092 и CpG №137 = 207 324 450 — в точности границы координатного окна K562. Обе мишени найдены по заявленным координатам. PAM = CGG, плюс-цепь. Ширина следа комплекса — по-прежнему регулируемая оценка, не измерение.",
+            "the 6,500 bp contain exactly 137 CGs; CpG #1 = 207,318,092 and CpG #137 = 207,324,450 — precisely the bounds of the K562 coordinate window. Both targets were found at their stated coordinates. PAM = CGG, plus strand. The complex footprint width is still an adjustable estimate, not a measurement.")}</p>
+          <p className="mb-1"><span className="text-amber-400">{t2(lang, "Расхождение", "Discrepancy")}:</span> {t2(lang,
+            "подписи индексов CpG в прежних заметках не сходятся с последовательностью. Пик +58…+84 — это CpG №70–72, а не №78–83; сдвиг плавает (−1 … −11) вдоль локуса. Координаты пика при этом верны, и разрыв 9 п.н. до протоспейсера сохраняется. Разрешить может только координатный CSV.",
+            "the CpG index labels in the earlier notes do not match the sequence. The +58…+84 peak is CpG #70–72, not #78–83; the shift drifts (−1 … −11) along the locus. The peak coordinates themselves are correct, and the 9 bp gap to the protospacer holds. Only the coordinate CSV can settle it for good.")}</p>
+          <p className="mb-1"><span className="text-slate-200">{t2(lang, "Терминология", "Terminology")}:</span> {t2(lang,
+            "контрольные образцы без редактирования везде называются",
+            "unedited control samples are called")} <span className="text-slate-100">unedited</span> {t2(lang,
+            "везде. В именах исходных файлов Day 35 они помечены как NT (not treated) — это то же самое, отдельного типа контроля нет.",
+            "everywhere. In the raw Day 35 file names they are labelled NT (not treated) — that is the same thing, there is no separate control type.")}</p>
+          <p><span className="text-slate-200">{t2(lang, "Пусто", "Empty")}:</span> {t2(lang,
+            "треки порога 0.995, ZFPoff в T-клетках, ATAC и DNase — соответствующих файлов не поступало. Базовая линия unedited в ONT завышена фильтром NoFullyUnmeth (19,7 % против 4,9 % по EM-seq); NaN в матрицах не различает отсутствие покрытия и неметилированность; кроссволк координат EM-seq ↔ ONT не решён.",
+            "the 0.995-threshold tracks, T-cell ZFPoff, ATAC, and DNase — no matching files have come in. The unedited baseline in ONT is inflated by the NoFullyUnmeth filter (19.7% vs 4.9% by EM-seq); NaN in the matrices does not distinguish no-coverage from unmethylated; the EM-seq ↔ ONT coordinate crosswalk is unresolved.")}</p>
         </div>
       </div>
     </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById("browser-root")).render(React.createElement(CD55Browser));
+const __browserRoot = ReactDOM.createRoot(document.getElementById("browser-root"));
+function __renderBrowser() {
+  const lang = document.documentElement.getAttribute("lang") === "en" ? "en" : "ru";
+  __browserRoot.render(React.createElement(CD55Browser, { lang }));
+}
+__renderBrowser();
+window.addEventListener("epicme:lang", __renderBrowser);
 
 </script>
 
