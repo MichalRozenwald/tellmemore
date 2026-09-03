@@ -24,6 +24,14 @@
   .lang button[aria-pressed="true"]{background:var(--berkeley);color:#fff}
   .stage{margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:6px;
     overflow:hidden;box-shadow:0 1px 3px rgba(0,50,98,.06)}
+  .stage:fullscreen{margin:0;border:0;border-radius:0;background:#0B0F14;
+    display:flex;flex-direction:column;justify-content:center;}
+  .stage:-webkit-full-screen{margin:0;border:0;border-radius:0;background:#0B0F14;
+    display:flex;flex-direction:column;justify-content:center;}
+  .stage:fullscreen canvas{max-height:84vh;width:auto;max-width:100%;margin:auto;}
+  .stage:-webkit-full-screen canvas{max-height:84vh;width:auto;max-width:100%;margin:auto;}
+  .stage:fullscreen .bar,.stage:-webkit-full-screen .bar{background:#12181f;border-color:#232b34;}
+  .stage:fullscreen .bar .tc,.stage:-webkit-full-screen .bar .tc{color:#9fb0c0;}
   canvas{display:block;width:100%;background:#F7F5F0}
   .bar{display:flex;align-items:center;gap:12px;padding:12px 14px;flex-wrap:wrap;
     border-top:1px solid var(--line)}
@@ -35,6 +43,11 @@
     cursor:pointer;min-width:170px}
   .fill{position:absolute;inset:0 auto 0 0;width:0;border-radius:99px;background:var(--berkeley)}
   .tc{font-size:13px;color:var(--faint);font-variant-numeric:tabular-nums;min-width:82px}
+  .zoom{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .zoom input[type=range]{width:150px;accent-color:var(--berkeley);cursor:pointer;}
+  #zoombar{padding-top:8px;}
+  #speedbar{padding-top:8px;}
+  .spd[aria-pressed="true"]{background:var(--berkeley);color:#fff;border-color:var(--berkeley);}
   .chapters{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
   .chapters button{border:1px solid var(--line);background:#fff;color:var(--dim);cursor:pointer;
     font:600 12.5px/1 inherit;padding:8px 11px;border-radius:4px}
@@ -64,12 +77,35 @@
   </div>
 
   <div class="stage">
-    <canvas id="mv" width="1600" height="900" aria-label="CRISPRoff methylation process"></canvas>
+    <canvas id="mv" width="1600" height="900" tabindex="0" aria-label="CRISPRoff methylation process"></canvas>
     <div class="bar">
+      <button class="ctl" id="back10" aria-label="-10s" title="-10s">⏪</button>
       <button class="ctl primary" id="play" data-i18n="play">▶ Смотреть</button>
+      <button class="ctl" id="fwd10" aria-label="+10s" title="+10s">⏩</button>
       <div class="track" id="tr"><div class="fill" id="fl"></div></div>
       <span class="tc" id="tc">0:00 / 0:24</span>
+      <button class="ctl" id="voice" aria-pressed="false" data-i18n="voiceoff">🔊 Озвучка</button>
+      <button class="ctl" id="fs" data-i18n="fsenter">⛶ На весь экран</button>
       <button class="ctl" id="save" data-i18n="save">↓ Кадр в PNG</button>
+    </div>
+    <div class="bar" id="zoombar">
+      <div class="zoom">
+        <button class="ctl" id="zout" aria-label="Zoom out">−</button>
+        <input id="zsl" type="range" min="0" max="100" value="0" aria-label="Zoom">
+        <button class="ctl" id="zin" aria-label="Zoom in">+</button>
+        <span class="tc" id="zlabel">×1.0</span>
+        <button class="ctl" id="zreset" data-i18n="zreset">⇺ Сброс</button>
+      </div>
+    </div>
+    <div class="bar" id="speedbar">
+      <div class="zoom" role="group" aria-label="Playback speed">
+        <span class="tc" id="speedlabel" data-i18n="speedlabel">Скорость:</span>
+        <button class="ctl spd" data-spd="0.5">0.5×</button>
+        <button class="ctl spd" data-spd="0.75">0.75×</button>
+        <button class="ctl spd primary" data-spd="1" aria-pressed="true">1×</button>
+        <button class="ctl spd" data-spd="1.5">1.5×</button>
+        <button class="ctl spd" data-spd="2">2×</button>
+      </div>
     </div>
   </div>
   <div class="chapters" id="ch"></div>
@@ -100,6 +136,8 @@ const sg=(t,a,b)=>cl((t-a)/(b-a),0,1);
 const cv=document.getElementById('mv'), ctx=cv.getContext('2d');
 const W=1600,H=900;
 const CAM={yaw:.62,pitch:-.10,dist:200,foc:1150,oy:.47};
+let USERZOOM=1;                    // user-controlled multiplier, 1 = the storyboard's own framing
+const ZMIN=0.5, ZMAX=3.2;
 let ATOMS=[],TAGS=[];
 const LIGHT=Vn([-.45,.72,.55]);
 
@@ -133,14 +171,25 @@ function lobe(c,rad,nRes,col,seed,sq){
          rad*.155+rad*.02*rnd(seed+i),col,Vn(n));
   }
 }
-function duplex(x0,x1,y,z,nbp,open){
+/* one helical turn is 10.5 bp; phase of the backbone at genomic position x */
+function thAt(x,x0,x1,nbp){ return ((x-x0)/(x1-x0))*nbp*(2*Math.PI/10.5); }
+const BPU = 1.43;                      // one base pair step, 0.34 nm in scene units
+/* position on a chosen strand (ph=0 or PI), just outside the backbone where a
+   5-methyl group points into the major groove */
+function strandPt(x,y,z,ph,x0,x1,nbp,out){
+  const a=thAt(x,x0,x1,nbp)+ph, R=4.2*(out||1.28);
+  return [x, y+Math.cos(a)*R, z+Math.sin(a)*R];
+}
+function duplex(x0,x1,y,z,nbp,open,newPh){
   const R=4.2;
   for(let i=0;i<=nbp;i++){
     const t=i/nbp, x=lp(x0,x1,t);
     // local unwinding where the complex has opened the duplex
     const o=open?cl(1-Math.abs(x-open.x)/open.w,0,1)*open.amt:0;
     const th=i*(2*Math.PI/10.5);
-    for(const [ph,col,sgn] of [[0,BK.pacific,1],[Math.PI,BK.steel,-1]]){
+    for(const [ph,col0,sgn] of [[0,BK.pacific,1],[Math.PI,BK.steel,-1]]){
+      // a strand synthesised in this round is drawn paler than the parental one
+      const col = (newPh!==undefined && ph===newPh) ? '#CFE0EE' : col0;
       for(let k=0;k<3;k++){
         const a=th+ph+k*.22, rr=R*(1-k*.06);
         const n=[0,Math.cos(a),Math.sin(a)];
@@ -197,29 +246,77 @@ function draw(){
 }
 
 /* ===================== storyboard ===================== */
-const DUR=24;                                   // seconds
+let DUR=58;   // recomputed from the caption lengths per language                                   // seconds
 const CH=[
- {t:0.00,ru:['Мишень','Участок промотора CD55. Метилирования пока нет ни на одном CpG.'],
-          en:['The target','A stretch of the CD55 promoter. No CpG carries a methyl mark yet.']},
- {t:0.09,ru:['Комплекс подходит','CRISPRoff сканирует ДНК, проверяя короткие последовательности рядом с PAM.'],
+ {t:0.000,ru:['Хроматин, а не голая ДНК','В ядре ДНК почти везде намотана на нуклеосомы. Так выглядит участок в несколько тысяч пар оснований вокруг гена.'],
+          en:['Chromatin, not naked DNA','In the nucleus the DNA is wrapped on nucleosomes almost everywhere. This is a few thousand base pairs around the gene.']},
+ {t:0.055,ru:['Модель: у активных промоторов — просвет','Приближаемся к точке старта транскрипции. У многих активных генов вокруг TSS нуклеосом нет — это общее наблюдение по данным ATAC-seq и DNase-seq на других генах. Здесь это гипотеза, не измерение.'],
+          en:['A model: active promoters tend to have a gap','Zooming in on the transcription start site. Many active genes carry a nucleosome-free stretch around the TSS — a general finding from ATAC-seq and DNase-seq on other genes. Here it is a hypothesis, not a measurement.'],
+          note:2},
+ {t:0.115,ru:['Мишень','Участок промотора CD55 с нуклеосомами. Метилирования пока нет ни на одном CpG.'],
+          en:['The target','A stretch of the CD55 promoter with its nucleosomes. No CpG carries a methyl mark yet.']},
+ {t:0.156,ru:['Комплекс подходит','CRISPRoff сканирует ДНК, проверяя короткие последовательности рядом с PAM.'],
           en:['The complex arrives','CRISPRoff scans the DNA, checking short sequences next to a PAM.']},
- {t:0.19,ru:['Посадка и расплетание','Узнав PAM, белок локально расплетает спираль. Направляющая РНК спаривается с целевой цепью, вторая вытесняется.'],
+ {t:0.197,ru:['Посадка и расплетание','Узнав PAM, белок локально расплетает спираль. Направляющая РНК спаривается с целевой цепью, вторая вытесняется.'],
           en:['Docking and unwinding','On recognising the PAM the protein unwinds the duplex locally. The guide RNA pairs with the target strand and the other is displaced.']},
- {t:0.31,ru:['Фермент тянется в сторону','DNMT3A на гибком линкере дотягивается до CpG сбоку от сайта посадки — под сам белок ему не попасть.'],
-          en:['The enzyme reaches sideways','DNMT3A on its flexible linker reaches a CpG beside the landing site — it cannot get underneath the protein itself.']},
- {t:0.41,ru:['Основание выворачивается','Чтобы дотянуться до пятого атома углерода, фермент полностью вытаскивает цитозин из спирали в свой карман.'],
+ {t:0.242,ru:['Дальше расходятся две ветки','С этого момента комплекс работает в две стороны одновременно: KRAB берётся за гистоны, DNMT3A — за саму ДНК. Ниже они показаны по очереди только ради наглядности.'],
+          en:['From here two branches run at once','The complex now works in two directions simultaneously: KRAB on the histones, DNMT3A on the DNA itself. They are shown one after the other below only for clarity.']},
+ {t:0.276,ru:['KRAB берёт KAP1','Единственное прямое действие KRAB. Он ничего не катализирует — связывает KAP1 своим участком, и описана стехиометрия примерно три KAP1 на один KRAB.'],
+          en:['KRAB grabs KAP1','The only thing KRAB does directly. It catalyses nothing — it binds KAP1, at a reported stoichiometry of about three KAP1 per KRAB.'],
+          note:1},
+ {t:0.314,ru:['KAP1 включается через SUMO','Собственный PHD-домен KAP1 сажает SUMO на его же бромодомен. Без этой модификации платформа не работает.'],
+          en:['KAP1 switches on through SUMO','KAP1’s own PHD domain places SUMO onto its bromodomain. Without that modification the platform is inert.'],
+          note:1},
+ {t:0.348,ru:['Садятся SETDB1 и NuRD','SETDB1 — гистоновая метилтрансфераза. NuRD несёт деацетилазу и ремоделирующую активность: снимает ацетилирование и двигает нуклеосомы.'],
+          en:['SETDB1 and NuRD dock','SETDB1 is a histone methyltransferase. NuRD carries deacetylase and remodelling activity: it strips acetylation and repositions nucleosomes.'],
+          note:1},
+ {t:0.389,ru:['H3K9me3 на хвостах гистонов','SETDB1 метилирует лизин 9 гистона H3. Это метка конститутивного гетерохроматина — она ложится на ДНК не саму, а на белки, вокруг которых ДНК намотана.'],
+          en:['H3K9me3 on the histone tails','SETDB1 methylates lysine 9 of histone H3. This is the mark of constitutive heterochromatin — it lands not on the DNA but on the proteins the DNA is wrapped around.'],
+          note:1},
+ {t:0.430,ru:['HP1 читает метку и замыкает петлю','HP1 связывается и с H3K9me3, и с KAP1 одновременно. Комплекс закрепляется и ставит метку дальше по соседним нуклеосомам — репрессия расползается от места посадки.'],
+          en:['HP1 reads the mark and closes the loop','HP1 binds both H3K9me3 and KAP1 at the same time. The complex is retained and writes the mark onto neighbouring nucleosomes — repression spreads from the landing site.'],
+          note:1},
+ {t:0.471,ru:['Хроматин уплотняется','Нуклеосомы стягиваются, участок становится недоступным для транскрипции. Это и есть вклад ветки KRAB: она выключает ген, не трогая последовательность и не трогая ДНК-метилирование.'],
+          en:['The chromatin compacts','The nucleosomes draw together and the region becomes inaccessible to transcription. That is the KRAB branch’s contribution: it silences the gene without touching the sequence and without touching DNA methylation.'],
+          note:1},
+ {t:0.509,ru:['Вторая ветка: фермент тянется в сторону','DNMT3A на гибком линкере дотягивается до CpG сбоку от сайта посадки — под сам белок ему не попасть.'],
+          en:['The second branch: the enzyme reaches sideways','DNMT3A on its flexible linker reaches a CpG beside the landing site — it cannot get underneath the protein itself.']},
+ {t:0.543,ru:['Основание выворачивается','Чтобы дотянуться до пятого атома углерода, фермент полностью вытаскивает цитозин из спирали в свой карман.'],
           en:['The base flips out','To reach carbon 5 the enzyme pulls the cytosine completely out of the helix into its pocket.']},
- {t:0.51,ru:['Перенос метила','Кофактор SAM отдаёт метильную группу на пятый углерод и уходит как SAH. Цитозин становится 5-метилцитозином.'],
+ {t:0.581,ru:['Перенос метила','Кофактор SAM отдаёт метильную группу на пятый углерод и уходит как SAH. Цитозин становится 5-метилцитозином.'],
           en:['Methyl transfer','The SAM cofactor donates its methyl group to carbon 5 and leaves as SAH. The cytosine becomes 5-methylcytosine.']},
- {t:0.60,ru:['Метки ложатся по сторонам','Фермент переходит от CpG к CpG по обе стороны. Каждый обработанный сайт получает метку.'],
+ {t:0.649,ru:['Метки ложатся по сторонам','Фермент переходит от CpG к CpG по обе стороны. Каждый обработанный сайт получает метку.'],
           en:['Marks land on both sides','The enzyme moves from CpG to CpG on either side. Every site it reaches gets a mark.']},
- {t:0.75,ru:['А под белком — пусто','Три CpG, физически накрытые комплексом, остаются нетронутыми. Это футпринт, который мы и увидели в данных по CD55.'],
+ {t:0.697,ru:['А под белком — пусто','Три CpG, физически накрытые комплексом, остаются нетронутыми. Это футпринт, который мы и увидели в данных по CD55.'],
           en:['But under the protein, nothing','The three CpGs physically covered by the complex stay untouched. This is the footprint we saw in the CD55 data.']},
- {t:0.86,ru:['Белок уходит','CRISPRoff доставляют транзиентно: через несколько дней его уже нет.'],
-          en:['The protein leaves','CRISPRoff is delivered transiently: within days it is gone.']},
- {t:0.94,ru:['Метка остаётся','Последовательность не изменилась ни на одну букву, но профиль метилирования — другой, и он копируется при делениях.'],
-          en:['The mark stays','Not one letter of sequence has changed, but the methylation profile is different — and it is copied at every division.']}
+ {t:0.728,ru:['Белок уходит','CRISPRoff доставляют транзиентно: через несколько дней его уже нет. Остаются две метки — на ДНК и на гистонах.'],
+          en:['The protein leaves','CRISPRoff is delivered transiently: within days it is gone. Two marks remain — one on the DNA and one on the histones.']},
+ {t:0.759,ru:['Обе ветки сходятся на UHRF1','UHRF1 читает и полуметилированную ДНК, и H3K9me2/3, и только после этого приводит DNMT1. То есть гистоновая метка от KRAB помогает наследовать метилирование от DNMT — поэтому вместе они держатся дольше, чем каждый по отдельности.'],
+          en:['Both branches meet on UHRF1','UHRF1 reads both the hemimethylated DNA and H3K9me2/3, and only then brings in DNMT1. The histone mark from KRAB therefore helps the DNMT methylation be inherited — which is why together they last longer than either alone.']},
+ {t:0.800,ru:['Проходит время, клетка делится','Редактора давно нет. Метка на ДНК и метка на гистонах остались — теперь их предстоит передать дальше.'],
+          en:['Time passes and the cell divides','The editor is long gone. The mark on the DNA and the mark on the histones remain — and now they have to be passed on.']},
+ {t:0.822,ru:['Вилка идёт вдоль ДНК','Двойная спираль расстёгивается, и на каждой родительской цепи достраивается новая — она синтезируется чистой. Позади вилки уже две двойные спирали, впереди ещё исходная.'],
+          en:['The fork travels along the DNA','The duplex unzips and a new strand is built on each parental one, synthesised clean. Behind the fork there are already two duplexes; ahead of it the original still stands.']},
+ {t:0.855,ru:['Обе копии полуметилированы','Каждая дочерняя молекула получила одну родительскую цепь с меткой и одну новую без неё. Ни одна не осталась полностью метилированной и ни одна — полностью чистой: у каждой метка есть на одной стороне CpG-диады.'],
+          en:['Both copies are hemimethylated','Each daughter got one parental strand carrying the mark and one new strand without it. Neither ends up fully methylated nor fully bare: each has the mark on one side of the CpG dyad.']},
+ {t:0.880,ru:['UHRF1 узнаёт сайт и приводит DNMT1','Тот самый узел, к которому сходились обе ветки. Именно полуметилированная диада — субстрат UHRF1: он читает её и H3K9me2/3, ставит убиквитин на хвост гистона, а DNMT1 дописывает недостающую метку на новой цепи. И так в обеих дочерних молекулах.'],
+          en:['UHRF1 recognises the site and brings DNMT1','The very node both branches converged on. The hemimethylated dyad is exactly what UHRF1 reads, alongside H3K9me2/3; it ubiquitinates the histone tail and DNMT1 writes the missing mark onto the new strand. In both daughters.']},
+ {t:0.900,ru:['ДНК-метилирование восстановлено','Диады снова метилированы с обеих сторон в обеих дочерних молекулах. Но у хроматина есть и вторая метка — гистоновая, и с ней сейчас происходит не то же самое.'],
+          en:['DNA methylation is restored','The dyads are symmetrically methylated again in both daughter molecules. But chromatin carries a second mark, on the histones — and that one is not being copied the same way.']},
+ {t:0.915,ru:['CAF-1 приносит тетрамер H3-H4','Позади вилки ДНК какое-то время голая. Шаперон CAF-1 садится прямо на неё и приносит пару гистонов H3 и пару H4, собранных в тетрамер, — это ядро будущего нового нуклеосома.'],
+          en:['CAF-1 delivers an H3-H4 tetramer','Behind the fork the DNA is briefly bare. The chaperone CAF-1 docks right on it and brings a pair of H3 and a pair of H4 histones, pre-assembled into a tetramer — the core of a new nucleosome.'],
+          note:3},
+ {t:0.933,ru:['H2A-H2B достраивают октамер','Ещё два димера H2A-H2B подходят с боков и достраивают тетрамер до полного октамера. ДНК наматывается вокруг — родился нуклеосом, но без единой метки: H3K9me3 на нём ещё нет.'],
+          en:['H2A-H2B dimers complete the octamer','Two more H2A-H2B dimers arrive from the sides and complete the tetramer into a full octamer. The DNA wraps around it — a nucleosome is born, but with no mark on it yet: no H3K9me3.'],
+          note:3},
+ {t:0.950,ru:['По всей нити — вперемешку','Так это повторяется во многих местах сразу. Родительские нуклеосомы (тёмные, уже с меткой) не уходят целиком к одной дочерней нити — они распределяются вразнобой между обеими, а промежутки заполняют такие же свежесобранные, ещё пустые нуклеосомы.'],
+          en:['Across the whole fibre, interspersed','This repeats at many places at once. Parental nucleosomes (darker, already marked) do not go whole to one daughter fibre — they land dispersively on both, and the gaps fill with nucleosomes just like the one we watched assemble, still bare.'],
+          note:3},
+ {t:0.972,ru:['HP1 читает метку и зовёт SETDB1 к соседу','HP1 садится на старый, помеченный нуклеосом и, не отпуская его, дотягивается до нового соседа — туда приходит SETDB1 и ставит метку. Тот же цикл читатель-писатель, что был при самой первой посадке комплекса.'],
+          en:['HP1 reads the mark and calls SETDB1 to a neighbour','HP1 lands on an old, marked nucleosome and, without letting go, reaches the new neighbour — SETDB1 arrives there and writes the mark. The same reader-writer loop as the very first time the complex landed.'],
+          note:3}
 ];
+
 /* CpG sites along the duplex; three of them sit under the complex */
 const SITES=[-64,-50,-36,-22,-8,4,16,30,44,58,72];
 const UNDER=[-8,4,16];
@@ -229,100 +326,366 @@ const CX=4;                                     // where the complex settles
 let LANG='ru';
 function renderAt(t){
   ATOMS=[];TAGS=[];
-  const a=sg(t,0,.09), dock=sg(t,.09,.19), open=sg(t,.19,.30);
-  const reach=sg(t,.30,.41), flip=sg(t,.41,.50), meth=sg(t,.50,.58);
-  const back=sg(t,.56,.62), sweep=sg(t,.60,.76), foot=sg(t,.75,.84);
-  const leave=sg(t,.86,.95);
+  const L = LANG==='ru';
+  // ---- timeline ----
+  // the middle of the film is the original sequence, remapped
+  const wide = sg(t,.00,.055), zoom = sg(t,.055,.115);
+  const m    = cl((t-.115)/.685, 0, 1);
+  const dpause = sg(t,.80,.822), fork = sg(t,.822,.855);
+  const hemi = sg(t,.855,.880), restore = sg(t,.880,.900), pair = sg(t,.900,.915);
+  const inDiv = t>=.80;
+  // the ending act, shown in more detail: how a new nucleosome is actually
+  // built, then how the old/new mix plays out along the fibre, then exactly
+  // how HP1 restores the mark on one representative pair
+  const tetramer = sg(t,.915,.933), dimers = sg(t,.933,.950);
+  const nucSplit = sg(t,.950,.972), hp1read = sg(t,.972,1.0);
+  const app  = sg(m,.00,.06), dock = sg(m,.06,.12), open = sg(m,.12,.185);
+  const rloop= sg(m,.185,.235);
+  // KRAB branch
+  const kap  = sg(m,.235,.29), sumo = sg(m,.29,.34), setd = sg(m,.34,.40);
+  const h3k9 = sg(m,.40,.46),  hp1  = sg(m,.46,.52), comp = sg(m,.52,.575);
+  // DNMT branch
+  const reach= sg(m,.575,.625), flip = sg(m,.625,.68), meth = sg(m,.68,.73);
+  const back = sg(m,.715,.78),  sweep= sg(m,.78,.85),  foot = sg(m,.85,.895);
+  const leave= sg(m,.895,.945), conv = sg(m,.94,1.0);
 
-  // slow orbit and a gentle push-in, easing off at the end
-  CAM.yaw=.50+t*0.46;
-  CAM.pitch=-.10-Math.sin(t*Math.PI)*.10;
-  CAM.dist=lp(232,186,ez(cl(t*1.6,0,1)))+ez(leave)*36;
+  const nucScene = sg(t,.915,1.0);
+  CAM.yaw = (t<.915) ? (.46 + m*0.40 - (1-ez(zoom))*0.18)
+    : (t<.950) ? .52                                    // steady close shot for the assembly
+    : (t<.972) ? (.30 + sg(t,.950,.972)*0.22)            // pan across the wide row
+    : .34;                                                // settle on the HP1/SETDB1 pair
+  CAM.pitch = (t<.915) ? (-.10 - Math.sin(m*Math.PI)*.10)
+    : (t<.950) ? -.14 : (t<.972) ? -.08 : -.04;
+  CAM.oy = (t<.915) ? (0.47 - ez(dpause)*0.02) : (t<.950) ? 0.34 : 0.50;
+  CAM.dist = (t<.115) ? lp(1220, 430, ez(zoom))
+    : (t<.915) ? lp(430,372,ez(cl(m*1.4,0,1))) + ez(leave)*16 - ez(dpause)*34
+    : (t<.950) ? lp(160, 190, ez(sg(t,.915,.950)))        // close on one assembling bead
+    : (t<.972) ? lp(520, 760, ez(sg(t,.950,.972)))        // pull out to the whole row
+    : lp(700, 200, ez(sg(t,.972,1.0)));                   // push in on the HP1 pair
+  CAM.dist = Math.max(30, CAM.dist / USERZOOM);   // user zoom, on top of the scripted shot
 
-  const cx=lp(-150,CX,ez(dock));                 // complex slides in
-  const lift=ez(leave)*190;                      // and lifts clear of frame at the end
-  const opened=open>0&&leave<1;
+  const cx = lp(-160,CX,ez(dock));
+  const lift = ez(leave)*190;
+  const opened = open>0 && leave<1;
 
-  duplex(-86,86,-16,0,50,opened?{x:CX,w:16,amt:5.2*ez(open)*(1-ez(leave))}:null);
+  if(t<.118){
+    /* establishing shot: the same fibre far outside the ROI, packed with
+       nucleosomes, with a gap around the promoter */
+    duplex(-460,460,-16,0,150,null);
+    for(let i=-9;i<=9;i++){
+      if(Math.abs(i)<2) continue;                    // the nucleosome-free promoter
+      const nx=i*58+(i>0?12:-12);
+      lobe([nx,-16,-40],23.1,340,i%2?'#CFC6DA':'#C6BCD3',600+i*13);
+    }
+    if(t<.06) tag([0,26,-20], L?'хроматин, ~3 kb':'chromatin, ~3 kb','#8B7FA3');
+    else      tag([0,26,-20], L?'модель: промотор без нуклеосом':'model: nucleosome-free promoter','#8a6200');
+    draw(); caption(t); return;
+  }
 
-  // the complex itself
-  if((a>0||dock>0)&&leave<.92){
+  duplex(-96,96,-16,0,56, opened?{x:CX,w:16,amt:5.2*ez(open)*(1-ez(leave))}:null);
+
+  /* ---- nucleosomes flanking the site. A core particle is ~110 A across,
+     so at this scale it is genuinely bigger than one Cas9 lobe. ---- */
+  const NUC=[-150,-90,90,150];
+  NUC.forEach((nx0,i)=>{
+    const pull = ez(comp)*(nx0<0?10:-10);        // chromatin draws together
+    const nx = nx0+pull, ny = -16+ez(comp)*6, nz = -26;
+    lobe([nx,ny,nz], 23.1, 340, i%2?'#CFC6DA':'#C6BCD3', 200+i*11);
+    // H3 tail carrying the mark SETDB1 writes
+    const v = cl(h3k9*4 - Math.abs(i-1.5)*0.5, 0, 1);
+    if(v>0){
+      const ty0 = ny+14, ty1 = ny+14+13*v;
+      strand([[nx,ty0,nz+8],[nx+3,ty1,nz+14]],'#D8CBE2',1.5,6);
+      for(let k=0;k<3;k++) atom([nx+3+k*.5,ty1+k*1.4,nz+14+k*.6],1.9,BK.gold,Vn([0,1,.5]));
+    }
+    if(i===1 && t>.41 && t<.53) tag([nx,ny+40,nz+14],'H3K9me3','#8a6200');
+  });
+  if(m>.02 && m<.09) tag([-104,8,-26], L?'нуклеосомы':'nucleosomes','#8B7FA3');
+
+  if((app>0||dock>0) && leave<.92){
     const bx=cx, by=14+lift;
-    lobe([bx-17,by,1],19,300,BK.bone,3,[1.05,.95,1]);
-    lobe([bx+15,by-4,-2],17,270,BK.bone,17);
-    lobe([bx-1,by-3,0],9,80,BK.boneDk,29);
-    // BFP and KRAB ride along
-    lobe([bx+40,by+9,-9],8.5,110,BK.green,67);
-    lobe([bx+57,by+14,3],5.6,50,BK.gold,79);
+    lobe([bx-6,by,1],15.0,300,BK.bone,3,[1.05,.95,1]);
+    lobe([bx+6,by-4,-2],15.0,270,BK.bone,17);
+    lobe([bx,by-3,0],4.0,60,BK.boneDk,29);  // interdomain cleft filler, not a real feature
+    lobe([bx+42,by+9,-9],8.3,110,BK.green,67);
+    lobe([bx+58,by+14,3],5.7,50,BK.gold,79);
     strand([[bx+30,by+2,-5],[bx+37,by+7,-8]],BK.boneDk,1.4,5);
     strand([[bx+46,by+11,-6],[bx+53,by+13,-1]],BK.boneDk,1.4,5);
-    if(t>.12&&t<.30)tag([bx-17,by+36,1],'dCas9',BK.navy);
+    if(m>.075&&m<.19) tag([bx-17,by+36,1],'dCas9',BK.navy);
+    if(m>.235&&m<.30) tag([bx+57,by+26,3],'KRAB','#8a6200');
 
-    // guide RNA out of the cleft, and the displaced strand
-    if(open>0&&leave<1){
-      const o=ez(open)*(1-ez(leave));
+    if(open>0 && leave<1){
       strand([[bx+2,by+9,4],[bx-6,by+17,8],[bx-17,by+25,12],[bx-30,by+31,15]],BK.gold,2.1,9);
       strand([[bx+2,-12+lift*.2,9],[bx+11,-5,18],[bx+22,-6,22],[bx+30,-15,17]],BK.rose,1.9,9);
-      if(t>.20&&t<.31)tag([bx-38,by+36,15],'sgRNA','#8a6200');
+      if(m>.13&&m<.20) tag([bx-38,by+36,15],'sgRNA','#8a6200');
     }
 
-    // DNMT3A / DNMT3L swinging to whichever CpG is being worked on
+    /* ---------- KRAB branch: KAP1 and everything it assembles ---------- */
+    if(kap>0){
+      const kx=bx+72, ky=by+34;
+      for(let i=0;i<3;i++){                       // ~3 KAP1 per KRAB
+        const a2=i*2.1, r=ez(kap);
+        lobe([kx+Math.cos(a2)*10*r, ky+Math.sin(a2)*8*r, 4+Math.sin(a2*1.7)*9*r],
+             12.4, 220, BK.pacific, 300+i*7);
+      }
+      strand([[bx+60,by+18,3],[kx-8,ky-3,4]],BK.boneDk,1.5,6);
+      if(m>.245&&m<.35) tag([kx,ky+26,4], L?'KAP1 ×3':'KAP1 ×3','#1E5C86');
+
+      if(sumo>0){                                  // SUMO on the bromodomain
+        lobe([kx+4,ky+18,12], 6.2*ez(sumo), 40, '#C48BB8', 411);
+        if(m>.295&&m<.36) tag([kx+16,ky+26,12],'SUMO','#8E4C7E');
+      }
+      if(setd>0){                                  // SETDB1 and NuRD dock on it
+        lobe([kx+34,ky+10,-18], 14.5*ez(setd), 240, '#2E8B70', 421);
+        lobe([kx+14,ky-26,20], 19.0*ez(setd), 340, '#B06AA0', 431);
+        strand([[kx+9,ky+6,0],[kx+26,ky+9,-13]],BK.boneDk,1.4,5);
+        strand([[kx+6,ky-6,6],[kx+11,ky-19,16]],BK.boneDk,1.4,5);
+        if(m>.35&&m<.43){ tag([kx+34,ky+26,-18],'SETDB1','#1C6E58');
+                          tag([kx+14,ky-42,20],'NuRD','#8E4C7E'); }
+      }
+      if(hp1>0){                                   // HP1 reads H3K9me3 and holds KAP1
+        NUC.forEach((nx0,i)=>{
+          if(i%2) return;
+          const pull=ez(comp)*(nx0<0?10:-10), nx=nx0+pull, ny=-16+ez(comp)*6;
+          lobe([nx+6, ny+34, -24], 7.8*ez(hp1), 90, '#D9C93F', 441+i*5);
+        });
+        if(m>.47&&m<.55) tag([-60,32,-24],'HP1','#8a6200');
+      }
+    }
+
+    /* ---------- DNMT branch ---------- */
     let target=-22;
     if(sweep>0){const i=Math.min(ORDER.length-1,Math.floor(sweep*ORDER.length));target=ORDER[i];}
-    const tx=lp(bx-30,target,ez(reach));
-    const ty=lp(by+16,3,ez(reach))+lift;
-    const near=target<0?-1:1;            // which side faces the camera at this yaw
-    const tz=lp(4,20*near,ez(reach));
-    lobe([tx,ty+7,tz],11,150,BK.rose,41);
-    lobe([tx-19*near,ty+3,tz-6*near],9.5,110,BK.rose2,53);
-    strand([[bx-14,by+4,4],[tx+7*near,ty+8,tz-4*near]],BK.boneDk,1.4,7);
-    if(t>.30&&t<.46)tag([tx,ty+24,tz],'DNMT3A','#A32B23');
+    if(reach>0){
+      const tx=lp(bx-30,target,ez(reach));
+      const ty=lp(by+16,3,ez(reach))+lift;
+      const near=target<0?-1:1;
+      const tz=lp(4,20*near,ez(reach));
+      lobe([tx,ty+7,tz],8.8,190,BK.rose,41);
+      lobe([tx-16*near,ty+3,tz-6*near],8.1,170,BK.rose2,53);
+      strand([[bx-14,by+4,4],[tx+7*near,ty+8,tz-4*near]],BK.boneDk,1.4,7);
+      if(m>.575&&m<.66) tag([tx,ty+24,tz],'DNMT3A','#A32B23');
 
-    // the flipped base: out of the duplex, methylated, then back
-    if(reach>.9&&leave<.2){
-      const up=ez(flip)-ez(back);
-      const col=meth>.55?BK.me:BK.gold;
-      for(let i=0;i<8;i++){
-        const f=i/7;
-        atom([target+f*1.2,-13+up*12*(0.3+f*0.7),4*near+up*10*f*near],1.8,col,Vn([.2,.5,1]));
-      }
-      if(t>.42&&t<.52)
-        tag([target,6+up*11,16*near],LANG==='ru'?'цитозин':'cytosine','#8a6200');
-      // cofactor beside the active site: SAM turns into SAH
-      if(flip>.3){
-        lobe([tx+11*near,ty+15,tz+5*near],3.4,22,meth>.6?'#8FA3B8':BK.green,91);
-        if(t>.46&&t<.60)tag([tx+20*near,ty+24,tz+5*near],meth>.6?'SAH':'SAM',meth>.6?'#5B6B7B':'#0E6446');
+      if(reach>.9 && leave<.2){
+        const up=ez(flip)-ez(back);
+        const col=meth>.55?BK.me:BK.gold;
+        for(let i=0;i<8;i++){
+          const f=i/7;
+          atom([target+f*1.2,-13+up*12*(0.3+f*0.7),4*near+up*10*f*near],1.8,col,Vn([.2,.5,1]));
+        }
+        if(m>.635&&m<.70) tag([target,6+up*11,16*near], L?'цитозин':'cytosine','#8a6200');
+        if(flip>.3){
+          lobe([tx+11*near,ty+15,tz+5*near],2.2,16, meth>.6?'#8FA3B8':BK.green, 91);
+          if(m>.665&&m<.75) tag([tx+20*near,ty+24,tz+5*near], meth>.6?'SAH':'SAM',
+                                meth>.6?'#5B6B7B':'#0E6446');
+        }
       }
     }
   }
 
   // methyl marks accumulating on the flanking CpGs
-  const done=Math.floor(sweep*ORDER.length+ (back>.6?1:0));
+  const done=Math.floor(sweep*ORDER.length + (back>.6?1:0));
   for(const x of SITES){
     if(UNDER.indexOf(x)>=0) continue;
     const idx=ORDER.indexOf(x);
     const on=(x===-22&&back>.6)||(idx>=0&&idx<done);
     if(!on) continue;
-    for(let k=0;k<3;k++)
-      atom([x+k*.5,-9.5+k*1.5,(x<0?-1:1)*(3.5+k*.6)],1.7,BK.me,Vn([0,1,.4]));
+    cpgMark(x,-16,0,0,        -96,96,56);   // forward-strand cytosine
+    cpgMark(x,-16,0,Math.PI,  -96,96,56);   // reverse-strand cytosine
   }
-  // the footprint call-out: the three covered sites stay bare
-  if(foot>.15&&leave<.5){
+  if(foot>.15 && leave<.5){
     for(const x of UNDER)
       for(let k=0;k<2;k++)
         atom([x,-11+k*1.4,7+k*.8],1.5,'#C9C2B4',Vn([0,1,.5]));
-    if(t>.77&&t<.88) tag([CX,-32,9],LANG==='ru'?'футпринт: 3 CpG чистые':'footprint: 3 CpGs bare','#8a6200');
+    if(m>.86&&m<.91) tag([CX,-32,9], L?'футпринт: 3 CpG чистые':'footprint: 3 CpGs bare','#8a6200');
+  }
+
+  /* ---------- the two branches meet on UHRF1 ---------- */
+  if(conv>0){
+    const ux=CX, uy=26;
+    lobe([ux,uy,10], 12.4*ez(conv), 220, BK.gold, 501);
+    strand([[ux-8,uy-10,8],[ux-18,-6,6]],BK.boneDk,1.5,7);      // down to the DNA mark
+    strand([[ux+8,uy+6,8],[ux+26,10,6]],BK.boneDk,1.5,7);       // across to the histone mark
+    if(m>.95) tag([ux,uy+30,10],'UHRF1','#8a6200');
+  }
+  if(inDiv){
+    ATOMS=[];TAGS=[];
+    /* Semiconservative replication, drawn properly:
+       the parental duplex unzips into its two strands, each of which templates
+       a new one. Every daughter therefore ends up with ONE parental strand
+       (carrying its 5mC) and ONE freshly made strand (bare) — both daughters
+       are hemimethylated, neither is fully methylated or fully bare.
+       Which parental strand went where decides which side of the dyad is
+       already marked: the top daughter keeps the forward-strand cytosine,
+       the bottom daughter keeps the reverse-strand one. */
+    const sep = ez(fork)*30;
+    const X0=-66, X1=66, NB=38;
+    const fx  = lp(X0,X1,ez(fork));         // how far the fork has travelled
+    for(const side of [-1,1]){
+      const y0 = -16 + side*sep;
+      const oldPh = (side<0) ? 0 : Math.PI;          // parental strand of this daughter
+      const newPh = (side<0) ? Math.PI : 0;          // strand made in this round
+      // behind the fork the duplex is already double-stranded again
+      duplex(X0, Math.max(X0,fx), y0, 0, Math.max(2,Math.round(NB*(fx-X0)/(X1-X0))),
+             null, newPh);
+      for(const x of SITES){
+        if(UNDER.indexOf(x)>=0) continue;
+        if(x>fx) continue;                            // not yet replicated
+        cpgMark(x,y0,0,oldPh,X0,X1,NB);               // inherited, always present
+        // the missing half is filled in behind DNMT1, not everywhere at once
+        const doneTo = lp(X0,X1,ez(restore));
+        if(x<=doneTo) cpgMark(x,y0,0,newPh,X0,X1,NB);
+      }
+      // the histone mark is distributed with the parental nucleosomes
+      if(fork<0.30) for(const nx0 of [-58,58]){
+        if(nx0>fx) continue;
+        lobe([nx0,y0,-40],23.1,340,'#C6BCD3',700+nx0);
+        strand([[nx0,y0+13,-32],[nx0+3,y0+24,-26]],'#D8CBE2',1.5,5);
+        for(let k=0;k<3;k++) atom([nx0+3+k*.5,y0+24+k*1.4,-26+k*.6],1.9,BK.gold,Vn([0,1,.5]));
+      }
+    }
+    // ahead of the fork the parental duplex is still intact and fully methylated
+    if(fx<X1){
+      duplex(Math.min(X1,fx),X1,-16,0,Math.max(2,Math.round(NB*(X1-fx)/(X1-X0))),null);
+      for(const x of SITES){
+        if(UNDER.indexOf(x)>=0 || x<=fx) continue;
+        cpgMark(x,-16,0,0,X0,X1,NB); cpgMark(x,-16,0,Math.PI,X0,X1,NB);
+      }
+      if(fork<0.30) for(const nx0 of [-58,58]) if(nx0>fx) lobe([nx0,-16,-40],23.1,340,'#C6BCD3',700+nx0);
+      // the replisome sitting at the junction
+      lobe([fx,-16,6],17.0,300,'#8FA3B8',777);
+      if(fork>.25 && fork<1) tag([fx,10,6], L?'репликационная вилка':'replication fork','#5B6B7B');
+    }
+    if(hemi>0 && restore<.9 && t>.857 && t<.882)
+      tag([-46,-16+sep+26,10],
+          L?'обе цепи полуметилированы':'both daughters are hemimethylated','#8a6200');
+    if(restore>0 && pair<.6){
+      // UHRF1 reads the hemimethylated dyad, DNMT1 completes it — on both daughters
+      const rx = lp(X0-4,X1-10,ez(restore));
+      for(const side of [-1,1]){
+        const y0=-16+side*sep;
+        lobe([rx-13,y0+16,14],12.4*ez(restore),220,BK.gold,801+(side>0?7:0));
+        lobe([rx+16,y0+14,10],15.7*ez(restore),300,'#2E6EA6',811+(side>0?7:0));
+        strand([[rx-5,y0+14,13],[rx+6,y0+13,11]],BK.boneDk,1.3,4);
+      }
+      if(t>.882&&t<.898){ tag([rx-24,-16+sep+38,14],'UHRF1','#8a6200');
+                          tag([rx+26,-16+sep+36,10],'DNMT1','#1E5C86'); }
+    }
+        if(pair>.4 && t<.915){
+      tag([0,-16-sep-32,0], L?'дочерняя клетка 1':'daughter cell 1','#1E5C86');
+      tag([0,-16+sep+50,0], L?'дочерняя клетка 2':'daughter cell 2','#1E5C86');
+    }
+
+    /* ---------------- nucleosome inheritance, in four beats ----------------
+       (1) how a NEW nucleosome is actually built: CAF-1 delivers an H3-H4
+           tetramer onto the bare DNA behind the fork, then two H2A-H2B
+           dimers complete the octamer and the DNA wraps around it;
+       (2) the same thing repeating along the whole fibre, old (marked)
+           nucleosomes interspersed with fresh ones like the one just built;
+       (3) the mechanism that restores the mark: HP1 reads H3K9me3 on an old
+           nucleosome and, without letting go, recruits SETDB1 onto the new
+           neighbour, which writes the mark there too.
+       Literature model (Alabert & Groth 2012; Reveron-Gomez et al. 2018;
+       histone chaperone review Ransom et al. 2010), not measured on CD55 —
+       the on-page note says so throughout. */
+    if(t>=.915){
+      ATOMS=[];TAGS=[];
+      const NEWX = -58, NEWY = -16;               // the one bead we build up close
+
+      if(t<.950){
+        /* ---- (1) close-up: one new nucleosome assembling from scratch ---- */
+        const T1 = ez(tetramer), T2 = ez(dimers);
+        duplex(NEWX-56, NEWX+56, NEWY, 0, 16, null);
+        // CAF-1 chaperone, present throughout this beat, fading once its job is done
+        lobe([NEWX-4, NEWY+22, 10], 9.5, 130, '#8E7CB8', 900);
+        if(tetramer<0.45) tag([NEWX-30, NEWY+62, 10], 'CAF-1', '#5B4A82');
+        if(T1>0){
+          // the H3-H4 tetramer, lowered onto the DNA as CAF-1 deposits it
+          const ty = lp(NEWY+22, NEWY+4, ez(T1));
+          lobe([NEWX-9, ty, 4], 8.0, 90, '#C9BFD6', 911);
+          lobe([NEWX+9, ty, 4], 8.0, 90, '#C9BFD6', 912);
+          if(T1>0.15 && T1<0.85) tag([NEWX+30, ty+16, 4], L?'тетрамер H3-H4':'H3-H4 tetramer', '#5B4A82');
+        }
+        if(T2>0){
+          // two H2A-H2B dimers arriving from either side to complete the octamer
+          const dx = lp(34, 15, ez(T2));
+          lobe([NEWX-dx, NEWY-2, -6], 7.2, 80, '#DCD3E6', 921);
+          lobe([NEWX+dx, NEWY-2, -6], 7.2, 80, '#DCD3E6', 922);
+          if(T2>0.15 && T2<0.85) tag([NEWX, NEWY-30, -6], L?'H2A-H2B×2':'H2A-H2B \u00d72', '#5B4A82');
+          if(T2>0.6){
+            // the finished nucleosome, DNA wrapped, no mark yet
+            const grow = ez(cl((T2-0.6)/0.4,0,1));
+            lobe([NEWX, NEWY, -4], 23.1*grow, 300, '#EDE9E2', 930);
+          }
+        }
+        if(T2>0.9) tag([NEWX, NEWY+46, -4], L?'нуклеосом собран, метки ещё нет':'nucleosome built, no mark yet', '#8a6200');
+      }
+      else if(t<.972){
+        /* ---- (2) pull out: the same thing has happened all along the fibre ---- */
+        const PATTERN=[[1,0,0,1,0],[0,1,1,0,1]];   // 1 = parental & marked, 0 = new & naive
+        const NX=[-116,-58,0,58,116];
+        const appear = ez(cl(nucSplit*1.6,0,1));
+        for(const side of [-1,1]){
+          const y0 = side*58;
+          const OLDNEW = PATTERN[side<0?0:1];
+          const shown = NX.filter((_,i)=>appear*5>i);
+          if(shown.length>1) strand(shown.map(nx=>[nx,y0,-20]), BK.steel, 1.1, 3);
+          NX.forEach((nx,i)=>{
+            if(appear*5<=i) return;
+            const isOld = OLDNEW[i]===1;
+            lobe([nx,y0,-20],23.1,340,isOld?'#B7A9C9':'#EDE9E2',700+nx+side*3);
+            if(isOld){
+              strand([[nx,y0+13,-12],[nx+3,y0+22,-6]],'#D8CBE2',1.5,5);
+              atom([nx+3,y0+23,-6],2.0,BK.gold,Vn([0,1,.5]));
+            }
+          });
+          tag([-140,y0,-20], L?('клетка '+(side<0?1:2)):('cell '+(side<0?1:2)),'#1E5C86');
+        }
+        if(t>.952) tag([0,110,-20], L?'старые (тёмные) и новые нуклеосомы вперемешку':'old (darker) and new nucleosomes, interspersed','#8a6200');
+      }
+      else{
+        /* ---- (3) close-up: HP1 reads the old mark, recruits SETDB1 to the new bead ---- */
+        const R = ez(hp1read);
+        const OX=-70, NX2=0, y0=-8;
+        duplex(OX-40, NX2+40, y0, 0, 22, null);
+        lobe([OX,y0,-20],23.1,300,'#B7A9C9',741);         // old, marked nucleosome
+        strand([[OX,y0+13,-12],[OX+3,y0+22,-6]],'#D8CBE2',1.5,5);
+        atom([OX+3,y0+23,-6],2.2,BK.gold,Vn([0,1,.5]));
+        lobe([NX2,y0,-20],23.1,300,'#EDE9E2',742);         // new, still-bare nucleosome
+        // HP1 lands on the old mark and stays put
+        const hp1y = lp(y0+50, y0+30, ez(cl(R*3,0,1)));
+        lobe([OX+2,hp1y,-4], 8.4, 90, '#D9C93F', 951);
+        if(R>0.05) tag([OX+2,hp1y+20,-4],'HP1','#8a6200');
+        // bridging contact from HP1 toward the new neighbour
+        if(R>0.35){
+          const b = ez(cl((R-0.35)/0.35,0,1));
+          strand([[OX+8,hp1y-2,-2],[lp(OX+8,NX2-6,b), lp(hp1y-2,y0+34,b), lp(-2,-6,b)]], '#D9C93F', 0.9, 6);
+        }
+        // SETDB1 arrives on the new nucleosome and writes the mark
+        if(R>0.55){
+          const s2 = ez(cl((R-0.55)/0.35,0,1));
+          lobe([NX2-2, lp(y0+40,y0+22,s2), -6], 8.0*Math.max(s2,0.15), 90, '#2E8B70', 961);
+          if(R<0.97) tag([NX2-2, y0+40, -6], 'SETDB1', '#1C6E58');
+          if(s2>0.5){
+            const m2 = ez(cl((s2-0.5)/0.5,0,1));
+            strand([[NX2,y0+13,-12],[NX2+3,y0+16+6*m2,-6]],'#D8CBE2',1.5,5);
+            atom([NX2+3,y0+17+6*m2,-6],2.0*m2+0.1,BK.gold,Vn([0,1,.5]));
+          }
+        }
+        if(R>0.85) tag([(OX+NX2)/2, y0-30, -20], L?'метка передана дальше':'the mark is passed on', '#8a6200');
+      }
+    }
   }
   draw();
   caption(t);
 }
 /* on-canvas caption block, part of the exported video */
 function caption(t){
-  let i=0; for(let k=0;k<CH.length;k++) if(t>=CH[k].t) i=k;
+  let i=0; for(let k=0;k<CH.length;k++) if(t>=CH[k].t-1e-9) i=k;
   const c=CH[i][LANG];
-  const pad=54, y=H-142;
+  const pad=54, y=H-196;
   ctx.fillStyle='rgba(255,255,255,.82)';
-  ctx.fillRect(0,y-30,W,172);
+  ctx.fillRect(0,y-30,W,230);
   ctx.fillStyle='#FDB515';ctx.fillRect(pad,y-6,74,4);
   ctx.textAlign='left';
   ctx.fillStyle='#003262';
@@ -330,10 +693,25 @@ function caption(t){
   ctx.fillText(c[0],pad,y+34);
   ctx.fillStyle='#4A5A6B';
   ctx.font="400 21px 'Public Sans',Arial,sans-serif";
-  wrap(c[1],pad,y+70,W-pad*2-360,27);
+  wrap(c[1],pad,y+70,W-pad*2-290,27);
+  if(CH[i].note){
+    ctx.fillStyle='#B8860B';
+    ctx.font="600 16px 'Public Sans',Arial,sans-serif";
+    const notes={
+      1: LANG==='ru'
+        ? 'Эта ветка — по литературе: H3K9me3 и посадку KAP1 мы на CD55 не измеряли.'
+        : 'This branch comes from the literature: we did not measure H3K9me3 or KAP1 binding at CD55.',
+      2: LANG==='ru'
+        ? 'Мы не измеряли доступность CD55: ни ATAC-seq, ни DNase-seq на этом промоторе ещё не делали. Открытый хроматин посадке помогает, но CRISPRoff работает и не только там — это в списке задач.'
+        : 'We have not measured CD55 accessibility: no ATAC-seq or DNase-seq at this promoter yet. Open chromatin helps binding, but CRISPRoff is not limited to open sites — this is on our to-do list.',
+      3: LANG==='ru'
+        ? 'Сборка нуклеосома шаперонами, дисперсная сегрегация и восстановление H3K9me3 читателем-писателем — по литературе (Alabert & Groth 2012; Reveron-Gomez 2018; обзор шаперонов Ransom et al. 2010). На CD55 мы это не измеряли; узор старых и новых нуклеосом на экране условный, не из данных.'
+        : 'Nucleosome assembly by chaperones, dispersive segregation and reader-writer restoration of H3K9me3 follow the literature (Alabert & Groth 2012; Reveron-Gomez 2018; chaperone review Ransom et al. 2010). We have not measured this at CD55; the pattern of old and new nucleosomes on screen is illustrative, not data.'};
+    wrap(notes[CH[i].note], pad, y+152, W-pad*2-290, 21);
+  }
   // progress ticks
-  ctx.fillStyle='#D6DEE9';ctx.fillRect(pad,H-30,W-pad*2,3);
-  ctx.fillStyle='#003262';ctx.fillRect(pad,H-30,(W-pad*2)*t,3);
+  ctx.fillStyle='#D6DEE9';ctx.fillRect(pad,H-18,W-pad*2,3);
+  ctx.fillStyle='#003262';ctx.fillRect(pad,H-18,(W-pad*2)*t,3);
   ctx.textAlign='right';
   ctx.fillStyle='#7C8B9B';ctx.font="600 17px 'Public Sans',Arial,sans-serif";
   ctx.fillText('epicme.bio · CD55',W-pad,y+34);
@@ -347,26 +725,117 @@ function wrap(txt,x,y,maxw,lh){
   }
   if(line)ctx.fillText(line,x,yy);
 }
+
+
+/* A CpG is a two-fold symmetric dyad: a cytosine on the forward strand and,
+   one base pair along, a cytosine on the reverse strand. Methylation is
+   therefore two marks per site, not one — which is what makes the
+   semiconservative copying in the division scene work at all.
+   The real CH3 group is ~0.3 nm — at the DNA's own scale that is close to
+   invisible, so unlike every other object in this film the mark is drawn
+   enlarged on purpose, as a small flag standing off the backbone, so the
+   act of methylation actually reads on screen. This one exaggeration is
+   called out in the on-page caveat; nothing else in the film is inflated. */
+function cpgMark(x,y,z,ph,x0,x1,nbp){
+  const dx = (ph===0)?0:BPU;
+  const base = strandPt(x+dx,y,z,ph,x0,x1,nbp);
+  const th = thAt(x+dx,x0,x1,nbp)+ph;
+  const out = Vn([0,Math.cos(th),Math.sin(th)]);
+  const tip = [base[0], base[1]+out[1]*3.4, base[2]+out[2]*3.4];
+  strand([base,tip], BK.me, 0.55, 4);           // short flag off the backbone
+  atom(tip, 2.6, BK.me, out);                    // the mark itself, enlarged for legibility
+  atom(tip, 1.05, '#EFFFF6', out);                // bright core so it pops against the paper background
+}
+
+/* ---------------- reading-time pacing ----------------
+   The storyboard positions in CH stay as they are; what changes is how much
+   real time each chapter is given. A chapter with three lines of text gets
+   several seconds more than a one-line chapter, so nothing has to be paused
+   to be read. warp() maps real progress back onto the storyboard. */
+let SEG=[];
+function buildPacing(){
+  const secs=[];
+  for(let i=0;i<CH.length;i++){
+    const c=CH[i][LANG];
+    const words=(c[0]+' '+c[1]).split(/\s+/).length;
+    // ~2.6 words/second reading pace, plus a beat to look at the picture
+    let d = 1.7 + words/3.5;                 // about 210 words per minute
+    if(CH[i].note) d += 2.2;                 // the caveat line needs reading too
+    secs.push(Math.max(3.6,d));
+  }
+  const total=secs.reduce((a,b)=>a+b,0);
+  DUR=Math.round(total);
+  SEG=[]; let acc=0;
+  for(let i=0;i<CH.length;i++){
+    const t0=CH[i].t, t1=(i+1<CH.length)?CH[i+1].t:1;
+    SEG.push({r0:acc/total, r1:(acc+secs[i])/total, t0:t0, t1:t1, sec:secs[i]});
+    acc+=secs[i];
+  }
+}
+function warp(u){
+  u=cl(u,0,1);
+  for(const s of SEG){
+    if(u<=s.r1||s===SEG[SEG.length-1]){
+      const k=(u-s.r0)/Math.max(1e-6,(s.r1-s.r0));
+      return cl(s.t0+(s.t1-s.t0)*cl(k,0,1),0,1);
+    }
+  }
+  return 1;
+}
+window.renderReal=function(u){ renderAt(warp(u)); };
+
 window.renderAt=renderAt;
 window.setLang=l=>{LANG=l;};
 
+
+/* ---------------- narration ----------------
+   Uses the browser's speech synthesis, so it speaks with whatever voice the
+   device already has — including Russian ones. Nothing is downloaded and no
+   audio file is shipped. Off by default; the button turns it on. */
+let VOICE_ON=false, spokenIdx=-1;
+function pickVoice(){
+  const want = LANG==='ru' ? 'ru' : 'en';
+  const vs = speechSynthesis.getVoices()||[];
+  return vs.find(v=>v.lang && v.lang.toLowerCase().startsWith(want)) || null;
+}
+function speakChapter(i){
+  if(!VOICE_ON || !('speechSynthesis' in window)) return;
+  const c=CH[i][LANG]; if(!c) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(c[0]+'. '+c[1]);
+  const v=pickVoice(); if(v){ u.voice=v; u.lang=v.lang; }
+  else u.lang = LANG==='ru' ? 'ru-RU' : 'en-US';
+  u.rate=cl(0.98*SPEED,0.6,2.5); u.pitch=1.0;
+  speechSynthesis.speak(u);
+}
+function speakNow(){
+  let cur=0; for(let k=0;k<SEG.length;k++) if(T>=SEG[k].r0) cur=k;
+  spokenIdx=cur; speakChapter(cur);
+}
+function narrateTick(){
+  if(!VOICE_ON) return;
+  let cur=0; for(let k=0;k<SEG.length;k++) if(T>=SEG[k].r0) cur=k;
+  if(cur!==spokenIdx){ spokenIdx=cur; speakChapter(cur); }
+}
+
 /* ===================== player ===================== */
 let T=0,playing=false,last=0;
+let SPEED=1;   // user-chosen playback speed, independent of the reading-time pacing
 const fl=document.getElementById('fl'),tcEl=document.getElementById('tc');
 const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 function ui(){
   fl.style.width=(T*100)+'%';
   tcEl.textContent=fmt(T*DUR)+' / '+fmt(DUR);
   const btns=document.querySelectorAll('#ch button');
-  let cur=0;for(let k=0;k<CH.length;k++)if(T>=CH[k].t)cur=k;
+  let cur=0;for(let k=0;k<SEG.length;k++)if(T>=SEG[k].r0)cur=k;
   btns.forEach((b,i)=>b.setAttribute('aria-current',String(i===cur)));
 }
 function frame(ts){
   if(!playing)return;
   if(!last)last=ts;
-  T+=(ts-last)/1000/DUR;last=ts;
+  T+=SPEED*(ts-last)/1000/DUR;last=ts;
   if(T>=1){T=1;playing=false;btn();}
-  renderAt(T);ui();
+  renderReal(T);ui();narrateTick();
   if(playing)requestAnimationFrame(frame);
 }
 function btn(){
@@ -376,13 +845,114 @@ function btn(){
 document.getElementById('play').addEventListener('click',()=>{
   if(T>=1&&!playing)T=0;
   playing=!playing;last=0;btn();
-  if(playing)requestAnimationFrame(frame);
+  if(playing){ if(VOICE_ON){spokenIdx=-1;speakNow();} requestAnimationFrame(frame); }
+  else if('speechSynthesis' in window) speechSynthesis.cancel();
 });
 const tr=document.getElementById('tr');
-tr.addEventListener('click',e=>{
+function seekTo(clientX){
   const r=tr.getBoundingClientRect();
-  T=cl((e.clientX-r.left)/r.width,0,1);playing=false;btn();renderAt(T);ui();
+  T=cl((clientX-r.left)/r.width,0,1);playing=false;btn();
+  if(VOICE_ON){spokenIdx=-1;speakNow();}
+  renderReal(T);ui();
+}
+tr.addEventListener('click',e=>seekTo(e.clientX));
+let scrubbing=false;
+tr.addEventListener('pointerdown',e=>{scrubbing=true;seekTo(e.clientX);
+  try{tr.setPointerCapture(e.pointerId);}catch(_){}});
+tr.addEventListener('pointermove',e=>{if(scrubbing)seekTo(e.clientX);});
+tr.addEventListener('pointerup',()=>scrubbing=false);
+tr.addEventListener('pointercancel',()=>scrubbing=false);
+
+/* skip back/forward by 10 real seconds */
+function skip(deltaSec){
+  T=cl(T+deltaSec/DUR,0,1); playing=false; btn();
+  if(VOICE_ON){spokenIdx=-1;speakNow();}
+  renderReal(T); ui();
+}
+document.getElementById('back10').addEventListener('click',()=>skip(-10));
+document.getElementById('fwd10').addEventListener('click',()=>skip(10));
+
+/* ---------------- zoom: buttons, slider, wheel, pinch, keyboard ---------------- */
+const zsl=document.getElementById('zsl'), zlabel=document.getElementById('zlabel');
+function zoomSync(){
+  zsl.value=String(Math.round((USERZOOM-ZMIN)/(ZMAX-ZMIN)*100));
+  zlabel.textContent='\u00d7'+USERZOOM.toFixed(1);
+}
+function setZoom(z){
+  USERZOOM=cl(z,ZMIN,ZMAX); zoomSync(); renderReal(T);
+}
+document.getElementById('zin').addEventListener('click',()=>setZoom(USERZOOM*1.18));
+document.getElementById('zout').addEventListener('click',()=>setZoom(USERZOOM/1.18));
+document.getElementById('zreset').addEventListener('click',()=>setZoom(1));
+zsl.addEventListener('input',()=>setZoom(ZMIN+(zsl.value/100)*(ZMAX-ZMIN)));
+cv.addEventListener('wheel',e=>{e.preventDefault();
+  setZoom(USERZOOM*(e.deltaY<0?1.08:1/1.08));},{passive:false});
+cv.addEventListener('keydown',e=>{
+  if(e.key==='+'||e.key==='='){e.preventDefault();setZoom(USERZOOM*1.15);}
+  else if(e.key==='-'||e.key==='_'){e.preventDefault();setZoom(USERZOOM/1.15);}
+  else if(e.key==='ArrowRight'){e.preventDefault();skip(e.shiftKey?30:10);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();skip(e.shiftKey?-30:-10);}
+  else if(e.key===' '){e.preventDefault();document.getElementById('play').click();}
 });
+(function(){
+  const pts=new Map(); let base=0, baseZoom=1;
+  cv.addEventListener('pointerdown',e=>{pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2){const v=[...pts.values()];
+      base=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]); baseZoom=USERZOOM;}});
+  cv.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;
+    pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2){const v=[...pts.values()];
+      const d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);
+      if(base>4)setZoom(baseZoom*d/base);}});
+  ['pointerup','pointercancel','pointerleave'].forEach(t=>
+    cv.addEventListener(t,e=>pts.delete(e.pointerId)));
+})();
+zoomSync();
+
+/* ---------------- playback speed ---------------- */
+document.querySelectorAll('.spd').forEach(b=>b.addEventListener('click',()=>{
+  SPEED=parseFloat(b.dataset.spd);
+  document.querySelectorAll('.spd').forEach(x=>{
+    x.classList.toggle('primary',x===b);
+    x.setAttribute('aria-pressed',String(x===b));
+  });
+}));
+document.getElementById('voice').addEventListener('click',e=>{
+  if(!('speechSynthesis' in window)){ e.currentTarget.disabled=true; return; }
+  VOICE_ON=!VOICE_ON;
+  e.currentTarget.setAttribute('aria-pressed',String(VOICE_ON));
+  e.currentTarget.textContent = VOICE_ON?TX[LANG].voiceon:TX[LANG].voiceoff;
+  if(VOICE_ON){ spokenIdx=-1; speakNow(); } else speechSynthesis.cancel();
+});
+if('speechSynthesis' in window) speechSynthesis.onvoiceschanged=()=>{};
+
+/* ---------------- fullscreen toggle ---------------- */
+const stageEl = document.querySelector('.stage');
+const fsBtn = document.getElementById('fs');
+function isFs(){
+  return document.fullscreenElement || document.webkitFullscreenElement;
+}
+function syncFsBtn(){
+  const on = !!isFs();
+  fsBtn.textContent = on ? TX[LANG].fsexit : TX[LANG].fsenter;
+  fsBtn.setAttribute('aria-pressed', String(on));
+}
+if(!(document.fullscreenEnabled || document.webkitFullscreenEnabled)) fsBtn.style.display='none';
+fsBtn.addEventListener('click', ()=>{
+  if(!isFs()){
+    const req = stageEl.requestFullscreen || stageEl.webkitRequestFullscreen;
+    if(req) req.call(stageEl); else stageEl.classList.toggle('fs-fallback');
+  } else {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if(exit) exit.call(document);
+  }
+});
+['fullscreenchange','webkitfullscreenchange'].forEach(ev=>
+  document.addEventListener(ev, syncFsBtn));
+document.addEventListener('keydown', e=>{
+  if(e.key==='f' && document.activeElement===cv){ fsBtn.click(); }
+});
+
 document.getElementById('save').addEventListener('click',()=>{
   const a=document.createElement('a');
   a.download='crisproff-frame.png';a.href=cv.toDataURL('image/png');a.click();
@@ -392,14 +962,16 @@ const TX={
 ru:{title:'CRISPRoff — фильм о работе метилирования',
  lede:'Весь процесс одним непрерывным дублем: комплекс подходит к мишени, расплетает ДНК, метилтрансфераза выворачивает цитозины по сторонам от сайта и ставит метки, а те CpG, что физически накрыты белком, остаются чистыми. В конце белок уходит, метка остаётся.',
  play:'▶ Смотреть',pause:'❚❚ Пауза',replay:'↻ Заново',save:'↓ Кадр в PNG',
+ voiceoff:'🔊 Озвучка',voiceon:'🔇 Выключить озвучку',zreset:'⤺ Сброс',back10:'-10 сек',fwd10:'+10 сек',speedlabel:'Скорость:',fsenter:'⛶ На весь экран',fsexit:'⛶ Свернуть',
  nh:'Что в этом кадре правда',
- np:'Верны последовательность событий, положение футпринта и то, что метки ложатся по сторонам, а не под белком — это ровно то, что мы измерили на CD55. Объёмы доменов посчитаны из молекулярных масс, шаг ДНК из параметров B-формы. Форма поверхностей — приближение, не экспериментальные координаты, и скорости событий условны: реальное метилирование идёт часами, а не секундами.',
+ np:'Верны последовательность событий, положение футпринта и то, что метки ложатся по сторонам, а не под белком — это ровно то, что мы измерили на CD55. Относительные размеры всех объектов настоящие: нуклеосома нарисована как 11 нм (крупнее dCas9), dCas9 — 10.0 × 7.1 нм по сфере-эквиваленту массы, остальные домены — по своим молекулярным массам, а сама метка сознательно увеличена: настоящая метильная группа около 0.3 нм и в масштабе ДНК почти не видна, поэтому здесь она нарисована крупнее и вынесена флажком от цепи — это единственный намеренно преувеличенный элемент в ролике. Репликация показана полуконсервативно: вилка идёт вдоль ДНК, каждая дочерняя молекула получает одну родительскую цепь и одну новую, поэтому обе выходят полуметилированными. Метилирование показано как CpG-диада — по цитозину на каждой цепи. Где объект в настоящем масштабе загораживал суть, он убран из кадра, а не уменьшен: в сцене деления нуклеосомы показаны только в начале. Форма поверхностей — по-прежнему приближение, не экспериментальные координаты, и скорости событий условны: реальное метилирование идёт часами, а не секундами. В планах: проверить доступность промотора CD55 по ATAC-seq (GSE74912, CD4⁺ T-клетки) и обновить сцену просвета по данным, а не по общей модели.',
  foot:'CD55 · epicme.bio · оформление по шаблону UC Berkeley и Innovative Genomics Institute'},
 en:{title:'CRISPRoff — a film of methylation at work',
  lede:'The whole process in one continuous take: the complex approaches its target, unwinds the DNA, the methyltransferase flips cytosines out on either side of the site and marks them, while the CpGs physically covered by the protein stay clean. At the end the protein leaves and the mark remains.',
  play:'▶ Play',pause:'❚❚ Pause',replay:'↻ Replay',save:'↓ Frame as PNG',
+ voiceoff:'🔊 Narration',voiceon:'🔇 Stop narration',zreset:'⤺ Reset',back10:'-10 s',fwd10:'+10 s',speedlabel:'Speed:',fsenter:'⛶ Fullscreen',fsexit:'⛶ Exit fullscreen',
  nh:'What is true in this film',
- np:'The order of events, the position of the footprint and the fact that marks land beside rather than under the protein are all correct — that is exactly what we measured at CD55. Domain volumes are computed from molecular masses and the DNA rise from B-form parameters. The surface shapes are approximations rather than experimental coordinates, and the pacing is arbitrary: real methylation takes hours, not seconds.',
+ np:'The order of events, the position of the footprint and the fact that marks land beside rather than under the protein are all correct — that is exactly what we measured at CD55. Relative sizes of every object are now real: the nucleosome is drawn at 11 nm (larger than dCas9), dCas9 at its 10.0 x 7.1 nm mass-equivalent, every other domain by its own molecular mass, and the mark is the one deliberate exception: a real methyl group is about 0.3 nm and nearly invisible at the DNA\u2019s own scale, so it is drawn larger here and held off the strand on a short flag — the only intentionally oversized element in the film. Replication is drawn semiconservatively: the fork travels along the DNA and each daughter receives one parental and one new strand, so both come out hemimethylated. Methylation is shown as a CpG dyad — one cytosine on each strand. Where a true-size object hid the point it was removed from frame rather than shrunk: nucleosomes appear only at the start of the division scene. Surface shapes remain approximations rather than experimental coordinates, and the pacing is arbitrary: real methylation takes hours, not seconds. On the to-do list: check CD55 promoter accessibility against ATAC-seq (GSE74912, CD4+ T cells) and update the gap scene from data instead of a general model.',
  foot:'CD55 · epicme.bio · styled after the UC Berkeley and Innovative Genomics Institute template'}};
 
 function buildChapters(){
@@ -407,7 +979,7 @@ function buildChapters(){
   CH.forEach((c,i)=>{
     const b=document.createElement('button');
     b.textContent=(i+1)+'. '+c[LANG][0];
-    b.addEventListener('click',()=>{T=c.t+0.005;playing=false;btn();renderAt(T);ui();});
+    b.addEventListener('click',()=>{T=(SEG[i]?SEG[i].r0+0.002:0);playing=false;btn();renderReal(T);ui();speakNow();});
     box.appendChild(b);
   });
 }
@@ -419,12 +991,17 @@ function applyLang(l){
   document.querySelectorAll('.lang button').forEach(b=>
     b.setAttribute('aria-pressed',String(b.dataset.lang===l)));
   document.getElementById('save').textContent=TX[l].save;
-  buildChapters();btn();renderAt(T);ui();
+  syncFsBtn();
+  document.getElementById('voice').textContent=VOICE_ON?TX[l].voiceon:TX[l].voiceoff;
+  document.getElementById('back10').setAttribute('aria-label',TX[l].back10);
+  document.getElementById('fwd10').setAttribute('aria-label',TX[l].fwd10);
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  buildPacing();buildChapters();btn();renderReal(T);ui();
   try{localStorage.setItem('epicme_lang',l);}catch(e){}
 }
 document.querySelectorAll('.lang button').forEach(b=>
   b.addEventListener('click',()=>applyLang(b.dataset.lang)));
-buildChapters();renderAt(0);ui();btn();
+buildPacing();buildChapters();renderReal(0);ui();btn();
 try{if(localStorage.getItem('epicme_lang')==='en')applyLang('en');}catch(e){}
 </script>
 </body>
