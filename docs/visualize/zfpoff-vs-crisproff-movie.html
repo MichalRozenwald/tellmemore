@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">CRISPRoff и ZFPoff — сравнительный ролик</title>
+<style>
+  :root{--berkeley:#003262;--gold:#FDB515;--pacific:#3B7EA1;--founders:#EEF2FA;
+    --ink:#16202B;--dim:#4A5A6B;--faint:#7C8B9B;--line:#D6DEE9;--paper:#FBFAF7}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);line-height:1.55;
+    font-family:'Public Sans','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 26px 80px}
+  .top{display:flex;justify-content:space-between;gap:24px;padding:46px 0 8px;flex-wrap:wrap}
+  .rule{width:170px;height:4px;background:var(--gold);margin:0 0 20px}
+  h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(28px,3.6vw,42px);
+    line-height:1.14;margin:0 0 14px;font-weight:700;color:var(--berkeley);max-width:22ch}
+  .lede{font-size:16.5px;color:var(--dim);max-width:74ch;margin:0}
+  .lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;
+    background:#fff;height:fit-content}
+  .lang button{border:0;background:transparent;color:var(--dim);cursor:pointer;
+    font:600 14px/1 inherit;padding:9px 17px;border-radius:999px}
+  .lang button[aria-pressed="true"]{background:var(--berkeley);color:#fff}
+  .stage{margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:6px;
+    overflow:hidden;box-shadow:0 1px 3px rgba(0,50,98,.06)}
+  .stage:fullscreen{margin:0;border:0;border-radius:0;background:#0B0F14;
+    display:flex;flex-direction:column;justify-content:center}
+  .stage:fullscreen canvas{max-height:84vh;width:auto;max-width:100%;margin:auto}
+  .stage:fullscreen .bar{background:#12181f;border-color:#232b34}
+  .stage:fullscreen .bar .tc{color:#9fb0c0}
+  canvas{display:block;width:100%;background:#F7F5F0;cursor:default}
+  .bar{display:flex;align-items:center;gap:11px;padding:12px 14px;flex-wrap:wrap;
+    border-top:1px solid var(--line)}
+  button.ctl{border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--berkeley);
+    cursor:pointer;font:600 14px/1 inherit;padding:10px 16px}
+  button.primary{background:var(--berkeley);color:#fff;border-color:var(--berkeley)}
+  button.ctl:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .track{flex:1 1 240px;height:8px;border-radius:99px;background:#E4E9F1;position:relative;
+    cursor:pointer;min-width:170px}
+  .fill{position:absolute;inset:0 auto 0 0;width:0;border-radius:99px;background:var(--berkeley)}
+  .tc{font-size:13px;color:var(--faint);font-variant-numeric:tabular-nums;min-width:88px}
+  .zoom{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .zoom input[type=range]{width:150px;accent-color:var(--berkeley);cursor:pointer}
+  .spd[aria-pressed="true"]{background:var(--berkeley);color:#fff;border-color:var(--berkeley)}
+  .chapters{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+  .chapters button{border:1px solid var(--line);background:#fff;color:var(--dim);cursor:pointer;
+    font:600 12.5px/1 inherit;padding:8px 11px;border-radius:4px}
+  .chapters button[aria-current="true"]{background:var(--founders);border-color:var(--berkeley);
+    color:var(--berkeley)}
+  .note{margin-top:26px;border-left:4px solid var(--gold);background:var(--founders);padding:15px 19px}
+  .note h3{margin:0 0 6px;font-size:15.5px;color:var(--berkeley);font-weight:700}
+  .note p{margin:0;color:var(--dim);font-size:14.5px;max-width:82ch}
+  .back-home{position:fixed;left:14px;top:12px;z-index:200;font:600 13px/1 'Public Sans',Arial,sans-serif;
+    text-decoration:none;color:#4A5A6B;background:rgba(255,255,255,.92);border:1px solid #D6DEE9;
+    border-radius:999px;padding:8px 13px;backdrop-filter:blur(6px)}
+  .back-home:hover{color:#003262;border-color:#003262}
+  footer{margin-top:40px;border-top:1px solid var(--line);padding-top:18px;color:var(--faint);font-size:13px}
+  @media (max-width:720px){.wrap{padding:0 14px 60px}}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back-home" aria-label="epicme.bio">← epicme.bio</a>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="rule"></div>
+      <h1 data-i18n="title">CRISPRoff и ZFPoff — сравнительный ролик</h1>
+      <p class="lede" data-i18n="lede">Две системы садятся почти на одну точку промотора CD55 и несут одинаковую начинку. Разница только в том, чем они находят мишень — и она видна в данных. Слева CRISPRoff, справа ZFPoff, всё в одном масштабе.</p>
+    </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <canvas id="mv" width="1600" height="900" tabindex="0" aria-label="CRISPRoff versus ZFPoff"></canvas>
+    <div class="bar">
+      <button class="ctl" id="back10">⏪</button>
+      <button class="ctl primary" id="play" data-i18n="play">▶ Смотреть</button>
+      <button class="ctl" id="fwd10">⏩</button>
+      <div class="track" id="tr"><div class="fill" id="fl"></div></div>
+      <span class="tc" id="tc">0:00 / 0:00</span>
+      <button class="ctl" id="voice" aria-pressed="false" data-i18n="voiceoff">🔊 Озвучка</button>
+      <button class="ctl" id="fs" data-i18n="fsenter">⛶ На весь экран</button>
+      <button class="ctl" id="save" data-i18n="save">↓ Кадр в PNG</button>
+    </div>
+    <div class="bar">
+      <div class="zoom">
+        <button class="ctl" id="zout" aria-label="Zoom out">−</button>
+        <input id="zsl" type="range" min="0" max="100" value="0" aria-label="Zoom">
+        <button class="ctl" id="zin" aria-label="Zoom in">+</button>
+        <span class="tc" id="zlabel">×1.0</span>
+        <button class="ctl" id="zreset" data-i18n="zreset">⤺ Сброс</button>
+      </div>
+    </div>
+    <div class="bar">
+      <div class="zoom" role="group" aria-label="Speed">
+        <span class="tc" data-i18n="speedlabel">Скорость:</span>
+        <button class="ctl spd" data-spd="0.5">0.5×</button>
+        <button class="ctl spd" data-spd="0.75">0.75×</button>
+        <button class="ctl spd primary" data-spd="1" aria-pressed="true">1×</button>
+        <button class="ctl spd" data-spd="1.5">1.5×</button>
+        <button class="ctl spd" data-spd="2">2×</button>
+      </div>
+    </div>
+  </div>
+  <div class="chapters" id="ch"></div>
+
+  <div class="note">
+    <h3 data-i18n="nh">Что здесь измерено, а что — модель</h3>
+    <p data-i18n="np">Измерено: координаты мишеней, перекрытие 14 из 20 п.н., профили метилирования по каждому из 137 CpG и футпринты: CpG 74–79 (22 п.н.) у CRISPRoff и CpG 74–76 (8 п.н.) у ZFPoff, ничего не усреднялось. Размеры белков посчитаны из молекулярных масс, ДНК — из параметров B-формы. Модель: что именно причиной футпринта является размер белка. Мы показали корреляцию размера и защиты на двух системах, но не доказали причинность. И главное: данные ZFPoff получены на K562 в сравнении отсортированных фракций, а CRISPRoff — на T-клетках в сравнении с неотредактированными. Разные клетки и разные контрасты, поэтому сравнивать величины эффекта нельзя, сравнима только геометрия.</p>
+  </div>
+  <footer data-i18n="foot">CD55 · epicme.bio · порог вызова метилирования 0.7</footer>
+</div>
+
+<script>
+/* ===================== renderer (same conventions as the CRISPRoff film) ===================== */
+const BK={dna:'#7FB2D9',dna2:'#B9CBDE',base:'#2E6EA6',bone:'#FBFAF6',boneDk:'#DED9CE',
+  rose:'#C4362F',rose2:'#9C2A24',green:'#127C56',gold:'#E8A317',me:'#1E8F63',navy:'#003262',
+  zfp:'#6A4C93',zfp2:'#8E7CB8'};
+const hex2rgb=h=>{h=h.replace('#','');
+  return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];};
+const rgbs=a=>'rgb('+a.map(v=>Math.round(Math.max(0,Math.min(255,v)))).join(',')+')';
+const rnd=i=>{const x=Math.sin(i*127.1+11.7)*43758.5453;return x-Math.floor(x);};
+const Vn=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l];};
+const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lp=(a,b,t)=>a+(b-a)*cl(t,0,1);
+const ez=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const sg=(t,a,b)=>cl((t-a)/(b-a),0,1);
+
+const cv=document.getElementById('mv'), ctx=cv.getContext('2d');
+const W=1600,H=900;
+const CAM={yaw:.42,pitch:-.10,dist:300,foc:1150,oy:.44};
+let USERZOOM=1; const ZMIN=0.5,ZMAX=3.2;
+let ATOMS=[],TAGS=[];
+const LIGHT=Vn([-.45,.72,.55]);
+const SC=4.2;                       // scene units per nm — DNA radius 1 nm = 4.2 u
+
+function proj(p){
+  const cp=Math.cos(CAM.pitch),sp=Math.sin(CAM.pitch);
+  const y1=p[1]*cp-p[2]*sp,z1=p[1]*sp+p[2]*cp;
+  const cy=Math.cos(CAM.yaw),sy=Math.sin(CAM.yaw);
+  const x2=p[0]*cy+z1*sy,z2=-p[0]*sy+z1*cy;
+  const zc=z2+CAM.dist,k=CAM.foc/Math.max(zc,14);
+  return {x:W/2+x2*k,y:H*CAM.oy-y1*k,z:zc,k:k};
+}
+function rotN(n){
+  const cp=Math.cos(CAM.pitch),sp=Math.sin(CAM.pitch);
+  const y1=n[1]*cp-n[2]*sp,z1=n[1]*sp+n[2]*cp;
+  const cy=Math.cos(CAM.yaw),sy=Math.sin(CAM.yaw);
+  return [n[0]*cy+z1*sy,y1,-n[0]*sy+z1*cy];
+}
+const atom=(p,r,c,n)=>ATOMS.push({p,r,c,n:n||Vn(p)});
+const tag=(p,t,c,s)=>TAGS.push({p,t,c,s:s||22});
+
+function lobe(c,rad,nRes,col,seed,sq){
+  sq=sq||[1,1,1];
+  const N=Math.max(30,nRes),ga=Math.PI*(3-Math.sqrt(5));
+  for(let i=0;i<N;i++){
+    const y=1-(i/(N-1))*2,r=Math.sqrt(Math.max(0,1-y*y)),th=ga*i;
+    const n=[Math.cos(th)*r,y,Math.sin(th)*r];
+    const bump=1+.13*Math.sin(n[0]*3.1+seed)+.10*Math.sin(n[1]*4.3+seed*1.7)
+                +.08*Math.sin(n[2]*5.2+seed*2.3)+.05*(rnd(seed*97+i)-.5);
+    const R=rad*bump;
+    atom([c[0]+n[0]*R*sq[0],c[1]+n[1]*R*sq[1],c[2]+n[2]*R*sq[2]],
+         rad*.155+rad*.02*rnd(seed+i),col,Vn(n));
+  }
+}
+function duplex(x0,x1,y,z,nbp){
+  const R=4.2;
+  for(let i=0;i<=nbp;i++){
+    const t=i/nbp, x=lp(x0,x1,t), th=i*(2*Math.PI/10.5);
+    for(const [ph,col] of [[0,BK.dna],[Math.PI,BK.dna2]]){
+      for(let k=0;k<3;k++){
+        const a=th+ph+k*.22, rr=R*(1-k*.06);
+        const n=[0,Math.cos(a),Math.sin(a)];
+        atom([x,y+n[1]*rr,z+n[2]*rr],1.5,col,n);
+      }
+    }
+    for(let k=-1;k<=1;k++){
+      const a=th,rr=R*.34*k;
+      atom([x,y+Math.cos(a)*rr,z+Math.sin(a)*rr],1.25,BK.base,[0,Math.cos(a),Math.sin(a)]);
+    }
+  }
+}
+function strand(pts,col,rad,per){
+  for(let i=0;i<pts.length-1;i++)
+    for(let k=0;k<(per||8);k++){
+      const t=k/(per||8);
+      atom([lp(pts[i][0],pts[i+1][0],t),lp(pts[i][1],pts[i+1][1],t),lp(pts[i][2],pts[i+1][2],t)],
+           rad,col,Vn([0,.6,1]));
+    }
+}
+/* a methyl mark, drawn as a flag off the backbone — the one deliberate
+   exaggeration, as in the CRISPRoff film */
+function mark(x,y,z,on){
+  if(on<=0.02) return;
+  strand([[x,y+4,z],[x,y+4+7*on,z]],BK.me,0.55,4);
+  atom([x,y+4+7*on,z],2.6*on+0.3,BK.me,Vn([0,1,.3]));
+  atom([x,y+4+7*on,z],1.05*on,'#EFFFF6',Vn([0,1,.3]));
+}
+function draw(){
+  ctx.setTransform(1,0,0,1,0,0);
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#FDFDFB');bg.addColorStop(.62,'#F4F2ED');bg.addColorStop(1,'#E7E0D4');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const P=ATOMS.map(a=>({q:proj(a.p),a})).sort((m,n)=>n.q.z-m.q.z);
+  for(const it of P){
+    const a=it.a,q=it.q,R=Math.max(.45,a.r*q.k);
+    if(q.x<-R||q.x>W+R||q.y<-R||q.y>H+R)continue;
+    const n=rotN(a.n);
+    const dif=Math.max(0,n[0]*LIGHT[0]+n[1]*LIGHT[1]+n[2]*LIGHT[2]);
+    const fog=cl((q.z-CAM.dist+90)/230,0,1);
+    const base=hex2rgb(a.c);
+    const lit=base.map(v=>v*(.70+.42*dif)+42*Math.pow(dif,3.2));
+    const far=lit.map((v,i)=>v+([243,241,236][i]-v)*fog*.55);
+    const g=ctx.createRadialGradient(q.x-R*.34,q.y-R*.40,R*.06,q.x,q.y,R*1.02);
+    g.addColorStop(0,rgbs(far.map(v=>v+(255-v)*.55)));
+    g.addColorStop(.55,rgbs(far));
+    g.addColorStop(1,rgbs(far.map(v=>v*.74)));
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(q.x,q.y,R,0,Math.PI*2);ctx.fill();
+  }
+  ctx.textAlign='center';
+  for(const l of TAGS){
+    const q=proj(l.p);
+    ctx.font='700 '+l.s+"px 'Public Sans',Arial,sans-serif";
+    ctx.lineWidth=6;ctx.strokeStyle='rgba(255,255,255,.92)';
+    const yy=Math.max(30,Math.min(H-16,q.y));
+    ctx.strokeText(l.t,q.x,yy);ctx.fillStyle=l.c;ctx.fillText(l.t,q.x,yy);
+  }
+}
+
+/* ===================== storyboard ===================== */
+/* Two panels side by side. Left = CRISPRoff, right = ZFPoff. Same DNA, same
+   target position, same payload domains — only the targeting module differs,
+   and it is drawn at its true relative size:
+     dCas9   158 kDa -> 10.0 nm long axis  -> radius 15.0 u (sphere-equivalent 7.14 nm)
+     ZFP ~7 fingers   23 kDa ->  3.76 nm    -> radius  7.9 u
+   The CpGs are placed at real spacing; the three that sit under the footprint
+   window are the ones the measured data show CRISPRoff protecting. */
+const LX=-100, RX=100;                 // panel centres
+const SITES=[-42,-28,-15,-6,4,14,26,40,54];   // CpG offsets within a panel
+/* Measured per-CpG footprints, read at full resolution — no averaging:
+   ZFPoff    CpG 74-76, 8 bp,  protection index 0.46 / 0.53 / 0.62
+   CRISPRoff CpG 74-79, 22 bp, index 0.21 / 0.16 / 0.22 / 0.19 / 0.28 / 0.69
+   Both start at the same CpG; only the reach differs. */
+const UNDER_ZFP=[-6,4,14];                    // 3 CpGs — the ZFPoff run
+const UNDER_CR =[-6,4,14,26,40];              // 5 CpGs — the wider CRISPRoff run
+const PI_ZFP={'-6':0.46,'4':0.53,'14':0.62};
+const PI_CR ={'-6':0.21,'4':0.16,'14':0.22,'26':0.19,'40':0.28};
+let LANG='ru';
+
+function panel(cx, kind, t){
+  const L = LANG==='ru';
+  const arrive = sg(t,.20,.32), bound = sg(t,.32,.42);
+  const isCR = (kind==='cr');
+  const reach  = sg(t,.50,.62), sweep = sg(t,.62,.80);
+
+  duplex(cx-72, cx+72, -16, 0, 42);
+
+  // target window band marker on the DNA
+  const UNDER = isCR ? UNDER_CR : UNDER_ZFP;
+  const PI    = isCR ? PI_CR : PI_ZFP;
+  if(t>.10){
+    for(const x of UNDER) atom([cx+x,-16-7,0],1.6,'#E8A317',Vn([0,-1,0]));
+  }
+
+  if(arrive>0){
+    const by = lp(150, 2, ez(arrive));
+    if(isCR){
+      // dCas9: two lobes, 10 nm across the long axis
+      lobe([cx-6,by,1],15.0,300,BK.bone,3,[1.05,.95,1]);
+      lobe([cx+6,by-4,-2],15.0,270,BK.bone,17);
+      if(t>.24&&t<.40) tag([cx,by+38,0],'dCas9',BK.navy,20);
+      // guide RNA out of the cleft
+      strand([[cx+2,by+9,4],[cx-8,by+20,9],[cx-20,by+28,13]],BK.gold,2.1,8);
+    } else {
+      // ZFP: a single compact domain, 3.76 nm — 2.7x narrower than dCas9
+      lobe([cx,by-2,0],7.9,140,BK.zfp,23);
+      if(t>.24&&t<.40) tag([cx,by+24,0],'ZFP',BK.zfp,20);
+    }
+    // the shared payload, identical on both sides
+    const off = isCR? 26 : 14;
+    lobe([cx-off-16,by+24,8],8.8,150,BK.rose,41);      // DNMT3A
+    lobe([cx-off-34,by+18,-2],8.1,130,BK.rose2,53);    // DNMT3L
+    lobe([cx+off+14,by+16,-8],8.3,140,BK.green,67);    // BFP
+    lobe([cx+off+34,by+22,4],5.7,80,BK.gold,79);       // KRAB
+    if(t>.42&&t<.52){
+      tag([cx-off-25,by+44,4],'Dnmt3A/L','#A32B23',18);
+      tag([cx+off+14,by+32,-8],'BFP','#0E6446',18);
+      tag([cx+off+36,by+40,4],'KRAB','#8a6200',18);
+    }
+    // DNMT3A reaches out to a flanking CpG
+    if(reach>0){
+      const tx = cx + lp(-off-16, -30, ez(reach));
+      strand([[cx-off-16,by+24,8],[tx,-4,14]],'#DED9CE',1.4,6);
+    }
+  }
+
+  // methylation appears; under the protein it depends on the system
+  if(sweep>0){
+    for(const x of SITES){
+      const order = (x+50)/110;                       // left-to-right sweep
+      let on = ez(cl(sweep*1.6-order*0.6,0,1));
+      const pi = PI[String(x)];
+      if(pi!==undefined) on *= pi;                    // that CpG's own measured index
+      mark(cx+x,-16,3.5,on);
+    }
+  }
+}
+
+function renderAt(t){
+  ATOMS=[];TAGS=[];
+  const L = LANG==='ru';
+  CAM.yaw = .06 + Math.sin(t*Math.PI)*0.05;
+  CAM.pitch = -.07;
+  CAM.dist = (t<.12 ? lp(470,320,ez(sg(t,0,.12)))
+            : t<.86 ? 320
+            : lp(320,296,ez(sg(t,.86,1)))) / USERZOOM;
+  CAM.oy = .46;
+
+  panel(LX,'cr',t);
+  panel(RX,'zfp',t);
+
+  // panel headings, always on
+  tag([LX,108,0], 'CRISPRoff', BK.navy, 30);
+  tag([RX,108,0], 'ZFPoff', BK.zfp, 30);
+
+  // the closing measurement, shown as text in the scene
+  if(t>.86){
+    const a=ez(sg(t,.86,.94));
+    if(a>.3){
+      tag([LX,66,0], L?'широкий футпринт':'wide footprint', '#A32B23', 24);
+      tag([RX,66,0], L?'узкий футпринт':'narrow footprint', '#5B4A82', 24);
+    }
+    if(t>.94){
+      tag([LX,44,0], L?'22 п.н. · CpG 74\u201379':'22 bp \u00b7 CpG 74\u201379', '#A32B23', 26);
+      tag([RX,44,0], L?'8 п.н. · CpG 74\u201376':'8 bp \u00b7 CpG 74\u201376', '#5B4A82', 26);
+    }
+  }
+  draw(); caption(t);
+}
+
+const CH=[
+ {t:0.00,ru:['Одна мишень на двоих','Обе системы нацелены на один и тот же участок промотора CD55: их мишени перекрываются на 14 из 20 пар оснований. Значит, различия в результате нельзя объяснить разным местом посадки.'],
+          en:['One target, two systems','Both systems aim at the same stretch of the CD55 promoter: their targets overlap by 14 of 20 base pairs. So any difference in outcome cannot be put down to a different landing site.']},
+ {t:0.20,ru:['Разные носители, в масштабе','Слева dCas9 — 10 нм по длинной оси. Справа цинковый палец — 3.8 нм. Разница в диаметре в 2.7 раза, и она нарисована честно, а не для наглядности.'],
+          en:['Different carriers, drawn to scale','On the left dCas9, 10 nm along its long axis. On the right the zinc finger, 3.8 nm. A 2.7-fold difference in width, drawn honestly rather than for effect.']},
+ {t:0.42,ru:['Начинка одинаковая','Метилтрансфераза Dnmt3A/L, флуоресцентная метка BFP и репрессор KRAB — одни и те же в обеих системах. Отличается только модуль, который находит мишень.'],
+          en:['The payload is identical','The Dnmt3A/L methyltransferase, the BFP tag and the KRAB repressor are the same in both systems. Only the targeting module differs.']},
+ {t:0.50,ru:['Фермент тянется в сторону','В обоих случаях DNMT3A на гибком линкере дотягивается до CpG рядом с сайтом посадки и начинает их метилировать.'],
+          en:['The enzyme reaches sideways','In both cases DNMT3A, on its flexible linker, reaches the CpGs beside the landing site and starts methylating them.']},
+ {t:0.62,ru:['Метки ложатся по сторонам','Фермент идёт от CpG к CpG. Пока обе системы ведут себя одинаково.'],
+          en:['Marks land on both sides','The enzyme works from CpG to CpG. So far both systems behave the same.']},
+ {t:0.80,ru:['А вот под белком — расходятся','Золотым отмечены CpG, попавшие под белок. Защищены они у обеих систем — но у CRISPRoff таких CpG шесть, а у ZFPoff только три: компактный цинковый палец накрывает меньший участок ДНК.'],
+          en:['Under the protein they diverge','The gold marks show the CpGs that fall under the protein. Both systems protect them — but CRISPRoff protects six and ZFPoff only three: the compact zinc finger covers a shorter stretch of DNA.']},
+ {t:0.86,ru:['Это и есть футпринт','Оба провала начинаются с одного и того же CpG 74 — это край общей мишени. Дальше они расходятся: у ZFPoff защита обрывается через 8 пар оснований, у CRISPRoff тянется на 22.'],
+          en:['That is the footprint','Both dips start at the same CpG 74 — the edge of the shared target. From there they diverge: the ZFPoff protection stops after 8 base pairs, the CRISPRoff one runs 22.']},
+ {t:0.94,ru:['Числа из наших данных','Индекс защиты по каждому CpG в отдельности, без усреднения. ZFPoff: 0.46, 0.53, 0.62 — и на CpG 77 уже 0.99. CRISPRoff: 0.21, 0.16, 0.22, 0.19, 0.28. Ширина следует за размером белка: ZFP 3.8 нм накрывает около 11 пар оснований, dCas9 10 нм — около 29. Измерено 8 и 22.'],
+          en:['The numbers from our data','Protection index per individual CpG, nothing averaged. ZFPoff: 0.46, 0.53, 0.62 — and already 0.99 at CpG 77. CRISPRoff: 0.21, 0.16, 0.22, 0.19, 0.28. The width tracks protein size: a 3.8 nm zinc finger covers about 11 base pairs, a 10 nm dCas9 about 29. Measured: 8 and 22.'],
+          note:1}
+];
+
+function caption(t){
+  let i=0; for(let k=0;k<CH.length;k++) if(t>=CH[k].t-1e-9) i=k;
+  const c=CH[i][LANG];
+  const pad=54, y=H-196;
+  ctx.fillStyle='rgba(255,255,255,.86)';
+  ctx.fillRect(0,y-30,W,230);
+  ctx.fillStyle='#FDB515';ctx.fillRect(pad,y-6,74,4);
+  ctx.textAlign='left';
+  ctx.fillStyle='#003262';
+  ctx.font="700 34px Georgia,'Times New Roman',serif";
+  ctx.fillText(c[0],pad,y+34);
+  ctx.fillStyle='#4A5A6B';
+  ctx.font="400 21px 'Public Sans',Arial,sans-serif";
+  wrap(c[1],pad,y+70,W-pad*2-290,27);
+  if(CH[i].note){
+    ctx.fillStyle='#B8860B';
+    ctx.font="600 16px 'Public Sans',Arial,sans-serif";
+    wrap(LANG==='ru'
+      ? 'Данные ZFPoff — K562, отсортированные фракции; CRISPRoff — T-клетки против неотредактированных. Разные клетки и контрасты: сравнима геометрия, не величина эффекта.'
+      : 'The ZFPoff data are K562 sorted fractions; CRISPRoff is T cells against unedited. Different cells and contrasts: the geometry is comparable, the effect size is not.',
+      pad, y+152, W-pad*2-290, 21);
+  }
+  ctx.fillStyle='#D6DEE9';ctx.fillRect(pad,H-18,W-pad*2,3);
+  ctx.fillStyle='#003262';ctx.fillRect(pad,H-18,(W-pad*2)*t,3);
+  ctx.textAlign='right';
+  ctx.fillStyle='#7C8B9B';ctx.font="600 17px 'Public Sans',Arial,sans-serif";
+  ctx.fillText('epicme.bio · CD55',W-pad,y+34);
+}
+function wrap(txt,x,y,maxw,lh){
+  const words=txt.split(' ');let line='',yy=y;
+  for(const w of words){
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxw&&line){ctx.fillText(line,x,yy);line=w;yy+=lh;}
+    else line=test;
+  }
+  if(line)ctx.fillText(line,x,yy);
+}
+
+/* ---------------- reading-time pacing ---------------- */
+let DUR=60, SEG=[];
+function buildPacing(){
+  const secs=[];
+  for(let i=0;i<CH.length;i++){
+    const c=CH[i][LANG];
+    const words=(c[0]+' '+c[1]).split(/\s+/).length;
+    let d=1.7+words/3.5;
+    if(CH[i].note) d+=2.2;
+    secs.push(Math.max(3.6,d));
+  }
+  const total=secs.reduce((a,b)=>a+b,0);
+  DUR=Math.round(total); SEG=[]; let acc=0;
+  for(let i=0;i<CH.length;i++){
+    const t0=CH[i].t, t1=(i+1<CH.length)?CH[i+1].t:1;
+    SEG.push({r0:acc/total,r1:(acc+secs[i])/total,t0,t1,sec:secs[i]});
+    acc+=secs[i];
+  }
+}
+function warp(u){
+  u=cl(u,0,1);
+  for(const s of SEG){
+    if(u<=s.r1||s===SEG[SEG.length-1]){
+      const k=(u-s.r0)/Math.max(1e-6,(s.r1-s.r0));
+      return cl(s.t0+(s.t1-s.t0)*cl(k,0,1),0,1);
+    }
+  }
+  return 1;
+}
+window.renderReal=u=>renderAt(warp(u));
+window.renderAt=renderAt;
+
+
+/* ---------------- narration ----------------
+   Speaks the current chapter with whatever voice the device already has,
+   including Russian ones. Nothing is downloaded and no audio file is shipped.
+   Off by default. */
+let VOICE_ON=false, spokenIdx=-1;
+function pickVoice(){
+  const want = LANG==='ru' ? 'ru' : 'en';
+  const vs = speechSynthesis.getVoices()||[];
+  return vs.find(v=>v.lang && v.lang.toLowerCase().startsWith(want)) || null;
+}
+function speakChapter(i){
+  if(!VOICE_ON || !('speechSynthesis' in window)) return;
+  const c=CH[i][LANG]; if(!c) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(c[0]+'. '+c[1]);
+  const v=pickVoice(); if(v){ u.voice=v; u.lang=v.lang; }
+  else u.lang = LANG==='ru' ? 'ru-RU' : 'en-US';
+  u.rate=cl(0.98*SPEED,0.6,2.5); u.pitch=1.0;
+  speechSynthesis.speak(u);
+}
+function speakNow(){
+  let cur=0; for(let k=0;k<SEG.length;k++) if(T>=SEG[k].r0) cur=k;
+  spokenIdx=cur; speakChapter(cur);
+}
+function narrateTick(){
+  if(!VOICE_ON) return;
+  let cur=0; for(let k=0;k<SEG.length;k++) if(T>=SEG[k].r0) cur=k;
+  if(cur!==spokenIdx){ spokenIdx=cur; speakChapter(cur); }
+}
+
+/* ---------------- player ---------------- */
+let T=0,playing=false,last=0,SPEED=1;
+const fl=document.getElementById('fl'),tcEl=document.getElementById('tc');
+const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+function ui(){
+  fl.style.width=(T*100)+'%';
+  tcEl.textContent=fmt(T*DUR)+' / '+fmt(DUR);
+  const btns=document.querySelectorAll('#ch button');
+  let cur=0;for(let k=0;k<SEG.length;k++)if(T>=SEG[k].r0)cur=k;
+  btns.forEach((b,i)=>b.setAttribute('aria-current',String(i===cur)));
+}
+function frame(ts){
+  if(!playing)return;
+  if(!last)last=ts;
+  T+=SPEED*(ts-last)/1000/DUR;last=ts;
+  if(T>=1){T=1;playing=false;btn();}
+  renderReal(T);ui();narrateTick();
+  if(playing)requestAnimationFrame(frame);
+}
+function btn(){
+  document.getElementById('play').textContent =
+    playing?TX[LANG].pause:(T>=1?TX[LANG].replay:TX[LANG].play);
+}
+document.getElementById('play').addEventListener('click',()=>{
+  if(T>=1&&!playing)T=0;
+  playing=!playing;last=0;btn();
+  if(playing){ if(VOICE_ON){spokenIdx=-1;speakNow();} requestAnimationFrame(frame); }
+  else if('speechSynthesis' in window) speechSynthesis.cancel();
+});
+const tr=document.getElementById('tr');
+function seekTo(x){const r=tr.getBoundingClientRect();
+  T=cl((x-r.left)/r.width,0,1);playing=false;btn();
+  if(VOICE_ON){spokenIdx=-1;speakNow();}
+  renderReal(T);ui();}
+tr.addEventListener('click',e=>seekTo(e.clientX));
+let scrub=false;
+tr.addEventListener('pointerdown',e=>{scrub=true;seekTo(e.clientX);
+  try{tr.setPointerCapture(e.pointerId);}catch(_){}});
+tr.addEventListener('pointermove',e=>{if(scrub)seekTo(e.clientX);});
+['pointerup','pointercancel'].forEach(t=>tr.addEventListener(t,()=>scrub=false));
+function skip(d){T=cl(T+d/DUR,0,1);playing=false;btn();
+  if(VOICE_ON){spokenIdx=-1;speakNow();}
+  renderReal(T);ui();}
+document.getElementById('back10').addEventListener('click',()=>skip(-10));
+document.getElementById('fwd10').addEventListener('click',()=>skip(10));
+
+const zsl=document.getElementById('zsl'),zlabel=document.getElementById('zlabel');
+function zoomSync(){zsl.value=String(Math.round((USERZOOM-ZMIN)/(ZMAX-ZMIN)*100));
+  zlabel.textContent='×'+USERZOOM.toFixed(1);}
+function setZoom(z){USERZOOM=cl(z,ZMIN,ZMAX);zoomSync();renderReal(T);}
+document.getElementById('zin').addEventListener('click',()=>setZoom(USERZOOM*1.18));
+document.getElementById('zout').addEventListener('click',()=>setZoom(USERZOOM/1.18));
+document.getElementById('zreset').addEventListener('click',()=>setZoom(1));
+zsl.addEventListener('input',()=>setZoom(ZMIN+(zsl.value/100)*(ZMAX-ZMIN)));
+cv.addEventListener('wheel',e=>{e.preventDefault();
+  setZoom(USERZOOM*(e.deltaY<0?1.08:1/1.08));},{passive:false});
+cv.addEventListener('keydown',e=>{
+  if(e.key==='+'||e.key==='='){e.preventDefault();setZoom(USERZOOM*1.15);}
+  else if(e.key==='-'||e.key==='_'){e.preventDefault();setZoom(USERZOOM/1.15);}
+  else if(e.key==='ArrowRight'){e.preventDefault();skip(e.shiftKey?30:10);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();skip(e.shiftKey?-30:-10);}
+  else if(e.key===' '){e.preventDefault();document.getElementById('play').click();}
+});
+zoomSync();
+document.querySelectorAll('.spd').forEach(b=>b.addEventListener('click',()=>{
+  SPEED=parseFloat(b.dataset.spd);
+  document.querySelectorAll('.spd').forEach(x=>{
+    x.classList.toggle('primary',x===b);
+    x.setAttribute('aria-pressed',String(x===b));});
+}));
+
+const stageEl=document.querySelector('.stage'), fsBtn=document.getElementById('fs');
+const isFs=()=>document.fullscreenElement||document.webkitFullscreenElement;
+function syncFsBtn(){const on=!!isFs();
+  fsBtn.textContent=on?TX[LANG].fsexit:TX[LANG].fsenter;
+  fsBtn.setAttribute('aria-pressed',String(on));}
+if(!(document.fullscreenEnabled||document.webkitFullscreenEnabled)) fsBtn.style.display='none';
+fsBtn.addEventListener('click',()=>{
+  if(!isFs()){const r=stageEl.requestFullscreen||stageEl.webkitRequestFullscreen;if(r)r.call(stageEl);}
+  else{const x=document.exitFullscreen||document.webkitExitFullscreen;if(x)x.call(document);}});
+['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,syncFsBtn));
+document.getElementById('voice').addEventListener('click',e=>{
+  if(!('speechSynthesis' in window)){ e.currentTarget.disabled=true; return; }
+  VOICE_ON=!VOICE_ON;
+  e.currentTarget.setAttribute('aria-pressed',String(VOICE_ON));
+  e.currentTarget.textContent = VOICE_ON?TX[LANG].voiceon:TX[LANG].voiceoff;
+  if(VOICE_ON){ spokenIdx=-1; speakNow(); } else speechSynthesis.cancel();
+});
+if('speechSynthesis' in window) speechSynthesis.onvoiceschanged=()=>{};
+
+document.getElementById('save').addEventListener('click',()=>{
+  const a=document.createElement('a');a.download='zfp-vs-crisproff-frame.png';
+  a.href=cv.toDataURL('image/png');a.click();});
+
+const TX={
+ru:{title:'CRISPRoff и ZFPoff — сравнительный ролик',
+ lede:'Две системы садятся почти на одну точку промотора CD55 и несут одинаковую начинку. Разница только в том, чем они находят мишень — и она видна в данных. Слева CRISPRoff, справа ZFPoff, всё в одном масштабе.',
+ play:'▶ Смотреть',pause:'❚❚ Пауза',replay:'↻ Заново',save:'↓ Кадр в PNG',
+ zreset:'⤺ Сброс',speedlabel:'Скорость:',fsenter:'⛶ На весь экран',fsexit:'⛶ Свернуть',
+ voiceoff:'🔊 Озвучка',voiceon:'🔇 Выключить озвучку',
+ nh:'Что здесь измерено, а что — модель',
+ np:'Измерено: координаты мишеней, перекрытие 14 из 20 п.н., профили метилирования по 137 CpG и избыток защиты — 0.41 и 0.67 у CRISPRoff против 0.98 и 1.04 у ZFPoff. Размеры белков посчитаны из молекулярных масс, ДНК — из параметров B-формы. Модель: что именно причиной футпринта является размер белка. Мы показали корреляцию размера и защиты на двух системах, но не доказали причинность. И главное: данные ZFPoff получены на K562 в сравнении отсортированных фракций, а CRISPRoff — на T-клетках в сравнении с неотредактированными. Разные клетки и разные контрасты, поэтому сравнивать величины эффекта нельзя, сравнима только геометрия.',
+ foot:'CD55 · epicme.bio · порог вызова метилирования 0.7'},
+en:{title:'CRISPRoff and ZFPoff — a side-by-side film',
+ lede:'Two systems land on almost the same spot in the CD55 promoter and carry the same payload. They differ only in how they find the target — and that difference shows up in the data. CRISPRoff on the left, ZFPoff on the right, both at the same scale.',
+ play:'▶ Play',pause:'❚❚ Pause',replay:'↻ Replay',save:'↓ Frame as PNG',
+ zreset:'⤺ Reset',speedlabel:'Speed:',fsenter:'⛶ Fullscreen',fsexit:'⛶ Exit fullscreen',
+ voiceoff:'🔊 Narration',voiceon:'🔇 Stop narration',
+ nh:'What is measured here and what is a model',
+ np:'Measured: the target coordinates, the 14-of-20 bp overlap, the methylation profiles at every one of the 137 CpGs, and the footprints: CpG 74\u201379 (22 bp) for CRISPRoff and CpG 74\u201376 (8 bp) for ZFPoff, with nothing averaged. Protein sizes are computed from molecular masses and the DNA from B-form parameters. The model: that protein size is what causes the footprint. We have shown size and protection correlate across two systems, but not that one causes the other. And most importantly: the ZFPoff data come from K562 comparing sorted fractions, while CRISPRoff comes from T cells compared against unedited. Different cells and different contrasts, so the effect sizes are not comparable — only the geometry is.',
+ foot:'CD55 · epicme.bio · methylation calling threshold 0.7'}};
+
+function buildChapters(){
+  const box=document.getElementById('ch');box.innerHTML='';
+  CH.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.textContent=(i+1)+'. '+c[LANG][0];
+    b.addEventListener('click',()=>{T=(SEG[i]?SEG[i].r0+0.002:0);playing=false;btn();renderReal(T);ui();
+      if(VOICE_ON){spokenIdx=-1;speakNow();}});
+    box.appendChild(b);
+  });
+}
+function applyLang(l){
+  LANG=l;document.documentElement.setAttribute('lang',l);
+  document.querySelectorAll('[data-i18n]').forEach(e=>{
+    const k=e.getAttribute('data-i18n');
+    if(k in TX[l])(e.tagName==='TITLE')?document.title=TX[l][k]:e.textContent=TX[l][k];});
+  document.querySelectorAll('.lang button').forEach(b=>
+    b.setAttribute('aria-pressed',String(b.dataset.lang===l)));
+  document.getElementById('save').textContent=TX[l].save;
+  document.getElementById('zreset').textContent=TX[l].zreset;
+  document.getElementById('voice').textContent=VOICE_ON?TX[l].voiceon:TX[l].voiceoff;
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  syncFsBtn();
+  buildPacing();buildChapters();btn();renderReal(T);ui();
+  try{localStorage.setItem('epicme_lang',l);}catch(e){}
+}
+document.querySelectorAll('.lang button').forEach(b=>
+  b.addEventListener('click',()=>applyLang(b.dataset.lang)));
+buildPacing();buildChapters();renderReal(0);ui();btn();
+try{if(localStorage.getItem('epicme_lang')==='en')applyLang('en');}catch(e){}
+</script>
+</body>
+</html>
