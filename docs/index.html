@@ -523,7 +523,7 @@
       </div>
       <span class="tag amber" data-i18n="viz-t5">Сравнение систем</span>
       <h3 data-i18n="viz-h-zfp">ZFPoff и CRISPRoff бок о бок</h3>
-      <p data-i18n="viz-p-zfp">Одна мишень, разные носители: dCas9 10 нм против цинкового пальца 3.8 нм. Футпринт есть у обоих, но у ZFPoff он 8 п.н., а у CRISPRoff 22.</p>
+      <p data-i18n="viz-p-zfp">Одна мишень, разные носители. След у обоих, но у ZFPoff он равен мишени (~20 п.н.), а у CRISPRoff шире (~28 п.н.) — он обязан удерживать ещё PAM.</p>
       <a class="btn" href="zfpoff-vs-crisproff.html" data-i18n="viz-go-zfp">Открыть сравнение с данными →</a>
     </article>
 </div>
@@ -787,12 +787,12 @@
   <div class="domain-strip">
     <div class="domain"><div class="n">14/20</div><div class="t" data-i18n="zfp-d1">п.н. перекрытия мишеней</div></div>
     <div class="domain"><div class="n" style="color:var(--orange)">10</div><div class="n" style="color:var(--purple);margin-top:-4px">3.8</div><div class="t" data-i18n="zfp-d2">нм: dCas9 против ZFP</div></div>
-    <div class="domain"><div class="n" style="color:var(--orange)">22</div><div class="n" style="color:var(--purple);margin-top:-4px">8</div><div class="t" data-i18n="zfp-d3">п.н. ширина футпринта</div></div>
+    <div class="domain"><div class="n" style="color:var(--orange)">~28</div><div class="n" style="color:var(--purple);margin-top:-4px">~20</div><div class="t" data-i18n="zfp-d3">п.н. след: CRISPRoff / ZFPoff</div></div>
     <div class="domain"><div class="n">0.84–0.86</div><div class="t" data-i18n="zfp-d4">корреляция профилей</div></div>
   </div>
 
-  <h3 style="margin:26px 0 6px;font-size:17px;" data-i18n="zfp-h3">Футпринт есть у обеих систем, но разной ширины</h3>
-  <p data-i18n="zfp-p3" style="font-size:15px;">Каждый столбик — отдельный CpG, ничего не усреднено. Провал начинается на CpG 74 у обеих систем, но у ZFPoff обрывается после 76, а у CRISPRoff тянется до 79.</p>
+  <h3 style="margin:26px 0 6px;font-size:17px;" data-i18n="zfp-h3">След у обеих систем: у ZFPoff равен мишени, у CRISPRoff шире</h3>
+  <p data-i18n="zfp-p3" style="font-size:15px;">Каждый столбик — отдельный CpG, ничего не усреднено. Провал начинается у 5′-края своей мишени у обеих систем, но у ZFPoff обрывается ровно на её конце (+106), а у CRISPRoff идёт дальше — через PAM и до +120.</p>
   <div class="zfp-stage">
     <svg id="zfp-foot" viewBox="0 0 640 260" role="img" aria-label="Per-CpG footprint"></svg>
   </div>
@@ -819,7 +819,7 @@
     </div>
   </div>
 
-  <div class="disclaimer" data-i18n="zfp-warn"><strong>Оговорка.</strong> Данные ZFPoff получены на K562 и сравнивают отсортированные фракции HIGH и LOW, а CRISPRoff — на первичных T-клетках против неотредактированных. Разные типы клеток и разные типы контраста: сопоставимы форма профиля и геометрия футпринта, но не величина эффекта.</div>
+  <div class="disclaimer" data-i18n="zfp-warn"><strong>Оговорка.</strong> Следы измерены по EM-seq 35-го дня: один донор, одни клетки, обе системы рядом — величины здесь сравнимы. Но у CRISPRoff в этом наборе одна биологическая реплика против двух у ZFPoff, а его след опирается на три CpG против шести, поэтому ~20 п.н. определены грубее, чем ~28. Ожидаемые длины — из Pavletich &amp; Pabo 1991, Nishimasu 2014 и Yang 2019.</div>
 </section>
 
 <section id="read">
@@ -1224,24 +1224,24 @@ const I18N = {
     'zfp-h2':'Два редактора на одной мишени',
     'zfp-lede':'ZFPoff и CRISPRoff нацелены практически на одну точку промотора CD55 — их мишени перекрываются на 14 из 20 пар оснований — и несут одинаковую начинку. Отличается только модуль, который находит мишень, и это видно в данных.',
     'zfp-d1':'п.н. перекрытия мишеней','zfp-d2':'нм: dCas9 против ZFP',
-    'zfp-d3':'п.н. ширина футпринта','zfp-d4':'корреляция профилей',
-    'zfp-h3':'Футпринт есть у обеих систем, но разной ширины',
-    'zfp-p3':'Каждый столбик — отдельный CpG, ничего не усреднено. Провал начинается на CpG 74 у обеих систем, но у ZFPoff обрывается после 76, а у CRISPRoff тянется до 79.',
+    'zfp-d3':'п.н. след: CRISPRoff / ZFPoff','zfp-d4':'корреляция профилей',
+    'zfp-h3':'След у обеих систем: у ZFPoff равен мишени, у CRISPRoff шире',
+    'zfp-p3':'Каждый столбик — отдельный CpG, ничего не усреднено. Провал начинается у 5′-края своей мишени у обеих систем, но у ZFPoff обрывается ровно на её конце (+106), а у CRISPRoff идёт дальше — через PAM и до +120.',
     'zfp-x':'номер CpG','zfp-y':'индекс защиты',
-    'zfp-lg1':'ZFPoff, K562','zfp-lg2':'CRISPRoff, Day 6','zfp-lg3':'внутри окна мишени',
+    'zfp-lg1':'ZFPoff, K562 (нанопор)','zfp-lg2':'CRISPRoff, Day 6 (нанопор)','zfp-lg3':'внутри окна мишени',
     'zfp-t-vid':'Ролик','zfp-h-vid':'Бок о бок, в одном масштабе',
     'zfp-p-vid':'Слева CRISPRoff, справа ZFPoff: посадка, метилирование и расхождение под белком.',
     'zfp-go-vid':'Открыть ролик с главами →',
     'zfp-t-sc':'Данные','zfp-h-sc':'137 CpG, точка за точкой',
     'zfp-p-sc':'Прирост метилирования на каждом CpG: ZFPoff по горизонтали, CRISPRoff Day 6 по вертикали. Корреляция 0.844.',
     'zfp-go-sc':'Открыть полное сравнение →',
-    'zfp-warn':'<strong>Оговорка.</strong> Данные ZFPoff получены на K562 и сравнивают отсортированные фракции HIGH и LOW, а CRISPRoff — на первичных T-клетках против неотредактированных. Разные типы клеток и разные типы контраста: сопоставимы форма профиля и геометрия футпринта, но не величина эффекта.',
+    'zfp-warn':'<strong>Оговорка.</strong> Следы измерены по EM-seq 35-го дня: один донор, одни клетки, обе системы рядом — величины здесь сравнимы. Но у CRISPRoff в этом наборе одна биологическая реплика против двух у ZFPoff, а его след опирается на три CpG против шести, поэтому ~20 п.н. определены грубее, чем ~28. Ожидаемые длины — из Pavletich &amp; Pabo 1991, Nishimasu 2014 и Yang 2019.',
     'nav-zfpsec':'ZFPoff и CRISPRoff',
     'nav-zfp':'ZFPoff vs CRISPRoff',
     'nav-zfpvid':'Видео: ZFPoff vs CRISPRoff',
     'viz-t5':'Сравнение систем',
     'viz-h-zfp':'ZFPoff и CRISPRoff бок о бок',
-    'viz-p-zfp':'Одна мишень, разные носители: dCas9 10 нм против цинкового пальца 3.8 нм. Футпринт есть у обоих, но у ZFPoff он 8 п.н., а у CRISPRoff 22.',
+    'viz-p-zfp':'Одна мишень, разные носители. След у обоих, но у ZFPoff он равен мишени (~20 п.н.), а у CRISPRoff шире (~28 п.н.) — он обязан удерживать ещё PAM.',
     'viz-go-zfp':'Открыть сравнение с данными →',
     'viz-l7':'Ролик: ZFPoff vs CRISPRoff',
     'nav-browser':'Геномный браузер',
@@ -1460,24 +1460,24 @@ const I18N = {
     'zfp-h2':'Two editors on one target',
     'zfp-lede':'ZFPoff and CRISPRoff aim at essentially the same spot in the CD55 promoter — their targets overlap by 14 of 20 base pairs — and carry the same payload. Only the targeting module differs, and that shows up in the data.',
     'zfp-d1':'bp of target overlap','zfp-d2':'nm: dCas9 vs ZFP',
-    'zfp-d3':'bp footprint width','zfp-d4':'profile correlation',
-    'zfp-h3':'Both systems leave a footprint, of different widths',
-    'zfp-p3':'Every bar is one CpG; nothing is averaged. The dip starts at CpG 74 in both systems, but stops after 76 for ZFPoff while CRISPRoff runs to 79.',
+    'zfp-d3':'bp footprint: CRISPRoff / ZFPoff','zfp-d4':'profile correlation',
+    'zfp-h3':'Both leave a footprint: ZFPoff equal to its target, CRISPRoff wider',
+    'zfp-p3':'Every bar is one CpG; nothing is averaged. The dip starts at the 5-prime edge of each system\u2019s own target, but for ZFPoff it stops exactly at the end of that target (+106), while CRISPRoff runs on through the PAM to about +120.',
     'zfp-x':'CpG number','zfp-y':'protection index',
-    'zfp-lg1':'ZFPoff, K562','zfp-lg2':'CRISPRoff, Day 6','zfp-lg3':'inside target window',
+    'zfp-lg1':'ZFPoff, K562 (nanopore)','zfp-lg2':'CRISPRoff, Day 6 (nanopore)','zfp-lg3':'inside target window',
     'zfp-t-vid':'Film','zfp-h-vid':'Side by side, at one scale',
     'zfp-p-vid':'CRISPRoff on the left, ZFPoff on the right: landing, methylation, and where they diverge under the protein.',
     'zfp-go-vid':'Open the film with chapters →',
     'zfp-t-sc':'Data','zfp-h-sc':'137 CpGs, point by point',
     'zfp-p-sc':'Methylation gain at each CpG: ZFPoff horizontally, CRISPRoff Day 6 vertically. Correlation 0.844.',
     'zfp-go-sc':'Open the full comparison →',
-    'zfp-warn':'<strong>Caveat.</strong> The ZFPoff data come from K562 comparing sorted HIGH and LOW fractions, while CRISPRoff comes from primary T cells against unedited. Different cell types and different kinds of contrast: the profile shape and footprint geometry are comparable, the effect size is not.',
+    'zfp-warn':'<strong>Caveat.</strong> The footprints are measured from day-35 EM-seq: one donor, the same cells, both systems side by side, so the magnitudes are comparable here. But CRISPRoff has one biological replicate in this set against two for ZFPoff, and its footprint rests on three CpGs against six, so the ~20 bp is measured more coarsely than the ~28. Expected lengths from Pavletich &amp; Pabo 1991, Nishimasu 2014 and Yang 2019.',
     'nav-zfpsec':'ZFPoff and CRISPRoff',
     'nav-zfp':'ZFPoff vs CRISPRoff',
     'nav-zfpvid':'Video: ZFPoff vs CRISPRoff',
     'viz-t5':'System comparison',
     'viz-h-zfp':'ZFPoff and CRISPRoff side by side',
-    'viz-p-zfp':'One target, different carriers: dCas9 at 10 nm against a 3.8 nm zinc finger. Both leave a footprint, but ZFPoff spans 8 bp and CRISPRoff 22.',
+    'viz-p-zfp':'One target, different carriers. Both leave a footprint, but the ZFPoff one equals its target (~20 bp) while CRISPRoff is wider (~28 bp) — it must also hold the PAM.',
     'viz-go-zfp':'Open the data comparison →',
     'viz-l7':'Film: ZFPoff vs CRISPRoff',
     'nav-browser':'Genome browser',
