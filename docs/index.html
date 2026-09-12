@@ -385,6 +385,9 @@
       <a href="browser/epicme-genome-browser.html" data-i18n="nav-browser">Геномный браузер</a>
       <a href="visualize/crisproff-all-visualisations.html" data-i18n="nav-viz">Визуализации CRISPRoff</a>
       <a href="visualize/crisproff-movie.html" data-i18n="nav-viz-movie">Видео: моделирование</a>
+      <a href="#zfp" data-i18n="nav-zfpsec">ZFPoff и CRISPRoff</a>
+      <a href="zfpoff-vs-crisproff.html" data-i18n="nav-zfp">ZFPoff vs CRISPRoff</a>
+      <a href="visualize/zfpoff-vs-crisproff-movie.html" data-i18n="nav-zfpvid">Видео: ZFPoff vs CRISPRoff</a>
     </nav>
   </div>
 </header>
@@ -512,7 +515,18 @@
       <p data-i18n="viz-p-vid">Комплекс садится на мишень, расплетает ДНК, выворачивает цитозины и ставит метки. Под белком CpG остаются чистыми, затем белок уходит.</p>
       <a class="btn" href="visualize/crisproff-movie.html" data-i18n="viz-go-vid">Открыть фильм с главами →</a>
     </article>
-  </div>
+      <!-- 5. ZFPoff vs CRISPRoff -->
+    <article class="viz-card">
+      <div class="viz-stage viz-stage-video">
+        <video id="viz-video-zfp" controls playsinline preload="metadata"
+               src="visualize/zfpoff-vs-crisproff-ru.mp4"></video>
+      </div>
+      <span class="tag amber" data-i18n="viz-t5">Сравнение систем</span>
+      <h3 data-i18n="viz-h-zfp">ZFPoff и CRISPRoff бок о бок</h3>
+      <p data-i18n="viz-p-zfp">Одна мишень, разные носители: dCas9 10 нм против цинкового пальца 3.8 нм. Футпринт есть у обоих, но у ZFPoff он 8 п.н., а у CRISPRoff 22.</p>
+      <a class="btn" href="zfpoff-vs-crisproff.html" data-i18n="viz-go-zfp">Открыть сравнение с данными →</a>
+    </article>
+</div>
 
   <p class="viz-all-label" data-i18n="viz-all">Все визуализации по отдельности:</p>
   <nav class="viz-links" aria-label="Visualisation pages">
@@ -523,6 +537,7 @@
     <a href="visualize/crisproff-folds.html" data-i18n="viz-l4">Белковые укладки</a>
     <a href="visualize/crisproff-spacefill.html" data-i18n="viz-l5">Объёмные модели</a>
     <a href="visualize/crisproff-movie.html" data-i18n="viz-l6">Фильм о метилировании</a>
+      <a href="visualize/zfpoff-vs-crisproff-movie.html" data-i18n="viz-l7">Ролик: ZFPoff vs CRISPRoff</a>
   </nav>
 </section>
 
@@ -551,9 +566,32 @@
     transition:border-color .15s ease,color .15s ease;}
   .viz-links a:hover,.viz-links a:focus-visible{border-color:var(--blue);color:var(--ink);}
   @media (prefers-reduced-motion:reduce){ #viz-3d,#viz-foot{animation:none;} }
+
+  /* Only what theme.css does not already provide. Everything else in this
+     block reuses .domain-strip/.domain/.grid2/.card/.tag/.btn/.disclaimer. */
+  #zfp .zfp-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:13px;
+    color:var(--ink-dim);}
+  #zfp .zfp-legend i{display:inline-block;width:13px;height:13px;margin-right:7px;
+    vertical-align:-2px;font-style:normal;border:1px solid var(--line);}
+  #zfp .zfp-legend i.sq{border-radius:2px;}
+  #zfp .zfp-legend i.ci{border-radius:50%;}
+  #zfp .zfp-stage{background:var(--surface-2);border:1px solid var(--line);
+    border-radius:var(--radius);padding:14px 10px 6px;}
+  #zfp .zfp-stage svg,#zfp .card svg{display:block;width:100%;height:auto;}
+  #zfp .card{padding:0 0 18px;display:flex;flex-direction:column;}
+  #zfp .card .tag{margin:14px 16px 0;align-self:flex-start;}
+  #zfp .card h3{margin:6px 16px 6px;}
+  #zfp .card p{margin:0 16px 14px;flex:1;}
+  #zfp .card .btn{display:inline-block;margin:0 16px;align-self:flex-start;
+    font-size:13px;padding:9px 14px;text-decoration:none;}
+  #zfp .card .shot{background:var(--surface-2);border-bottom:1px solid var(--line);
+    border-radius:var(--radius) var(--radius) 0 0;overflow:hidden;}
+  #zfp .card video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;
+    border-radius:var(--radius) var(--radius) 0 0;}
 </style>
 
 <script>
+
 /* Превью для блока визуализаций. Всё автономно, ничего не тянется извне.
    Палитра берётся из theme.css, чтобы блок не заводил собственных цветов. */
 (function(){
@@ -739,6 +777,50 @@
   })();
 })();
 </script>
+
+
+<section id="zfp">
+  <div class="kicker" data-i18n="zfp-kicker">Сравнение систем · ZFPoff и CRISPRoff</div>
+  <h2 data-i18n="zfp-h2">Два редактора на одной мишени</h2>
+  <p class="lede" data-i18n="zfp-lede">ZFPoff и CRISPRoff нацелены практически на одну точку промотора CD55 — их мишени перекрываются на 14 из 20 пар оснований — и несут одинаковую начинку. Отличается только модуль, который находит мишень, и это видно в данных.</p>
+
+  <div class="domain-strip">
+    <div class="domain"><div class="n">14/20</div><div class="t" data-i18n="zfp-d1">п.н. перекрытия мишеней</div></div>
+    <div class="domain"><div class="n" style="color:var(--orange)">10</div><div class="n" style="color:var(--purple);margin-top:-4px">3.8</div><div class="t" data-i18n="zfp-d2">нм: dCas9 против ZFP</div></div>
+    <div class="domain"><div class="n" style="color:var(--orange)">22</div><div class="n" style="color:var(--purple);margin-top:-4px">8</div><div class="t" data-i18n="zfp-d3">п.н. ширина футпринта</div></div>
+    <div class="domain"><div class="n">0.84–0.86</div><div class="t" data-i18n="zfp-d4">корреляция профилей</div></div>
+  </div>
+
+  <h3 style="margin:26px 0 6px;font-size:17px;" data-i18n="zfp-h3">Футпринт есть у обеих систем, но разной ширины</h3>
+  <p data-i18n="zfp-p3" style="font-size:15px;">Каждый столбик — отдельный CpG, ничего не усреднено. Провал начинается на CpG 74 у обеих систем, но у ZFPoff обрывается после 76, а у CRISPRoff тянется до 79.</p>
+  <div class="zfp-stage">
+    <svg id="zfp-foot" viewBox="0 0 640 260" role="img" aria-label="Per-CpG footprint"></svg>
+  </div>
+  <div class="zfp-legend" id="zfp-foot-legend"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <div>
+        <video id="zfp-vid" controls playsinline preload="metadata"
+               src="visualize/zfpoff-vs-crisproff-ru.mp4"></video>
+      </div>
+      <span class="tag amber" data-i18n="zfp-t-vid">Ролик</span>
+      <h3 data-i18n="zfp-h-vid">Бок о бок, в одном масштабе</h3>
+      <p data-i18n="zfp-p-vid">Слева CRISPRoff, справа ZFPoff: посадка, метилирование и расхождение под белком.</p>
+      <a class="btn" href="visualize/zfpoff-vs-crisproff-movie.html" data-i18n="zfp-go-vid">Открыть ролик с главами →</a>
+    </div>
+    <div class="card">
+      <div class="shot"><svg id="zfp-scatter" viewBox="0 0 520 300" role="img"
+        aria-label="Per-CpG scatter"></svg></div>
+      <span class="tag blue" data-i18n="zfp-t-sc">Данные</span>
+      <h3 data-i18n="zfp-h-sc">137 CpG, точка за точкой</h3>
+      <p data-i18n="zfp-p-sc">Прирост метилирования на каждом CpG: ZFPoff по горизонтали, CRISPRoff Day 6 по вертикали. Корреляция 0.844.</p>
+      <a class="btn" href="zfpoff-vs-crisproff.html" data-i18n="zfp-go-sc">Открыть полное сравнение →</a>
+    </div>
+  </div>
+
+  <div class="disclaimer" data-i18n="zfp-warn"><strong>Оговорка.</strong> Данные ZFPoff получены на K562 и сравнивают отсортированные фракции HIGH и LOW, а CRISPRoff — на первичных T-клетках против неотредактированных. Разные типы клеток и разные типы контраста: сопоставимы форма профиля и геометрия футпринта, но не величина эффекта.</div>
+</section>
 
 <section id="read">
     <div class="kicker-shaped read"><span class="shape"></span><span class="lbl" data-i18n="read-kicker">Read — что видит секвенатор</span></div>
@@ -1138,6 +1220,30 @@
    ============================================================ */
 const I18N = {
   ru: {
+    'zfp-kicker':'Сравнение систем · ZFPoff и CRISPRoff',
+    'zfp-h2':'Два редактора на одной мишени',
+    'zfp-lede':'ZFPoff и CRISPRoff нацелены практически на одну точку промотора CD55 — их мишени перекрываются на 14 из 20 пар оснований — и несут одинаковую начинку. Отличается только модуль, который находит мишень, и это видно в данных.',
+    'zfp-d1':'п.н. перекрытия мишеней','zfp-d2':'нм: dCas9 против ZFP',
+    'zfp-d3':'п.н. ширина футпринта','zfp-d4':'корреляция профилей',
+    'zfp-h3':'Футпринт есть у обеих систем, но разной ширины',
+    'zfp-p3':'Каждый столбик — отдельный CpG, ничего не усреднено. Провал начинается на CpG 74 у обеих систем, но у ZFPoff обрывается после 76, а у CRISPRoff тянется до 79.',
+    'zfp-x':'номер CpG','zfp-y':'индекс защиты',
+    'zfp-lg1':'ZFPoff, K562','zfp-lg2':'CRISPRoff, Day 6','zfp-lg3':'внутри окна мишени',
+    'zfp-t-vid':'Ролик','zfp-h-vid':'Бок о бок, в одном масштабе',
+    'zfp-p-vid':'Слева CRISPRoff, справа ZFPoff: посадка, метилирование и расхождение под белком.',
+    'zfp-go-vid':'Открыть ролик с главами →',
+    'zfp-t-sc':'Данные','zfp-h-sc':'137 CpG, точка за точкой',
+    'zfp-p-sc':'Прирост метилирования на каждом CpG: ZFPoff по горизонтали, CRISPRoff Day 6 по вертикали. Корреляция 0.844.',
+    'zfp-go-sc':'Открыть полное сравнение →',
+    'zfp-warn':'<strong>Оговорка.</strong> Данные ZFPoff получены на K562 и сравнивают отсортированные фракции HIGH и LOW, а CRISPRoff — на первичных T-клетках против неотредактированных. Разные типы клеток и разные типы контраста: сопоставимы форма профиля и геометрия футпринта, но не величина эффекта.',
+    'nav-zfpsec':'ZFPoff и CRISPRoff',
+    'nav-zfp':'ZFPoff vs CRISPRoff',
+    'nav-zfpvid':'Видео: ZFPoff vs CRISPRoff',
+    'viz-t5':'Сравнение систем',
+    'viz-h-zfp':'ZFPoff и CRISPRoff бок о бок',
+    'viz-p-zfp':'Одна мишень, разные носители: dCas9 10 нм против цинкового пальца 3.8 нм. Футпринт есть у обоих, но у ZFPoff он 8 п.н., а у CRISPRoff 22.',
+    'viz-go-zfp':'Открыть сравнение с данными →',
+    'viz-l7':'Ролик: ZFPoff vs CRISPRoff',
     'nav-browser':'Геномный браузер',
     'browser-kicker':'Read — все треки на одной оси',
     'browser-h2':'Геномный браузер по области интереса CD55',
@@ -1350,6 +1456,30 @@ const I18N = {
     'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley. Эта страница — точка входа: полная библиография — на страницах <a href="about.html">о проекте</a> и <a href="about-cd55.html">CD55 explorer</a>.'
   },
   en: {
+    'zfp-kicker':'System comparison · ZFPoff and CRISPRoff',
+    'zfp-h2':'Two editors on one target',
+    'zfp-lede':'ZFPoff and CRISPRoff aim at essentially the same spot in the CD55 promoter — their targets overlap by 14 of 20 base pairs — and carry the same payload. Only the targeting module differs, and that shows up in the data.',
+    'zfp-d1':'bp of target overlap','zfp-d2':'nm: dCas9 vs ZFP',
+    'zfp-d3':'bp footprint width','zfp-d4':'profile correlation',
+    'zfp-h3':'Both systems leave a footprint, of different widths',
+    'zfp-p3':'Every bar is one CpG; nothing is averaged. The dip starts at CpG 74 in both systems, but stops after 76 for ZFPoff while CRISPRoff runs to 79.',
+    'zfp-x':'CpG number','zfp-y':'protection index',
+    'zfp-lg1':'ZFPoff, K562','zfp-lg2':'CRISPRoff, Day 6','zfp-lg3':'inside target window',
+    'zfp-t-vid':'Film','zfp-h-vid':'Side by side, at one scale',
+    'zfp-p-vid':'CRISPRoff on the left, ZFPoff on the right: landing, methylation, and where they diverge under the protein.',
+    'zfp-go-vid':'Open the film with chapters →',
+    'zfp-t-sc':'Data','zfp-h-sc':'137 CpGs, point by point',
+    'zfp-p-sc':'Methylation gain at each CpG: ZFPoff horizontally, CRISPRoff Day 6 vertically. Correlation 0.844.',
+    'zfp-go-sc':'Open the full comparison →',
+    'zfp-warn':'<strong>Caveat.</strong> The ZFPoff data come from K562 comparing sorted HIGH and LOW fractions, while CRISPRoff comes from primary T cells against unedited. Different cell types and different kinds of contrast: the profile shape and footprint geometry are comparable, the effect size is not.',
+    'nav-zfpsec':'ZFPoff and CRISPRoff',
+    'nav-zfp':'ZFPoff vs CRISPRoff',
+    'nav-zfpvid':'Video: ZFPoff vs CRISPRoff',
+    'viz-t5':'System comparison',
+    'viz-h-zfp':'ZFPoff and CRISPRoff side by side',
+    'viz-p-zfp':'One target, different carriers: dCas9 at 10 nm against a 3.8 nm zinc finger. Both leave a footprint, but ZFPoff spans 8 bp and CRISPRoff 22.',
+    'viz-go-zfp':'Open the data comparison →',
+    'viz-l7':'Film: ZFPoff vs CRISPRoff',
     'nav-browser':'Genome browser',
     'browser-kicker':'Read — every track on one axis',
     'browser-h2':'Genome browser over the CD55 region of interest',
@@ -1581,6 +1711,13 @@ function applyLang(lang){
       lang==='ru' ? 'квадрат — CpG под белком, метки нет'
                   : 'square — CpG under the protein, no mark');
   }
+  if(window.__zfpDraw) window.__zfpDraw();
+  var vz2=document.getElementById('zfp-vid');
+  if(vz2){ vz2.src = (lang==='ru') ? 'visualize/zfpoff-vs-crisproff-ru.mp4'
+                                   : 'visualize/zfpoff-vs-crisproff-en.mp4'; }
+  var vz=document.getElementById('viz-video-zfp');
+  if(vz){ vz.src = (lang==='ru') ? 'visualize/zfpoff-vs-crisproff-ru.mp4'
+                                 : 'visualize/zfpoff-vs-crisproff-en.mp4'; }
   var vv=document.getElementById('viz-video');
   if(vv){ vv.src = (lang==='ru') ? 'visualize/crisproff-methylation-ru.mp4'
                                  : 'visualize/crisproff-methylation-en.mp4'; }
@@ -1646,6 +1783,83 @@ document.querySelectorAll('#lang-switch button').forEach(btn => {
       toggle.focus();
     }
   });
+})();
+</script>
+<script>
+/* ---------------- ZFPoff vs CRISPRoff previews ----------------
+   Per-CpG only: every CpG is its own bar / its own point, nothing averaged. */
+(function(){
+  const FOOT={"cpg": [67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87], "zfp": [0.971, 0.944, 0.907, 1.097, 0.993, 0.772, 0.976, 0.463, 0.533, 0.619, 0.993, 1.187, 1.155, 1.174, 1.047, 1.178, 1.173, 1.037, 1.041, 1.059, 1.025], "cr6": [0.547, 0.924, 0.822, 1.155, 1.038, 1.185, 1.205, 0.214, 0.156, 0.223, 0.192, 0.281, 0.686, 1.042, 1.139, 1.253, 1.304, 1.003, 0.914, 0.932, 1.048], "win": [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]};
+  const SC={"zfp": [0.0328, 0.0301, 0.0581, -0.0379, 0.0107, 0.0025, -0.0048, 0.0157, 0.0175, 0.024, 0.0096, 0.0272, 0.0204, 0.0282, 0.0139, -0.0176, -0.0007, -0.0081, 0.045, 0.1281, 0.1169, 0.1095, 0.3027, 0.1267, 0.2382, 0.238, 0.3006, 0.3677, 0.3862, 0.3259, 0.2476, 0.1977, 0.3215, 0.4007, 0.1754, 0.3436, 0.4803, 0.2079, 0.3265, 0.258, 0.3483, 0.3199, 0.305, 0.2439, 0.2667, 0.4313, 0.3613, 0.5649, 0.3705, 0.6139, 0.551, 0.447, 0.4052, 0.2825, 0.6285, 0.5738, 0.2233, 0.5141, 0.4401, 0.3706, 0.6212, 0.5609, 0.4937, 0.5388, 0.4368, 0.5511, 0.5814, 0.565, 0.5426, 0.6565, 0.5946, 0.4618, 0.5844, 0.2769, 0.3191, 0.3707, 0.5942, 0.7107, 0.6911, 0.7026, 0.6266, 0.7049, 0.7022, 0.6206, 0.6228, 0.634, 0.6135, 0.6403, 0.6346, 0.3467, 0.3922, 0.4941, 0.1466, 0.5133, 0.3765, 0.4918, 0.4139, 0.5303, 0.4828, 0.5079, 0.6124, 0.4249, 0.4734, 0.2155, 0.268, 0.3578, 0.5378, 0.4576, 0.521, 0.613, 0.5009, 0.3068, 0.3765, 0.3121, 0.4641, 0.1502, 0.3303, 0.3951, 0.2819, 0.3765, 0.2182, 0.3276, 0.1119, 0.2958, 0.3226, 0.3641, 0.2121, 0.4326, 0.0787, 0.3433, 0.0784, 0.0849, 0.0136, 0.0292, 0.0301, 0.0416, -0.0308], "cr6": [-0.06, -0.1189, -0.1323, -0.1335, -0.022, -0.0786, -0.0469, -0.0432, -0.0162, -0.0449, -0.0335, -0.0372, -0.0386, -0.0444, -0.0259, -0.1393, -0.1105, -0.1226, -0.0201, -0.0471, 0.0541, 0.0679, 0.184, 0.1311, 0.1718, 0.1973, 0.2325, 0.2607, 0.2667, 0.2299, 0.2183, 0.1944, 0.3053, 0.2351, 0.0974, 0.2951, 0.3404, 0.0923, 0.3114, 0.2784, 0.3999, 0.4657, 0.4445, 0.2289, 0.2606, 0.2925, 0.1947, 0.3393, 0.1463, 0.3532, 0.2405, 0.3109, 0.4834, 0.4306, 0.6033, 0.5244, 0.2922, 0.2303, 0.3047, 0.2981, 0.6072, 0.597, 0.5128, 0.5701, 0.4879, 0.2903, 0.282, 0.4767, 0.4242, 0.5959, 0.5357, 0.6115, 0.6217, 0.1103, 0.0805, 0.1151, 0.0992, 0.1449, 0.354, 0.5376, 0.5874, 0.6462, 0.6725, 0.5174, 0.4714, 0.481, 0.5406, 0.485, 0.5589, 0.2431, 0.2448, 0.3022, 0.0624, 0.1242, 0.0976, 0.1641, 0.1557, 0.1962, 0.2369, 0.3518, 0.5257, 0.3789, 0.4675, 0.1225, 0.1857, 0.1667, 0.2039, 0.1839, 0.2795, 0.3509, 0.3352, 0.2198, 0.4696, 0.2632, 0.3832, 0.073, 0.1996, 0.2798, 0.2303, 0.3227, 0.2215, 0.2466, 0.1047, 0.2332, 0.1786, 0.1804, 0.0737, 0.1471, 0.0287, -0.0115, -0.0511, -0.0935, -0.0787, -0.0719, -0.101, -0.1237, -0.121]};
+  const NS='http://www.w3.org/2000/svg';
+  function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);
+    if(p)p.appendChild(e);return e;}
+  function tx(p,x,y,s,a){const e=el('text',Object.assign({x,y,fill:'#A9B8B0','font-size':11,
+    'font-family':"'Space Grotesk',sans-serif"},a||{}),p);e.textContent=s;return e;}
+  function L(k){try{const l=document.documentElement.getAttribute('lang')||'ru';
+    return (typeof I18N!=='undefined'&&I18N[l]&&I18N[l][k])||k;}catch(e){return k;}}
+  const cs=getComputedStyle(document.documentElement);
+  const CVv=n=>(cs.getPropertyValue(n)||'').trim();
+  /* theme.css assigns the hues: purple = ZFPoff, orange = CRISPRoff
+     (orange-deep = Day 6). Blue means "unedited", so it must NOT be used
+     for an edited sample. Shape is the redundant cue: square = ZFPoff,
+     triangle = CRISPRoff. */
+  const CZ=CVv('--purple')||'#CC79A7', CC6=CVv('--orange-deep')||'#8E6000',
+        CY=CVv('--yellow')||'#F0E442', CL=CVv('--line')||'#24352E',
+        CF=CVv('--ink-faint')||'#6E8079', CD=CVv('--ink-dim')||'#A9B8B0';
+
+  function drawFoot(){
+    const s=document.getElementById('zfp-foot'); if(!s)return; s.innerHTML='';
+    const X=48,Y=18,W=560,H=180, n=FOOT.cpg.length, bw=W/n;
+    const sy=v=>Y+H-Math.max(0,Math.min(v,1.35))/1.35*H;
+    [0,.25,.5,.75,1].forEach(g=>{
+      el('line',{x1:X,y1:sy(g),x2:X+W,y2:sy(g),stroke:CL,'stroke-width':g===1?1.6:1,
+        opacity:g===1?1:.55},s);
+      tx(s,X-8,sy(g)+4,g.toFixed(2),{'text-anchor':'end','font-size':10,fill:CF,
+        'font-family':"'IBM Plex Mono',monospace"});
+    });
+    for(let i=0;i<n;i++){
+      const x0=X+i*bw;
+      if(FOOT.win[i]) el('rect',{x:x0,y:Y,width:bw,height:H,fill:CY,opacity:.13},s);
+      [['zfp',CZ,0],['cr6',CC6,1]].forEach(function(t){
+        const k=t[0],col=t[1],si=t[2];
+        const v=FOOT[k][i], w=bw*0.36, x=x0+bw*0.10+si*(w+bw*0.08);
+        el('rect',{x:x.toFixed(1),y:sy(v).toFixed(1),width:w.toFixed(1),
+          height:Math.max(1,Y+H-sy(v)).toFixed(1),fill:col,opacity:.9,rx:2},s);
+      });
+      if(i%2===0) tx(s,x0+bw/2,Y+H+15,String(FOOT.cpg[i]),{'text-anchor':'middle','font-size':9.5,
+        fill:CF,'font-family':"'IBM Plex Mono',monospace"});
+    }
+    tx(s,X+W/2,Y+H+34,L('zfp-x'),{'text-anchor':'middle','font-size':11,fill:CF});
+    tx(s,X-34,Y-4,L('zfp-y'),{'font-size':10.5,fill:CD});
+    const lg=document.getElementById('zfp-foot-legend'); if(lg){lg.innerHTML='';
+      [[CZ,'zfp-lg1','sq'],[CC6,'zfp-lg2','sq'],[CY,'zfp-lg3','sq']].forEach(function(t){
+        const sp=document.createElement('span');
+        sp.innerHTML='<i class="'+t[2]+'" style="background:'+t[0]+'"></i>'+L(t[1]); lg.appendChild(sp);});}
+  }
+  function drawScatter(){
+    const s=document.getElementById('zfp-scatter'); if(!s)return; s.innerHTML='';
+    const X=52,Y=22,W=420,H=230, lo=-0.15, hi=0.95;
+    const sx=v=>X+(v-lo)/(hi-lo)*W, sy=v=>Y+H-(v-lo)/(hi-lo)*H;
+    el('rect',{x:X,y:Y,width:W,height:H,fill:'none',stroke:CL,'stroke-width':1},s);
+    el('line',{x1:sx(lo),y1:sy(lo),x2:sx(hi),y2:sy(hi),stroke:CF,'stroke-width':1,
+      'stroke-dasharray':'4 4'},s);
+    for(let i=0;i<SC.zfp.length;i++){
+      const x=sx(SC.zfp[i]), y=sy(SC.cr6[i]);
+      el('rect',{x:(x-2.3).toFixed(1),y:(y-2.3).toFixed(1),width:4.6,height:4.6,
+        fill:CZ,opacity:.62,rx:1},s);
+    }
+    [0,.25,.5,.75].forEach(g=>{
+      tx(s,X-7,sy(g)+4,g.toFixed(2),{'text-anchor':'end','font-size':9.5,fill:CF,
+        'font-family':"'IBM Plex Mono',monospace"});
+      tx(s,sx(g),Y+H+14,g.toFixed(2),{'text-anchor':'middle','font-size':9.5,fill:CF,
+        'font-family':"'IBM Plex Mono',monospace"});
+    });
+    tx(s,X+W/2,Y+H+32,'ZFPoff \u0394',{'text-anchor':'middle','font-size':11,fill:CF});
+    tx(s,X-40,Y+10,'CRISPRoff D6 \u0394',{'font-size':10.5,fill:CD});
+  }
+  window.__zfpDraw=function(){drawFoot();drawScatter();};
+  window.__zfpDraw();
 })();
 </script>
 <script src="assets/epicme-chat.js" defer></script>
