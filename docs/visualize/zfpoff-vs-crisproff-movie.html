@@ -110,7 +110,7 @@
 
   <div class="note">
     <h3 data-i18n="nh">Что здесь измерено, а что — модель</h3>
-    <p data-i18n="np">Измерено: координаты мишеней, перекрытие 14 из 20 п.н., профили метилирования по каждому из 137 CpG и футпринты: CpG 74–79 (22 п.н.) у CRISPRoff и CpG 74–76 (8 п.н.) у ZFPoff, ничего не усреднялось. Размеры белков посчитаны из молекулярных масс, ДНК — из параметров B-формы. Модель: что именно причиной футпринта является размер белка. Мы показали корреляцию размера и защиты на двух системах, но не доказали причинность. И главное: данные ZFPoff получены на K562 в сравнении отсортированных фракций, а CRISPRoff — на T-клетках в сравнении с неотредактированными. Разные клетки и разные контрасты, поэтому сравнивать величины эффекта нельзя, сравнима только геометрия.</p>
+    <p data-i18n="np">Измерено: координаты мишеней, перекрытие 14 из 20 п.н., профили метилирования по каждому CpG и футпринты по данным EM-seq того же донора: около 28 п.н. (+93…+120) у CRISPRoff и около 20 п.н. (+87…+106) у ZFPoff. Ожидаемые длины — из Pavletich & Pabo 1991, Nishimasu 2014 и Yang 2019. Размеры белков посчитаны из молекулярных масс, ДНК — из параметров B-формы. Модель: что именно причиной футпринта является размер белка. Мы показали корреляцию размера и защиты на двух системах, но не доказали причинность. И главное: данные ZFPoff получены на K562 в сравнении отсортированных фракций, а CRISPRoff — на T-клетках в сравнении с неотредактированными. Разные клетки и разные контрасты, поэтому сравнивать величины эффекта нельзя, сравнима только геометрия.</p>
   </div>
   <footer data-i18n="foot">CD55 · epicme.bio · порог вызова метилирования 0.7</footer>
 </div>
@@ -119,7 +119,7 @@
 /* ===================== renderer (same conventions as the CRISPRoff film) ===================== */
 const BK={dna:'#7FB2D9',dna2:'#B9CBDE',base:'#2E6EA6',bone:'#FBFAF6',boneDk:'#DED9CE',
   rose:'#C4362F',rose2:'#9C2A24',green:'#127C56',gold:'#E8A317',me:'#1E8F63',navy:'#003262',
-  zfp:'#6A4C93',zfp2:'#8E7CB8'};
+  zfp:'#CC79A7',zfp2:'#7B3F63'};
 const hex2rgb=h=>{h=h.replace('#','');
   return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];};
 const rgbs=a=>'rgb('+a.map(v=>Math.round(Math.max(0,Math.min(255,v)))).join(',')+')';
@@ -243,13 +243,17 @@ function draw(){
 const LX=-100, RX=100;                 // panel centres
 const SITES=[-42,-28,-15,-6,4,14,26,40,54];   // CpG offsets within a panel
 /* Measured per-CpG footprints, read at full resolution — no averaging:
-   ZFPoff    CpG 74-76, 8 bp,  protection index 0.46 / 0.53 / 0.62
-   CRISPRoff CpG 74-79, 22 bp, index 0.21 / 0.16 / 0.22 / 0.19 / 0.28 / 0.69
-   Both start at the same CpG; only the reach differs. */
-const UNDER_ZFP=[-6,4,14];                    // 3 CpGs — the ZFPoff run
-const UNDER_CR =[-6,4,14,26,40];              // 5 CpGs — the wider CRISPRoff run
-const PI_ZFP={'-6':0.46,'4':0.53,'14':0.62};
-const PI_CR ={'-6':0.21,'4':0.16,'14':0.22,'26':0.19,'40':0.28};
+   ZFPoff    +87..+106, ~20 bp, index 0.69 / 0.51 / 0.66
+   CRISPRoff +93..+120, ~28 bp, index 0.26 / 0.26 / 0.65 / 0.21 / 0.31
+   Both start at their own target's 5' edge; ZFPoff stops at the end of its
+   target, CRISPRoff continues through the PAM. */
+/* EM-seq Day 35, same donor, per-CpG protection index — nothing averaged.
+   ZFPoff protection is confined to its own 20 bp target (+87..+106);
+   CRISPRoff runs on through the PAM (+113..+115) to about +120. */
+const UNDER_ZFP=[-6,4,14];                    // CpGs +89, +97, +105
+const UNDER_CR =[-6,4,14,26,40];              // CpGs +97, +102, +105, +113, +116
+const PI_ZFP={'-6':0.69,'4':0.51,'14':0.66};
+const PI_CR ={'-6':0.26,'4':0.26,'14':0.65,'26':0.21,'40':0.31};
 let LANG='ru';
 
 function panel(cx, kind, t){
@@ -325,19 +329,19 @@ function renderAt(t){
   panel(RX,'zfp',t);
 
   // panel headings, always on
-  tag([LX,108,0], 'CRISPRoff', BK.navy, 30);
+  tag([LX,108,0], 'CRISPRoff', '#8E6000', 30);
   tag([RX,108,0], 'ZFPoff', BK.zfp, 30);
 
   // the closing measurement, shown as text in the scene
   if(t>.86){
     const a=ez(sg(t,.86,.94));
     if(a>.3){
-      tag([LX,66,0], L?'широкий футпринт':'wide footprint', '#A32B23', 24);
-      tag([RX,66,0], L?'узкий футпринт':'narrow footprint', '#5B4A82', 24);
+      tag([LX,66,0], L?'мишень + PAM + корпус':'target + PAM + body', '#8E6000', 24);
+      tag([RX,66,0], L?'только мишень':'target only', '#7B3F63', 24);
     }
     if(t>.94){
-      tag([LX,44,0], L?'22 п.н. · CpG 74\u201379':'22 bp \u00b7 CpG 74\u201379', '#A32B23', 26);
-      tag([RX,44,0], L?'8 п.н. · CpG 74\u201376':'8 bp \u00b7 CpG 74\u201376', '#5B4A82', 26);
+      tag([LX,44,0], L?'~28 п.н. · +93\u2026+120':'~28 bp \u00b7 +93\u2026+120', '#8E6000', 26);
+      tag([RX,44,0], L?'~20 п.н. · +87\u2026+106':'~20 bp \u00b7 +87\u2026+106', '#7B3F63', 26);
     }
   }
   draw(); caption(t);
@@ -346,20 +350,20 @@ function renderAt(t){
 const CH=[
  {t:0.00,ru:['Одна мишень на двоих','Обе системы нацелены на один и тот же участок промотора CD55: их мишени перекрываются на 14 из 20 пар оснований. Значит, различия в результате нельзя объяснить разным местом посадки.'],
           en:['One target, two systems','Both systems aim at the same stretch of the CD55 promoter: their targets overlap by 14 of 20 base pairs. So any difference in outcome cannot be put down to a different landing site.']},
- {t:0.20,ru:['Разные носители, в масштабе','Слева dCas9 — 10 нм по длинной оси. Справа цинковый палец — 3.8 нм. Разница в диаметре в 2.7 раза, и она нарисована честно, а не для наглядности.'],
-          en:['Different carriers, drawn to scale','On the left dCas9, 10 nm along its long axis. On the right the zinc finger, 3.8 nm. A 2.7-fold difference in width, drawn honestly rather than for effect.']},
+ {t:0.20,ru:['Разные носители, в масштабе','Слева dCas9 — 10 нм по длинной оси. Справа цинковый палец — 3.8 нм. Но решает не диаметр: важно, сколько пар оснований белок держит и сколько закрывает сверх этого.'],
+          en:['Different carriers, drawn to scale','On the left dCas9, 10 nm along its long axis. On the right the zinc finger, 3.8 nm. But diameter is not what decides it: what matters is how many base pairs the protein holds, and how many it covers beyond them.']},
  {t:0.42,ru:['Начинка одинаковая','Метилтрансфераза Dnmt3A/L, флуоресцентная метка BFP и репрессор KRAB — одни и те же в обеих системах. Отличается только модуль, который находит мишень.'],
           en:['The payload is identical','The Dnmt3A/L methyltransferase, the BFP tag and the KRAB repressor are the same in both systems. Only the targeting module differs.']},
  {t:0.50,ru:['Фермент тянется в сторону','В обоих случаях DNMT3A на гибком линкере дотягивается до CpG рядом с сайтом посадки и начинает их метилировать.'],
           en:['The enzyme reaches sideways','In both cases DNMT3A, on its flexible linker, reaches the CpGs beside the landing site and starts methylating them.']},
  {t:0.62,ru:['Метки ложатся по сторонам','Фермент идёт от CpG к CpG. Пока обе системы ведут себя одинаково.'],
           en:['Marks land on both sides','The enzyme works from CpG to CpG. So far both systems behave the same.']},
- {t:0.80,ru:['А вот под белком — расходятся','Золотым отмечены CpG, попавшие под белок. Защищены они у обеих систем — но у CRISPRoff таких CpG шесть, а у ZFPoff только три: компактный цинковый палец накрывает меньший участок ДНК.'],
-          en:['Under the protein they diverge','The gold marks show the CpGs that fall under the protein. Both systems protect them — but CRISPRoff protects six and ZFPoff only three: the compact zinc finger covers a shorter stretch of DNA.']},
- {t:0.86,ru:['Это и есть футпринт','Оба провала начинаются с одного и того же CpG 74 — это край общей мишени. Дальше они расходятся: у ZFPoff защита обрывается через 8 пар оснований, у CRISPRoff тянется на 22.'],
-          en:['That is the footprint','Both dips start at the same CpG 74 — the edge of the shared target. From there they diverge: the ZFPoff protection stops after 8 base pairs, the CRISPRoff one runs 22.']},
- {t:0.94,ru:['Числа из наших данных','Индекс защиты по каждому CpG в отдельности, без усреднения. ZFPoff: 0.46, 0.53, 0.62 — и на CpG 77 уже 0.99. CRISPRoff: 0.21, 0.16, 0.22, 0.19, 0.28. Ширина следует за размером белка: ZFP 3.8 нм накрывает около 11 пар оснований, dCas9 10 нм — около 29. Измерено 8 и 22.'],
-          en:['The numbers from our data','Protection index per individual CpG, nothing averaged. ZFPoff: 0.46, 0.53, 0.62 — and already 0.99 at CpG 77. CRISPRoff: 0.21, 0.16, 0.22, 0.19, 0.28. The width tracks protein size: a 3.8 nm zinc finger covers about 11 base pairs, a 10 nm dCas9 about 29. Measured: 8 and 22.'],
+ {t:0.80,ru:['А вот под белком — расходятся','Золотым отмечены CpG под белком. Защищены они у обеих систем, но по-разному: у ZFPoff защита обрывается ровно на конце мишени, +106. У CRISPRoff она идёт дальше — через PAM и ещё на несколько оснований, до +120.'],
+          en:['Under the protein they diverge','The gold marks show the CpGs under the protein. Both systems protect them, but differently: the ZFPoff protection stops exactly at the end of its target, +106. The CRISPRoff one runs further — through the PAM and a few bases beyond, to about +120.']},
+ {t:0.86,ru:['Дело не в толщине белка','Цинковый палец из шести-семи модулей держит 20 пар оснований по конструкции и почти ничего не закрывает сверх этого — его след равен мишени. dCas9 держит те же 20 пар, но обязан удерживать ещё PAM и корпусом накрывает несколько оснований за ним.'],
+          en:['It is not about protein thickness','A six- or seven-finger zinc finger holds 20 base pairs by construction and shields almost nothing beyond them — its footprint equals its target. dCas9 holds the same 20 bp but must also hold the PAM, and its body covers a few bases past it.']},
+ {t:0.94,ru:['Числа из наших данных','EM-seq, 35-й день, один донор, обе системы рядом. Индекс защиты по каждому CpG: ZFPoff 0.69, 0.51, 0.66 — и сразу за мишенью, на +113, уже 1.22. CRISPRoff 0.26, 0.26, 0.65, 0.21, 0.31. Следы: около 20 пар оснований против 28 при 20 и 29 ожидаемых из структурных работ.'],
+          en:['The numbers from our data','EM-seq, day 35, one donor, both systems side by side. Protection index at each CpG: ZFPoff 0.69, 0.51, 0.66 — and immediately past its target, at +113, already 1.22. CRISPRoff 0.26, 0.26, 0.65, 0.21, 0.31. Footprints: about 20 base pairs against 28, versus 20 and 29 expected from the structural literature.'],
           note:1}
 ];
 
@@ -381,8 +385,8 @@ function caption(t){
     ctx.fillStyle='#B8860B';
     ctx.font="600 16px 'Public Sans',Arial,sans-serif";
     wrap(LANG==='ru'
-      ? 'Данные ZFPoff — K562, отсортированные фракции; CRISPRoff — T-клетки против неотредактированных. Разные клетки и контрасты: сравнима геометрия, не величина эффекта.'
-      : 'The ZFPoff data are K562 sorted fractions; CRISPRoff is T cells against unedited. Different cells and contrasts: the geometry is comparable, the effect size is not.',
+      ? 'EM-seq, 35-й день, один донор: обе системы на одних клетках. У CRISPRoff одна биологическая реплика против двух у ZFPoff — величины сравнимы, но с этой оговоркой.'
+      : 'EM-seq, day 35, one donor: both systems in the same cells. CRISPRoff has one biological replicate against two for ZFPoff — the magnitudes are comparable, with that caveat.',
       pad, y+152, W-pad*2-290, 21);
   }
   ctx.fillStyle='#D6DEE9';ctx.fillRect(pad,H-18,W-pad*2,3);
@@ -565,7 +569,7 @@ ru:{title:'CRISPRoff и ZFPoff — сравнительный ролик',
  zreset:'⤺ Сброс',speedlabel:'Скорость:',fsenter:'⛶ На весь экран',fsexit:'⛶ Свернуть',
  voiceoff:'🔊 Озвучка',voiceon:'🔇 Выключить озвучку',
  nh:'Что здесь измерено, а что — модель',
- np:'Измерено: координаты мишеней, перекрытие 14 из 20 п.н., профили метилирования по 137 CpG и избыток защиты — 0.41 и 0.67 у CRISPRoff против 0.98 и 1.04 у ZFPoff. Размеры белков посчитаны из молекулярных масс, ДНК — из параметров B-формы. Модель: что именно причиной футпринта является размер белка. Мы показали корреляцию размера и защиты на двух системах, но не доказали причинность. И главное: данные ZFPoff получены на K562 в сравнении отсортированных фракций, а CRISPRoff — на T-клетках в сравнении с неотредактированными. Разные клетки и разные контрасты, поэтому сравнивать величины эффекта нельзя, сравнима только геометрия.',
+ np:'Измерено: координаты мишеней, перекрытие 14 из 20 п.н., профили метилирования по 137 CpG и избыток защиты — 0.41 и 0.67 у CRISPRoff против 0.98 и 1.04 у ZFPoff. Размеры белков посчитаны из молекулярных масс, ДНК — из параметров B-формы. Модель: что след определяется длиной контакта с ДНК плюс стерическим навесом — это интерпретация, а не измерение; около 5 п.н. навеса у dCas9 мы интерполировали между кристаллографией и АСМ. Ограничения: у CRISPRoff в наборе EM-seq одна биологическая реплика против двух у ZFPoff, а след ZFPoff опирается на три CpG против шести. Нанопоровые данные ZFPoff — это K562 и отсортированные фракции, поэтому в сравнении величин участвует только EM-seq.',
  foot:'CD55 · epicme.bio · порог вызова метилирования 0.7'},
 en:{title:'CRISPRoff and ZFPoff — a side-by-side film',
  lede:'Two systems land on almost the same spot in the CD55 promoter and carry the same payload. They differ only in how they find the target — and that difference shows up in the data. CRISPRoff on the left, ZFPoff on the right, both at the same scale.',
@@ -573,7 +577,7 @@ en:{title:'CRISPRoff and ZFPoff — a side-by-side film',
  zreset:'⤺ Reset',speedlabel:'Speed:',fsenter:'⛶ Fullscreen',fsexit:'⛶ Exit fullscreen',
  voiceoff:'🔊 Narration',voiceon:'🔇 Stop narration',
  nh:'What is measured here and what is a model',
- np:'Measured: the target coordinates, the 14-of-20 bp overlap, the methylation profiles at every one of the 137 CpGs, and the footprints: CpG 74\u201379 (22 bp) for CRISPRoff and CpG 74\u201376 (8 bp) for ZFPoff, with nothing averaged. Protein sizes are computed from molecular masses and the DNA from B-form parameters. The model: that protein size is what causes the footprint. We have shown size and protection correlate across two systems, but not that one causes the other. And most importantly: the ZFPoff data come from K562 comparing sorted fractions, while CRISPRoff comes from T cells compared against unedited. Different cells and different contrasts, so the effect sizes are not comparable — only the geometry is.',
+ np:'Measured: the target coordinates, the 14-of-20 bp overlap, the methylation profile at every CpG, and the footprints from EM-seq on the same donor: about 28 bp (+93 to +120) for CRISPRoff and about 20 bp (+87 to +106) for ZFPoff. Expected lengths from Pavletich & Pabo 1991, Nishimasu 2014 and Yang 2019. Protein sizes are computed from molecular masses and the DNA from B-form parameters. The model: that the footprint is set by DNA contact length plus steric overhang — an interpretation, not a measurement; the ~5 bp of dCas9 overhang is our interpolation between crystallography and AFM. Limitations: CRISPRoff has one biological replicate in the EM-seq set against two for ZFPoff, and the ZFPoff footprint rests on three CpGs against six. The nanopore ZFPoff data are K562 sorted fractions, so only EM-seq enters the comparison of magnitudes.',
  foot:'CD55 · epicme.bio · methylation calling threshold 0.7'}};
 
 function buildChapters(){
