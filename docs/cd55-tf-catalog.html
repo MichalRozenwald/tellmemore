@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">epicme.bio — каталог ТФ и ChIP-seq по CD55</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page-specific only. Palette, nav, footer, cards, tags and tables all
+     come from assets/theme.css — nothing is redefined here. */
+  .hero{ padding:56px 0 28px; }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--blue); font-weight:600; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--blue-deep); }
+  h1.display{
+    font-size:clamp(24px, 3.6vw, 36px); font-weight:600; line-height:1.22;
+    letter-spacing:-0.01em; margin:0 0 18px; max-width:840px;
+  }
+  .catalog-wrap{ overflow-x:auto; margin-top:14px; }
+  .catalog-wrap table{ width:100%; border-collapse:collapse; font-size:13.5px; min-width:920px; }
+  .catalog-wrap th{
+    text-align:left; padding:10px 12px; border-bottom:1.5px solid var(--line);
+    font-family:'Space Grotesk',sans-serif; font-size:12.5px; color:var(--ink-dim);
+    font-weight:600; white-space:nowrap;
+  }
+  .catalog-wrap td{
+    padding:11px 12px; border-bottom:1px solid var(--line);
+    vertical-align:top; color:var(--ink-dim); line-height:1.5;
+  }
+  .catalog-wrap td strong{ color:var(--ink); }
+  .catalog-wrap code{ font-family:'IBM Plex Mono',monospace; font-size:12px; }
+  .catalog-wrap .tag{ margin-top:6px; display:inline-block; }
+  .sub-h{ margin:34px 0 6px; }
+  .page-actions{ display:flex; gap:10px; flex-wrap:wrap; margin:28px 0 8px; }
+</style>
+</head>
+<body>
+
+<header class="nav" id="site-nav">
+  <div class="nav-inner">
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang="ru" class="active">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="brand brand-logo" style="text-decoration:none;">
+      <svg class="logo-mark" viewBox="0 0 40 40" width="26" height="26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <polygon points="16,7 25,12.5 25,27.5 16,33 7,27.5 7,12.5" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="2"/>
+        <text x="16" y="24" font-family="'IBM Plex Mono', monospace" font-size="13" font-weight="700" fill="var(--ink)" text-anchor="middle">C</text>
+        <line x1="22" y1="11" x2="28" y2="7" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="30" cy="8" r="3.4" fill="var(--orange)"/>
+        <line x1="30" y1="4.6" x2="30" y2="1.8" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="27.3" y1="9.7" x2="24.8" y2="11.3" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="32.7" y1="9.7" x2="35.2" y2="11.3" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-stack">
+        <span class="brand-word">epi<span class="accent-c">C</span>me</span>
+        <span class="brand-sub" data-i18n="brand-sub">эпигеном · CRISPRoff · метилирование</span>
+      </span>
+    </a>
+    <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav-links">
+      <span data-i18n="nav-toggle-label">Меню</span>
+      <span class="nav-toggle-icon" aria-hidden="true">▾</span>
+    </button>
+    <nav class="nav-links" id="site-nav-links">
+      <a href="index.html" data-i18n="nav-home">Главная</a>
+      <a href="about.html" data-i18n="nav-about">О проекте</a>
+      <a href="about-cd55.html">CD55 explorer</a>
+      <a href="day6.html">Day 6</a>
+      <a href="day35.html">Day 35</a>
+      <a href="day35-emseq.html" data-i18n="nav-emseq">EM-seq · Day 35</a>
+      <a href="day6VSday35.html">Day 35 vs Day 6</a>
+      <a href="k562.html" data-i18n="nav-k562">K562</a>
+      <a href="k562-chipseq.html" data-i18n="nav-chipseq">ChIP-seq</a>
+      <a href="cd55-tf-catalog.html" data-i18n="nav-tfcat" class="active">Каталог ТФ</a>
+      <a href="public-methylation.html" data-i18n="nav-public">Публичные данные</a>
+      <a href="primary-tcell-public-data.html" data-i18n="nav-tcelldata">Публичные данные первичных T-клеток</a>
+      <a href="cd55-tf-tcells.html" data-i18n="nav-tf">Механизмы</a>
+      <a href="cd55-dna-structures.html" data-i18n="nav-struct">Структуры ДНК</a>
+      <a href="methylation-and-memory.html" data-i18n="nav-memory">Метилирование и память</a>
+      <a href="methylation-generational-trauma.html" data-i18n="nav-trauma">Метилирование и травма</a>
+      <a href="upload-user-input.html" data-i18n="nav-upload" class="upload-nav-link">Загрузка данных</a>
+      <a href="research-ideas-todos.html" data-i18n="nav-research">Research Ideas/Todos</a>
+      <a href="genomic-foundation-models.html" data-i18n="nav-models">Foundation-модели</a>
+      <a href="synthetic-cd55-roi-baseline.html" data-i18n="nav-synth">Synthetic ROI</a>
+      <a href="CHAPLEedited.htm" data-i18n="nav-chaple" class="ella-link">CHAPLE-синдром</a>
+      <a href="cd55HGSOCedited.htm" data-i18n="nav-hgsoc" class="ella-link">CD55 и рак яичников</a>
+      <a href="mesites_plot_wNucNEW.html" data-i18n="nav-mesites-nuc" class="ella-link">Mesites: delMC + нуклеосомы</a>
+      <a href="mesites_plotEDITED.htm" data-i18n="nav-mesites" class="ella-link">Mesites: delMC</a>
+      <a href="browser/epicme-genome-browser.html" data-i18n="nav-browser">Геномный браузер</a>
+      <a href="visualize/crisproff-all-visualisations.html" data-i18n="nav-viz">Визуализации CRISPRoff</a>
+      <a href="visualize/crisproff-movie.html" data-i18n="nav-viz-movie">Видео: моделирование</a>
+      <a href="#zfp" data-i18n="nav-zfpsec">ZFPoff и CRISPRoff</a>
+      <a href="zfpoff-vs-crisproff.html" data-i18n="nav-zfp">ZFPoff vs CRISPRoff</a>
+      <a href="visualize/zfpoff-vs-crisproff-movie.html" data-i18n="nav-zfpvid">Видео: ZFPoff vs CRISPRoff</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow" data-i18n="eyebrow">epicme.bio · справочник</div>
+    <h1 class="display" data-i18n="h1">Каталог транскрипционных факторов CD55: где лежит ChIP-seq</h1>
+    <p class="lede" data-i18n="lede"></p>
+    <p class="mini-caption" data-i18n="win"></p>
+  </section>
+
+  <section>
+    <h2 class="sub-h" data-i18n="h2a"></h2>
+    <p data-i18n="p2a"></p>
+    <div class="catalog-wrap" data-i18n="tbl1"></div>
+  </section>
+
+  <section>
+    <h2 class="sub-h" data-i18n="h2b"></h2>
+    <p data-i18n="p2b"></p>
+    <div class="catalog-wrap" data-i18n="tbl2"></div>
+  </section>
+
+  <section>
+    <h2 class="sub-h" data-i18n="h2c"></h2>
+    <p data-i18n="p2c"></p>
+    <div data-i18n="agg"></div>
+  </section>
+
+  <section>
+    <h2 class="sub-h" data-i18n="h2d"></h2>
+    <ul data-i18n="todo"></ul>
+    <div class="disclaimer" data-i18n="ctcf"></div>
+    <div class="disclaimer" data-i18n="caveat"></div>
+
+    <div class="page-actions">
+      <a class="btn ghost" href="index.html" data-i18n="back">← Назад на главную</a>
+      <a class="btn" href="k562-chipseq.html" data-i18n="toK562">Разбор ChIP-seq в K562 →</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap" data-i18n="footer">
+    epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley.
+  </div>
+</footer>
+
+<script>
+/* Same bilingual mechanism as every other page: both languages written out
+   in full, never derived from one another, choice persisted in localStorage
+   so it carries across the site. */
+const I18N = {
+  ru: {
+    'agg': '<ul><li><a href="http://gtrd.biouml.org" target="_blank" rel="noopener">GTRD</a> &mdash; 15&thinsp;982 human ChIP-seq experiments, 1&thinsp;391 TFs, uniform processing, per-TF metaclusters</li><li><a href="https://chip-atlas.org/peak_browser" target="_blank" rel="noopener">ChIP-Atlas</a> &mdash; filter by TF and cell-type class, one-click IGV/UCSC</li><li><a href="https://remap.univ-amu.fr/" target="_blank" rel="noopener">ReMap 2022</a> &mdash; merged non-redundant peaks per TF, UCSC track hub</li><li><a href="http://cistrome.org/db/" target="_blank" rel="noopener">Cistrome DB</a> &mdash; curated metadata with QC scores</li><li><a href="http://summit.med.unideb.hu/summitdb/" target="_blank" rel="noopener">ChIPSummitDB</a> &mdash; motif-to-summit distances; separates direct binding from co-IP</li><li><a href="https://unibind.uio.no/" target="_blank" rel="noopener">UniBind</a> &mdash; ChIP-supported <em>and</em> motif-matched only</li></ul>',
+    'back': '← Назад на главную',
+    'caveat': '<strong>Оговорка.</strong> Ни одна строка здесь не измерена заново — это каталог чужих данных со ссылками. Две вещи важно читать правильно. Первое: отсутствие пика NF-κB в нестимулированных K562 — это несовпадение условий, а не доказательство отсутствия связывания. Второе: метакластеры агрегаторов склеивают типы клеток — пик там не означает связывания в T-клетках.',
+    'ctcf': '<strong>Противоречие в наших собственных текстах — CTCF.</strong> Строка CTCF выше и страница <a href="k562-chipseq.html">разбора ChIP-seq</a> говорят, что пик есть — CpG #43–86, <code>chr1:207 320 854–207 321 372</code>. Абзац «Кого на этом промоторе никто не проверял» на <a href="index.html">главной</a> говорит, что пика нет. Оба утверждения одновременно верными быть не могут, а CTCF — несущая конструкция гипотезы «метилирование мешает связыванию». Пока не проверено по сырому bigBed (<code>bigBedToBed</code> с hgdownload), ни одна формулировка не должна использоваться как установленный факт — ни здесь, ни в главе диссертации.',
+    'eyebrow': 'epicme.bio · справочник',
+    'h1': 'Каталог транскрипционных факторов CD55: где лежит ChIP-seq',
+    'h2a': 'Часть 1 — опубликованные регуляторы CD55',
+    'h2b': 'Часть 2 — остальные, по важности для CD55',
+    'h2c': 'Агрегаторы — где искать дальше',
+    'h2d': 'Что ещё не закрыто',
+    'lede': 'Пофакторный список всех публичных данных по связыванию факторов, которые литература связывает с регуляцией CD55 (DAF), плюс факторы, которые реально сидят в нашем окне K562. Прямые номера ENCODE там, где они проверены поштучно; запросы-фильтры там, где нет; и честные пометки там, где данных просто нет.',
+    'nav-about': 'О проекте',
+    'nav-browser': 'Геномный браузер',
+    'nav-chaple': 'CHAPLE-синдром',
+    'nav-chipseq': 'ChIP-seq',
+    'nav-emseq': 'EM-seq · Day 35',
+    'nav-hgsoc': 'CD55 и рак яичников',
+    'nav-home': 'Главная',
+    'nav-k562': 'K562',
+    'nav-memory': 'Метилирование и память',
+    'nav-mesites': 'Mesites: delMC',
+    'nav-mesites-nuc': 'Mesites: delMC + нуклеосомы',
+    'nav-models': 'Foundation-модели',
+    'nav-public': 'Публичные данные',
+    'nav-research': 'Research Ideas/Todos',
+    'nav-struct': 'Структуры ДНК',
+    'nav-synth': 'Synthetic ROI',
+    'nav-tcelldata': 'Публичные данные первичных T-клеток',
+    'nav-tf': 'Механизмы',
+    'nav-tfcat': 'Каталог ТФ',
+    'nav-toggle-label': 'Меню',
+    'nav-trauma': 'Метилирование и травма',
+    'nav-upload': 'Загрузка данных',
+    'nav-viz': 'Визуализации CRISPRoff',
+    'nav-viz-movie': 'Видео: моделирование',
+    'nav-zfp': 'ZFPoff vs CRISPRoff',
+    'nav-zfpsec': 'ZFPoff и CRISPRoff',
+    'nav-zfpvid': 'Видео: ZFPoff vs CRISPRoff',
+    'p2a': 'Порядок тот же, что в исходном списке литературы.',
+    'p2b': 'Сначала те, кто подтверждён в нашем окне K562 и механистически способен объяснить разницу LOW/HIGH; в конце — общая транскрипционная машинерия.',
+    'p2c': 'Все эти базы пересчитывают ENCODE и GEO единообразно и отдают BED/UCSC. Запрос лучше делать по окну целиком, а не по каждому фактору отдельно.',
+    'tbl1': '<table><thead><tr><th>Фактор</th><th>ENCODE ChIP-seq</th><th>Другие источники</th><th>Роль в регуляции CD55</th><th>Статьи</th></tr></thead><tbody><tr><td><strong>NF-κB — RELA</strong><br><span class="tag green">есть в ENCODE</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR000EAG/" target="_blank" rel="noopener"><code>ENCSR000EAG</code></a> GM12878 + TNFα 6 h<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=RELA" target="_blank" rel="noopener">RELA — all cell lines</a></td><td>HepG2, K562, HeLa-S3, лимфоидные линии / HepG2, K562, HeLa-S3, lymphoid lines</td><td>Мутагенез промотора и люцифераза показывают зависимость от NF-κB-сайта; ChIP подтверждает связывание на промоторе CD55 в клетках рака толстой кишки.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9889927/" target="_blank" rel="noopener">PMC9889927</a></td></tr><tr><td><strong>NF-κB — NFKB1 (p50)</strong><br><span class="tag green">есть в ENCODE</span></td><td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=NFKB1" target="_blank" rel="noopener">NFKB1 — all cell lines</a><br><a href="https://www.encodeproject.org/experiments/ENCSR387QUV/" target="_blank" rel="noopener"><code>ENCSR387QUV</code></a> RELB, GM12878 (non-canonical, bonus)</td><td>GM12878, K562</td><td>p50-субъединица того же комплекса NF-κB.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9889927/" target="_blank" rel="noopener">PMC9889927</a></td></tr><tr><td><strong>TFCP2</strong><br><span class="tag amber">новое — есть в K562</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR998OMC/" target="_blank" rel="noopener"><code>ENCSR998OMC</code></a> K562, CETCh-seq (Snyder lab)<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=TFCP2" target="_blank" rel="noopener">TFCP2 — all cell lines</a></td><td>SK-HEP-1 (TFCP2-HA, promoter array) — <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4311423/" target="_blank" rel="noopener">PMC4311423</a></td><td>Нокдаун, мутация сайта и ChIP подтверждают прямое связывание TFCP2 с промотором CD55.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9889927/" target="_blank" rel="noopener">PMC9889927</a></td></tr><tr><td><strong>KLF4</strong><br><span class="tag red">пробел</span></td><td>Только eGFP-KLF4 в HEK293 / eGFP-KLF4 in HEK293 only<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=KLF4" target="_blank" rel="noopener">KLF4 — all cell lines</a></td><td>GEO: эндотелий при ламинарном сдвиге, серии по репрограммированию iPSC, мышиный <code>GSE11431</code></td><td>Три CACCC-бокса рядом с TSS; ведущий предполагаемый активатор. Гипотеза остаётся мотивной и функциональной, но не подтверждённой ChIP в K562.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10884306/" target="_blank" rel="noopener">PMC10884306</a></td></tr><tr><td><strong>CREB (CREB1)</strong><br><span class="tag green">есть в ENCODE</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR000BSO/" target="_blank" rel="noopener"><code>ENCSR000BSO</code></a> K562<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=CREB1" target="_blank" rel="noopener">CREB1 — all cell lines</a></td><td>GM12878, HepG2, LNCaP и др. / GM12878, HepG2, LNCaP and more</td><td>Мутации CRE-сайтов снижают индукцию промотора CD55 в контексте HCV core; CRE/CREB также идёт рядом с KLF4. В нашем окне K562 подтверждён ATF1 — тот же CRE, другой член семейства.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3558599/" target="_blank" rel="noopener">PMC3558599</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10884306/" target="_blank" rel="noopener">PMC10884306</a></td></tr><tr><td><strong>SP1</strong><br><span class="tag amber">требует проверки</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR000BKO/" target="_blank" rel="noopener"><code>ENCSR000BKO</code></a> K562, Myers/HAIB<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=SP1" target="_blank" rel="noopener">SP1 — all cell lines</a></td><td>GM12878, HepG2, HeLa-S3, HEK293</td><td>Связывание SP1 функционально необходимо для активности промотора CD55.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3558599/" target="_blank" rel="noopener">PMC3558599</a></td></tr><tr><td><strong>HIF-1 (HIF1A)</strong><br><span class="tag red">пробел</span></td><td>Нет в ENCODE / not in ENCODE<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=HIF1A" target="_blank" rel="noopener">HIF1A — all cell lines</a></td><td><code>GSE145157</code> (HCT116, RKO, A549, H460, 24 h hypoxia) · MCF-7 · DLD-1 + TIG-3 · <code>GSE16347</code> HepG2</td><td>Работы по гипоксии описывают HIF-зависимую индукцию CD55 и предполагаемые HIF-1-сайты в промоторе.</td><td><a href="https://ashpublications.org/blood/article/117/23/e207/22454/High-resolution-genome-wide-mapping-of-HIF-binding" target="_blank" rel="noopener">Blood 2011</a> · <a href="https://www.nature.com/articles/s41467-021-21687-2" target="_blank" rel="noopener">Nat Commun 2021</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3051044/" target="_blank" rel="noopener">PMC3051044</a></td></tr><tr><td><strong>PU.1 (SPI1)</strong><br><span class="tag amber">требует проверки</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR000BGQ/" target="_blank" rel="noopener"><code>ENCSR000BGQ</code></a> GM12878<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=SPI1" target="_blank" rel="noopener">SPI1 — all cell lines</a></td><td>Миелоидные и B-линии / myeloid and B-lineage lines</td><td>Аллель-зависимый эффект промотора связан с связыванием PU.1; нокдаун SPI1 снижает активность промотора в моноцитарных моделях.</td><td><strong>PMID нужно добавить / PMID still needed</strong></td></tr></tbody></table>',
+    'tbl2': '<table><thead><tr><th>Фактор</th><th>ENCODE ChIP-seq</th><th>Другие источники</th><th>Роль в регуляции CD55</th><th>Статьи</th></tr></thead><tbody><tr><td><strong>CTCF</strong><br><span class="tag green">есть в ENCODE</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR000EGM/" target="_blank" rel="noopener"><code>ENCSR000EGM</code></a> K562, Snyder lab<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=CTCF" target="_blank" rel="noopener">CTCF — all cell lines</a></td><td>Практически все линии ENCODE / essentially every ENCODE line</td><td>Не описан в литературе по CD55, но связывание прямо блокируется метилированием CpG в сайте. Пик в K562 попадает на CpG #43–86 — внутрь значимого кластера.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10325916/" target="_blank" rel="noopener">NAR 2023</a></td></tr><tr><td><strong>NRF1</strong><br><span class="tag green">есть в ENCODE</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR494TDU/" target="_blank" rel="noopener"><code>ENCSR494TDU</code></a> K562<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=NRF1" target="_blank" rel="noopener">NRF1 — all cell lines</a></td><td>K562, GM12878, HepG2</td><td>Учебниковый чувствительный к метилированию фактор: метилирование прямо конкурирует за сайт. Пик в K562 — CpG #13–43.</td><td><a href="https://www.nature.com/articles/nature16462" target="_blank" rel="noopener">Domcke, Nature 2015</a></td></tr><tr><td><strong>ATF1</strong><br><span class="tag green">есть в ENCODE</span></td><td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=ATF1" target="_blank" rel="noopener">ATF1 — all cell lines</a></td><td>K562, GM12878, HepG2</td><td>Член семейства CREB/ATF, связывает тот же CRE (TGACGTCA) и гетеродимеризуется с CREB1. CRE-модуль из литературы по CD55 занят в K562 — под именем паралога.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3558599/" target="_blank" rel="noopener">PMC3558599</a></td></tr><tr><td><strong>DNMT3B</strong><br><span class="tag red">пробел</span></td><td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=DNMT3B" target="_blank" rel="noopener">DNMT3B — all cell lines</a></td><td>Пик в этом окне — только HepG2 / peak in this window: HepG2 only</td><td>Де-ново метилтрансфераза — именно она ставила бы метку, если подтвердится. В K562 эксперимента нет — ни подтвердить, ни исключить нельзя.</td><td><a href="https://www.nature.com/articles/nrg.2016.83" target="_blank" rel="noopener">Nat Rev Genet 2016</a></td></tr><tr><td><strong>EP300 / p300</strong><br><span class="tag blue">контекст</span></td><td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=EP300" target="_blank" rel="noopener">EP300 — all cell lines</a></td><td>K562 ✓</td><td>Коактиватор, не сайт-специфичный. Подтверждает, что окно — активный регуляторный модуль, а не молчащая область.</td><td>—</td></tr><tr><td><strong>POLR2A (total + Ser5-P)</strong><br><span class="tag blue">контекст</span></td><td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=POLR2A" target="_blank" rel="noopener">POLR2A — all cell lines</a></td><td>K562 ✓ (обе формы / both forms)</td><td>Запущенная и инициирующая Pol II на TSS CD55. Значит, изменение метилирования происходит в транскрипционно активном промоторе.</td><td>—</td></tr></tbody></table>',
+    'title': 'epicme.bio — каталог ТФ и ChIP-seq по CD55',
+    'toK562': 'Разбор ChIP-seq в K562 →',
+    'todo': '<li><strong>KLF4</strong> — в K562 и T-клетках не профилирован. Наборы GEO по эндотелию и репрограммированию всё равно можно пересечь с окном — с пометкой, что тип клеток не тот.</li><li><strong>SPI1</strong> — в исходном списке нет PMID на аллель-зависимый эффект PU.1/DAF. Ссылку надо прибить, а не угадать.</li><li><strong>SP1 и CREB1</strong> — эксперименты в K562 есть, но попадание IDR-пика в окно надо перепроверить по сырому bigBed (<code>bigBedToBed</code>), а не по сводному API.</li><li><strong>TFCP2</strong> — найден в K562 (<code>ENCSR998OMC</code>, CETCh-seq). Осталось посмотреть, есть ли пик в нашем окне.</li><li><strong>liftOver</strong> — ENCODE только hg38; любой набор пиков рядом с T2T-координатами надо переводить.</li>',
+    'win': 'Окно: <code>chr1:207 318 092–207 324 450</code> (GRCh38), TSS CD55 на <code>chr1:207 321 678</code>. ENCODE только hg38 — для T2T нужен liftOver hg38 → hs1.',
+    'footer': 'epicme.bio — открытый научный проект и PhD-работа Михаль (Миши) Розенвальд, лаборатории Aaron Streets &amp; Fyodor Urnov, UC Berkeley.',
+    'brand-sub': 'эпигеном · CRISPRoff · метилирование',
+    'nav-toggle-label': 'Меню'
+  },
+  en: {
+    'agg': '<ul><li><a href="http://gtrd.biouml.org" target="_blank" rel="noopener">GTRD</a> &mdash; 15&thinsp;982 human ChIP-seq experiments, 1&thinsp;391 TFs, uniform processing, per-TF metaclusters</li><li><a href="https://chip-atlas.org/peak_browser" target="_blank" rel="noopener">ChIP-Atlas</a> &mdash; filter by TF and cell-type class, one-click IGV/UCSC</li><li><a href="https://remap.univ-amu.fr/" target="_blank" rel="noopener">ReMap 2022</a> &mdash; merged non-redundant peaks per TF, UCSC track hub</li><li><a href="http://cistrome.org/db/" target="_blank" rel="noopener">Cistrome DB</a> &mdash; curated metadata with QC scores</li><li><a href="http://summit.med.unideb.hu/summitdb/" target="_blank" rel="noopener">ChIPSummitDB</a> &mdash; motif-to-summit distances; separates direct binding from co-IP</li><li><a href="https://unibind.uio.no/" target="_blank" rel="noopener">UniBind</a> &mdash; ChIP-supported <em>and</em> motif-matched only</li></ul>',
+    'back': '← Back to the home page',
+    'caveat': '<strong>Caveat.</strong> Nothing on this page was measured afresh — it is a catalogue of other people’s data with links. Two things need reading correctly. First, a missing NF-κB peak in unstimulated K562 is a condition mismatch, not evidence against binding. Second, aggregator metaclusters collapse cell types — a peak there does not mean binding in T cells.',
+    'ctcf': '<strong>Contradiction between our own pages — CTCF.</strong> The CTCF row above and the <a href="k562-chipseq.html">ChIP-seq breakdown</a> both report a peak — CpG #43–86, <code>chr1:207,320,854–207,321,372</code>. The “nobody has checked these factors” paragraph on the <a href="index.html">home page</a> says there is none. Both cannot be true, and CTCF is load-bearing for the methylation-blocks-binding hypothesis. Until this is checked against raw bigBed (<code>bigBedToBed</code> from hgdownload, not the summarised API), neither wording should be used as settled fact — here or in a dissertation chapter.',
+    'eyebrow': 'epicme.bio · reference',
+    'h1': 'CD55 transcription factor catalogue: where the ChIP-seq lives',
+    'h2a': 'Part 1 — published CD55 regulators',
+    'h2b': 'Part 2 — the rest, by importance for CD55',
+    'h2c': 'Aggregators — where to look next',
+    'h2d': 'Still open',
+    'lede': 'A factor-by-factor list of every public binding dataset for the transcription factors the literature links to CD55 (DAF) regulation, plus the factors that actually sit in our K562 window. Direct ENCODE accessions where they were verified one by one, filter queries where they were not, and honest labels where the data simply does not exist.',
+    'nav-about': 'About',
+    'nav-browser': 'Genome browser',
+    'nav-chaple': 'CHAPLE syndrome',
+    'nav-chipseq': 'ChIP-seq',
+    'nav-emseq': 'EM-seq · Day 35',
+    'nav-hgsoc': 'CD55 in ovarian cancer',
+    'nav-home': 'Home',
+    'nav-k562': 'K562',
+    'nav-memory': 'Methylation &amp; memory',
+    'nav-mesites': 'Mesites: delMC',
+    'nav-mesites-nuc': 'Mesites: delMC + nucleosomes',
+    'nav-models': 'Foundation models',
+    'nav-public': 'Public data',
+    'nav-research': 'Research Ideas/Todos',
+    'nav-struct': 'DNA structures',
+    'nav-synth': 'Synthetic ROI',
+    'nav-tcelldata': 'Public Primary T cells data',
+    'nav-tf': 'Mechanisms',
+    'nav-tfcat': 'TF catalogue',
+    'nav-toggle-label': 'Menu',
+    'nav-trauma': 'Methylation &amp; trauma',
+    'nav-upload': 'Upload data',
+    'nav-viz': 'CRISPRoff visualisations',
+    'nav-viz-movie': 'Video: the simulation',
+    'nav-zfp': 'ZFPoff vs CRISPRoff',
+    'nav-zfpsec': 'ZFPoff and CRISPRoff',
+    'nav-zfpvid': 'Video: ZFPoff vs CRISPRoff',
+    'p2a': 'Ordered exactly as in the source literature list.',
+    'p2b': 'Factors confirmed in our K562 window and mechanistically capable of explaining the LOW/HIGH difference come first; general transcriptional machinery comes last.',
+    'p2c': 'These all reprocess ENCODE and GEO uniformly and export BED/UCSC. Query the window once in each rather than hunting factor by factor.',
+    'tbl1': '<table><thead><tr><th>Factor</th><th>ENCODE ChIP-seq</th><th>Other sources</th><th>Role in CD55 regulation</th><th>References</th></tr></thead><tbody><tr><td><strong>NF-κB — RELA</strong><br><span class="tag green">in ENCODE</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR000EAG/" target="_blank" rel="noopener"><code>ENCSR000EAG</code></a> GM12878 + TNFα 6 h<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=RELA" target="_blank" rel="noopener">RELA — all cell lines</a></td><td>HepG2, K562, HeLa-S3, лимфоидные линии / HepG2, K562, HeLa-S3, lymphoid lines</td><td>Promoter mutagenesis and luciferase assays show dependence on an NF-κB site; ChIP supports binding at the CD55 promoter in colon cancer cells.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9889927/" target="_blank" rel="noopener">PMC9889927</a></td></tr><tr><td><strong>NF-κB — NFKB1 (p50)</strong><br><span class="tag green">in ENCODE</span></td><td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=NFKB1" target="_blank" rel="noopener">NFKB1 — all cell lines</a><br><a href="https://www.encodeproject.org/experiments/ENCSR387QUV/" target="_blank" rel="noopener"><code>ENCSR387QUV</code></a> RELB, GM12878 (non-canonical, bonus)</td><td>GM12878, K562</td><td>The p50 subunit of the same NF-κB complex.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9889927/" target="_blank" rel="noopener">PMC9889927</a></td></tr><tr><td><strong>TFCP2</strong><br><span class="tag amber">new — exists in K562</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR998OMC/" target="_blank" rel="noopener"><code>ENCSR998OMC</code></a> K562, CETCh-seq (Snyder lab)<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=TFCP2" target="_blank" rel="noopener">TFCP2 — all cell lines</a></td><td>SK-HEP-1 (TFCP2-HA, promoter array) — <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4311423/" target="_blank" rel="noopener">PMC4311423</a></td><td>Knockdown, site mutation and ChIP support direct TFCP2 binding to the CD55 promoter.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9889927/" target="_blank" rel="noopener">PMC9889927</a></td></tr><tr><td><strong>KLF4</strong><br><span class="tag red">gap</span></td><td>Только eGFP-KLF4 в HEK293 / eGFP-KLF4 in HEK293 only<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=KLF4" target="_blank" rel="noopener">KLF4 — all cell lines</a></td><td>GEO: эндотелий при ламинарном сдвиге, серии по репрограммированию iPSC, мышиный <code>GSE11431</code></td><td>Three CACCC boxes near the TSS; the leading proposed activator. The hypothesis stays motif-based and functional, not ChIP-confirmed in K562.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10884306/" target="_blank" rel="noopener">PMC10884306</a></td></tr><tr><td><strong>CREB (CREB1)</strong><br><span class="tag green">in ENCODE</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR000BSO/" target="_blank" rel="noopener"><code>ENCSR000BSO</code></a> K562<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=CREB1" target="_blank" rel="noopener">CREB1 — all cell lines</a></td><td>GM12878, HepG2, LNCaP и др. / GM12878, HepG2, LNCaP and more</td><td>CRE-site mutations reduce CD55 promoter induction in an HCV-core context; CRE/CREB signalling also runs alongside KLF4. In our K562 window it is ATF1 that is confirmed — same CRE, different family member.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3558599/" target="_blank" rel="noopener">PMC3558599</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10884306/" target="_blank" rel="noopener">PMC10884306</a></td></tr><tr><td><strong>SP1</strong><br><span class="tag amber">needs checking</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR000BKO/" target="_blank" rel="noopener"><code>ENCSR000BKO</code></a> K562, Myers/HAIB<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=SP1" target="_blank" rel="noopener">SP1 — all cell lines</a></td><td>GM12878, HepG2, HeLa-S3, HEK293</td><td>SP1 binding is functionally required for CD55 promoter activity.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3558599/" target="_blank" rel="noopener">PMC3558599</a></td></tr><tr><td><strong>HIF-1 (HIF1A)</strong><br><span class="tag red">gap</span></td><td>Нет в ENCODE / not in ENCODE<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=HIF1A" target="_blank" rel="noopener">HIF1A — all cell lines</a></td><td><code>GSE145157</code> (HCT116, RKO, A549, H460, 24 h hypoxia) · MCF-7 · DLD-1 + TIG-3 · <code>GSE16347</code> HepG2</td><td>Hypoxia work reports HIF-dependent CD55 induction and describes putative HIF-1 binding sites in the promoter.</td><td><a href="https://ashpublications.org/blood/article/117/23/e207/22454/High-resolution-genome-wide-mapping-of-HIF-binding" target="_blank" rel="noopener">Blood 2011</a> · <a href="https://www.nature.com/articles/s41467-021-21687-2" target="_blank" rel="noopener">Nat Commun 2021</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3051044/" target="_blank" rel="noopener">PMC3051044</a></td></tr><tr><td><strong>PU.1 (SPI1)</strong><br><span class="tag amber">needs checking</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR000BGQ/" target="_blank" rel="noopener"><code>ENCSR000BGQ</code></a> GM12878<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=SPI1" target="_blank" rel="noopener">SPI1 — all cell lines</a></td><td>Миелоидные и B-линии / myeloid and B-lineage lines</td><td>An allele-dependent CD55 promoter effect is linked to PU.1 binding; SPI1 knockdown reduces promoter activity in monocyte models.</td><td><strong>PMID нужно добавить / PMID still needed</strong></td></tr></tbody></table>',
+    'tbl2': '<table><thead><tr><th>Factor</th><th>ENCODE ChIP-seq</th><th>Other sources</th><th>Role in CD55 regulation</th><th>References</th></tr></thead><tbody><tr><td><strong>CTCF</strong><br><span class="tag green">in ENCODE</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR000EGM/" target="_blank" rel="noopener"><code>ENCSR000EGM</code></a> K562, Snyder lab<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=CTCF" target="_blank" rel="noopener">CTCF — all cell lines</a></td><td>Практически все линии ENCODE / essentially every ENCODE line</td><td>Not reported in the CD55 literature, but binding is directly blocked by CpG methylation in its site. The K562 peak falls on CpG #43–86 — inside the significant cluster.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10325916/" target="_blank" rel="noopener">NAR 2023</a></td></tr><tr><td><strong>NRF1</strong><br><span class="tag green">in ENCODE</span></td><td><a href="https://www.encodeproject.org/experiments/ENCSR494TDU/" target="_blank" rel="noopener"><code>ENCSR494TDU</code></a> K562<br><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=NRF1" target="_blank" rel="noopener">NRF1 — all cell lines</a></td><td>K562, GM12878, HepG2</td><td>The textbook methylation-sensitive factor: methylation directly competes for the site. The K562 peak sits at CpG #13–43.</td><td><a href="https://www.nature.com/articles/nature16462" target="_blank" rel="noopener">Domcke, Nature 2015</a></td></tr><tr><td><strong>ATF1</strong><br><span class="tag green">in ENCODE</span></td><td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=ATF1" target="_blank" rel="noopener">ATF1 — all cell lines</a></td><td>K562, GM12878, HepG2</td><td>A CREB/ATF family member binding the same CRE (TGACGTCA) and heterodimerising with CREB1. The CRE module implicated by the CD55 literature is occupied in K562 — under a paralog’s name.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3558599/" target="_blank" rel="noopener">PMC3558599</a></td></tr><tr><td><strong>DNMT3B</strong><br><span class="tag red">gap</span></td><td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=DNMT3B" target="_blank" rel="noopener">DNMT3B — all cell lines</a></td><td>Пик в этом окне — только HepG2 / peak in this window: HepG2 only</td><td>The de novo methyltransferase — the enzyme that would write the mark if confirmed. No K562 experiment exists, so it can be neither confirmed nor excluded here.</td><td><a href="https://www.nature.com/articles/nrg.2016.83" target="_blank" rel="noopener">Nat Rev Genet 2016</a></td></tr><tr><td><strong>EP300 / p300</strong><br><span class="tag blue">context</span></td><td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=EP300" target="_blank" rel="noopener">EP300 — all cell lines</a></td><td>K562 ✓</td><td>A coactivator, not sequence-specific. Confirms the window is an active regulatory module rather than a silent region.</td><td>—</td></tr><tr><td><strong>POLR2A (total + Ser5-P)</strong><br><span class="tag blue">context</span></td><td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_title=TF+ChIP-seq&amp;status=released&amp;target.label=POLR2A" target="_blank" rel="noopener">POLR2A — all cell lines</a></td><td>K562 ✓ (обе формы / both forms)</td><td>Engaged and initiating Pol II at the CD55 TSS. The methylation change therefore sits in a transcriptionally active promoter.</td><td>—</td></tr></tbody></table>',
+    'title': 'epicme.bio — CD55 TF catalogue and ChIP-seq',
+    'toK562': 'The K562 ChIP-seq breakdown →',
+    'todo': '<li><strong>KLF4</strong> — never profiled in K562 or T cells. The endothelial and reprogramming GEO datasets can still be intersected with the window, flagged for the wrong cell type.</li><li><strong>SPI1</strong> — the source list carries no PMID for the PU.1/DAF allele effect. That reference must be pinned, not guessed.</li><li><strong>SP1 and CREB1</strong> — K562 experiments exist, but whether an IDR peak falls in the window needs re-checking from raw bigBed (<code>bigBedToBed</code>) rather than the summarised API.</li><li><strong>TFCP2</strong> — found in K562 (<code>ENCSR998OMC</code>, CETCh-seq). What remains is checking whether it has a peak in our window.</li><li><strong>liftOver</strong> — ENCODE is hg38 only; any peak set used beside T2T coordinates has to be converted.</li>',
+    'win': 'Window: <code>chr1:207,318,092–207,324,450</code> (GRCh38), CD55 TSS at <code>chr1:207,321,678</code>. ENCODE is hg38 only — T2T work needs a liftOver hg38 → hs1.',
+    'footer': 'epicme.bio — an open science project and PhD capstone by Michal (Misha) Rozenwald, Aaron Streets &amp; Fyodor Urnov labs, UC Berkeley.',
+    'brand-sub': 'epigenome · CRISPRoff · methylation',
+    'nav-toggle-label': 'Menu'
+  }
+};
+
+function applyLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var v = I18N[lang] && I18N[lang][el.getAttribute('data-i18n')];
+    if(v === undefined) return;
+    if(el.tagName === 'TITLE') el.textContent = v; else el.innerHTML = v;
+  });
+  document.querySelectorAll('#lang-switch button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+  try{ localStorage.setItem('epicme-lang', lang); }catch(e){}
+}
+document.querySelectorAll('#lang-switch button').forEach(function(b){
+  b.addEventListener('click', function(){ applyLang(b.getAttribute('data-lang')); });
+});
+(function(){
+  var saved = 'ru';
+  try{ saved = localStorage.getItem('epicme-lang') || 'ru'; }catch(e){}
+  applyLang(saved);
+})();
+
+/* Collapsing nav, mirroring index.html */
+(function(){
+  var nav = document.getElementById('site-nav');
+  var toggle = document.getElementById('nav-toggle');
+  if(!nav || !toggle) return;
+  function fits(){
+    nav.classList.toggle('nav-collapsed', window.innerWidth < 1100);
+  }
+  fits();
+  window.addEventListener('resize', fits);
+  toggle.addEventListener('click', function(){
+    var open = nav.classList.toggle('nav-open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.addEventListener('click', function(e){
+    if(nav.classList.contains('nav-collapsed') && nav.classList.contains('nav-open')
+       && !nav.contains(e.target)){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && nav.classList.contains('nav-open')){
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    }
+  });
+})();
+</script>
+<script src="assets/epicme-chat.js" defer></script>
+
+</body>
+</html>
